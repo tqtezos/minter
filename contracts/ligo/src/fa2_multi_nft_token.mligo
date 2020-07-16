@@ -20,7 +20,7 @@ type ledger = (token_id, address) big_map
 type nft_token_storage = {
   ledger : ledger;
   token_metadata : nft_meta;
-  last_used_id : token_id;
+  next_token_id : token_id;
   operators : operator_storage;
 }
 
@@ -33,7 +33,7 @@ let get_owner_hook_ops (tx_descriptors, storage
 type nft_token_storage = {
   ledger : ledger;
   token_metadata : nft_meta;
-  last_used_id : token_id;
+  next_token_id : token_id;
   operators : operator_storage;
   permissions_descriptor : permissions_descriptor;
 }

@@ -31,7 +31,7 @@ let mint_tokens (param, storage : mint_token_param * nft_token_storage)
   let minted : minted = List.fold
     (fun (acc, t : minted * token_metadata_mint) ->
       let meta : token_metadata = {
-        token_id = acc.storage.last_used_id;
+        token_id = acc.storage.next_token_id;
         symbol = t.symbol;
         name = t.name;
         decimals = 0n;
@@ -46,7 +46,7 @@ let mint_tokens (param, storage : mint_token_param * nft_token_storage)
       let new_storage = { acc.storage with
         token_metadata = new_token_metadata;
         ledger = new_ledger;
-        last_used_id = acc.storage.last_used_id + 1n;
+        next_token_id = acc.storage.next_token_id + 1n;
       } in
       {
         storage = new_storage;

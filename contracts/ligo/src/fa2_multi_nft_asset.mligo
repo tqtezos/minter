@@ -32,3 +32,17 @@ let nft_asset_main (param, storage : nft_asset_entrypoints * nft_asset_storage)
     let ops, admin = simple_admin (a, storage.admin) in
     let new_storage = { storage with admin = admin; } in
     ops, new_storage
+
+let sample_storage : nft_asset_storage = {
+  assets = {
+    ledger = (Big_map.empty : ledger);
+    token_metadata = (Big_map.empty : nft_meta);
+    next_token_id = 0n;
+    operators = (Big_map.empty : operator_storage);
+  };
+  admin = {
+    admin = ("tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU" : address);
+    pending_admin = (None : address option);
+    paused = true;
+  };
+}
