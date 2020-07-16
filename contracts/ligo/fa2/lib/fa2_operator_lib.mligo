@@ -39,6 +39,16 @@ let validate_update_operators_by_owner (update, updater : update_operator * addr
   in
   if op.owner = updater then unit else failwith fa2_not_owner
 
+let fa2_update_operators (updates_michelson, storage
+    : (update_operator_michelson list) * operator_storage) : operator_storage =
+  let updates = operator_updates_from_michelson updates_michelson in
+  let updater = Tezos.sender in
+  let process_update = (fun (ops, update : operator_storage * update_operator) ->
+    let u = validate_update_operators_by_owner (update, updater) in
+    update_operators (update, ops)
+  ) in
+  List.fold process_update updates storage
+
 (**
 Create an operator validator function based on provided operator policy.
 @param tx_policy operator_transfer_policy defining the constrains on who can transfer.
