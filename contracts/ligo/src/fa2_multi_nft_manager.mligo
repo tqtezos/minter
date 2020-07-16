@@ -17,19 +17,19 @@ type mint_token_param = {
 }
 
 
-type minted = {
+type minted1 = {
   storage : nft_token_storage;
-  reversed_new_token_ids : token_id list;
+  reversed_txs : transfer_destination_descriptor list;
 }
 
-let mint_tokens (param, storage : mint_token_param * nft_token_storage)
-    : operation list * nft_token_storage =
-  let seed : minted = { 
+let update_meta_and_create_txs (param, storage 
+    : mint_token_param * nft_token_storage) : minted1 =
+  let seed1 : minted1 = { 
     storage = storage; 
-    reversed_new_token_ids = ([] : token_id list);
+    reversed_txs = ([] : transfer_destination_descriptor list);
   } in
-  let minted : minted = List.fold
-    (fun (acc, t : minted * token_metadata_mint) ->
+  List.fold
+    (fun (acc, t : minted1 * token_metadata_mint) ->
       let meta : token_metadata = {
         token_id = acc.storage.next_token_id;
         symbol = t.symbol;
@@ -41,24 +41,57 @@ let mint_tokens (param, storage : mint_token_param * nft_token_storage)
         Layout.convert_to_right_comb meta in
       let new_token_metadata =
         Big_map.add meta.token_id meta_michelson acc.storage.token_metadata in
-      let new_ledger =
-        Big_map.add meta.token_id t.owner acc.storage.ledger in
+
       let new_storage = { acc.storage with
         token_metadata = new_token_metadata;
-        ledger = new_ledger;
         next_token_id = acc.storage.next_token_id + 1n;
       } in
+
+      let tx : transfer_destination_descriptor = {
+        to_ = Some t.owner;
+        token_id = meta.token_id;
+        amount = 1n;
+      } in
+
       {
         storage = new_storage;
-        reversed_new_token_ids = meta.token_id :: acc.reversed_new_token_ids;
+        reversed_txs = tx :: acc.reversed_txs;
       }
-    ) param.tokens seed
-  in
-  let new_tokens = List.fold
-    (fun (acc, t : token_id list * token_id) -> t :: acc) 
-    minted.reversed_new_token_ids ([] : token_id list) in
-  let callback_op = Operation.transaction new_tokens 0mutez param.callback in
-  [callback_op], minted.storage
+    ) param.tokens seed1
+
+type minted2 = {
+  txs : transfer_destination_descriptor list;
+  new_tokens : token_id list;
+}
+
+let prepare_tx_and_token_lists (reversed_txs : transfer_destination_descriptor list)
+    : minted2 =
+  (* reverse tx destination list and form alist of token ids for callback *)
+  let seed2 : minted2 = {
+    txs = ([] : transfer_destination_descriptor list);
+    new_tokens = ([] : token_id list);
+  } in
+  List.fold
+    (fun (acc, t : minted2 * transfer_destination_descriptor) -> 
+      {txs = t :: acc.txs; new_tokens = t.token_id :: acc.new_tokens; }
+    ) 
+    reversed_txs seed2
+
+let mint_tokens (param, storage : mint_token_param * nft_token_storage)
+    : operation list * nft_token_storage =
+  let mint1 = update_meta_and_create_txs (param, storage) in
+  let mint2 = prepare_tx_and_token_lists mint1.reversed_txs in
+  (* update ledger *)
+  let tx_descriptor : transfer_descriptor = {
+    from_ = (None : address option);
+    txs = mint2.txs;
+  } in
+  let nop_operator_validator = fun (p : address * operator_storage) -> unit in
+  let ops, new_storage =
+    fa2_transfer ([tx_descriptor], nop_operator_validator, mint1.storage) in 
+  let callback_op = Operation.transaction mint2.new_tokens 0mutez param.callback in
+  callback_op :: ops, new_storage
+  (* ([] : operation list), mint1.storage *)
   
 
 
