@@ -24,6 +24,10 @@ type nft_token_storage = {
   operators : operator_storage;
 }
 
+let get_owner_hook_ops (tx_descriptors, storage
+    : (transfer_descriptor list) * nft_token_storage) : operation list =
+  ([] : operation list)
+
 #else
 
 type nft_token_storage = {
@@ -34,7 +38,64 @@ type nft_token_storage = {
   permissions_descriptor : permissions_descriptor;
 }
 
+let get_owner_hook_ops (tx_descriptors, storage
+    : (transfer_descriptor list) * nft_token_storage) : operation list =
+  let tx_descriptor_param : transfer_descriptor_param = {
+    batch = tx_descriptors;
+    operator = Tezos.sender;
+  } in
+  get_owner_hook_ops_for (tx_descriptor_param, storage.permissions_descriptor)
+
 #endif
+
+(**
+Update leger balances according to the specified transfers. Fails if any of the
+permissions or constraints are violated.
+@param txs transfers to be applied to the ledger
+@param owner_validator function that validates of the tokens from the particular owner can be transferred. 
+ *)
+let transfer (txs, owner_validator, ops_storage, ledger
+    : (transfer_descriptor list) * ((address * operator_storage) -> unit) * operator_storage * ledger)
+    : ledger = 
+  let make_transfer = fun (l, tx : ledger * transfer_descriptor) ->
+    let u = match tx.from_ with
+    | None -> unit
+    | Some o -> owner_validator (o, ops_storage)
+    in
+    List.fold 
+      (fun (ll, dst : ledger * transfer_destination_descriptor) ->
+        let current_owner = Big_map.find_opt dst.token_id ll in
+        match current_owner with
+        | None -> (failwith fa2_token_undefined : ledger)
+        | Some o -> 
+          if dst.amount = 0n
+          then ll (* zero amount transfer, don't change the ledger *)
+          else if dst.amount > 0n (* invalid amount for nft *)
+          then (failwith fa2_insufficient_balance : ledger)
+          else ( 
+            let lll = match tx.from_ with
+            | None -> ll (* this is a mint transfer. do not need to update `from_` balance *)
+            | Some from_ ->
+              if from_ <> o
+              then (failwith fa2_insufficient_balance : ledger)
+              else Big_map.remove dst.token_id ll
+            in 
+            match dst.to_ with
+            | None -> lll (* this is a burn transfer. do not need to update `to_` balance *)
+            | Some to_ -> Big_map.add dst.token_id to_ lll
+          )
+      ) tx.txs l
+  in    
+  List.fold make_transfer txs ledger
+
+let fa2_transfer (tx_descriptors, validator, storage
+    : (transfer_descriptor list) * ((address * operator_storage)-> unit) * nft_token_storage)
+    : (operation list) * nft_token_storage =
+  
+  let new_ledger = transfer (tx_descriptors, validator, storage.operators, storage.ledger) in
+  let new_storage = { storage with ledger = new_ledger; } in
+  let ops = get_owner_hook_ops (tx_descriptors, storage) in
+  ops, new_storage
 
 (** 
 Retrieve the balances for the specified tokens and owners
@@ -60,16 +121,15 @@ let fa2_main (param, storage : fa2_entry_points * nft_token_storage)
   match param with
   | Transfer txs_michelson -> 
     (* convert transfer batch into `transfer_descriptor` batch *)
-    (* let txs = transfers_from_michelson txs_michelson in
-    let tx_descriptors = transfers_to_descriptors txs in *)
+    let txs = transfers_from_michelson txs_michelson in
+    let tx_descriptors = transfers_to_descriptors txs in
     (* 
     will validate that a sender is either `from_` parameter of each transfer
     or a permitted operator for the owner `from_` address.
     *)
-    (* let validator = make_default_operator_validator Tezos.sender in
+    let validator = make_default_operator_validator Tezos.sender in
 
-    fa2_transfer (tx_descriptors, validator, storage) *)
-    ([] : operation list), storage
+    fa2_transfer (tx_descriptors, validator, storage)
 
   | Balance_of pm ->
     let p = balance_of_param_from_michelson pm in
