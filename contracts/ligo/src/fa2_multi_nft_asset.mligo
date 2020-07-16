@@ -33,6 +33,8 @@ let nft_asset_main (param, storage : nft_asset_entrypoints * nft_asset_storage)
     let new_storage = { storage with admin = admin; } in
     ops, new_storage
 
+#if !OWNER_HOOKS
+
 let sample_storage : nft_asset_storage = {
   assets = {
     ledger = (Big_map.empty : ledger);
@@ -46,3 +48,5 @@ let sample_storage : nft_asset_storage = {
     paused = true;
   };
 }
+
+#endif
