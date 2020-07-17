@@ -5,7 +5,7 @@
                (list %tokens
                   (pair (pair (map %extras string string) (string %name))
                         (pair (address %owner) (string %symbol))))))
-        (list %minted nat)) ;
+        (or (list %minted nat) (pair %set_fa2_admin (address %fa2) (address %new_admin)))) ;
   storage
     (pair (pair (pair %admin (pair (address %admin) (bool %paused)) (option %pending_admin address))
                 (list %last_created_token_ids nat))
@@ -229,32 +229,72 @@
                  PAIR ;
                  DIP { DROP 5 } } ;
              DIP { DROP } }
-           { DIG 1 ;
-             DUP ;
-             DUG 2 ;
-             CDR ;
-             IF_NONE
-               { PUSH string "NO_MINT_IN_PROGRESS" ; FAILWITH }
-               { SENDER ;
+           { DUP ;
+             IF_LEFT
+               { DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CDR ;
+                 IF_NONE
+                   { PUSH string "NO_MINT_IN_PROGRESS" ; FAILWITH }
+                   { SENDER ;
+                     DIG 1 ;
+                     DUP ;
+                     DUG 2 ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { PUSH string "INVALID_CALLBACK_SENDER" ; FAILWITH }
+                        { DIG 3 ;
+                          DUP ;
+                          DUG 4 ;
+                          DIG 2 ;
+                          DUP ;
+                          DUG 3 ;
+                          DIP { DUP ; CDR ; SWAP ; CAR ; CAR } ;
+                          SWAP ;
+                          PAIR ;
+                          PAIR ;
+                          NIL operation ;
+                          PAIR } ;
+                     DIP { DROP } } ;
+                 DIP { DROP } }
+               { DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
+                 CAR ;
+                 DIG 4 ;
+                 DUP ;
+                 DUG 5 ;
+                 SWAP ;
+                 EXEC ;
                  DIG 1 ;
                  DUP ;
                  DUG 2 ;
-                 COMPARE ;
-                 NEQ ;
-                 IF { PUSH string "INVALID_CALLBACK_SENDER" ; FAILWITH }
-                    { DIG 2 ;
-                      DUP ;
-                      DUG 3 ;
-                      DIG 2 ;
-                      DUP ;
-                      DUG 3 ;
-                      DIP { DUP ; CDR ; SWAP ; CAR ; CAR } ;
-                      SWAP ;
-                      PAIR ;
-                      PAIR ;
-                      NIL operation ;
-                      PAIR } ;
-                 DIP { DROP } } ;
+                 CAR ;
+                 CONTRACT %set_admin address ;
+                 DUP ;
+                 IF_NONE
+                   { PUSH string "NO_SET_ADMIN_ENTRY_POINT" ; FAILWITH }
+                   { DUP ;
+                     PUSH mutez 0 ;
+                     DIG 5 ;
+                     DUP ;
+                     DUG 6 ;
+                     CDR ;
+                     TRANSFER_TOKENS ;
+                     DIP { DROP } } ;
+                 DIP { DROP } ;
+                 DIG 4 ;
+                 DUP ;
+                 DUG 5 ;
+                 NIL operation ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CONS ;
+                 PAIR ;
+                 DIP { DROP 3 } } ;
              DIP { DROP } } ;
          DIP { DROP 3 } } }
 

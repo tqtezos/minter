@@ -12,8 +12,14 @@ type minter_param = {
   tokens : token_metadata_mint list;
 }
 
+type set_admin_param = {
+  fa2 : address;
+  new_admin : address;
+}
+
 type minter_entrypoints =
  | Admin of simple_admin
+ | Set_fa2_admin of set_admin_param
  | Mint of minter_param
  | Minted of token_id list
 
@@ -32,6 +38,13 @@ let create_mint_op (param, mint_address : mint_tokens_param * address) : operati
   | None -> (failwith "NO_MINT_ENTRY_POINT" : operation)
   | Some c -> Operation.transaction param 0mutez c
 
+let create_set_admin_op (p : set_admin_param) : operation =
+  let set_admin_opt : address contract option =
+    Operation.get_entrypoint_opt "%set_admin" p.fa2 in
+  match set_admin_opt with
+  | None -> (failwith "NO_SET_ADMIN_ENTRY_POINT" : operation)
+  | Some c -> Operation.transaction p.new_admin 0mutez c
+
 
 type return_type = operation list * minter_storage
 
@@ -42,6 +55,11 @@ let minter_main(param, storage : minter_entrypoints * minter_storage)
     let ops, admin = simple_admin (a, storage.admin) in
     let new_storage = { storage with admin = admin; } in
     ops, new_storage
+
+  | Set_fa2_admin p ->
+    let u = fail_if_not_admin storage.admin in
+    let set_admin_op = create_set_admin_op p in
+    [set_admin_op], storage
 
   | Mint p ->
     let u = fail_if_not_admin storage.admin in
