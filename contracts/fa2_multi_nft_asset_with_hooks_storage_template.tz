@@ -1,0 +1,5 @@
+(Pair (Pair (Pair "$ADMIN" True) None)
+      (Pair (Pair (Pair {} 0)
+                  (Pair {} (Pair (Pair None (Left (Right Unit))) (Pair (Left (Left Unit)) (Left (Left Unit))))))
+            {}))
+

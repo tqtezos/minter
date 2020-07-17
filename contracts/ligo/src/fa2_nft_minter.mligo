@@ -69,3 +69,12 @@ let minter_main(param, storage : minter_entrypoints * minter_storage)
         ([] : operation list), new_storage
     )
     
+let sample_storage : minter_storage = {
+  admin = {
+    admin = ("tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU" : address);
+    pending_admin = (None : address option);
+    paused = true;
+  };
+  last_fa2_nft = (None : address option); 
+  last_created_token_ids = ([] : token_id list);
+}
