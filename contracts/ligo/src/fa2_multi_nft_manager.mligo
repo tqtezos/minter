@@ -11,9 +11,11 @@ type token_metadata_mint = {
   owner : address;
 }
 
-type mint_token_param = {
+type minted_callback = token_id list contract
+
+type mint_tokens_param = {
   tokens : token_metadata_mint list;
-  callback : token_id list contract;
+  callback : minted_callback;
 }
 
 
@@ -23,7 +25,7 @@ type minted1 = {
 }
 
 let update_meta_and_create_txs (param, storage 
-    : mint_token_param * nft_token_storage) : minted1 =
+    : mint_tokens_param * nft_token_storage) : minted1 =
   let seed1 : minted1 = { 
     storage = storage; 
     reversed_txs = ([] : transfer_destination_descriptor list);
@@ -77,7 +79,7 @@ let prepare_tx_and_token_lists (reversed_txs : transfer_destination_descriptor l
     ) 
     reversed_txs seed2
 
-let mint_tokens (param, storage : mint_token_param * nft_token_storage)
+let mint_tokens (param, storage : mint_tokens_param * nft_token_storage)
     : operation list * nft_token_storage =
   let mint1 = update_meta_and_create_txs (param, storage) in
   let mint2 = prepare_tx_and_token_lists mint1.reversed_txs in

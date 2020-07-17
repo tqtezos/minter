@@ -12,7 +12,7 @@
                    (list %update_operators
                       (or (pair %add_operator (address %owner) (address %operator))
                           (pair %remove_operator (address %owner) (address %operator)))))))
-        (pair %minter
+        (pair %mint
            (contract %callback (list nat))
            (list %tokens
               (pair (pair (map %extras string string) (string %name))

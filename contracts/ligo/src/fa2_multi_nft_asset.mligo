@@ -10,7 +10,7 @@ type nft_asset_storage = {
 
 type nft_asset_entrypoints =
   | Assets of fa2_entry_points
-  | Minter of mint_token_param
+  | Mint of mint_tokens_param
   | Admin of simple_admin
 
 
@@ -22,7 +22,7 @@ let nft_asset_main (param, storage : nft_asset_entrypoints * nft_asset_storage)
     let new_storage = { storage with assets = new_assets; } in
     ops, new_storage
 
-  | Minter mp ->
+  | Mint mp ->
     let u = fail_if_not_admin storage.admin in
     let ops, new_assets = mint_tokens (mp, storage.assets) in
     let new_storage = { storage with assets = new_assets; } in
