@@ -56,3 +56,29 @@ will be an element to also explore in future iterations.
   - Details on a particular asset
   - Ability to transfer the asset to a different address
   
+#### First Release Low-Level Requirements 
+- Metadata related to created NFTs
+     - Simple name
+     - Description
+     - Symbol
+     - General key-value pairs
+     - URL (IPFS image)
+- Contract with standard FA2 entry points
+     - Mint new tokens
+     - Transfer
+- Backend 
+     - Sandbox
+     - Indexer
+     - Database 
+     - Server
+- Frontend
+     - React
+     - Snowpack
+- Queries and Mutations (GraphQL)
+     - Tokens based on User ID / tz address
+     - NFT by ID to pull information
+- Exploration into Beacon 
+     - User to sign transactions and transfer operations
+- Exploration into IPFS
+     - Image hosting and calling for NFTs
+  
