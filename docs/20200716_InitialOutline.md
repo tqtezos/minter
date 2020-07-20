@@ -64,8 +64,6 @@ will be an element to also explore in future iterations.
      - General key-value pairs
      - URL (IPFS image)
 - Contract with standard FA2 entry points
-     - Mint new tokens
-     - Transfer
 - Backend 
      - Sandbox
      - Indexer
