@@ -1,0 +1,1 @@
+import { bootstrap } from './bootstrap-sandbox';
