@@ -1,8 +1,6 @@
 import { bootstrap } from './bootstrap-sandbox';
 import { $log } from '@tsed/logger';
 
-beforeAll(bootstrap)
-
 describe('balance of', () => {
   const tezos = bootstrap();
   it('bootstrap account', async () => {
