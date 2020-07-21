@@ -14,14 +14,14 @@ function load_contract_code(filename: string): string {
   return fs.readFileSync(filepath).toString();
 }
 
-export function originate_minter(admin: string, tz: TezosToolkit): Promise<Contract> {
+export async function originate_minter(tz: TezosToolkit, admin: string): Promise<Contract> {
   let code = load_contract_code('fa2_nft_minter.tz');
   let storage = `(Pair (Pair (Pair (Pair "${admin}" False) None) {}) None)`;
-  return originate_contract(code, storage, "minter", tz);
+  return originate_contract(tz, code, storage, "minter");
 }
 
-function originate_contract(
-  code: string, storage: any, name: string, tz: TezosToolkit): Promise<Contract> {
+async function originate_contract(
+  tz: TezosToolkit, code: string, storage: any, name: string): Promise<Contract> {
   $log.debug(`code : ${code}`);
   $log.debug(`storage: ${storage}`)
   return tz.contract
