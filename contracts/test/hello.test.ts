@@ -1,13 +1,19 @@
 import { bootstrap } from './bootstrap-sandbox';
 import { $log } from '@tsed/logger';
+import { TezosToolkit } from '@taquito/taquito';
 
 describe('balance of', () => {
-  const tezos = bootstrap();
+  let tezos: TezosToolkit;
+
+  beforeAll(async () => {
+    tezos = await bootstrap();
+  })
+
   it('bootstrap account', async () => {
     tezos.signer
       .publicKeyHash()
       .then(bootstrapKey => tezos.tz.getBalance(bootstrapKey))
-      .then(balance => $log.debug(`bootstrap account balance ${balance.toNumber() / 1000000} ꜩ`))
+      .then(balance => $log.info(`bootstrap account balance ${balance.toNumber() / 1000000} ꜩ`))
       .catch(error => $log.error(JSON.stringify(error)));
   })
 })

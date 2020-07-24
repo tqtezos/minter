@@ -20,27 +20,30 @@ export async function originate_minter(tz: TezosToolkit, admin: string): Promise
   return originate_contract(tz, code, storage, "minter");
 }
 
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function originate_contract(
   tz: TezosToolkit, code: string, storage: any, name: string): Promise<Contract> {
-  $log.debug(`code : ${code}`);
-  $log.debug(`storage: ${storage}`)
-  return tz.contract
-    .originate({
+  try {
+    const originationOp = await tz.contract.originate({
       code: code,
-      storage: storage
-    })
-    .then(originationOp => {
-      $log.debug(`originated ${name} contract. Consumed gas: ${originationOp.consumedGas}`);
-      return originationOp.contract()
-    })
-    .then(contract => {
-      $log.debug(`${name} address: ${contract.address}`);
-      return Promise.resolve(contract)
-    })
-    .catch(error => {
-      let jsonError = JSON.stringify(error, null, 2);
-      $log.error(
-        `Failed to originate ${name} contract ${jsonError}`);
-      return Promise.reject(jsonError);
-    })
+      init: storage
+    });
+    $log.debug(`get originating op. address ${originationOp.contractAddress}`);
+
+    //A HACK
+    await delay(5000);
+
+    let contract = await originationOp.contract();
+    $log.debug(`originated contract ${name} with address ${contract.address}`);
+    $log.debug(`consumed gas: ${originationOp.consumedGas}`);
+    return Promise.resolve(contract);
+  } catch (error) {
+    let jsonError = JSON.stringify(error, null, 2);
+    $log.fatal(`${name} origination error ${JSON.stringify(error, null, 2)}`);
+    throw error;
+  }
+
 }
