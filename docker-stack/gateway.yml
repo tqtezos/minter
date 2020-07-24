@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+  gateway:
+    image: nginx
+    ports:
+      - ${NGINX_PORT}:80
+    volumes:
+      - ${PROJECT_ROOT_DIR}/docker-stack/nginx.conf:/etc/nginx/nginx.conf:ro

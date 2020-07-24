@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+  ui:
+    image: minter-ui-dev
+    volumes:
+      - ${PROJECT_ROOT_DIR}/client/src:/usr/src/app/client/src
+    ports:
+      - 3000:3000
