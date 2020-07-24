@@ -22,6 +22,7 @@
     "@taquito/taquito": "^6.3.4-beta.0",
     "@taquito/tezbridge-signer": "^6.3.4-beta.0",
     "@tsed/logger": "^5.5.2",
+    "child_process": "^1.0.2",
     "source-map-support": "^0.5.19"
   }
 }

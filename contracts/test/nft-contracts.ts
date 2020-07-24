@@ -1,6 +1,5 @@
 import { $log } from '@tsed/logger';
-import * as fs from 'fs';
-import * as path from 'path';
+import { compile_and_load_contract } from './ligo';
 import { TezosToolkit } from '@taquito/taquito';
 import { Operation } from '@taquito/taquito/dist/types/operations/operations';
 import { ContractAbstraction } from '@taquito/taquito/dist/types/contract';
@@ -9,26 +8,24 @@ import { ContractProvider } from '@taquito/taquito/dist/types/contract/interface
 
 export type Contract = ContractAbstraction<ContractProvider>;
 
-function load_contract_code(filename: string): string {
-  const filepath = path.join(__dirname, '../ligo/out/', filename);
-  return fs.readFileSync(filepath).toString();
-}
 
 export async function originate_minter(tz: TezosToolkit, admin: string): Promise<Contract> {
-  const code = load_contract_code('fa2_nft_minter.tz');
+  const code = await compile_and_load_contract(
+    'fa2_nft_minter.mligo', 'minter_main', 'fa2_nft_minter.tz');
   const storage =
     `(Pair (Pair (Pair (Pair "${admin}" False) None) {}) None)`;
   return originate_contract(tz, code, storage, "minter");
 }
 
 export async function originate_nft(tz: TezosToolkit, admin: string): Promise<Contract> {
-  const code = load_contract_code('fa2_multi_nft_asset.tz');
+  const code = await compile_and_load_contract(
+    'fa2_multi_nft_asset.mligo', 'nft_asset_main', 'fa2_multi_nft_asset.tz');
   const storage = `(Pair (Pair (Pair "${admin}" True) None) (Pair (Pair {} 0) (Pair {} {})))`;
   return originate_contract(tz, code, storage, "nft");
 }
 
 function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise<void>(resolve => setTimeout(resolve, ms));
 }
 
 async function originate_contract(
