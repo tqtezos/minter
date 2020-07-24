@@ -42,7 +42,7 @@ async function originate_contract(
     return Promise.resolve(contract);
   } catch (error) {
     let jsonError = JSON.stringify(error, null, 2);
-    $log.fatal(`${name} origination error ${JSON.stringify(error, null, 2)}`);
+    $log.fatal(`${name} origination error ${jsonError}`);
     throw error;
   }
 
