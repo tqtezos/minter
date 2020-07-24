@@ -8,7 +8,7 @@ export async function bootstrap(): Promise<TezosToolkit> {
   const testAccountKey = 'edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx';
   const signer = await InMemorySigner.fromSecretKey(testAccountKey);
   tezos.setProvider({
-    signer: signer,
+    signer,
     rpc: 'http://localhost:20000',
   });
   // await importKey(tezos, testAccountKey);

@@ -10,20 +10,20 @@ import { ContractProvider } from '@taquito/taquito/dist/types/contract/interface
 export type Contract = ContractAbstraction<ContractProvider>;
 
 function load_contract_code(filename: string): string {
-  let filepath = path.join(__dirname, '../ligo/out/', filename);
+  const filepath = path.join(__dirname, '../ligo/out/', filename);
   return fs.readFileSync(filepath).toString();
 }
 
 export async function originate_minter(tz: TezosToolkit, admin: string): Promise<Contract> {
-  let code = load_contract_code('fa2_nft_minter.tz');
-  let storage =
+  const code = load_contract_code('fa2_nft_minter.tz');
+  const storage =
     `(Pair (Pair (Pair (Pair "${admin}" False) None) {}) None)`;
   return originate_contract(tz, code, storage, "minter");
 }
 
 export async function originate_nft(tz: TezosToolkit, admin: string): Promise<Contract> {
-  let code = load_contract_code('fa2_multi_nft_asset.tz');
-  let storage = `(Pair (Pair (Pair "${admin}" True) None) (Pair (Pair {} 0) (Pair {} {})))`;
+  const code = load_contract_code('fa2_multi_nft_asset.tz');
+  const storage = `(Pair (Pair (Pair "${admin}" True) None) (Pair (Pair {} 0) (Pair {} {})))`;
   return originate_contract(tz, code, storage, "nft");
 }
 
