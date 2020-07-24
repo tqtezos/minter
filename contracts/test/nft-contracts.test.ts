@@ -25,5 +25,4 @@ describe('initialize', () => {
     $log.debug(`nft ${nft.address}`);
   })
 
-  test('stub', () => undefined)
 })
