@@ -21,10 +21,10 @@ describe('initialize', () => {
     nft = await originate_nft(tezos.bob, minter.address);
   })
 
-  test('check origination', () => {
-    $log.debug(`minter ${minter.address}`);
-    $log.debug(`nft ${nft.address}`);
-  })
+  // test('check origination', () => {
+  //   $log.debug(`minter ${minter.address}`);
+  //   $log.debug(`nft ${nft.address}`);
+  // })
 
   async function mint_token(tz: TezosToolkit, symbol: string, name: string, owner: string): Promise<void> {
     const op = await minter.methods.mint(nft.address, [{
@@ -38,11 +38,11 @@ describe('initialize', () => {
     return Promise.resolve();
   }
 
-  // test('mint token', async () => {
-  //   const bobAddress = await tezos.bob.signer.publicKeyHash();
-  //   $log.info('minting')
-  //   await mint_token(tezos.bob, 'TK1', 'A token', bobAddress);
-  //   $log.info('minted');
-  // })
+  test('mint token', async () => {
+    const bobAddress = await tezos.bob.signer.publicKeyHash();
+    $log.info('minting')
+    await mint_token(tezos.bob, 'TK1', 'A token', bobAddress);
+    $log.info('minted');
+  })
 
 })

@@ -32,13 +32,6 @@ async function run_cmd(cwd: string, cmd: string): Promise<void> {
   return new Promise<void>((resolve, reject) => child.exec(
     cmd,
     { cwd },
-    (err, stdoput, errout) => {
-      if (errout)
-        reject(errout);
-      else {
-        $log.info(`ligo: ${stdoput}`)
-        resolve();
-      }
-    }
+    (err, stdout, errout) => errout ? reject(errout) : resolve()
   ));
 }
