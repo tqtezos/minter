@@ -7,7 +7,6 @@ describe('balance of', () => {
 
   beforeAll(async () => {
     tezos = await bootstrap();
-    return Promise.resolve();
   })
 
   test('bootstrap account', async () => {

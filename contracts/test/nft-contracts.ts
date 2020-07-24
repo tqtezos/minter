@@ -49,7 +49,7 @@ async function originate_contract(
   } catch (error) {
     const jsonError = JSON.stringify(error, null, 2);
     $log.fatal(`${name} origination error ${jsonError}`);
-    throw error;
+    return Promise.reject(error);
   }
 
 }

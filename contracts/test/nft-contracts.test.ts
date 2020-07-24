@@ -12,18 +12,18 @@ describe('initialize', () => {
 
   beforeAll(async () => {
     tezos = await bootstrap();
-    return Promise.resolve();
   })
 
   beforeEach(async () => {
     const admin = await tezos.signer.publicKeyHash();
     minter = await originate_minter(tezos, admin);
     nft = await originate_nft(tezos, minter.address);
-    return Promise.resolve();
   })
 
   test('check origination', () => {
     $log.debug(`minter ${minter.address}`);
     $log.debug(`nft ${nft.address}`);
   })
+
+  test('stub', () => undefined)
 })
