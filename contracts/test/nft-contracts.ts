@@ -7,7 +7,7 @@ import { ContractAbstraction } from '@taquito/taquito/dist/types/contract';
 import { ContractProvider } from '@taquito/taquito/dist/types/contract/interface';
 
 
-type Contract = ContractAbstraction<ContractProvider>;
+export type Contract = ContractAbstraction<ContractProvider>;
 
 function load_contract_code(filename: string): string {
   let filepath = path.join(__dirname, '../ligo/out/', filename);
@@ -16,8 +16,15 @@ function load_contract_code(filename: string): string {
 
 export async function originate_minter(tz: TezosToolkit, admin: string): Promise<Contract> {
   let code = load_contract_code('fa2_nft_minter.tz');
-  let storage = `(Pair (Pair (Pair (Pair "${admin}" False) None) {}) None)`;
+  let storage =
+    `(Pair (Pair (Pair (Pair "${admin}" False) None) {}) None)`;
   return originate_contract(tz, code, storage, "minter");
+}
+
+export async function originate_nft(tz: TezosToolkit, admin: string): Promise<Contract> {
+  let code = load_contract_code('fa2_multi_nft_asset.tz');
+  let storage = `(Pair (Pair (Pair "${admin}" True) None) (Pair (Pair {} 0) (Pair {} {})))`;
+  return originate_contract(tz, code, storage, "nft");
 }
 
 function delay(ms: number) {
@@ -31,14 +38,13 @@ async function originate_contract(
       code: code,
       init: storage
     });
-    $log.debug(`get originating op. address ${originationOp.contractAddress}`);
 
     //A HACK
     await delay(5000);
 
     let contract = await originationOp.contract();
-    $log.debug(`originated contract ${name} with address ${contract.address}`);
-    $log.debug(`consumed gas: ${originationOp.consumedGas}`);
+    $log.info(`originated contract ${name} with address ${contract.address}`);
+    $log.info(`consumed gas: ${originationOp.consumedGas}`);
     return Promise.resolve(contract);
   } catch (error) {
     let jsonError = JSON.stringify(error, null, 2);
