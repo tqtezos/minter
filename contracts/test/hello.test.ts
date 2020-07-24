@@ -7,9 +7,10 @@ describe('balance of', () => {
 
   beforeAll(async () => {
     tezos = await bootstrap();
+    return Promise.resolve();
   })
 
-  it('bootstrap account', async () => {
+  test('bootstrap account', async () => {
     tezos.signer
       .publicKeyHash()
       .then(bootstrapKey => tezos.tz.getBalance(bootstrapKey))
