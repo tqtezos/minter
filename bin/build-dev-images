@@ -4,4 +4,4 @@ set -e
 
 docker build -t bashcurl -f docker/bashcurl.dockerfile docker/
 docker build -t minter-api-dev -f docker/api-dev.dockerfile .
-# docker build -t minter-ui-dev -f docker/ui-dev.dockerfile .
+docker build -t minter-ui-dev -f docker/ui-dev.dockerfile .

@@ -20,6 +20,7 @@ docker stack deploy \
        -c $DOCKER_STACK_DIR/network.yml \
        -c $DOCKER_STACK_DIR/postgres.yml \
        -c $DOCKER_STACK_DIR/gateway.yml \
+       -c $UI_STACK_FILE \
        $STACK_NAME
 
 ENV_START_SCRIPT=$PROJECT_ROOT_DIR/bin/${ENV_NAME}/start
