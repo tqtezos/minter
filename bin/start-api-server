@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -e
+
+source ${BASH_SOURCE%/*}/setup-env
+
+npx nodemon \
+    --watch $PROJECT_ROOT_DIR/server/src/ \
+    --ext ts,tsx --exec ts-node \
+    --files $PROJECT_ROOT_DIR/server/src/index.ts

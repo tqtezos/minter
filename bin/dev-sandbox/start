@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -e
+
+mkdir -p $TZ_INDEX_DB_PATH
+mkdir -p $FLEXTESA_DATA_DIR
+
+docker stack deploy \
+       -c $DOCKER_STACK_DIR/flextesa.yml \
+       $STACK_NAME
+
+export CHAIN_ID=$(docker run --rm -it --network=${STACK_NAME}_default \
+                         -e TEZOS_RPC_URL=${TEZOS_RPC_URL} \
+                         -v $PROJECT_ROOT_DIR/bin/chain-id:/bin/chain-id \
+                         bashcurl bash -c "/bin/chain-id 2> /dev/null")
+
+echo "Chain id: " $CHAIN_ID
+
+docker stack deploy \
+       -c $DOCKER_STACK_DIR/tzindex.yml \
+       -c $DOCKER_STACK_DIR/tzstats.yml \
+       $STACK_NAME

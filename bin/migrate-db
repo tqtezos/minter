@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+SQL_DIR=$(cd ${BASH_SOURCE%/*}/.. && echo $PWD/db)
+echo "Using SQL from $SQL_DIR"
+
+docker run --network=${STACK_NAME}_default --rm \
+       -v ${SQL_DIR}:/flyway/sql flyway/flyway \
+       -url=jdbc:postgresql://$POSTGRES_HOST:$POSTGRES_PORT/postgres \
+       -user=$POSTGRES_USER \
+       -password=$POSTGRES_PASSWORD \
+       migrate

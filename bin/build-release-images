@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -e
+
+docker build -t bashcurl -f docker/bashcurl.dockerfile docker/
+docker build -t minter-api -f docker/api.dockerfile .
+docker build -t minter-ui -f docker/ui.dockerfile .

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+cd $(dirname $0)
+
+./stop
+
+if [[ $@ =~ "--hard" ]]
+then
+  ./reset --confirm
+fi
+
+./start
