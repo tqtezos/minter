@@ -26,6 +26,7 @@ function signer_to_toolkit(signer: Signer): TezosToolkit {
   tezos.setProvider({
     signer,
     rpc: 'http://localhost:20000',
+    config: { confirmationPollingIntervalSecond: 3 }
   });
   return tezos;
 }

@@ -37,7 +37,7 @@ async function originate_contract(
     });
 
     //A HACK
-    await delay(5000);
+    // await delay(5000);
 
     const contract = await originationOp.contract();
     $log.info(`originated contract ${name} with address ${contract.address}`);
