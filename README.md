@@ -64,11 +64,12 @@ Docker development images are set up to reload server and web ui on source code
 changes.
 
 To setup this project for an IDE, you will want to install NPM dependencies
-outside of Docker:
+outside of Docker. Make sure you have [Yarn](https://yarnpkg.com)
+(version `1.22.x` or above) installed:
 
 ```sh
-pushd client; yarn install; popd
-pushd server; yarn install; popd
+pushd client; yarn; popd
+pushd server; yarn; popd
 ```
 
 By default `bin/start` starts sandbox environment. To run against public tezos

@@ -8,9 +8,6 @@ services:
       # this is accessed from the browser
       TZSTATS_API_URL: http://localhost:${TZ_INDEX_PORT}
     ports:
-      # FIXME for some reason wrong port is mapped when
-      # using variable
-      #- "${TZSTATS_PORT}:8000"
       - 3001:8000
     depends_on:
       - tzindex

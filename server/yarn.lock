@@ -1017,11 +1017,6 @@ blakejs@^1.1.0:
   resolved "https://registry.yarnpkg.com/blakejs/-/blakejs-1.1.0.tgz#69df92ef953aa88ca51a32df6ab1c54a155fc7a5"
   integrity sha1-ad+S75U6qIylGjLfarHFShVfx6U=
 
-bluebird@^3.7.2:
-  version "3.7.2"
-  resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
-  integrity sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==
-
 bn.js@^4.4.0:
   version "4.11.8"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.8.tgz#2cde09eb5ee341f484746bb0309b3253b1b1442f"
@@ -1356,13 +1351,6 @@ configstore@^5.0.1:
     unique-string "^2.0.0"
     write-file-atomic "^3.0.0"
     xdg-basedir "^4.0.0"
-
-connect-session-knex@^1.5.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/connect-session-knex/-/connect-session-knex-1.6.0.tgz#daeeab6d0518bbf02db5d627c9904d29c19248db"
-  integrity sha512-iU4cc/khw20lOjW9fPw0dS3XT72IgRxYzh8ZYpQmvuPxNl42zcr7kq/gJL9JnsBDCqQQ1gnWwdiQbxN1rpJuHg==
-  dependencies:
-    bluebird "^3.7.2"
 
 console-control-strings@^1.0.0, console-control-strings@~1.1.0:
   version "1.1.0"
