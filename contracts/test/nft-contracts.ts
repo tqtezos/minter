@@ -1,5 +1,6 @@
 import { $log } from '@tsed/logger';
 import * as path from 'path';
+import { BigNumber } from 'bignumber.js'
 import { compileAndLoadContract, defaultEnv, LigoEnv } from './ligo';
 import { TezosToolkit } from '@taquito/taquito';
 import { Operation } from '@taquito/taquito/dist/types/operations/operations';
@@ -9,6 +10,17 @@ import { ContractProvider } from '@taquito/taquito/dist/types/contract/interface
 
 export type Contract = ContractAbstraction<ContractProvider>;
 
+interface AdminStorage {
+  admin: string;
+  pending_admin?: string;
+  paused: boolean;
+}
+
+export interface MinterStorage {
+  admin: AdminStorage;
+  last_fa2_nft?: string;
+  last_created_token_ids: number[];
+}
 
 export async function originateMinter(tz: TezosToolkit, admin: string): Promise<Contract> {
   const code = await compileAndLoadContract(defaultEnv,
@@ -23,6 +35,14 @@ export async function originateNft(tz: TezosToolkit, admin: string): Promise<Con
     'fa2_multi_nft_asset.mligo', 'nft_asset_main', 'fa2_multi_nft_asset.tz');
   const storage = `(Pair (Pair (Pair "${admin}" True) None) (Pair (Pair {} 0) (Pair {} {})))`;
   return originateContract(tz, code, storage, "nft");
+}
+
+export interface InspectorStorage {
+  balance: BigNumber,
+  request: {
+    owner: string,
+    token_id: BigNumber
+  }
 }
 
 export async function originateInspector(tz: TezosToolkit): Promise<Contract> {
