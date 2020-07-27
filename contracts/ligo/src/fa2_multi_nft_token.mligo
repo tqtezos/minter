@@ -48,6 +48,25 @@ let get_owner_hook_ops (tx_descriptors, storage
 
 #endif
 
+let dec_balance(owner, token_id, ledger : address option * token_id * ledger) : ledger =
+  match owner with
+  | None -> ledger (* this is mint transfer, don't change the ledger *)
+  | Some o -> (
+    let current_owner = Big_map.find_opt token_id ledger in
+    match current_owner with
+    | None -> (failwith fa2_insufficient_balance : ledger)
+    | Some cur_o -> 
+      if cur_o = o
+      then Big_map.remove token_id ledger
+      else (failwith fa2_insufficient_balance : ledger)
+  )
+
+let inc_balance(owner, token_id, ledger : address option * token_id * ledger) : ledger =
+  match owner with
+  | None -> ledger (* this is burn transfer, don't change the ledger *)
+  | Some o -> Big_map.add token_id o ledger
+
+
 (**
 Update leger balances according to the specified transfers. Fails if any of the
 permissions or constraints are violated.
@@ -64,26 +83,13 @@ let transfer (txs, owner_validator, ops_storage, ledger
     in
     List.fold 
       (fun (ll, dst : ledger * transfer_destination_descriptor) ->
-        let current_owner = Big_map.find_opt dst.token_id ll in
-        match current_owner with
-        | None -> (failwith fa2_token_undefined : ledger)
-        | Some o -> 
-          if dst.amount = 0n
-          then ll (* zero amount transfer, don't change the ledger *)
-          else if dst.amount > 0n (* invalid amount for nft *)
-          then (failwith fa2_insufficient_balance : ledger)
-          else ( 
-            let lll = match tx.from_ with
-            | None -> ll (* this is a mint transfer. do not need to update `from_` balance *)
-            | Some from_ ->
-              if from_ <> o
-              then (failwith fa2_insufficient_balance : ledger)
-              else Big_map.remove dst.token_id ll
-            in 
-            match dst.to_ with
-            | None -> lll (* this is a burn transfer. do not need to update `to_` balance *)
-            | Some to_ -> Big_map.add dst.token_id to_ lll
-          )
+        if dst.amount > 1n
+        then (failwith fa2_insufficient_balance : ledger)
+        else if dst.amount = 0n
+        then ll (* zero transfer, don't change the ledger *)
+        else
+          let lll = dec_balance (tx.from_, dst.token_id, ll) in
+          inc_balance(dst.to_, dst.token_id, lll)
       ) tx.txs l
   in    
   List.fold make_transfer txs ledger
