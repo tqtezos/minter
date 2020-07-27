@@ -4,6 +4,7 @@ import { $log } from '@tsed/logger';
 import {
   Contract, originateMinter, originateNft, originateInspector,
   address, MinterStorage, MinterTokenMetadata,
+  Fa2Transfer,
   InspectorStorage, InspectorStorageState, BalanceOfRequest
 } from './nft-contracts'
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
@@ -83,15 +84,11 @@ describe('initialize', () => {
     expect(bobHasToken).toBe(true);
   })
 
-  async function transferNft(operator: TezosToolkit, from_: address, to_: address,
-    tokenId: number): Promise<void> {
+  async function transferNfts(operator: TezosToolkit, txs: Fa2Transfer[]): Promise<void> {
     $log.info('transferring');
     const nftWithOperator = await operator.contract.at(nft.address);
 
-    const op = await nftWithOperator.methods.transfer([{
-      from_,
-      txs: [{ to_, token_id: tokenId, amount: 1 }]
-    }]).send();
+    const op = await nftWithOperator.methods.transfer(txs).send();
 
     const hash = await op.confirmation(3);
     $log.info(`consumed gas: ${op.consumedGas}`);
@@ -118,7 +115,13 @@ describe('initialize', () => {
     expect(aliceHasATokenBefore).toBe(false);
     expect(bobHasATokenBefore).toBe(true);
 
-    await transferNft(tezos.bob, bobAddress, aliceAddress, tokenId);
+    await transferNfts(tezos.bob,
+      [
+        {
+          from_: bobAddress,
+          txs: [{ to_: aliceAddress, token_id: tokenId, amount: 1 }]
+        }
+      ]);
 
     const [aliceHasATokenAfter, bobHasATokenAfter] = await hasTokens([
       { owner: aliceAddress, token_id: tokenId },

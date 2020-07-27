@@ -39,6 +39,17 @@ export async function originateMinter(tz: TezosToolkit, admin: address): Promise
   return originateContract(tz, code, storage, "minter");
 }
 
+export interface Fa2TransferDestination {
+  to_?: address;
+  token_id: number;
+  amount: number;
+}
+
+export interface Fa2Transfer {
+  from_?: address;
+  txs: Fa2TransferDestination[];
+}
+
 export async function originateNft(tz: TezosToolkit, admin: address): Promise<Contract> {
   const code = await compileAndLoadContract(defaultEnv,
     'fa2_multi_nft_asset.mligo', 'nft_asset_main', 'fa2_multi_nft_asset.tz');
