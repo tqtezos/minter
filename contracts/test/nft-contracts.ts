@@ -1,5 +1,6 @@
 import { $log } from '@tsed/logger';
-import { compile_and_load_contract } from './ligo';
+import * as path from 'path';
+import { compileAndLoadContract, defaultEnv, LigoEnv } from './ligo';
 import { TezosToolkit } from '@taquito/taquito';
 import { Operation } from '@taquito/taquito/dist/types/operations/operations';
 import { ContractAbstraction } from '@taquito/taquito/dist/types/contract';
@@ -9,26 +10,36 @@ import { ContractProvider } from '@taquito/taquito/dist/types/contract/interface
 export type Contract = ContractAbstraction<ContractProvider>;
 
 
-export async function originate_minter(tz: TezosToolkit, admin: string): Promise<Contract> {
-  const code = await compile_and_load_contract(
+export async function originateMinter(tz: TezosToolkit, admin: string): Promise<Contract> {
+  const code = await compileAndLoadContract(defaultEnv,
     'fa2_nft_minter.mligo', 'minter_main', 'fa2_nft_minter.tz');
   const storage =
     `(Pair (Pair (Pair (Pair "${admin}" False) None) {}) None)`;
-  return originate_contract(tz, code, storage, "minter");
+  return originateContract(tz, code, storage, "minter");
 }
 
-export async function originate_nft(tz: TezosToolkit, admin: string): Promise<Contract> {
-  const code = await compile_and_load_contract(
+export async function originateNft(tz: TezosToolkit, admin: string): Promise<Contract> {
+  const code = await compileAndLoadContract(defaultEnv,
     'fa2_multi_nft_asset.mligo', 'nft_asset_main', 'fa2_multi_nft_asset.tz');
   const storage = `(Pair (Pair (Pair "${admin}" True) None) (Pair (Pair {} 0) (Pair {} {})))`;
-  return originate_contract(tz, code, storage, "nft");
+  return originateContract(tz, code, storage, "nft");
+}
+
+export async function originateInspector(tz: TezosToolkit): Promise<Contract> {
+  const inspectorSrcDir = path.join(defaultEnv.cwd, 'fa2_clients');
+  const env = new LigoEnv(defaultEnv.cwd, inspectorSrcDir, defaultEnv.outDir);
+
+  const code = await compileAndLoadContract(env,
+    'inspector.mligo', 'main', 'inspector.tz');
+  const storage = `(Left Unit)`;
+  return originateContract(tz, code, storage, "inspector");
 }
 
 function delay(ms: number) {
   return new Promise<void>(resolve => setTimeout(resolve, ms));
 }
 
-async function originate_contract(
+async function originateContract(
   tz: TezosToolkit, code: string, storage: any, name: string): Promise<Contract> {
   try {
     const originationOp = await tz.contract.originate({

@@ -8,7 +8,7 @@ type TestKeys = {
   alice: Signer
 }
 
-async function flextesa_keys(): Promise<TestKeys> {
+async function flextesaKeys(): Promise<TestKeys> {
   const bobK = InMemorySigner.fromSecretKey('edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx');
   const aliceK = InMemorySigner.fromSecretKey('edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq');
   const [bob, alice] = await Promise.all([bobK, aliceK]);
@@ -21,7 +21,7 @@ export type TestTz = {
   alice: TezosToolkit;
 }
 
-function signer_to_toolkit(signer: Signer): TezosToolkit {
+function signerToToolkit(signer: Signer): TezosToolkit {
   const tezos = new TezosToolkit();
   tezos.setProvider({
     signer,
@@ -32,10 +32,10 @@ function signer_to_toolkit(signer: Signer): TezosToolkit {
 }
 
 export async function bootstrap(): Promise<TestTz> {
-  const { bob, alice } = await flextesa_keys();
+  const { bob, alice } = await flextesaKeys();
   const result = {
-    bob: signer_to_toolkit(bob),
-    alice: signer_to_toolkit(alice)
+    bob: signerToToolkit(bob),
+    alice: signerToToolkit(alice)
   };
   return Promise.resolve(result);
 }
