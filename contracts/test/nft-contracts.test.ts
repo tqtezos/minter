@@ -74,6 +74,28 @@ describe('initialize', () => {
     return Promise.resolve();
   }
 
+  async function addOperator(owner: TezosToolkit, operator: address): Promise<void> {
+    $log.info('adding operator')
+    const nftWithOwner = await owner.contract.at(nft.address);
+    const ownerAddress = await owner.signer.publicKeyHash();
+    const op = await nftWithOwner.methods.update_operators([
+      {
+        add_operator: {
+          owner: ownerAddress,
+          operator
+        }
+      }
+    ]).send()
+    await op.confirmation(3);
+    $log.info(`consumed gas: ${op.consumedGas}`)
+    return Promise.resolve();
+  }
+
+  // test.only('update_operators', async () => {
+  //   const bobAddress = await tezos.bob.signer.publicKeyHash();
+  //   await addOperator(tezos.alice, bobAddress);
+  // });
+
   // test('check origination', () => {
   //   $log.debug(`minter ${minter.address}`);
   //   $log.debug(`nft ${nft.address}`);
@@ -156,4 +178,64 @@ describe('initialize', () => {
     await expect(p).rejects.toHaveProperty('message', 'FA2_NOT_OPERATOR');
   });
 
+  test('transfer by operator', async () => {
+    const aliceAddress = await tezos.alice.signer.publicKeyHash();
+    const bobAddress = await tezos.bob.signer.publicKeyHash();
+    $log.info('minting')
+    const [tokenId1, tokenId2] = await mintTokens(tezos.bob, [
+      {
+        symbol: 'TK1',
+        name: 'A token',
+        owner: bobAddress,
+        extras: new MichelsonMap<string, string>()
+      },
+      {
+        symbol: 'TK2',
+        name: 'B token',
+        owner: aliceAddress,
+        extras: new MichelsonMap<string, string>()
+      },
+    ]);
+    $log.info(`minted tokens ${tokenId1}, ${tokenId2}`);
+
+    // check initial balances
+    const [aliceHasToken1Before, aliceHasToken2Before,
+      bobHasToken1Before, bobHasToken2Before] = await hasTokens([
+        { owner: aliceAddress, token_id: tokenId1 },
+        { owner: aliceAddress, token_id: tokenId2 },
+        { owner: bobAddress, token_id: tokenId1 },
+        { owner: bobAddress, token_id: tokenId2 },
+      ]);
+    expect(aliceHasToken1Before).toBe(false);
+    expect(aliceHasToken2Before).toBe(true);
+    expect(bobHasToken1Before).toBe(true);
+    expect(bobHasToken2Before).toBe(false);
+
+    await addOperator(tezos.alice, bobAddress)
+
+    // swap tokens
+    await transferNfts(tezos.bob, [
+      {
+        from_: bobAddress,
+        txs: [{ to_: aliceAddress, token_id: tokenId1, amount: 1 }]
+      },
+      {
+        from_: aliceAddress,
+        txs: [{ to_: bobAddress, token_id: tokenId2, amount: 1 }]
+      }
+    ]);
+
+    // check balances after the swap
+    const [aliceHasToken1After, aliceHasToken2After,
+      bobHasToken1After, bobHasToken2After] = await hasTokens([
+        { owner: aliceAddress, token_id: tokenId1 },
+        { owner: aliceAddress, token_id: tokenId2 },
+        { owner: bobAddress, token_id: tokenId1 },
+        { owner: bobAddress, token_id: tokenId2 },
+      ]);
+    expect(aliceHasToken1After).toBe(true);
+    expect(aliceHasToken2After).toBe(false);
+    expect(bobHasToken1After).toBe(false);
+    expect(bobHasToken2After).toBe(true);
+  });
 })
