@@ -46,6 +46,11 @@ export async function originateNft(tz: TezosToolkit, admin: address): Promise<Co
   return originateContract(tz, code, storage, "nft");
 }
 
+export interface BalanceOfRequest {
+  owner: address;
+  token_id: number;
+}
+
 export interface InspectorStorage {
   balance: BigNumber,
   request: {

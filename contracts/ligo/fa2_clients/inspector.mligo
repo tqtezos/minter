@@ -2,12 +2,12 @@
 #include "../fa2/lib/fa2_convertors.mligo"
 
 type storage =
-  | State of balance_of_response
+  | State of balance_of_response list
   | Empty
 
 type query_param = {
   fa2 : address;
-  request : balance_of_request_michelson;
+  requests : balance_of_request_michelson list;
 }
 
 type param =
@@ -21,7 +21,7 @@ let main (p, s : param * storage) : (operation list) * storage =
   | Query q ->
     (* preparing balance_of request and invoking FA2 *)
     let aux : balance_of_param_aux = {
-      requests = [ q.request ];
+      requests = q.requests;
       callback =
         (Operation.get_entrypoint "%response" Current.self_address :
           (balance_of_response_michelson list) contract);
@@ -43,11 +43,6 @@ let main (p, s : param * storage) : (operation list) * storage =
       )
       responses_michelson
     in
-    let new_s = 
-      match responses with 
-      | b :: tl -> b
-      | [] -> (failwith "invalid response" : balance_of_response)
-    in
-    ([] : operation list), State new_s
+    ([] : operation list), State responses
 
   | Default u -> ([] : operation list), s

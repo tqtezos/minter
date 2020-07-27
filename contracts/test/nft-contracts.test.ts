@@ -3,7 +3,7 @@ import { BigNumber } from 'bignumber.js'
 import { $log } from '@tsed/logger';
 import {
   Contract, originateMinter, originateNft, originateInspector,
-  address, MinterStorage, MinterTokenMetadata, InspectorStorage
+  address, MinterStorage, MinterTokenMetadata, InspectorStorage, BalanceOfRequest
 } from './nft-contracts'
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 
@@ -27,22 +27,25 @@ describe('initialize', () => {
     nft = await originateNft(tezos.bob, minter.address);
   })
 
-  async function hasToken(owner: address, tokenId: number): Promise<boolean> {
+  async function hasTokens(requests: BalanceOfRequest[]): Promise<boolean[]> {
     $log.info('checking token balance');
 
     const op = await inspector.methods.query(
-      nft.address, owner, tokenId
+      nft.address, requests
     ).send();
     const hash = await op.confirmation(3);
     $log.info(`consumed gas: ${op.consumedGas}`);
 
-    const storage = await inspector.storage<InspectorStorage>();
-    if (storage.balance.eq(1))
-      return Promise.resolve(true);
-    else if (storage.balance.eq(0))
-      return Promise.resolve(false);
-    else
-      return Promise.reject(`Invalid NFT balance ${storage.balance}`);
+    const storage = await inspector.storage<InspectorStorage[]>();
+    const results = storage.map(se => {
+      if (se.balance.eq(1))
+        return true;
+      else if (se.balance.eq(0))
+        return false;
+      else
+        throw new Error(`Invalid NFT balance ${se.balance}`);
+    });
+    return Promise.resolve(results);
   }
 
   // test('check origination', () => {
@@ -70,7 +73,7 @@ describe('initialize', () => {
       }]);
     $log.info(`minted token ${tokenId}`);
 
-    const bobHasToken = await hasToken(bobAddress, tokenId);
+    const [bobHasToken] = await hasTokens([{ owner: bobAddress, token_id: tokenId }]);
     expect(bobHasToken).toBe(true);
   })
 
@@ -102,15 +105,19 @@ describe('initialize', () => {
       }]);
     $log.info(`minted token ${tokenId}`);
 
-    const aliceHasATokenBefore = await hasToken(aliceAddress, tokenId);
-    const bobHasATokenBefore = await hasToken(bobAddress, tokenId);
+    const [aliceHasATokenBefore, bobHasATokenBefore] = await hasTokens([
+      { owner: aliceAddress, token_id: tokenId },
+      { owner: bobAddress, token_id: tokenId },
+    ]);
     expect(aliceHasATokenBefore).toBe(false);
     expect(bobHasATokenBefore).toBe(true);
 
     await transferNft(tezos.bob, bobAddress, aliceAddress, tokenId);
 
-    const aliceHasATokenAfter = await hasToken(aliceAddress, tokenId);
-    const bobHasATokenAfter = await hasToken(bobAddress, tokenId);
+    const [aliceHasATokenAfter, bobHasATokenAfter] = await hasTokens([
+      { owner: aliceAddress, token_id: tokenId },
+      { owner: bobAddress, token_id: tokenId },
+    ]);
     expect(aliceHasATokenAfter).toBe(true);
     expect(bobHasATokenAfter).toBe(false);
   })

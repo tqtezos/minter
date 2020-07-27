@@ -1,11 +1,11 @@
 { parameter
     (or (or (unit %default)
-            (pair %query (address %fa2) (pair %request (address %owner) (nat %token_id))))
+            (pair %query (address %fa2) (list %requests (pair (address %owner) (nat %token_id)))))
         (list %response
            (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))) ;
   storage
     (or (unit %empty)
-        (pair %state (nat %balance) (pair %request (address %owner) (nat %token_id)))) ;
+        (list %state (pair (nat %balance) (pair %request (address %owner) (nat %token_id))))) ;
   code { DUP ;
          CDR ;
          DIG 1 ;
@@ -16,12 +16,8 @@
            { DUP ;
              IF_LEFT
                { DIG 2 ; DUP ; DUG 3 ; NIL operation ; PAIR ; DIP { DROP } }
-               { NIL (pair address nat) ;
-                 DIG 1 ;
-                 DUP ;
-                 DUG 2 ;
+               { DUP ;
                  CDR ;
-                 CONS ;
                  SELF ;
                  ADDRESS ;
                  CONTRACT %response
@@ -88,13 +84,9 @@
                    PAIR ;
                    DIP { DROP 2 } } ;
              DUP ;
-             IF_CONS
-               { DUP ; DIP { DROP 2 } }
-               { PUSH string "invalid response" ; FAILWITH } ;
-             DUP ;
              RIGHT unit ;
              NIL operation ;
              PAIR ;
-             DIP { DROP 3 } } ;
+             DIP { DROP 2 } } ;
          DIP { DROP 2 } } }
 
