@@ -46,6 +46,12 @@ To stop:
 ```
 bin/stop
 ```
+You can now open:
+
+- [http://localhost:9000](http://localhost:9000) to view the application.
+- [http://localhost:9000/graphql](http://localhost:9000/graphql) to open the GraphQL playground.
+
+## Development
 
 Note names of the services printed by the start script and check their log
 output, e.g.:
@@ -53,13 +59,6 @@ output, e.g.:
 ```
 docker service logs minter-dev-sandbox_api-server --follow
 ```
-
-You can now open:
-
-- [http://localhost:9000](http://localhost:9000) to view the application.
-- [http://localhost:9000/graphql](http://localhost:9000/graphql) to open the GraphQL playground.
-
-## Development
 
 Docker development images are set up to reload server and web ui on source code
 changes.
