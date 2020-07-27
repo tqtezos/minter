@@ -137,11 +137,27 @@ export type ContractStorageMeta = {
 
 export type Mutation = {
   __typename?: "Mutation";
-  createAlias?: Maybe<User>;
+  createProfile: Profile;
+  createNonFungibleToken: NonFungibleToken;
 };
 
-export type MutationCreateAliasArgs = {
+export type MutationCreateProfileArgs = {
   alias: Scalars["String"];
+  address: Scalars["String"];
+};
+
+export type MutationCreateNonFungibleTokenArgs = {
+  token_id: Scalars["String"];
+  creator_address: Scalars["String"];
+  operation_address: Scalars["String"];
+};
+
+export type NonFungibleToken = {
+  __typename?: "NonFungibleToken";
+  id: Scalars["Int"];
+  token_id: Scalars["String"];
+  creator_address: Scalars["String"];
+  operation_address: Scalars["String"];
 };
 
 export type Operation = {
@@ -150,11 +166,33 @@ export type Operation = {
   time?: Maybe<Scalars["String"]>;
 };
 
+export type Profile = {
+  __typename?: "Profile";
+  id: Scalars["Int"];
+  alias?: Maybe<Scalars["String"]>;
+  address: Scalars["String"];
+};
+
+export type PublishedOperation = {
+  __typename?: "PublishedOperation";
+  id: Scalars["Int"];
+  address: Scalars["String"];
+  initiator_address: Scalars["String"];
+};
+
 export type Query = {
   __typename?: "Query";
-  settings: Settings;
   contractStorage?: Maybe<ContractStorage>;
   contractOperations?: Maybe<Array<Maybe<ContractOperation>>>;
+  nftByTokenId?: Maybe<NonFungibleToken>;
+  nftByCreatorAddress?: Maybe<NonFungibleToken>;
+  nftByOperationAddress?: Maybe<NonFungibleToken>;
+  nftTokens?: Maybe<Array<Maybe<NonFungibleToken>>>;
+  profileByAddress?: Maybe<Profile>;
+  profileByAlias?: Maybe<Profile>;
+  publishedOperationByAddress?: Maybe<PublishedOperation>;
+  publishedOperationByInitiatorAddress?: Maybe<PublishedOperation>;
+  settings: Settings;
 };
 
 export type QueryContractStorageArgs = {
@@ -163,6 +201,38 @@ export type QueryContractStorageArgs = {
 
 export type QueryContractOperationsArgs = {
   contract_id: Scalars["String"];
+};
+
+export type QueryNftByTokenIdArgs = {
+  token_id: Scalars["String"];
+};
+
+export type QueryNftByCreatorAddressArgs = {
+  creator_address: Scalars["String"];
+};
+
+export type QueryNftByOperationAddressArgs = {
+  operation_address: Scalars["String"];
+};
+
+export type QueryNftTokensArgs = {
+  limit?: Maybe<Scalars["Int"]>;
+};
+
+export type QueryProfileByAddressArgs = {
+  address: Scalars["String"];
+};
+
+export type QueryProfileByAliasArgs = {
+  alias: Scalars["String"];
+};
+
+export type QueryPublishedOperationByAddressArgs = {
+  address: Scalars["String"];
+};
+
+export type QueryPublishedOperationByInitiatorAddressArgs = {
+  address: Scalars["String"];
 };
 
 export type Settings = {
@@ -174,13 +244,6 @@ export type Subscription = {
   __typename?: "Subscription";
   operationSent?: Maybe<Operation>;
   operationConfirmed?: Maybe<Operation>;
-};
-
-export type User = {
-  __typename?: "User";
-  id: Scalars["Int"];
-  alias: Scalars["String"];
-  tz_public_key: Scalars["String"];
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -302,7 +365,6 @@ export type DirectiveResolverFn<
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Query: ResolverTypeWrapper<{}>;
-  Settings: ResolverTypeWrapper<Settings>;
   String: ResolverTypeWrapper<Scalars["String"]>;
   ContractStorage: ResolverTypeWrapper<ContractStorage>;
   ContractStorageMeta: ResolverTypeWrapper<ContractStorageMeta>;
@@ -320,8 +382,11 @@ export type ResolversTypes = ResolversObject<{
   >;
   BigMapDiffItem: ResolverTypeWrapper<BigMapDiffItem>;
   BigMapDiffItemMeta: ResolverTypeWrapper<BigMapDiffItemMeta>;
+  NonFungibleToken: ResolverTypeWrapper<NonFungibleToken>;
+  Profile: ResolverTypeWrapper<Profile>;
+  PublishedOperation: ResolverTypeWrapper<PublishedOperation>;
+  Settings: ResolverTypeWrapper<Settings>;
   Mutation: ResolverTypeWrapper<{}>;
-  User: ResolverTypeWrapper<User>;
   Subscription: ResolverTypeWrapper<{}>;
   Operation: ResolverTypeWrapper<Operation>;
 }>;
@@ -329,7 +394,6 @@ export type ResolversTypes = ResolversObject<{
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Query: {};
-  Settings: Settings;
   String: Scalars["String"];
   ContractStorage: ContractStorage;
   ContractStorageMeta: ContractStorageMeta;
@@ -345,8 +409,11 @@ export type ResolversParentTypes = ResolversObject<{
   ContractOperationStorageMeta: ContractOperationStorageMeta;
   BigMapDiffItem: BigMapDiffItem;
   BigMapDiffItemMeta: BigMapDiffItemMeta;
+  NonFungibleToken: NonFungibleToken;
+  Profile: Profile;
+  PublishedOperation: PublishedOperation;
+  Settings: Settings;
   Mutation: {};
-  User: User;
   Subscription: {};
   Operation: Operation;
 }>;
@@ -594,12 +661,36 @@ export type MutationResolvers<
   ContextType = SessionContext,
   ParentType extends ResolversParentTypes["Mutation"] = ResolversParentTypes["Mutation"]
 > = ResolversObject<{
-  createAlias?: Resolver<
-    Maybe<ResolversTypes["User"]>,
+  createProfile?: Resolver<
+    ResolversTypes["Profile"],
     ParentType,
     ContextType,
-    RequireFields<MutationCreateAliasArgs, "alias">
+    RequireFields<MutationCreateProfileArgs, "alias" | "address">
   >;
+  createNonFungibleToken?: Resolver<
+    ResolversTypes["NonFungibleToken"],
+    ParentType,
+    ContextType,
+    RequireFields<
+      MutationCreateNonFungibleTokenArgs,
+      "token_id" | "creator_address" | "operation_address"
+    >
+  >;
+}>;
+
+export type NonFungibleTokenResolvers<
+  ContextType = SessionContext,
+  ParentType extends ResolversParentTypes["NonFungibleToken"] = ResolversParentTypes["NonFungibleToken"]
+> = ResolversObject<{
+  id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  token_id?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  creator_address?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  operation_address?: Resolver<
+    ResolversTypes["String"],
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
 export type OperationResolvers<
@@ -611,11 +702,34 @@ export type OperationResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
+export type ProfileResolvers<
+  ContextType = SessionContext,
+  ParentType extends ResolversParentTypes["Profile"] = ResolversParentTypes["Profile"]
+> = ResolversObject<{
+  id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  alias?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  address?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+}>;
+
+export type PublishedOperationResolvers<
+  ContextType = SessionContext,
+  ParentType extends ResolversParentTypes["PublishedOperation"] = ResolversParentTypes["PublishedOperation"]
+> = ResolversObject<{
+  id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  address?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  initiator_address?: Resolver<
+    ResolversTypes["String"],
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+}>;
+
 export type QueryResolvers<
   ContextType = SessionContext,
   ParentType extends ResolversParentTypes["Query"] = ResolversParentTypes["Query"]
 > = ResolversObject<{
-  settings?: Resolver<ResolversTypes["Settings"], ParentType, ContextType>;
   contractStorage?: Resolver<
     Maybe<ResolversTypes["ContractStorage"]>,
     ParentType,
@@ -628,6 +742,55 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryContractOperationsArgs, "contract_id">
   >;
+  nftByTokenId?: Resolver<
+    Maybe<ResolversTypes["NonFungibleToken"]>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryNftByTokenIdArgs, "token_id">
+  >;
+  nftByCreatorAddress?: Resolver<
+    Maybe<ResolversTypes["NonFungibleToken"]>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryNftByCreatorAddressArgs, "creator_address">
+  >;
+  nftByOperationAddress?: Resolver<
+    Maybe<ResolversTypes["NonFungibleToken"]>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryNftByOperationAddressArgs, "operation_address">
+  >;
+  nftTokens?: Resolver<
+    Maybe<Array<Maybe<ResolversTypes["NonFungibleToken"]>>>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryNftTokensArgs, never>
+  >;
+  profileByAddress?: Resolver<
+    Maybe<ResolversTypes["Profile"]>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryProfileByAddressArgs, "address">
+  >;
+  profileByAlias?: Resolver<
+    Maybe<ResolversTypes["Profile"]>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryProfileByAliasArgs, "alias">
+  >;
+  publishedOperationByAddress?: Resolver<
+    Maybe<ResolversTypes["PublishedOperation"]>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryPublishedOperationByAddressArgs, "address">
+  >;
+  publishedOperationByInitiatorAddress?: Resolver<
+    Maybe<ResolversTypes["PublishedOperation"]>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryPublishedOperationByInitiatorAddressArgs, "address">
+  >;
+  settings?: Resolver<ResolversTypes["Settings"], ParentType, ContextType>;
 }>;
 
 export type SettingsResolvers<
@@ -656,16 +819,6 @@ export type SubscriptionResolvers<
   >;
 }>;
 
-export type UserResolvers<
-  ContextType = SessionContext,
-  ParentType extends ResolversParentTypes["User"] = ResolversParentTypes["User"]
-> = ResolversObject<{
-  id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
-  alias?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-  tz_public_key?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
-}>;
-
 export type Resolvers<ContextType = SessionContext> = ResolversObject<{
   BigMapDiffItem?: BigMapDiffItemResolvers<ContextType>;
   BigMapDiffItemMeta?: BigMapDiffItemMetaResolvers<ContextType>;
@@ -681,11 +834,13 @@ export type Resolvers<ContextType = SessionContext> = ResolversObject<{
   ContractStorageMeta?: ContractStorageMetaResolvers<ContextType>;
   JSON?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
+  NonFungibleToken?: NonFungibleTokenResolvers<ContextType>;
   Operation?: OperationResolvers<ContextType>;
+  Profile?: ProfileResolvers<ContextType>;
+  PublishedOperation?: PublishedOperationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Settings?: SettingsResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
-  User?: UserResolvers<ContextType>;
 }>;
 
 /**

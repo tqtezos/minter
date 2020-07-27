@@ -128,11 +128,27 @@ export type ContractStorageMeta = {
 
 export type Mutation = {
   __typename?: "Mutation";
-  createAlias?: Maybe<User>;
+  createProfile: Profile;
+  createNonFungibleToken: NonFungibleToken;
 };
 
-export type MutationCreateAliasArgs = {
+export type MutationCreateProfileArgs = {
   alias: Scalars["String"];
+  address: Scalars["String"];
+};
+
+export type MutationCreateNonFungibleTokenArgs = {
+  token_id: Scalars["String"];
+  creator_address: Scalars["String"];
+  operation_address: Scalars["String"];
+};
+
+export type NonFungibleToken = {
+  __typename?: "NonFungibleToken";
+  id: Scalars["Int"];
+  token_id: Scalars["String"];
+  creator_address: Scalars["String"];
+  operation_address: Scalars["String"];
 };
 
 export type Operation = {
@@ -141,11 +157,33 @@ export type Operation = {
   time?: Maybe<Scalars["String"]>;
 };
 
+export type Profile = {
+  __typename?: "Profile";
+  id: Scalars["Int"];
+  alias?: Maybe<Scalars["String"]>;
+  address: Scalars["String"];
+};
+
+export type PublishedOperation = {
+  __typename?: "PublishedOperation";
+  id: Scalars["Int"];
+  address: Scalars["String"];
+  initiator_address: Scalars["String"];
+};
+
 export type Query = {
   __typename?: "Query";
-  settings: Settings;
   contractStorage?: Maybe<ContractStorage>;
   contractOperations?: Maybe<Array<Maybe<ContractOperation>>>;
+  nftByTokenId?: Maybe<NonFungibleToken>;
+  nftByCreatorAddress?: Maybe<NonFungibleToken>;
+  nftByOperationAddress?: Maybe<NonFungibleToken>;
+  nftTokens?: Maybe<Array<Maybe<NonFungibleToken>>>;
+  profileByAddress?: Maybe<Profile>;
+  profileByAlias?: Maybe<Profile>;
+  publishedOperationByAddress?: Maybe<PublishedOperation>;
+  publishedOperationByInitiatorAddress?: Maybe<PublishedOperation>;
+  settings: Settings;
 };
 
 export type QueryContractStorageArgs = {
@@ -154,6 +192,38 @@ export type QueryContractStorageArgs = {
 
 export type QueryContractOperationsArgs = {
   contract_id: Scalars["String"];
+};
+
+export type QueryNftByTokenIdArgs = {
+  token_id: Scalars["String"];
+};
+
+export type QueryNftByCreatorAddressArgs = {
+  creator_address: Scalars["String"];
+};
+
+export type QueryNftByOperationAddressArgs = {
+  operation_address: Scalars["String"];
+};
+
+export type QueryNftTokensArgs = {
+  limit?: Maybe<Scalars["Int"]>;
+};
+
+export type QueryProfileByAddressArgs = {
+  address: Scalars["String"];
+};
+
+export type QueryProfileByAliasArgs = {
+  alias: Scalars["String"];
+};
+
+export type QueryPublishedOperationByAddressArgs = {
+  address: Scalars["String"];
+};
+
+export type QueryPublishedOperationByInitiatorAddressArgs = {
+  address: Scalars["String"];
 };
 
 export type Settings = {
@@ -165,11 +235,4 @@ export type Subscription = {
   __typename?: "Subscription";
   operationSent?: Maybe<Operation>;
   operationConfirmed?: Maybe<Operation>;
-};
-
-export type User = {
-  __typename?: "User";
-  id: Scalars["Int"];
-  alias: Scalars["String"];
-  tz_public_key: Scalars["String"];
 };

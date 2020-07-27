@@ -2,10 +2,6 @@
   "name": "minter-api",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "serve": "ts-node src/index.ts",
-    "graphql-codegen": "graphql-codegen --config codegen.yml"
-  },
   "dependencies": {
     "@taquito/signer": "^6.2.0-beta.1",
     "@taquito/taquito": "^6.2.0-beta.0",

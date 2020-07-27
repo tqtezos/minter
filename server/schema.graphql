@@ -115,10 +115,23 @@ type ContractOperation {
 
 ## Application Types
 
-type User {
+type Profile {
   id: Int!
-  alias: String!
-  tz_public_key: String!
+  alias: String
+  address: String!
+}
+
+type NonFungibleToken {
+  id: Int!
+  token_id: String!
+  creator_address: String!
+  operation_address: String!
+}
+
+type PublishedOperation {
+  id: Int!
+  address: String!
+  initiator_address: String!
 }
 
 type Settings {
@@ -128,13 +141,26 @@ type Settings {
 ## Toplevel Types
 
 type Query {
-  settings: Settings!
   contractStorage(contract_id: String!): ContractStorage
   contractOperations(contract_id: String!): [ContractOperation]
+  nftByTokenId(token_id: String!): NonFungibleToken
+  nftByCreatorAddress(creator_address: String!): NonFungibleToken
+  nftByOperationAddress(operation_address: String!): NonFungibleToken
+  nftTokens(limit: Int): [NonFungibleToken]
+  profileByAddress(address: String!): Profile
+  profileByAlias(alias: String!): Profile
+  publishedOperationByAddress(address: String!): PublishedOperation
+  publishedOperationByInitiatorAddress(address: String!): PublishedOperation
+  settings: Settings!
 }
 
 type Mutation {
-  createAlias(alias: String!): User
+  createProfile(alias: String!, address: String!): Profile!
+  createNonFungibleToken(
+    token_id: String!,
+    creator_address: String!,
+    operation_address: String!
+  ): NonFungibleToken!
 }
 
 type Subscription {

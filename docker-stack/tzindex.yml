@@ -14,5 +14,5 @@ services:
       - ${TZ_INDEX_PORT}:8000
     depends_on:
       - sandbox
-    # tzindex end up in a bad state if it catches sandbox while it is starting
+    # Wait for the sandbox node to start, otherwise tzindex crashes
     command: ["sh", "-c", "sleep 10 && tzindex run"]
