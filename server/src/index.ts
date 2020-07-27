@@ -15,7 +15,7 @@ process.on("uncaughtException", error => {
 
 const IS_DEV_ENV = !["production", "test"].includes(process.env.NODE_ENV || "");
 
-const typeDefs = importSchema(path.resolve(__dirname + "/../schema.graphql"));
+const typeDefs = importSchema(path.resolve(__dirname + "/schema.graphql"));
 
 async function run() {
   const envPort = process.env.MINTER_API_PORT;
