@@ -3,7 +3,7 @@ import { BigNumber } from 'bignumber.js'
 import { $log } from '@tsed/logger';
 import {
   Contract, originateMinter, originateNft, originateInspector,
-  MinterStorage, InspectorStorage
+  address, MinterStorage, MinterTokenMetadata, InspectorStorage
 } from './nft-contracts'
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 
@@ -27,7 +27,7 @@ describe('initialize', () => {
     nft = await originateNft(tezos.bob, minter.address);
   })
 
-  async function hasToken(owner: string, tokenId: number): Promise<boolean> {
+  async function hasToken(owner: address, tokenId: number): Promise<boolean> {
     $log.info('checking token balance');
 
     const op = await inspector.methods.query(
@@ -50,30 +50,31 @@ describe('initialize', () => {
   //   $log.debug(`nft ${nft.address}`);
   // })
 
-  async function mintToken(tz: TezosToolkit, symbol: string, name: string, owner: string): Promise<number> {
-    const op = await minter.methods.mint(nft.address, [{
-      symbol,
-      name,
-      owner,
-      extras: new MichelsonMap()
-    }]).send();
+  async function mintTokens(tz: TezosToolkit, tokens: MinterTokenMetadata[]): Promise<number[]> {
+    const op = await minter.methods.mint(nft.address, tokens).send();
     const hash = await op.confirmation(3);
     $log.info(`consumed gas: ${op.consumedGas}`);
     const storage = await minter.storage<MinterStorage>();
-    return Promise.resolve(storage.last_created_token_ids[0]);
+    return Promise.resolve(storage.last_created_token_ids);
   }
 
   test('mint token', async () => {
     const bobAddress = await tezos.bob.signer.publicKeyHash();
     $log.info('minting')
-    const tokenId = await mintToken(tezos.bob, 'TK1', 'A token', bobAddress);
+    const [tokenId] = await mintTokens(tezos.bob,
+      [{
+        symbol: 'TK1',
+        name: 'A token',
+        owner: bobAddress,
+        extras: new MichelsonMap<string, string>()
+      }]);
     $log.info(`minted token ${tokenId}`);
 
     const bobHasToken = await hasToken(bobAddress, tokenId);
     expect(bobHasToken).toBe(true);
   })
 
-  async function transferNft(operator: TezosToolkit, from_: string, to_: string,
+  async function transferNft(operator: TezosToolkit, from_: address, to_: address,
     tokenId: number): Promise<void> {
     $log.info('transferring');
     const nftWithOperator = await operator.contract.at(nft.address);
@@ -92,7 +93,13 @@ describe('initialize', () => {
     const aliceAddress = await tezos.alice.signer.publicKeyHash();
     const bobAddress = await tezos.bob.signer.publicKeyHash();
     $log.info('minting')
-    const tokenId = await mintToken(tezos.bob, 'TK1', 'A token', bobAddress);
+    const [tokenId] = await mintTokens(tezos.bob,
+      [{
+        symbol: 'TK1',
+        name: 'A token',
+        owner: bobAddress,
+        extras: new MichelsonMap<string, string>()
+      }]);
     $log.info(`minted token ${tokenId}`);
 
     const aliceHasATokenBefore = await hasToken(aliceAddress, tokenId);

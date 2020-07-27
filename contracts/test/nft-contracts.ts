@@ -2,13 +2,22 @@ import { $log } from '@tsed/logger';
 import * as path from 'path';
 import { BigNumber } from 'bignumber.js'
 import { compileAndLoadContract, defaultEnv, LigoEnv } from './ligo';
-import { TezosToolkit } from '@taquito/taquito';
+import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 import { Operation } from '@taquito/taquito/dist/types/operations/operations';
 import { ContractAbstraction } from '@taquito/taquito/dist/types/contract';
 import { ContractProvider } from '@taquito/taquito/dist/types/contract/interface';
 
 
 export type Contract = ContractAbstraction<ContractProvider>;
+
+export type address = string;
+
+export interface MinterTokenMetadata {
+  symbol: string;
+  name: string;
+  owner: address;
+  extras: MichelsonMap<string, string>;
+}
 
 interface AdminStorage {
   admin: string;
@@ -18,11 +27,11 @@ interface AdminStorage {
 
 export interface MinterStorage {
   admin: AdminStorage;
-  last_fa2_nft?: string;
+  last_fa2_nft?: address;
   last_created_token_ids: number[];
 }
 
-export async function originateMinter(tz: TezosToolkit, admin: string): Promise<Contract> {
+export async function originateMinter(tz: TezosToolkit, admin: address): Promise<Contract> {
   const code = await compileAndLoadContract(defaultEnv,
     'fa2_nft_minter.mligo', 'minter_main', 'fa2_nft_minter.tz');
   const storage =
@@ -30,7 +39,7 @@ export async function originateMinter(tz: TezosToolkit, admin: string): Promise<
   return originateContract(tz, code, storage, "minter");
 }
 
-export async function originateNft(tz: TezosToolkit, admin: string): Promise<Contract> {
+export async function originateNft(tz: TezosToolkit, admin: address): Promise<Contract> {
   const code = await compileAndLoadContract(defaultEnv,
     'fa2_multi_nft_asset.mligo', 'nft_asset_main', 'fa2_multi_nft_asset.tz');
   const storage = `(Pair (Pair (Pair "${admin}" True) None) (Pair (Pair {} 0) (Pair {} {})))`;
@@ -40,7 +49,7 @@ export async function originateNft(tz: TezosToolkit, admin: string): Promise<Con
 export interface InspectorStorage {
   balance: BigNumber,
   request: {
-    owner: string,
+    owner: address,
     token_id: BigNumber
   }
 }
