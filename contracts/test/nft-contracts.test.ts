@@ -3,9 +3,11 @@ import { BigNumber } from 'bignumber.js'
 import { $log } from '@tsed/logger';
 import {
   Contract, originateMinter, originateNft, originateInspector,
-  address, MinterStorage, MinterTokenMetadata, InspectorStorage, BalanceOfRequest
+  address, MinterStorage, MinterTokenMetadata,
+  InspectorStorage, InspectorStorageState, BalanceOfRequest
 } from './nft-contracts'
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
+import { LigoEnv } from './ligo';
 
 
 jest.setTimeout(180000); // 3 minutes per test
@@ -36,16 +38,20 @@ describe('initialize', () => {
     const hash = await op.confirmation(3);
     $log.info(`consumed gas: ${op.consumedGas}`);
 
-    const storage = await inspector.storage<InspectorStorage[]>();
-    const results = storage.map(se => {
-      if (se.balance.eq(1))
-        return true;
-      else if (se.balance.eq(0))
-        return false;
-      else
-        throw new Error(`Invalid NFT balance ${se.balance}`);
-    });
-    return Promise.resolve(results);
+    const storage = await inspector.storage<InspectorStorage>();
+    if (Array.isArray(storage)) {
+      const results = storage.map(se => {
+        if (se.balance.eq(1))
+          return true;
+        else if (se.balance.eq(0))
+          return false;
+        else
+          throw new Error(`Invalid NFT balance ${se.balance}`);
+      });
+      return Promise.resolve(results);
+    }
+    else
+      return Promise.reject('Invalid inspector storage state Empty.');
   }
 
   // test('check origination', () => {

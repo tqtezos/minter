@@ -51,13 +51,15 @@ export interface BalanceOfRequest {
   token_id: number;
 }
 
-export interface InspectorStorage {
-  balance: BigNumber,
+export interface InspectorStorageState {
+  balance: BigNumber;
   request: {
-    owner: address,
-    token_id: BigNumber
+    owner: address;
+    token_id: BigNumber;
   }
 }
+
+export type InspectorStorage = InspectorStorageState[] | {};
 
 export async function originateInspector(tz: TezosToolkit): Promise<Contract> {
   const inspectorSrcDir = path.join(defaultEnv.cwd, 'fa2_clients');
