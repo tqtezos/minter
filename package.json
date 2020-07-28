@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "gen-gql": "graphql-codegen && prettier --write server/src/generated/graphql_schema.ts client/src/generated/graphql_schema.tsx"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^1.9.1",
+    "@graphql-codegen/fragment-matcher": "^1.11.2",
+    "@graphql-codegen/introspection": "1.13.5",
+    "@graphql-codegen/typescript": "1.13.5",
+    "@graphql-codegen/typescript-operations": "^1.9.1",
+    "@graphql-codegen/typescript-react-apollo": "1.13.5",
+    "@graphql-codegen/typescript-resolvers": "^1.9.1",
+    "graphql": "^14.2.0",
+    "graphql-tag": "^2.10.3",
+    "prettier": "^2.0.5"
+  }
+}

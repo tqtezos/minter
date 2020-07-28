@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  api-server:
+    image: minter-ui-api
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TZSTATS_API_URL: ${TZSTATS_API_URL}
+      TEZOS_RPC_URL: ${TEZOS_RPC_URL}
+      TZSTATS_URL: ${TZSTATS_URL}
+    ports:
+      - 3300:3300

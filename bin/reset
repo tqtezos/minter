@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+source ${BASH_SOURCE%/*}/env
+
+if [[ $@ =~ "--confirm" ]]
+then
+  echo "Resetting database, blockchain, and indexer..."
+  rm -rf $PROJECT_ROOT_DIR/.pgdata
+  rm -rf $PROJECT_ROOT_DIR/.tzindex
+  rm -rf $PROJECT_ROOT_DIR/.flextesa
+  echo "Done"
+  exit 0
+fi
+
+echo "WARNING: This command removes your database, blockchain, and indexer data"
+echo "  Run with the \`--confirm\` flag to procede"
+
+exit 1

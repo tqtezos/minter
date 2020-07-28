@@ -1,0 +1,18 @@
+TEZOS_RPC_PORT=20000
+TEZOS_RPC_HOST=sandbox
+TEZOS_RPC_PROTO=http
+
+TEZOS_RPC_URL=${TEZOS_RPC_PROTO}://${TEZOS_RPC_HOST}:${TEZOS_RPC_PORT}
+
+TZ_INDEX_PORT=8000
+TZ_STATS_PORT=3001
+
+TZSTATS_API_URL=http://indexer:${TZ_INDEX_PORT}
+
+#this is for UI to open links
+TZSTATS_URL=http://localhost:${TZ_STATS_PORT}
+
+FLEXTESA_DOCKER_IMG=registry.gitlab.com/tezos/flextesa:ce51babe-run
+
+TZ_INDEX_DB_PATH=$PROJECT_ROOT_DIR/.tzindex
+FLEXTESA_DATA_DIR=$PROJECT_ROOT_DIR/.flextesa

@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  indexer:
+    image: blockwatch/tzindex
+    environment:
+      TZ_RPC_HOST: sandbox
+      TZ_RPC_PORT: ${TEZOS_RPC_PORT}
+      TZ_SERVER_CORS_ENABLE: "true"
+      TZ_DATABASE_PATH: /var/tzindex/data/${CHAIN_ID}
+    volumes:
+      - ${TZ_INDEX_DB_PATH}:/var/tzindex/data
+    ports:
+      - ${TZ_INDEX_PORT}:8000
+    depends_on:
+      - sandbox
+    # Wait for the sandbox node to start, otherwise tzindex crashes
+    command: ["sh", "-c", "sleep 10 && tzindex run"]

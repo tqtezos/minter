@@ -1,0 +1,14 @@
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=secret
+POSTGRES_HOST=db
+POSTGRES_PORT=5432
+
+NGINX_PORT=9000
+NGINX_DEV_PORT=9001
+
+#Docker volume specs can only use absolute path
+PROJECT_ROOT_DIR=$(cd -- "${BASH_SOURCE%/*}/../" && pwd)
+echo "Project root dir: ${PROJECT_ROOT_DIR}"
+PGDATA=$PROJECT_ROOT_DIR/.pgdata
+
+DOCKER_STACK_DIR=$PROJECT_ROOT_DIR/docker-stack
