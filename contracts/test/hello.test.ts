@@ -12,10 +12,10 @@ describe('balance of', () => {
   test('bootstrap Bob account', async () => {
     tezos.bob.signer
       .publicKeyHash()
-      .then((bootstrapKey) => tezos.alice.tz.getBalance(bootstrapKey))
-      .then((balance) =>
+      .then(bootstrapKey => tezos.alice.tz.getBalance(bootstrapKey))
+      .then(balance =>
         $log.info(`bootstrap account balance ${balance.toNumber() / 1000000} ꜩ`)
       )
-      .catch((error) => $log.error(JSON.stringify(error)));
+      .catch(error => $log.error(JSON.stringify(error)));
   });
 });

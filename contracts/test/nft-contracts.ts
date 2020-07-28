@@ -99,7 +99,7 @@ export async function originateInspector(tz: TezosToolkit): Promise<Contract> {
 }
 
 function delay(ms: number) {
-  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+  return new Promise<void>(resolve => setTimeout(resolve, ms));
 }
 
 async function originateContract(

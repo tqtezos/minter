@@ -45,7 +45,7 @@ describe('initialize', () => {
 
     const storage = await inspector.storage<InspectorStorage>();
     if (Array.isArray(storage)) {
-      const results = storage.map((se) => {
+      const results = storage.map(se => {
         if (se.balance.eq(1)) return true;
         else if (se.balance.eq(0)) return false;
         else throw new Error(`Invalid NFT balance ${se.balance}`);
