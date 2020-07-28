@@ -25,9 +25,6 @@ coverage
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
-# Dependency directories
-node_modules/
-
 # Optional npm cache directory
 .npm
 
@@ -51,7 +48,7 @@ node_modules/
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+**/node_modules
 /.pnp
 .pnp.js
 
@@ -62,7 +59,8 @@ node_modules/
 /client/build
 
 # misc
-.DS_Store
+**/.DS_Store
+**/.vscode
 .env.local
 .env.development.local
 .env.test.local
@@ -73,3 +71,7 @@ yarn-debug.log*
 yarn-error.log*
 
 nginx.vars
+
+**/*.pp.mligo
+**/*.pp.ligo
+

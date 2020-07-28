@@ -1,0 +1,92 @@
+{ parameter
+    (or (or (unit %default)
+            (pair %query (address %fa2) (list %requests (pair (address %owner) (nat %token_id)))))
+        (list %response
+           (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))) ;
+  storage
+    (or (unit %empty)
+        (list %state (pair (nat %balance) (pair %request (address %owner) (nat %token_id))))) ;
+  code { DUP ;
+         CDR ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         IF_LEFT
+           { DUP ;
+             IF_LEFT
+               { DIG 2 ; DUP ; DUG 3 ; NIL operation ; PAIR ; DIP { DROP } }
+               { DUP ;
+                 CDR ;
+                 SELF ;
+                 ADDRESS ;
+                 CONTRACT %response
+                   (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance))) ;
+                 IF_NONE
+                   { PUSH string "bad address for get_entrypoint (%response)" ; FAILWITH }
+                   {} ;
+                 PAIR ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CONTRACT %balance_of
+                   (pair (list %requests (pair (address %owner) (nat %token_id)))
+                         (contract %callback
+                            (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance))))) ;
+                 IF_NONE
+                   { PUSH string "bad address for get_entrypoint (%balance_of)" ; FAILWITH }
+                   {} ;
+                 DUP ;
+                 PUSH mutez 0 ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 CAR ;
+                 DIG 4 ;
+                 DUP ;
+                 DUG 5 ;
+                 CDR ;
+                 PAIR ;
+                 TRANSFER_TOKENS ;
+                 DIG 5 ;
+                 DUP ;
+                 DUG 6 ;
+                 NIL operation ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CONS ;
+                 PAIR ;
+                 DIP { DROP 4 } } ;
+             DIP { DROP } }
+           { DUP ;
+             MAP { DUP ;
+                   CAR ;
+                   DIG 1 ;
+                   DUP ;
+                   DUG 2 ;
+                   CDR ;
+                   PAIR ;
+                   DUP ;
+                   CDR ;
+                   CDR ;
+                   DIG 1 ;
+                   DUP ;
+                   DUG 2 ;
+                   CDR ;
+                   CAR ;
+                   PAIR ;
+                   DIG 1 ;
+                   DUP ;
+                   DUG 2 ;
+                   CAR ;
+                   PAIR ;
+                   DIP { DROP 2 } } ;
+             DUP ;
+             RIGHT unit ;
+             NIL operation ;
+             PAIR ;
+             DIP { DROP 2 } } ;
+         DIP { DROP 2 } } }
+

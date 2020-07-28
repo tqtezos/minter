@@ -1,0 +1,300 @@
+{ parameter
+    (or (or (or %admin (or (unit %confirm_admin) (bool %pause)) (address %set_admin))
+            (pair %mint
+               (address %fa2_nft)
+               (list %tokens
+                  (pair (pair (map %extras string string) (string %name))
+                        (pair (address %owner) (string %symbol))))))
+        (or (list %minted nat) (pair %set_fa2_admin (address %fa2) (address %new_admin)))) ;
+  storage
+    (pair (pair (pair %admin (pair (address %admin) (bool %paused)) (option %pending_admin address))
+                (list %last_created_token_ids nat))
+          (option %last_fa2_nft address)) ;
+  code { LAMBDA
+           (pair (pair address bool) (option address))
+           unit
+           { DUP ;
+             CAR ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             NEQ ;
+             IF { PUSH string "NOT_AN_ADMIN" ; FAILWITH } { UNIT } ;
+             DIP { DROP } } ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         CDR ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CAR ;
+         IF_LEFT
+           { DUP ;
+             IF_LEFT
+               { DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
+                 CAR ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 PAIR ;
+                 DUP ;
+                 CDR ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 IF_LEFT
+                   { DUP ;
+                     IF_LEFT
+                       { DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         CDR ;
+                         IF_NONE
+                           { PUSH string "NO_PENDING_ADMIN" ; FAILWITH }
+                           { DUP ;
+                             SENDER ;
+                             COMPARE ;
+                             EQ ;
+                             IF { DIG 3 ;
+                                  DUP ;
+                                  DUG 4 ;
+                                  CAR ;
+                                  NONE address ;
+                                  SWAP ;
+                                  CDR ;
+                                  SENDER ;
+                                  PAIR ;
+                                  PAIR }
+                                { PUSH string "NOT_A_PENDING_ADMIN" ; FAILWITH } ;
+                             DIP { DROP } } ;
+                         DUP ;
+                         NIL operation ;
+                         PAIR ;
+                         DIP { DROP 2 } }
+                       { DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         DIG 8 ;
+                         DUP ;
+                         DUG 9 ;
+                         SWAP ;
+                         EXEC ;
+                         DIG 3 ;
+                         DUP ;
+                         DUG 4 ;
+                         DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         PAIR ;
+                         DUP ;
+                         CDR ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         DIP { DUP ; CDR ; SWAP ; CAR ; CAR } ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR ;
+                         DIP { DROP } ;
+                         NIL operation ;
+                         PAIR ;
+                         DIP { DROP 2 } } ;
+                     DIP { DROP } }
+                   { DIG 1 ;
+                     DUP ;
+                     DUG 2 ;
+                     DIG 7 ;
+                     DUP ;
+                     DUG 8 ;
+                     SWAP ;
+                     EXEC ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     PAIR ;
+                     DUP ;
+                     CDR ;
+                     DIG 1 ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SOME ;
+                     SWAP ;
+                     CAR ;
+                     PAIR ;
+                     DIP { DROP } ;
+                     NIL operation ;
+                     PAIR ;
+                     DIP { DROP 2 } } ;
+                 DIP { DROP 2 } ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 DIP { DUP ; CDR ; SWAP ; CAR ; CDR } ;
+                 PAIR ;
+                 PAIR ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 PAIR ;
+                 DIP { DROP 2 } }
+               { DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
+                 CAR ;
+                 DIG 4 ;
+                 DUP ;
+                 DUG 5 ;
+                 SWAP ;
+                 EXEC ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
+                 SOME ;
+                 SWAP ;
+                 CAR ;
+                 CAR ;
+                 NIL nat ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 SELF ;
+                 ADDRESS ;
+                 DUP ;
+                 CONTRACT %minted (list nat) ;
+                 DUP ;
+                 IF_NONE
+                   { PUSH string "NO_MINTED_ENTRYPOINT" ; FAILWITH }
+                   { DUP ; DIP { DROP } } ;
+                 DIP { DROP 2 } ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 CAR ;
+                 DIG 4 ;
+                 DUP ;
+                 DUG 5 ;
+                 CDR ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 PAIR ;
+                 PAIR ;
+                 DUP ;
+                 CDR ;
+                 CONTRACT %mint
+                   (pair (contract %callback (list nat))
+                         (list %tokens
+                            (pair (pair (map %extras string string) (string %name))
+                                  (pair (address %owner) (string %symbol))))) ;
+                 DUP ;
+                 IF_NONE
+                   { PUSH string "NO_MINT_ENTRY_POINT" ; FAILWITH }
+                   { DUP ;
+                     PUSH mutez 0 ;
+                     DIG 4 ;
+                     DUP ;
+                     DUG 5 ;
+                     CAR ;
+                     TRANSFER_TOKENS ;
+                     DIP { DROP } } ;
+                 DIP { DROP 2 } ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 NIL operation ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CONS ;
+                 PAIR ;
+                 DIP { DROP 5 } } ;
+             DIP { DROP } }
+           { DUP ;
+             IF_LEFT
+               { DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CDR ;
+                 IF_NONE
+                   { PUSH string "NO_MINT_IN_PROGRESS" ; FAILWITH }
+                   { SENDER ;
+                     DIG 1 ;
+                     DUP ;
+                     DUG 2 ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { PUSH string "INVALID_CALLBACK_SENDER" ; FAILWITH }
+                        { DIG 3 ;
+                          DUP ;
+                          DUG 4 ;
+                          DIG 2 ;
+                          DUP ;
+                          DUG 3 ;
+                          DIP { DUP ; CDR ; SWAP ; CAR ; CAR } ;
+                          SWAP ;
+                          PAIR ;
+                          PAIR ;
+                          NIL operation ;
+                          PAIR } ;
+                     DIP { DROP } } ;
+                 DIP { DROP } }
+               { DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
+                 CAR ;
+                 DIG 4 ;
+                 DUP ;
+                 DUG 5 ;
+                 SWAP ;
+                 EXEC ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CONTRACT %set_admin address ;
+                 DUP ;
+                 IF_NONE
+                   { PUSH string "NO_SET_ADMIN_ENTRY_POINT" ; FAILWITH }
+                   { DUP ;
+                     PUSH mutez 0 ;
+                     DIG 5 ;
+                     DUP ;
+                     DUG 6 ;
+                     CDR ;
+                     TRANSFER_TOKENS ;
+                     DIP { DROP } } ;
+                 DIP { DROP } ;
+                 DIG 4 ;
+                 DUP ;
+                 DUG 5 ;
+                 NIL operation ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CONS ;
+                 PAIR ;
+                 DIP { DROP 3 } } ;
+             DIP { DROP } } ;
+         DIP { DROP 3 } } }
+
