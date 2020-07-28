@@ -7,13 +7,15 @@ describe('balance of', () => {
 
   beforeAll(async () => {
     tezos = await bootstrap();
-  })
+  });
 
   test('bootstrap Bob account', async () => {
     tezos.bob.signer
       .publicKeyHash()
-      .then(bootstrapKey => tezos.alice.tz.getBalance(bootstrapKey))
-      .then(balance => $log.info(`bootstrap account balance ${balance.toNumber() / 1000000} ꜩ`))
-      .catch(error => $log.error(JSON.stringify(error)));
-  })
-})
+      .then((bootstrapKey) => tezos.alice.tz.getBalance(bootstrapKey))
+      .then((balance) =>
+        $log.info(`bootstrap account balance ${balance.toNumber() / 1000000} ꜩ`)
+      )
+      .catch((error) => $log.error(JSON.stringify(error)));
+  });
+});
