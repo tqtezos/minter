@@ -5,6 +5,7 @@ import {
   Contract,
   originateMinter,
   originateNft,
+  originateNftWithHooks,
   originateInspector,
   address,
   MinterStorage,
@@ -17,9 +18,9 @@ import {
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 import { LigoEnv } from './ligo';
 
-jest.setTimeout(180000); // 3 minutes for all test
+jest.setTimeout(180000); // 3 minutes
 
-describe('initialize', () => {
+describe.each([originateNft, originateNftWithHooks])('test NFT', createNft => {
   let tezos: TestTz;
   let minter: Contract;
   let nft: Contract;
@@ -33,7 +34,7 @@ describe('initialize', () => {
   beforeEach(async () => {
     const admin = await tezos.bob.signer.publicKeyHash();
     minter = await originateMinter(tezos.bob, admin);
-    nft = await originateNft(tezos.bob, minter.address);
+    nft = await createNft(tezos.bob, minter.address);
   });
 
   async function hasTokens(requests: BalanceOfRequest[]): Promise<boolean[]> {

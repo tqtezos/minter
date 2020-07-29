@@ -69,6 +69,23 @@ export async function originateNft(
   return originateContract(tz, code, storage, 'nft');
 }
 
+export async function originateNftWithHooks(
+  tz: TezosToolkit,
+  admin: address
+): Promise<Contract> {
+  const code = await compileAndLoadContract(
+    defaultEnv,
+    'fa2_multi_nft_asset_with_hooks.mligo',
+    'nft_asset_main_with_hooks',
+    'fa2_multi_nft_asset_with_hooks.tz'
+  );
+  const storage = `(Pair (Pair (Pair "${admin}" False) None)\
+  (Pair (Pair (Pair {} 0)\
+              (Pair {} (Pair (Pair None (Left (Right Unit))) (Pair (Left (Left Unit)) (Left (Left Unit))))))\
+        {}))`;
+  return originateContract(tz, code, storage, 'nft');
+}
+
 export interface BalanceOfRequest {
   owner: address;
   token_id: number;
