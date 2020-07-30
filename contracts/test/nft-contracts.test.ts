@@ -1,22 +1,22 @@
-import { bootstrap, TestTz } from './bootstrap-sandbox';
-import { BigNumber } from 'bignumber.js';
 import { $log } from '@tsed/logger';
+import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
+
+import { bootstrap, TestTz } from './bootstrap-sandbox';
+import { Contract, address } from './ligo';
+
 import {
-  Contract,
   originateMinter,
   originateNft,
   originateNftWithHooks,
-  originateInspector,
-  address,
   MinterStorage,
   MinterTokenMetadata,
-  Fa2Transfer,
-  InspectorStorage,
-  InspectorStorageState,
-  BalanceOfRequest
+  Fa2Transfer
 } from './nft-contracts';
-import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
-import { LigoEnv } from './ligo';
+import {
+  originateInspector,
+  InspectorStorage,
+  BalanceOfRequest
+} from './fa2-balance-inspector';
 
 jest.setTimeout(180000); // 3 minutes
 
