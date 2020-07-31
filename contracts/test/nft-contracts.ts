@@ -1,12 +1,7 @@
 import { $log } from '@tsed/logger';
 
-import {
-  compileAndLoadContract,
-  originateContract,
-  defaultEnv,
-  address,
-  Contract
-} from './ligo';
+import { compileAndLoadContract, originateContract, defaultEnv } from './ligo';
+import { Contract, address, nat } from './type-aliases';
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 
 export interface MinterTokenMetadata {
@@ -25,7 +20,7 @@ interface AdminStorage {
 export interface MinterStorage {
   admin: AdminStorage;
   last_fa2_nft?: address;
-  last_created_token_ids: number[];
+  last_created_token_ids: nat[];
 }
 
 export async function originateMinter(
@@ -40,17 +35,6 @@ export async function originateMinter(
   );
   const storage = `(Pair (Pair (Pair (Pair "${admin}" False) None) {}) None)`;
   return originateContract(tz, code, storage, 'minter');
-}
-
-export interface Fa2TransferDestination {
-  to_?: address;
-  token_id: number;
-  amount: number;
-}
-
-export interface Fa2Transfer {
-  from_?: address;
-  txs: Fa2TransferDestination[];
 }
 
 export async function originateNft(
@@ -84,6 +68,6 @@ export async function originateNftWithHooks(
   return originateContract(tz, code, storage, 'nft');
 }
 
-function delay(ms: number) {
-  return new Promise<void>(resolve => setTimeout(resolve, ms));
-}
+// function delay(ms: number) {
+//   return new Promise<void>(resolve => setTimeout(resolve, ms));
+// }

@@ -3,9 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { $log } from '@tsed/logger';
 
-import { ContractAbstraction } from '@taquito/taquito/dist/types/contract';
-import { ContractProvider } from '@taquito/taquito/dist/types/contract/interface';
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
+import { Contract } from './type-aliases';
 
 export class LigoEnv {
   readonly cwd: string;
@@ -35,10 +34,6 @@ function defaultLigoEnv(): LigoEnv {
   const out = path.join(cwd, 'out');
   return new LigoEnv(cwd, src, out);
 }
-
-export type Contract = ContractAbstraction<ContractProvider>;
-
-export type address = string;
 
 export async function compileAndLoadContract(
   env: LigoEnv,
@@ -86,9 +81,6 @@ export async function originateContract(
       code,
       init: storage
     });
-
-    //A HACK
-    // await delay(5000);
 
     const contract = await originationOp.contract();
     $log.info(`originated contract ${name} with address ${contract.address}`);
