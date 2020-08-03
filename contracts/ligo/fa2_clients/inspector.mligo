@@ -26,7 +26,7 @@ let main (p, s : param * storage) : (operation list) * storage =
         (Operation.get_entrypoint "%response" Current.self_address :
           (balance_of_response_michelson list) contract);
     } in
-    let bpm = Layout.convert_to_right_comb aux in
+    let bpm = Layout.convert_to_right_comb (aux : balance_of_param_aux) in
     let fa2 : balance_of_param_michelson contract = 
       Operation.get_entrypoint "%balance_of" q.fa2 in
     let q_op = Operation.transaction bpm 0mutez fa2 in

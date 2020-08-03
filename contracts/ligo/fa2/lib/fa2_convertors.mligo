@@ -22,7 +22,7 @@ let permissions_descriptor_to_michelson (d : permissions_descriptor)
     | None -> (None : custom_permission_policy_michelson option)
     | Some c -> Some (Layout.convert_to_right_comb c)
   } in
-  Layout.convert_to_right_comb aux
+  Layout.convert_to_right_comb (aux : permissions_descriptor_aux)
 
 let transfer_descriptor_to_michelson (p : transfer_descriptor) : transfer_descriptor_michelson =
   let aux : transfer_descriptor_aux = {
@@ -33,7 +33,7 @@ let transfer_descriptor_to_michelson (p : transfer_descriptor) : transfer_descri
       )
       p.txs;
   } in
-  Layout.convert_to_right_comb aux
+  Layout.convert_to_right_comb (aux : transfer_descriptor_aux)
 
 let transfer_descriptor_param_to_michelson (p : transfer_descriptor_param)
     : transfer_descriptor_param_michelson =
@@ -41,7 +41,7 @@ let transfer_descriptor_param_to_michelson (p : transfer_descriptor_param)
     operator = p.operator;
     batch = List.map  transfer_descriptor_to_michelson p.batch;
   } in
-  Layout.convert_to_right_comb aux
+  Layout.convert_to_right_comb (aux : transfer_descriptor_param_aux)
 
 let transfer_descriptor_from_michelson (p : transfer_descriptor_michelson) : transfer_descriptor =
   let aux : transfer_descriptor_aux = Layout.convert_from_right_comb p in
@@ -91,7 +91,7 @@ let transfer_to_michelson (tx : transfer) : transfer_michelson =
         t
       ) tx.txs;
   } in
-  Layout.convert_to_right_comb aux   
+  Layout.convert_to_right_comb (aux : transfer_aux)
 
 let transfers_to_michelson (txs : transfer list) : transfer_michelson list =
   List.map transfer_to_michelson txs
@@ -141,14 +141,14 @@ let balance_of_param_to_michelson (p : balance_of_param) : balance_of_param_mich
       p.requests;
     callback = p.callback;
   } in
-  Layout.convert_to_right_comb aux
+  Layout.convert_to_right_comb (aux : balance_of_param_aux)
 
 let balance_of_response_to_michelson (r : balance_of_response) : balance_of_response_michelson =
   let aux : balance_of_response_aux = {
     request = Layout.convert_to_right_comb r.request;
     balance = r.balance;
   } in
-  Layout.convert_to_right_comb aux
+  Layout.convert_to_right_comb (aux : balance_of_response_aux)
 
 let balance_of_response_from_michelson (rm : balance_of_response_michelson) : balance_of_response =
   let aux : balance_of_response_aux = Layout.convert_from_right_comb rm in

@@ -40,7 +40,7 @@ let update_meta_and_create_txs (param, storage
         extras = t.extras;
       } in
       let meta_michelson : token_metadata_michelson =
-        Layout.convert_to_right_comb meta in
+        Layout.convert_to_right_comb (meta : token_metadata) in
       let new_token_metadata =
         Big_map.add meta.token_id meta_michelson acc.storage.token_metadata in
 

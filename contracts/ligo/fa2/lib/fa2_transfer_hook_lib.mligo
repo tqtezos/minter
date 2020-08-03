@@ -3,7 +3,7 @@
  Each transfer hook contract maintains a registry of known FA2 contracts and
  validates that it is invoked from registered FA2 contracts.
  
- The implementation assumes that the transfer hook entry point is labeled as
+ The implementation assumes that the transfer hook entrypoint is labeled as
  `%tokens_transferred_hook`.
  *)
  
@@ -27,7 +27,7 @@ let create_register_hook_op
     hook = hook_fn;
     permissions_descriptor = permissions_descriptor_to_michelson descriptor;
   } in
-  let pm = Layout.convert_to_right_comb p in
+  let pm = Layout.convert_to_right_comb (p : set_hook_param_aux) in
   Operation.transaction (Set_transfer_hook pm) 0mutez fa2
 
 
