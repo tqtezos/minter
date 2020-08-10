@@ -1,0 +1,11 @@
+@import '~antd/dist/antd.css';
+
+.ant-layout-header {
+  background: white;
+}
+
+.ant-layout-content {
+  background: white;
+  padding: 0 50px;
+}
+
