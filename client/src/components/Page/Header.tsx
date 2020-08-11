@@ -28,7 +28,7 @@ const HeaderButton: FC<HeaderButtonProps> = ({title, onClick}) => (
     shape="round" 
     type="primary"
     onClick={onClick}
-    css={{ width: '6em'}}
+    css={{ width: '7em'}}
   >
     {title}
   </Button>
@@ -43,8 +43,8 @@ const Header: FC = () => (
       <Col>
         <Space size="middle">
           <HeaderButton title="FAQ" onClick={() => {}} />
-          <HeaderButton title="Mint" onClick={() => {}} />
-          <HeaderButton title="Log In" onClick={() => {}} />
+          <HeaderButton title="Create" onClick={() => {}} />
+          <HeaderButton title="Connect" onClick={() => {}} />
         </Space>
       </Col>
     </Row>

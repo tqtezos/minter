@@ -52,10 +52,10 @@ const SplashPage: FC = () => (
   <Page>
     <Row>
       <Col span={10}>
-        <Title>Mint token on Tezos <br /> with the click of a button</Title>
+        <Title>Create NFTs on Tezos <br /> with the click of a button</Title>
         <Description>
-          Create any kind asset: fungible, non-fungible or a basket by
-          using our simple interface. Just connect your Tezos account.
+          Create and mint a new non-fungible token by using our simple interface. 
+          Just connect your Tezos account.
         </Description>
         <MintTokensButton onClick={() => {}} />
         <Description css={{marginTop: '7em'}}>
