@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { FC } from 'react';
-import { jsx, css } from '@emotion/core';
+import { jsx } from '@emotion/core';
 import styled from '@emotion/styled';
 import { Row, Col, Button } from 'antd';
 
@@ -59,7 +59,8 @@ const SplashPage: FC = () => (
         </Description>
         <MintTokensButton onClick={() => {}} />
         <Description css={{marginTop: '7em'}}>
-          Learn more about TZIP-12 here
+          Learn more about TZIP-12
+          <a href="https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md"> here</a>
         </Description>
       </Col>
       <Col span={14}>
