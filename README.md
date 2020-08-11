@@ -1,4 +1,4 @@
-# Minter
+# Open Minter
 
 ## Description
 
