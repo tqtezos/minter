@@ -1,8 +1,15 @@
-# Minter
+# OpenMinter
 
 ## Description
 
-WIP
+OpenMinter is an open-source tool to allow anyone 
+to create, manage, and use assets on the Tezos blockchain
+via the FA2 standard. The tool enables the user to easily 
+create any type of asset (fungible, semi-fungible, 
+non-fungible), deploy their own associated contracts for 
+those assets, manage them with an administration interface, 
+and eventually use them via third-party services (exchanges, 
+auctions, voting - DAOs, and games).
 
 ## Requirements
 
