@@ -1,15 +1,8 @@
-/** @jsx jsx */
-import { FC } from 'react';
-import { jsx, Interpolation } from '@emotion/core';
+import React, { FC } from 'react';
+import styled from '@emotion/styled';
 import NonFungibleToken from './nonFungibleToken.png';
 
-const imageStyle: Interpolation = {
-  maxWidth: '100%',
-  maxHeight: '100%',
-  padding: '10px 30px'
-}
-
-const parentStyle: Interpolation = {
+const Container = styled.div({
   width: 214,
   height: 302,
   border: '1px solid #E8E8E8',
@@ -17,9 +10,16 @@ const parentStyle: Interpolation = {
   flexFlow: 'column',
   alignItems: 'center',
   justifyContent: 'flex-start'
-};
+});
 
-const titleStyle: Interpolation = {
+const Image = styled.img({
+  maxWidth: '100%',
+  maxHeight: '100%',
+  padding: '10px 30px',
+  margin: 'auto'
+});
+
+const Title = styled.div({
   padding: '10px 30px',
   textAlign: 'center',
   fontFamily: 'sans-serif',
@@ -28,9 +28,9 @@ const titleStyle: Interpolation = {
   lineHeight: '23px',
   letterSpacing: '0.15px',
   color: 'rgba(0, 0, 0, 0.87)'
-};
+});
 
-const descriptionStyle: Interpolation = {
+const Description = styled.div({
   padding: '10px 30px',
   textAlign: 'center',
   fontFamily: 'sans-serif',
@@ -39,7 +39,7 @@ const descriptionStyle: Interpolation = {
   lineHeight: '20px',
   letterSpacing: '0.25px',
   color: 'rgba(0, 0, 0, 0.6)'
-};
+});
 
 interface BigIconProps {
   image: string;
@@ -48,13 +48,11 @@ interface BigIconProps {
 }
 
 const BigIcon: FC<BigIconProps> = ({ image, title, description}) => (
-  <div css={parentStyle}>
-    <div css={{flex: 1}} />
-    <img src={image} alt={title} css={imageStyle} />
-    <div css={{flex: 1}} />
-    <div css={titleStyle}>{title}</div>
-    <div css={descriptionStyle}>{description}</div>
-  </div>
+  <Container>
+    <Image src={image} alt={title} />
+    <Title>{title}</Title>
+    <Description>{description}</Description>
+  </Container>
 );
 
 export default BigIcon;
