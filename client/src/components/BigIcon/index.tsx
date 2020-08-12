@@ -1,26 +1,26 @@
 import React, { FC } from 'react';
 import styled from '@emotion/styled';
 import NonFungibleToken from './nonFungibleToken.png';
+import { Space } from 'antd';
 
 const Container = styled.div({
   width: 214,
   height: 302,
   border: '1px solid #E8E8E8',
+  padding: '1.5em',
   display: 'flex',
   flexFlow: 'column',
   alignItems: 'center',
-  justifyContent: 'flex-start'
+  justifyContent: 'flex-end'
 });
 
 const Image = styled.img({
   maxWidth: '100%',
   maxHeight: '100%',
-  padding: '10px 30px',
   margin: 'auto'
 });
 
 const Title = styled.div({
-  padding: '10px 30px',
   textAlign: 'center',
   fontFamily: 'sans-serif',
   fontWeight: 500,
@@ -31,7 +31,6 @@ const Title = styled.div({
 });
 
 const Description = styled.div({
-  padding: '10px 30px',
   textAlign: 'center',
   fontFamily: 'sans-serif',
   fontWeight: 'bold',
@@ -50,8 +49,10 @@ interface BigIconProps {
 const BigIcon: FC<BigIconProps> = ({ image, title, description}) => (
   <Container>
     <Image src={image} alt={title} />
-    <Title>{title}</Title>
-    <Description>{description}</Description>
+    <Space direction="vertical" size="middle">
+      <Title>{title}</Title>
+      <Description>{description}</Description>
+    </Space>
   </Container>
 );
 
