@@ -2,6 +2,7 @@
 import { FC, Fragment } from 'react';
 import { Button, Row, Col, Space } from 'antd';
 import { jsx } from '@emotion/core';
+import { useLocation } from 'wouter';
 
 import LogoImage from './logo.png';
 
@@ -35,20 +36,24 @@ const HeaderButton: FC<HeaderButtonProps> = ({title, onClick}) => (
 );
 
 
-const Header: FC = () => (
-  <Fragment>
-    <Row align="middle">
-      <Col><Logo onClick={() => {}} /></Col>
-      <Col flex="1" />
-      <Col>
-        <Space size="middle">
-          <HeaderButton title="FAQ" onClick={() => {}} />
-          <HeaderButton title="Create" onClick={() => {}} />
-          <HeaderButton title="Connect" onClick={() => {}} />
-        </Space>
-      </Col>
-    </Row>
-  </Fragment>
-);
+const Header: FC = () => {
+  const [, setLocation] = useLocation();
+
+  return (
+    <Fragment>
+      <Row align="middle">
+        <Col><Logo onClick={() => {setLocation('/')}} /></Col>
+        <Col flex="1" />
+        <Col>
+          <Space size="middle">
+            <HeaderButton title="FAQ" onClick={() => {}} />
+            <HeaderButton title="Create" onClick={() => {}} />
+            <HeaderButton title="Connect" onClick={() => {}} />
+          </Space>
+        </Col>
+      </Row>
+    </Fragment>
+  );
+};
 
 export default Header;

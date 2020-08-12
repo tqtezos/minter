@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { jsx } from '@emotion/core';
 import styled from '@emotion/styled';
 import { Row, Col, Button } from 'antd';
+import { useLocation } from 'wouter';
 
 import Page from '../Page';
 import Splash from './splash.png'
@@ -48,26 +49,32 @@ const SplashImage: FC = () => (
   />
 );
 
-const SplashPage: FC = () => (
-  <Page>
-    <Row>
-      <Col span={10}>
-        <Title>Create NFTs on Tezos <br /> with the click of a button</Title>
-        <Description>
-          Create and mint a new non-fungible token by using our simple interface. 
-          Just connect your Tezos account.
-        </Description>
-        <MintTokensButton onClick={() => {}} />
-        <Description css={{marginTop: '7em'}}>
-          Learn more about TZIP-12
-          <a href="https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md"> here</a>
-        </Description>
-      </Col>
-      <Col span={14}>
-        <SplashImage />
-      </Col>
-    </Row>
-  </Page>
-);
+const SplashPage: FC = () => {
+  const [, setLocation] = useLocation();
+
+  return (
+    <Page>
+      <Row>
+        <Col span={10}>
+          <Title>Create NFTs on Tezos <br /> with the click of a button</Title>
+          <Description>
+            Create and mint a new non-fungible token by using our simple interface. 
+            Just connect your Tezos account.
+          </Description>
+          <MintTokensButton onClick={
+            () => {setLocation('/create-non-fungible')}} 
+          />
+          <Description css={{marginTop: '7em'}}>
+            Learn more about TZIP-12
+            <a href="https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md"> here</a>
+          </Description>
+        </Col>
+        <Col span={14}>
+          <SplashImage />
+        </Col>
+      </Row>
+    </Page>
+  );
+}
 
 export default SplashPage;
