@@ -16,7 +16,7 @@ const InputForm: FC = () => (
       name="description"
     >
       <Input.TextArea
-        placeholder="Lorel ipsum"
+        placeholder="Lorem ipsum"
         autoSize={{ minRows: 3, maxRows: 6 }}
       />
     </Form.Item>
