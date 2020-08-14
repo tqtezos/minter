@@ -1,8 +1,0 @@
-{
-  "extends": "@snowpack/app-scripts-react",
-  "scripts": {},
-  "plugins": [],
-  "devOptions": {
-    "port": 3000
-  }
-}

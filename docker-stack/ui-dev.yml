@@ -3,6 +3,7 @@ version: '3.7'
 services:
   ui:
     image: minter-ui-dev
+    tty: true
     volumes:
       - ${PROJECT_ROOT_DIR}/client/src:/usr/src/app/client/src
     ports:
