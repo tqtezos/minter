@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+cd ${BASH_SOURCE%/*}/..
+
+docker pull ligolang/ligo:next 2>&1 1>/dev/null
+
+compile_contract() {
+  LIGO_CONTRACT="$1"
+  LIGO_ENTRY="$2"
+  docker run \
+    -v "$(pwd):/data" --rm \
+    -t ligolang/ligo:next \
+    compile-contract "/data/$LIGO_CONTRACT" "$LIGO_ENTRY" \
+    --brief
+}
+
+# TODO: Configure at top level
+ADMIN_ADDRESS="tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb"
+ORIGINATOR_PRIVATE_KEY="edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
+# TEZOS_RPC_URL="http://localhost:20000"
+
+COMPIILED_MINTER_CODE=`compile_contract contracts/ligo/src/fa2_nft_minter.mligo minter_main`
+COMPILED_NFT_CODE=`compile_contract contracts/ligo/src/fa2_multi_nft_asset.mligo nft_asset_main`
+
+MINTER_STORAGE="(Pair (Pair (Pair (Pair \"$ADMIN_ADDRESS\" False) None) {}) None)"
+NFT_STORAGE="(Pair (Pair (Pair \"$ADMIN_ADDRESS\" True) None) (Pair (Pair {} 0) (Pair {} {})))"
+
+# TODO: Use server dev docker image to run these commands
+
+echo "Originating Minter Contract..."
+echo "$COMPIILED_MINTER_CODE" | ts-node server/scripts/originate_contract.ts $ORIGINATOR_PRIVATE_KEY "$MINTER_STORAGE"
+
+echo "Originating NFT Contract..."
+echo "$COMPILED_NFT_CODE" | ts-node server/scripts/originate_contract.ts $ORIGINATOR_PRIVATE_KEY "$NFT_STORAGE"
