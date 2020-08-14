@@ -13,7 +13,7 @@ const Page: FC<{children: React.ReactNode}> = ({children}) => (
       </div>
       <Divider css={{margin: 0}}/>
     </div>
-    <div css={{flex: 1, padding: '3vw'}}>
+    <div css={{flex: 1, padding: '0.5em 3vw'}}>
       {children}
     </div>
   </div>

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ant-design/icons": "^4.2.2",
     "@emotion/core": "^10.0.28",
     "@emotion/styled": "^10.0.27",
     "@testing-library/jest-dom": "^4.2.4",

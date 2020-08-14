@@ -61,6 +61,6 @@ export default BigIcon;
 export const NonFungibleIcon: FC = () => 
   <BigIcon
     image={NonFungibleToken} 
-    title="Non Fungible" 
+    title="Non-Fungible" 
     description="A unique asset that is one-of-a-kind" 
   />

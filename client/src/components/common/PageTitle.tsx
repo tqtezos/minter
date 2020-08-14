@@ -1,16 +1,20 @@
 /** @jsx jsx */
 import { FC, Fragment } from 'react';
+
 import { jsx } from '@emotion/core';
 import styled from '@emotion/styled';
 
-const Title = styled.h1({
+import { Row, Col } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons'
+
+const Title = styled.div({
   fontFamily: 'sans-serif',
   fontSize: '60px',
   lineHeight: '60px',
   letterSpacing: '0.75px',
 });
   
-const Description = styled.p({
+const Text = styled.div({
   fontFamily: 'sans-serif',
   fontWeight: 300,
   fontSize: '20px',
@@ -22,12 +26,26 @@ const Description = styled.p({
 interface PageTitleProps {
   title: string;
   description: string;
+  onClick: () =>  void;
 }
   
-const PageTitle: FC<PageTitleProps> = ({ title, description}) => (
+const PageTitle: FC<PageTitleProps> = ({ title, description, onClick}) => (
   <Fragment>
-    <Title>{title}</Title>
-    <Description>{description}</Description>
+    <Row 
+      align="middle" 
+      justify="start" 
+      onClick={onClick}
+      css={{ cursor: 'pointer'}} 
+    >
+      <Col><ArrowLeftOutlined /></Col>
+      <Col><Text css={{marginLeft: '0.5em'}}>Back</Text></Col>
+    </Row>
+    <Row css={{paddingTop: '1em'}}>
+      <Col><Title>{title}</Title></Col>
+    </Row>
+    <Row css={{paddingTop: '1em'}}>
+      <Col><Text>{description}</Text></Col>
+    </Row>
   </Fragment>
 );
 
