@@ -14,7 +14,7 @@ const Title = styled.div({
   letterSpacing: '0.75px',
 });
   
-const Text = styled.div({
+const Text = styled.span({
   fontFamily: 'sans-serif',
   fontWeight: 300,
   fontSize: '20px',
@@ -26,7 +26,7 @@ const Text = styled.div({
 interface PageTitleProps {
   title: string;
   description: string;
-  onClick: () =>  void;
+  onClick?: () =>  void;
 }
   
 const PageTitle: FC<PageTitleProps> = ({ title, description, onClick}) => (
@@ -34,11 +34,18 @@ const PageTitle: FC<PageTitleProps> = ({ title, description, onClick}) => (
     <Row 
       align="middle" 
       justify="start" 
-      onClick={onClick}
-      css={{ cursor: 'pointer'}} 
     >
-      <Col><ArrowLeftOutlined /></Col>
-      <Col><Text css={{marginLeft: '0.5em'}}>Back</Text></Col>
+      <Col>
+        <Text 
+          onClick={onClick}      
+          css={{ 
+            cursor: 'pointer',
+            visibility: onClick ? 'visible' : 'hidden'
+          }} 
+        >
+          <ArrowLeftOutlined />&nbsp;Back
+        </Text>
+      </Col>
     </Row>
     <Row css={{paddingTop: '1em'}}>
       <Col><Title>{title}</Title></Col>
