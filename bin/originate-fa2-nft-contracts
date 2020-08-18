@@ -1,8 +1,19 @@
 #!/usr/bin/env bash
 
+##
+# This origination script only works for the development sandbox environment
+# TODO: Expand with input arguments that parameterize the public/private keys
+#       and Tezos RPC address
+##
+
+# Setup
+
 cd ${BASH_SOURCE%/*}/..
 
 docker pull ligolang/ligo:next 2>&1 1>/dev/null
+
+
+# Contract compilation, origination & creation
 
 compile_contract() {
   LIGO_CONTRACT="$1"
@@ -14,21 +25,49 @@ compile_contract() {
     --brief
 }
 
-# TODO: Configure at top level
+
+originate_contract() {
+  PRIVATE_KEY="$1"
+  STORAGE="$2"
+  CONFIG_KEY="$3"
+  docker run \
+    -v "$(pwd)/server/config:/usr/src/app/server/config" \
+    -i --rm --network="minter-dev-sandbox_default" minter-api-dev \
+    yarn exec -s ts-node /usr/src/app/server/scripts/originate_contract.ts "$PRIVATE_KEY" "$STORAGE" "$CONFIG_KEY"
+}
+
+
+create_contract() {
+  CONTRACT="$1"
+  ENTRY="$2"
+  PRIVATE_KEY="$3"
+  STORAGE="$4"
+  CONFIG_KEY="$5"
+  compile_contract "$CONTRACT" "$ENTRY" | originate_contract "$PRIVATE_KEY" "$STORAGE" "$CONFIG_KEY"
+}
+
+
+# Originator Wallet
+
 ADMIN_ADDRESS="tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb"
 ORIGINATOR_PRIVATE_KEY="edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
-# TEZOS_RPC_URL="http://localhost:20000"
 
-COMPIILED_MINTER_CODE=`compile_contract contracts/ligo/src/fa2_nft_minter.mligo minter_main`
-COMPILED_NFT_CODE=`compile_contract contracts/ligo/src/fa2_multi_nft_asset.mligo nft_asset_main`
 
+# Originate Minter Contract
+
+MINTER_CONFIG_KEY="minter_contract"
+MINTER_CONTRACT="contracts/ligo/src/fa2_nft_minter.mligo"
+MINTER_ENTRY="minter_main"
 MINTER_STORAGE="(Pair (Pair (Pair (Pair \"$ADMIN_ADDRESS\" False) None) {}) None)"
+
+create_contract "$MINTER_CONTRACT" "$MINTER_ENTRY" "$ORIGINATOR_PRIVATE_KEY" "$MINTER_STORAGE" "$MINTER_CONFIG_KEY"
+
+
+# Originate NFT Contract
+
+NFT_CONFIG_KEY="nft_contract"
+NFT_CONTRACT="contracts/ligo/src/fa2_multi_nft_asset.mligo"
+NFT_ENTRY="nft_asset_main"
 NFT_STORAGE="(Pair (Pair (Pair \"$ADMIN_ADDRESS\" True) None) (Pair (Pair {} 0) (Pair {} {})))"
 
-# TODO: Use server dev docker image to run these commands
-
-echo "Originating Minter Contract..."
-echo "$COMPIILED_MINTER_CODE" | ts-node server/scripts/originate_contract.ts $ORIGINATOR_PRIVATE_KEY "$MINTER_STORAGE"
-
-echo "Originating NFT Contract..."
-echo "$COMPILED_NFT_CODE" | ts-node server/scripts/originate_contract.ts $ORIGINATOR_PRIVATE_KEY "$NFT_STORAGE"
+create_contract "$NFT_CONTRACT" "$NFT_ENTRY" "$ORIGINATOR_PRIVATE_KEY" "$NFT_STORAGE" "$NFT_CONFIG_KEY"
