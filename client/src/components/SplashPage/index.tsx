@@ -6,7 +6,6 @@ import { Row, Col, Button } from 'antd';
 import { useLocation } from 'wouter';
 
 import Page from '../Page';
-import Splash from './splash.png'
 
 const Title = styled.h1({
   fontFamily: 'sans-serif',
@@ -41,21 +40,13 @@ const MintTokensButton: FC<{ onClick: () => void }> = ({ onClick }) => (
   </Button>
 );
 
-const SplashImage: FC = () => (
-  <img
-    src={Splash} 
-    alt="Splash"
-    css={{maxWidth: '100%', maxHeight: '100%'}}
-  />
-);
-
 const SplashPage: FC = () => {
   const [, setLocation] = useLocation();
 
   return (
     <Page>
-      <Row>
-        <Col span={10}>
+      <Row css={{marginTop: '7em'}}>
+        <Col offset={3} span={18}>
           <Title>Create NFTs on Tezos <br /> with the click of a button</Title>
           <Description>
             Create and mint a new non-fungible token by using our simple interface. 
@@ -68,9 +59,6 @@ const SplashPage: FC = () => {
             Learn more about TZIP-12
             <a href="https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md"> here</a>
           </Description>
-        </Col>
-        <Col span={14}>
-          <SplashImage />
         </Col>
       </Row>
     </Page>
