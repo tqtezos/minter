@@ -2,8 +2,9 @@
 import { FC } from 'react';
 import { jsx } from '@emotion/core';
 import { Form, Input, Button } from 'antd';
+import UploadImage, { UploadImageProps } from './UploadImage';
 
-const InputForm: FC = () => (
+const InputForm: FC<UploadImageProps> = ({ onChange }) => (
   <Form layout="vertical" css={{width: '30em'}}>
     <Form.Item
       label="Name"
@@ -27,10 +28,16 @@ const InputForm: FC = () => (
       <Input />
     </Form.Item>
     <Form.Item
-      label="IPFS Hash"
-      name="ipfsHash"
+      label="Image Upload"
+      name="image"
     >
-      <Input/>
+      <UploadImage onChange={onChange} />
+    </Form.Item>
+    <Form.Item
+      label="IPFS Hash (CID)"
+      name="ipfsCid"
+    >
+      <Input disabled/>
     </Form.Item>
     <Form.Item>
       <Button 
