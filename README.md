@@ -2,13 +2,13 @@
 
 ## Description
 
-OpenMinter is an open-source tool to allow anyone 
+OpenMinter is an open-source tool to allow anyone
 to create, manage, and use assets on the Tezos blockchain
-via the FA2 standard. The tool enables the user to easily 
-create any type of asset (fungible, semi-fungible, 
-non-fungible), deploy their own associated contracts for 
-those assets, manage them with an administration interface, 
-and eventually use them via third-party services (exchanges, 
+via the FA2 standard. The tool enables the user to easily
+create any type of asset (fungible, semi-fungible,
+non-fungible), deploy their own associated contracts for
+those assets, manage them with an administration interface,
+and eventually use them via third-party services (exchanges,
 auctions, voting - DAOs, and games).
 
 ## Requirements
@@ -53,10 +53,21 @@ To stop:
 ```
 bin/stop
 ```
+
 You can now open:
 
 - [http://localhost:9000](http://localhost:9000) to view the application.
 - [http://localhost:9000/graphql](http://localhost:9000/graphql) to open the GraphQL playground.
+
+
+### Originating Contracts
+
+Once you've started the docker swarm services with `bin/start`, the Minter needs
+a set of initial contracts to interact with. To originate them run:
+
+```
+bin/originate-fa2-nft-contracts
+```
 
 ## Development
 
