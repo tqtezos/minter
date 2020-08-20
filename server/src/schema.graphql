@@ -115,12 +115,6 @@ type ContractOperation {
 
 ## Application Types
 
-type Profile {
-  id: Int!
-  alias: String
-  address: String!
-}
-
 type NonFungibleToken {
   id: Int!
   token_id: String!
@@ -130,40 +124,47 @@ type NonFungibleToken {
 
 type PublishedOperation {
   id: Int!
-  address: String!
-  initiator_address: String!
+  hash: String!
+  initiator: String!
+  method: String!
+  params: String!
+  status: String!
+  retry: Boolean!
 }
 
 type Settings {
   tzStatsUrl: String!
+  minterContractAddress: String
+  nftContractAddress: String
+  adminAddress: String
 }
 
 ## Toplevel Types
 
 type Query {
-  contractStorage(contract_id: String!): ContractStorage
-  contractOperations(contract_id: String!): [ContractOperation]
+  nftTokens(limit: Int): [NonFungibleToken]
   nftByTokenId(token_id: String!): NonFungibleToken
   nftByCreatorAddress(creator_address: String!): NonFungibleToken
   nftByOperationAddress(operation_address: String!): NonFungibleToken
-  nftTokens(limit: Int): [NonFungibleToken]
-  profileByAddress(address: String!): Profile
-  profileByAlias(alias: String!): Profile
-  publishedOperationByAddress(address: String!): PublishedOperation
-  publishedOperationByInitiatorAddress(address: String!): PublishedOperation
+
+  publishedOperationByHash(address: String!): PublishedOperation
+  publishedOperationByInitiator(address: String!): PublishedOperation
+  publishedOperationByMethod(address: String!): PublishedOperation
+  publishedOperationByStatus(address: String!): PublishedOperation
+
   settings: Settings!
 }
 
 type Mutation {
-  createProfile(alias: String!, address: String!): Profile!
   createNonFungibleToken(
-    token_id: String!,
-    creator_address: String!,
-    operation_address: String!
-  ): NonFungibleToken!
+    name: String!,
+    description: String!
+    symbol: String!
+    ipfs_hash: String!
+  ): PublishedOperation!
 }
 
 type Subscription {
-  operationSent: Operation
-  operationConfirmed: Operation
+  operationSent: PublishedOperation
+  operationConfirmed: PublishedOperation
 }
