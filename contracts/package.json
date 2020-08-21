@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "start-sandbox": "../../flextesa/start-sandbox.sh",
-    "kill-sandbox": "../../flextesa/kill-sandbox.sh"
+    "start-sandbox": "../flextesa/start-sandbox.sh",
+    "kill-sandbox": "../flextesa/kill-sandbox.sh"
   },
   "author": "",
   "license": "MIT",
