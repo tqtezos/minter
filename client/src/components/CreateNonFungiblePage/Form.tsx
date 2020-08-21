@@ -2,9 +2,9 @@
 import { FC } from 'react';
 import { jsx } from '@emotion/core';
 import { Form, Input, Button } from 'antd';
-import UploadImage, { UploadImageProps } from './UploadImage';
+import ImageIpfsUpload, { ImageIpfsUploadProps } from './ImageIpfsUpload';
 
-const InputForm: FC<UploadImageProps> = ({ onChange }) => (
+const InputForm: FC<ImageIpfsUploadProps> = ({ onChange }) => (
   <Form layout="vertical" css={{width: '30em'}}>
     <Form.Item
       label="Name"
@@ -31,7 +31,7 @@ const InputForm: FC<UploadImageProps> = ({ onChange }) => (
       label="Image Upload"
       name="image"
     >
-      <UploadImage onChange={onChange} />
+      <ImageIpfsUpload onChange={onChange} />
     </Form.Item>
     <Form.Item
       label="IPFS Hash (CID)"
