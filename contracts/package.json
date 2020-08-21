@@ -1,5 +1,5 @@
 {
-  "name": "contracts-test",
+  "name": "minter-contracts",
   "version": "1.0.0",
   "description": "smart contracts tests using flextesa sandbox and taquito",
   "main": "index.js",
@@ -7,8 +7,8 @@
     "test": "jest",
     "start-sandbox": "../flextesa/start-sandbox.sh",
     "kill-sandbox": "../flextesa/kill-sandbox.sh",
-    "build": "tsc -p ./src",
-    "build:watch": "tsc -w -p ./src"
+    "build": "tsc -p .",
+    "build:watch": "tsc -w -p ."
   },
   "author": "",
   "license": "MIT",
