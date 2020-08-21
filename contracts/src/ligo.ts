@@ -29,9 +29,9 @@ export class LigoEnv {
 export const defaultEnv: LigoEnv = defaultLigoEnv();
 
 function defaultLigoEnv(): LigoEnv {
-  const cwd = path.join(__dirname, '../ligo/');
-  const src = path.join(cwd, 'src');
-  const out = path.join(cwd, 'out');
+  const cwd = path.join(__dirname, '..');
+  const src = path.join(cwd, 'ligo/src');
+  const out = path.join(cwd, 'bin/contracts');
   return new LigoEnv(cwd, src, out);
 }
 

@@ -15,7 +15,7 @@ import { BalanceOfRequest, BalanceOfResponse } from '../src/fa2-interface';
 export type InspectorStorage = BalanceOfResponse[] | {};
 
 export async function originateInspector(tz: TezosToolkit): Promise<Contract> {
-  const inspectorSrcDir = path.join(defaultEnv.cwd, 'fa2_clients');
+  const inspectorSrcDir = path.join(defaultEnv.cwd, 'ligo/fa2_clients');
   const env = new LigoEnv(defaultEnv.cwd, inspectorSrcDir, defaultEnv.outDir);
 
   const code = await compileAndLoadContract(
