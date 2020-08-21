@@ -2,8 +2,8 @@ import { $log } from '@tsed/logger';
 import { BigNumber } from 'bignumber.js';
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 
-import { bootstrap, TestTz } from './bootstrap-sandbox';
-import { Contract, address, nat } from './type-aliases';
+import { bootstrap, TestTz } from '../src/bootstrap-sandbox';
+import { Contract, address, nat } from '../src/type-aliases';
 
 import {
   originateMinter,
@@ -11,8 +11,8 @@ import {
   originateNftWithHooks,
   MinterStorage,
   MinterTokenMetadata
-} from './nft-contracts';
-import { BalanceOfRequest, transfer, addOperator } from './fa2-interface';
+} from '../src/nft-contracts';
+import { BalanceOfRequest, transfer, addOperator } from '../src/fa2-interface';
 import {
   originateInspector,
   InspectorStorage,

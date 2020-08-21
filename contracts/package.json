@@ -6,7 +6,9 @@
   "scripts": {
     "test": "jest",
     "start-sandbox": "../flextesa/start-sandbox.sh",
-    "kill-sandbox": "../flextesa/kill-sandbox.sh"
+    "kill-sandbox": "../flextesa/kill-sandbox.sh",
+    "build": "tsc -p ./src",
+    "build:watch": "tsc -w -p ./src"
   },
   "author": "",
   "license": "MIT",

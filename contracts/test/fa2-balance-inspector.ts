@@ -8,9 +8,9 @@ import {
   originateContract,
   defaultEnv,
   LigoEnv
-} from './ligo';
-import { address, Contract } from './type-aliases';
-import { BalanceOfRequest, BalanceOfResponse } from './fa2-interface';
+} from '../src/ligo';
+import { address, Contract } from '../src/type-aliases';
+import { BalanceOfRequest, BalanceOfResponse } from '../src/fa2-interface';
 
 export type InspectorStorage = BalanceOfResponse[] | {};
 
