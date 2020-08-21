@@ -7,6 +7,7 @@
     "test": "jest",
     "start-sandbox": "../flextesa/start-sandbox.sh",
     "kill-sandbox": "../flextesa/kill-sandbox.sh",
+    "clear": "rimraf bin/**/*.js",
     "build": "tsc -p .",
     "build:watch": "tsc -w -p ."
   },
@@ -16,6 +17,7 @@
     "@types/jest": "^26.0.7",
     "jest": "^26.1.0",
     "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
     "ts-jest": "^26.1.3",
     "tslint": "^6.1.2",
     "typescript": "^3.9.7"
