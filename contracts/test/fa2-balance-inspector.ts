@@ -25,7 +25,8 @@ export async function originateInspector(tz: TezosToolkit): Promise<Contract> {
     'inspector.tz'
   );
   const storage = `(Left Unit)`;
-  return originateContract(tz, code, storage, 'inspector');
+  const c = await originateContract(tz, code, storage, 'inspector');
+  return c;
 }
 
 export async function queryBalances(

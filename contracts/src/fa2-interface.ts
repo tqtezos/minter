@@ -1,15 +1,15 @@
 import { $log } from '@tsed/logger';
-import { TezosToolkit } from '@taquito/taquito';
-import { Contract, address, nat } from './type-aliases';
+import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
+import { address, nat } from './type-aliases';
 
 export interface Fa2TransferDestination {
-  to_?: address;
+  to_: address;
   token_id: nat;
   amount: nat;
 }
 
 export interface Fa2Transfer {
-  from_?: address;
+  from_: address;
   txs: Fa2TransferDestination[];
 }
 
@@ -21,6 +21,14 @@ export interface BalanceOfRequest {
 export interface BalanceOfResponse {
   balance: nat;
   request: BalanceOfRequest;
+}
+
+export interface TokenMetadata {
+  token_id: nat;
+  symbol: string;
+  name: string;
+  decimals: nat;
+  extras: MichelsonMap<string, string>;
 }
 
 export async function transfer(
