@@ -60,14 +60,13 @@ MINTER_CONTRACT="contracts/ligo/src/fa2_nft_minter.mligo"
 MINTER_ENTRY="minter_main"
 MINTER_STORAGE="(Pair (Pair (Pair (Pair \"$ADMIN_ADDRESS\" False) None) {}) None)"
 
-create_contract "$MINTER_CONTRACT" "$MINTER_ENTRY" "$ORIGINATOR_PRIVATE_KEY" "$MINTER_STORAGE" "$MINTER_CONFIG_KEY"
-
+MINTER_ADDRESS="$(create_contract "$MINTER_CONTRACT" "$MINTER_ENTRY" "$ORIGINATOR_PRIVATE_KEY" "$MINTER_STORAGE" "$MINTER_CONFIG_KEY")"
 
 # Originate NFT Contract
 
 NFT_CONFIG_KEY="nft_contract"
 NFT_CONTRACT="contracts/ligo/src/fa2_multi_nft_asset.mligo"
 NFT_ENTRY="nft_asset_main"
-NFT_STORAGE="(Pair (Pair (Pair \"$ADMIN_ADDRESS\" True) None) (Pair (Pair {} 0) (Pair {} {})))"
+NFT_STORAGE="(Pair (Pair (Pair \"$MINTER_ADDRESS\" True) None) (Pair (Pair {} 0) (Pair {} {})))"
 
 create_contract "$NFT_CONTRACT" "$NFT_ENTRY" "$ORIGINATOR_PRIVATE_KEY" "$NFT_STORAGE" "$NFT_CONFIG_KEY"

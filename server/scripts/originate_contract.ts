@@ -32,9 +32,9 @@ async function main() {
       {},
       { configPath: CONFIG_PATH }
     );
-    console.log(`Originated ${configKey} at ${contract.address}`);
+    process.stdout.write(contract.address);
     config.set(configKey, contract.address);
-    console.log(`Updated config at server/config/${CONFIG_NAME}`);
+    console.error(`Updated config at server/config/${CONFIG_NAME}`);
   } catch (e) {
     console.log(e);
     process.exit(1);
