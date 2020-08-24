@@ -4,7 +4,7 @@ import { jsx } from '@emotion/core';
 import { Form, Input, Button } from 'antd';
 
 const InputForm: FC = () => (
-  <Form layout="vertical" css={{width: '25em'}}>
+  <Form layout="vertical" css={{width: '30em'}}>
     <Form.Item
       label="Name"
       name="name"

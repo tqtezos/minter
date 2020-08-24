@@ -12,6 +12,7 @@ const Title = styled.div({
   fontSize: '60px',
   lineHeight: '60px',
   letterSpacing: '0.75px',
+  color: 'black'
 });
   
 const Text = styled.span({
