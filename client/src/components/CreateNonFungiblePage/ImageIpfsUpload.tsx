@@ -6,6 +6,9 @@ import { UploadOutlined } from '@ant-design/icons';
 import { UploadChangeParam } from 'antd/lib/upload';
 import { RcCustomRequestOptions } from 'antd/lib/upload/interface';
 
+const IpfsClient = require('ipfs-http-client');
+const ipfsClient = IpfsClient('http://localhost:5001');
+
 const dummyRequest = ({ file, onSuccess }: RcCustomRequestOptions) => {
   setTimeout(() => {
     onSuccess({}, file);
@@ -24,10 +27,14 @@ const ImageIpfsUpload: FC<ImageIpfsUploadProps> = ({ onChange }) => {
   const onChangeHandler = (info: UploadChangeParam) => {
     if (info.file.status === 'done') {
       const reader = new FileReader();
-      reader.addEventListener('load', () => { 
-        onChange({url: reader.result as string}) 
+      
+      reader.addEventListener('load', async () => { 
+        const ipfsFile = await ipfsClient.add(reader.result);
+        const url = `http://localhost:8080/ipfs/${ipfsFile.path}`
+        onChange({url}) 
       });
-      reader.readAsDataURL(info.file.originFileObj as Blob);    
+      
+      reader.readAsArrayBuffer(info.file.originFileObj as Blob);    
     }    
   }
 

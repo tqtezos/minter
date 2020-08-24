@@ -1,0 +1,25 @@
+
+declare module 'ipfs-http-client' {
+    
+}
+
+// import CID from "./cid";
+
+// declare module "ipfs-http-client" {
+    // const ipfsClient = (options: any) => IpfsClientApi;
+
+    // export type FileContent = any | Blob | string;
+
+    // export interface IpfsFile {
+    //   path: string;
+    //   hash: CID;
+    //   size: number;
+    // }
+  
+    // export interface IpfsClientApi {
+    //   add: (data: FileContent) => Promise<IpfsFile[]>;
+    // }
+
+    // export default ipfsClient;
+// }
+

@@ -37,7 +37,7 @@ const InputForm: FC<ImageIpfsUploadProps> = ({ onChange }) => (
       label="IPFS Hash (CID)"
       name="ipfsCid"
     >
-      <Input disabled/>
+      <Input readOnly/>
     </Form.Item>
     <Form.Item>
       <Button 
