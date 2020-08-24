@@ -36,28 +36,34 @@ Docker  | `19.03.x` | [Link][docker]
 
 ## Usage
 
-Build docker images for development:
+### Setup
+
+First build docker images for development:
 
 ```
 bin/build-dev-images
 ```
 
-Start services in docker swarm:
+Next, import a Tezos private key. For local development, we can use the default
+`Alice` secret key that's included in the Tezos sandbox node:
+
+```
+printf "edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq" | docker secret create tz_private_key -
+```
+
+### Starting and Stopping
+
+We can now start our docker swarm services:
 
 ```
 bin/start
 ```
 
-To stop:
+To stop and teardown the services, run:
 
 ```
 bin/stop
 ```
-
-You can now open:
-
-- [http://localhost:9000](http://localhost:9000) to view the application.
-- [http://localhost:9000/graphql](http://localhost:9000/graphql) to open the GraphQL playground.
 
 
 ### Originating Contracts
@@ -69,9 +75,14 @@ a set of initial contracts to interact with. To originate them run:
 bin/originate-fa2-nft-contracts
 ```
 
+You can now open:
+
+- [http://localhost:9000](http://localhost:9000) to view the application.
+- [http://localhost:9000/graphql](http://localhost:9000/graphql) to open the GraphQL playground.
+
 ## Development
 
-Note names of the services printed by the start script and check their log
+Note the names of the services printed by the start script and check their log
 output, e.g.:
 
 ```
