@@ -18,7 +18,7 @@ generates:
       useIndexSignature: true
       scalars:
         DateTime: Date
-      contextType: "./../components/context#SessionContext"
+      contextType: "./../components/context#Context"
   client/src/generated/fragmentTypes.json:
     plugins:
       - fragment-matcher
