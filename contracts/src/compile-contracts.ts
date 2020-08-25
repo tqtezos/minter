@@ -3,17 +3,17 @@
 import { defaultEnv, LigoEnv, compileContract } from './ligo';
 import { $log } from '@tsed/logger';
 
-async function main(): Promise<number> {
+async function main(): Promise<void> {
   try {
     const env = defaultEnv;
 
     await compileNftContract(env);
     // add other contracts here
 
-    return 0;
+    process.exit(0);
   } catch (err) {
     $log.error(err);
-    return 1;
+    process.exit(1);
   }
 }
 

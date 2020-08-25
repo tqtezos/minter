@@ -51,11 +51,13 @@ function main() {
                 case 1:
                     _a.sent();
                     // add other contracts here
-                    return [2 /*return*/, 0];
+                    process.exit(0);
+                    return [3 /*break*/, 3];
                 case 2:
                     err_1 = _a.sent();
                     logger_1.$log.error(err_1);
-                    return [2 /*return*/, 1];
+                    process.exit(1);
+                    return [3 /*break*/, 3];
                 case 3: return [2 /*return*/];
             }
         });
