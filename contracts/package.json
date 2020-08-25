@@ -9,7 +9,11 @@
     "kill-sandbox": "../flextesa/kill-sandbox.sh",
     "clear": "rimraf bin/**/*.js",
     "build": "tsc -p .",
-    "build:watch": "tsc -w -p ."
+    "build:watch": "tsc -w -p .",
+    "compile-contract": "node bin/compile-contracts.js"
+  },
+  "bin": {
+    "compile-contracts": "bin/compile-contracts.js"
   },
   "author": "",
   "license": "MIT",
