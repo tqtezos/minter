@@ -43,7 +43,7 @@ export async function compileAndLoadContract(
 ): Promise<string> {
   const src = env.srcFilePath(srcFile);
   const out = env.outFilePath(dstFile);
-  await compileContract(env.cwd, src, main, out);
+  await compileContractImpl(env.cwd, src, main, out);
 
   return new Promise<string>((resolve, reject) =>
     fs.readFile(out, (err, buff) =>
@@ -52,7 +52,18 @@ export async function compileAndLoadContract(
   );
 }
 
-async function compileContract(
+export async function compileContract(
+  env: LigoEnv,
+  srcFile: string,
+  main: string,
+  dstFile: string
+): Promise<void> {
+  const src = env.srcFilePath(srcFile);
+  const out = env.outFilePath(dstFile);
+  await compileContractImpl(env.cwd, src, main, out);
+}
+
+async function compileContractImpl(
   cwd: string,
   srcFilePath: string,
   main: string,

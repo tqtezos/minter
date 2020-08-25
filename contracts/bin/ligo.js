@@ -55,7 +55,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.originateContract = exports.compileAndLoadContract = exports.defaultEnv = exports.LigoEnv = void 0;
+exports.originateContract = exports.compileContract = exports.compileAndLoadContract = exports.defaultEnv = exports.LigoEnv = void 0;
 var child = __importStar(require("child_process"));
 var fs = __importStar(require("fs"));
 var path = __importStar(require("path"));
@@ -90,7 +90,7 @@ function compileAndLoadContract(env, srcFile, main, dstFile) {
                 case 0:
                     src = env.srcFilePath(srcFile);
                     out = env.outFilePath(dstFile);
-                    return [4 /*yield*/, compileContract(env.cwd, src, main, out)];
+                    return [4 /*yield*/, compileContractImpl(env.cwd, src, main, out)];
                 case 1:
                     _a.sent();
                     return [2 /*return*/, new Promise(function (resolve, reject) {
@@ -103,7 +103,24 @@ function compileAndLoadContract(env, srcFile, main, dstFile) {
     });
 }
 exports.compileAndLoadContract = compileAndLoadContract;
-function compileContract(cwd, srcFilePath, main, dstFilePath) {
+function compileContract(env, srcFile, main, dstFile) {
+    return __awaiter(this, void 0, void 0, function () {
+        var src, out;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    src = env.srcFilePath(srcFile);
+                    out = env.outFilePath(dstFile);
+                    return [4 /*yield*/, compileContractImpl(env.cwd, src, main, out)];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.compileContract = compileContract;
+function compileContractImpl(cwd, srcFilePath, main, dstFilePath) {
     return __awaiter(this, void 0, void 0, function () {
         var cmd;
         return __generator(this, function (_a) {
