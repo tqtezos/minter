@@ -63,6 +63,7 @@ var fs = __importStar(require("fs"));
 var path = __importStar(require("path"));
 var async_retry_1 = __importDefault(require("async-retry"));
 var configstore_1 = __importDefault(require("configstore"));
+var ligo_1 = require("./ligo");
 var taquito_1 = require("@taquito/taquito");
 var signer_1 = require("@taquito/signer");
 function main() {
@@ -105,6 +106,26 @@ function main() {
                     process.exit(1);
                     return [3 /*break*/, 6];
                 case 6: return [2 /*return*/];
+            }
+        });
+    });
+}
+function bootstrapNft(config, tz) {
+    return __awaiter(this, void 0, void 0, function () {
+        var adminAddress, storage;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    logger_1.$log.info('bootstrapping NFT contract..');
+                    return [4 /*yield*/, tz.signer.publicKeyHash()];
+                case 1:
+                    adminAddress = _a.sent();
+                    storage = "(Pair (Pair (Pair \"" + adminAddress + "\" True) None) (Pair (Pair {} 0) (Pair {} {})))";
+                    return [4 /*yield*/, bootstrapContract(config, tz, 'contracts.nft', 'fa2_multi_nft_asset.tz', storage)];
+                case 2:
+                    _a.sent();
+                    logger_1.$log.info('bootstrapped NFT contract');
+                    return [2 /*return*/];
             }
         });
     });
@@ -160,29 +181,43 @@ function awaitForNetwork(tz) {
         });
     });
 }
-function bootstrapNft(config, tz) {
+function bootstrapContract(config, tz, configKey, contractFilename, contractStorage) {
     return __awaiter(this, void 0, void 0, function () {
-        var adminAddress, storage;
+        var shouldOrig, codeFilepath, code, contract;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    logger_1.$log.info('bootstrapping NFT contract..');
-                    return [4 /*yield*/, tz.signer.publicKeyHash()];
+                case 0: return [4 /*yield*/, shouldOriginate(config, tz, configKey)];
                 case 1:
-                    adminAddress = _a.sent();
-                    storage = "(Pair (Pair (Pair \"" + adminAddress + "\" True) None) (Pair (Pair {} 0) (Pair {} {})))";
-                    return [4 /*yield*/, bootstrapContract(config, tz, 'contracts.nft', 'fa2_multi_nft_asset.tz', storage)];
+                    shouldOrig = _a.sent();
+                    if (!shouldOrig)
+                        return [2 /*return*/];
+                    logger_1.$log.info('originating...');
+                    codeFilepath = ligo_1.defaultEnv.outFilePath(contractFilename);
+                    return [4 /*yield*/, ligo_1.loadFile(codeFilepath)];
                 case 2:
-                    _a.sent();
-                    logger_1.$log.info('bootstrapped NFT contract');
+                    code = _a.sent();
+                    return [4 /*yield*/, ligo_1.originateContract(tz, code, contractStorage, configKey)];
+                case 3:
+                    contract = _a.sent();
+                    config.set(configKey, contract.address);
+                    logger_1.$log.info('originated');
                     return [2 /*return*/];
             }
         });
     });
 }
-function bootstrapContract(config, tz, configKey, contractFilename, contractStorage) {
-    return __awaiter(this, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/];
-    }); });
+function shouldOriginate(config, tz, configKey) {
+    return __awaiter(this, void 0, void 0, function () {
+        var existingAddress;
+        return __generator(this, function (_a) {
+            existingAddress = config.get(configKey);
+            if (!existingAddress)
+                return [2 /*return*/, true];
+            return [2 /*return*/, tz.contract
+                    .at(existingAddress)
+                    .then(function () { return false; })
+                    .catch(function () { return true; })];
+        });
+    });
 }
 main();

@@ -55,7 +55,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.originateContract = exports.compileContract = exports.compileAndLoadContract = exports.defaultEnv = exports.LigoEnv = void 0;
+exports.originateContract = exports.compileContract = exports.loadFile = exports.compileAndLoadContract = exports.defaultEnv = exports.LigoEnv = void 0;
 var child = __importStar(require("child_process"));
 var fs = __importStar(require("fs"));
 var path = __importStar(require("path"));
@@ -84,7 +84,7 @@ function defaultLigoEnv() {
 }
 function compileAndLoadContract(env, srcFile, main, dstFile) {
     return __awaiter(this, void 0, void 0, function () {
-        var src, out;
+        var src, out, code;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -93,16 +93,27 @@ function compileAndLoadContract(env, srcFile, main, dstFile) {
                     return [4 /*yield*/, compileContractImpl(env.cwd, src, main, out)];
                 case 1:
                     _a.sent();
-                    return [2 /*return*/, new Promise(function (resolve, reject) {
-                            return fs.readFile(out, function (err, buff) {
-                                return err ? reject(err) : resolve(buff.toString());
-                            });
-                        })];
+                    return [4 /*yield*/, loadFile(out)];
+                case 2:
+                    code = _a.sent();
+                    return [2 /*return*/, code];
             }
         });
     });
 }
 exports.compileAndLoadContract = compileAndLoadContract;
+function loadFile(fileName) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, new Promise(function (resolve, reject) {
+                    return fs.readFile(fileName, function (err, buff) {
+                        return err ? reject(err) : resolve(buff.toString());
+                    });
+                })];
+        });
+    });
+}
+exports.loadFile = loadFile;
 function compileContract(env, srcFile, main, dstFile) {
     return __awaiter(this, void 0, void 0, function () {
         var src, out;

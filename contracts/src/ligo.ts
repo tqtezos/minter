@@ -44,9 +44,13 @@ export async function compileAndLoadContract(
   const src = env.srcFilePath(srcFile);
   const out = env.outFilePath(dstFile);
   await compileContractImpl(env.cwd, src, main, out);
+  const code = await loadFile(out);
+  return code;
+}
 
+export async function loadFile(fileName: string): Promise<string> {
   return new Promise<string>((resolve, reject) =>
-    fs.readFile(out, (err, buff) =>
+    fs.readFile(fileName, (err, buff) =>
       err ? reject(err) : resolve(buff.toString())
     )
   );
