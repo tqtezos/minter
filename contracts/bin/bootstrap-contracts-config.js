@@ -166,13 +166,13 @@ function awaitForNetwork(tz) {
                     return [4 /*yield*/, async_retry_1.default(function () { return __awaiter(_this, void 0, void 0, function () {
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
-                                    case 0: return [4 /*yield*/, tz.rpc.getBlockHeader({ block: '1' })];
+                                    case 0: return [4 /*yield*/, tz.rpc.getBlockHeader({ block: '2' })];
                                     case 1:
                                         _a.sent();
                                         return [2 /*return*/];
                                 }
                             });
-                        }); }, { retries: 6 })];
+                        }); }, { retries: 8 })];
                 case 1:
                     _a.sent();
                     logger_1.$log.info('connected');

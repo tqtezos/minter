@@ -83,9 +83,9 @@ async function awaitForNetwork(tz: TezosToolkit): Promise<void> {
 
   await retry(
     async () => {
-      await tz.rpc.getBlockHeader({ block: '1' });
+      await tz.rpc.getBlockHeader({ block: '2' });
     },
-    { retries: 6 }
+    { retries: 8 }
   );
 
   $log.info('connected');
