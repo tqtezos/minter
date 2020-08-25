@@ -1,0 +1,8 @@
+{
+  "rpc": "https://testnet-tezos.giganode.io",
+  "admin": {
+    "address": "tz1f6LtT8nER9aYaaNb7PPJq7rkhwpcXexU6",
+    "secret": "edskRfLsHb49bP4dTpYzAZ7qHCX4ByK2g6Cwq2LWqRYAQSeRpziaZGBW72vrJnp1ahLGKd9rXUf7RHzm8EmyPgseUi3VS9putT"
+  },
+  "contracts": {}
+}
