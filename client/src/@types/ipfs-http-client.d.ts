@@ -2,9 +2,13 @@ declare module 'ipfs-http-client' {
 
   export type FileContent = any | Blob | string;
 
+  export interface Cid {
+    toString: () => string;
+  }
+
   export interface IpfsFile {
     path: string;
-    cid: any;
+    cid: Cid;
     size: number;
   }
 
