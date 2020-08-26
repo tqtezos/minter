@@ -5,13 +5,15 @@ import { TransactionOperation } from '@taquito/taquito/dist/types/operations/tra
 import { Context } from '../../components/context';
 
 async function confirmOperation(
-  { db, tzClient }: Context,
+  { db, pubsub, tzClient }: Context,
   operation: TransactionOperation
 ) {
   const constants = await tzClient.rpc.getConstants();
   const pollingInterval: number = Number(constants.time_between_blocks[0]) / 5;
   await operation.confirmation(1, pollingInterval);
   await PublishedOperation.updateStatusByHash(db, operation.hash, 'confirmed');
+  const publishedOp = await PublishedOperation.byHash(db, operation.hash);
+  pubsub.publish('OPERATION_CONFIRMED', { operationConfirmed: publishedOp });
 }
 
 const Mutation: MutationResolvers = {
