@@ -2,13 +2,18 @@ import { Resolvers, QueryResolvers } from '../../generated/graphql_schema';
 import { SessionContext } from '../../components/context';
 import axios from 'axios';
 import NonFungibleToken from '../../models/non_fungible_token';
-// import Profile from "../../models/profile";
-// import PublishedOperation from '../../models/published_operation';
+import PublishedOperation from '../../models/published_operation';
 
 const getTzStats = async (ctx: SessionContext, resource: string) =>
   (await axios.get(`${ctx.tzStatsApiUrl}/${resource}`)).data;
 
 const Query: QueryResolvers = {
+  async publishedOperationByHash(_parent, { hash }, { db }) {
+    const publishedOp = await PublishedOperation.byHash(db, hash);
+    return publishedOp || null;
+  },
+
+  // TODO: Convert to indexer API getters
   async nftByTokenId(_parent, { token_id }, { db }) {
     const nft = await NonFungibleToken.byTokenId(db, token_id);
     return nft || null;

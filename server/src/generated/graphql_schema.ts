@@ -179,9 +179,9 @@ export type Query = {
   nftByCreatorAddress?: Maybe<NonFungibleToken>;
   nftByOperationAddress?: Maybe<NonFungibleToken>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
-  publishedOperationByInitiator?: Maybe<PublishedOperation>;
-  publishedOperationByMethod?: Maybe<PublishedOperation>;
-  publishedOperationByStatus?: Maybe<PublishedOperation>;
+  publishedOperationsByInitiator?: Maybe<Array<Maybe<PublishedOperation>>>;
+  publishedOperationsByMethod?: Maybe<Array<Maybe<PublishedOperation>>>;
+  publishedOperationsByStatus?: Maybe<Array<Maybe<PublishedOperation>>>;
   settings: Settings;
 };
 
@@ -202,19 +202,19 @@ export type QueryNftByOperationAddressArgs = {
 };
 
 export type QueryPublishedOperationByHashArgs = {
-  address: Scalars['String'];
+  hash: Scalars['String'];
 };
 
-export type QueryPublishedOperationByInitiatorArgs = {
-  address: Scalars['String'];
+export type QueryPublishedOperationsByInitiatorArgs = {
+  initiator: Scalars['String'];
 };
 
-export type QueryPublishedOperationByMethodArgs = {
-  address: Scalars['String'];
+export type QueryPublishedOperationsByMethodArgs = {
+  method: Scalars['String'];
 };
 
-export type QueryPublishedOperationByStatusArgs = {
-  address: Scalars['String'];
+export type QueryPublishedOperationsByStatusArgs = {
+  status: Scalars['String'];
 };
 
 export type Settings = {
@@ -725,25 +725,25 @@ export type QueryResolvers<
     Maybe<ResolversTypes['PublishedOperation']>,
     ParentType,
     ContextType,
-    RequireFields<QueryPublishedOperationByHashArgs, 'address'>
+    RequireFields<QueryPublishedOperationByHashArgs, 'hash'>
   >;
-  publishedOperationByInitiator?: Resolver<
-    Maybe<ResolversTypes['PublishedOperation']>,
+  publishedOperationsByInitiator?: Resolver<
+    Maybe<Array<Maybe<ResolversTypes['PublishedOperation']>>>,
     ParentType,
     ContextType,
-    RequireFields<QueryPublishedOperationByInitiatorArgs, 'address'>
+    RequireFields<QueryPublishedOperationsByInitiatorArgs, 'initiator'>
   >;
-  publishedOperationByMethod?: Resolver<
-    Maybe<ResolversTypes['PublishedOperation']>,
+  publishedOperationsByMethod?: Resolver<
+    Maybe<Array<Maybe<ResolversTypes['PublishedOperation']>>>,
     ParentType,
     ContextType,
-    RequireFields<QueryPublishedOperationByMethodArgs, 'address'>
+    RequireFields<QueryPublishedOperationsByMethodArgs, 'method'>
   >;
-  publishedOperationByStatus?: Resolver<
-    Maybe<ResolversTypes['PublishedOperation']>,
+  publishedOperationsByStatus?: Resolver<
+    Maybe<Array<Maybe<ResolversTypes['PublishedOperation']>>>,
     ParentType,
     ContextType,
-    RequireFields<QueryPublishedOperationByStatusArgs, 'address'>
+    RequireFields<QueryPublishedOperationsByStatusArgs, 'status'>
   >;
   settings?: Resolver<ResolversTypes['Settings'], ParentType, ContextType>;
 }>;
