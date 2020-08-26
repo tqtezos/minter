@@ -37,7 +37,7 @@ const uploadToIpfs = async (blob: Blob): Promise<IpfsContent> => {
   return {
     cid: ipfsFile.cid.toString(),
     size: ipfsFile.size,
-    url: `http://localhost:8080/ipfs/${ipfsFile.cid}`,
+    url: `http://127.0.0.1:8080/ipfs/${ipfsFile.cid}`,
     publicGatewayUrl: `https://ipfs.io/ipfs/${ipfsFile.cid}`
   }
 }
