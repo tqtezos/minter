@@ -8,4 +8,4 @@ RUN yarn install
 
 COPY server .
 
-CMD ["yarn", "run", "nodemon", "--watch", "./src", "--ext", "ts,tsx", "--exec", "ts-node", "--files", "./src/index.ts"]
+CMD ["yarn", "run", "nodemon", "-L", "--watch", "./src", "--ext", "ts,tsx", "--exec", "ts-node", "--files", "./src/index.ts"]
