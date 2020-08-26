@@ -48,7 +48,8 @@ export async function transfer(
 export async function addOperator(
   fa2: address,
   owner: TezosToolkit,
-  operator: address
+  operator: address,
+  token_id: nat
 ): Promise<void> {
   $log.info('adding operator');
   const fa2WithOwner = await owner.contract.at(fa2);
@@ -58,7 +59,8 @@ export async function addOperator(
       {
         add_operator: {
           owner: ownerAddress,
-          operator
+          operator,
+          token_id
         }
       }
     ])
@@ -70,7 +72,8 @@ export async function addOperator(
 export async function removeOperator(
   fa2: address,
   owner: TezosToolkit,
-  operator: address
+  operator: address,
+  token_id: nat
 ): Promise<void> {
   $log.info('removing operator');
   const fa2WithOwner = await owner.contract.at(fa2);
@@ -80,7 +83,8 @@ export async function removeOperator(
       {
         add_operator: {
           owner: ownerAddress,
-          operator
+          operator,
+          token_id
         }
       }
     ])
