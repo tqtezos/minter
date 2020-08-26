@@ -15,7 +15,9 @@
   },
   "bin": {
     "compile-contracts": "ts-node src/compile-contracts.ts",
-    "bootstrap": "ts-node src/bootstrap-contracts-config.ts"
+    "bootstrap": "ts-node src/bootstrap-contracts-config.ts",
+    "bootstrap-sandbox": "env ENV_NAME=sandbox ts-node src/bootstrap-contracts-config.ts",
+    "bootstrap-testnet": "env ENV_NAME=testnet ts-node src/bootstrap-contracts-config.ts"
   },
   "author": "",
   "license": "MIT",
