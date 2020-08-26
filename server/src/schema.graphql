@@ -147,10 +147,10 @@ type Query {
   nftByCreatorAddress(creator_address: String!): NonFungibleToken
   nftByOperationAddress(operation_address: String!): NonFungibleToken
 
-  publishedOperationByHash(address: String!): PublishedOperation
-  publishedOperationByInitiator(address: String!): PublishedOperation
-  publishedOperationByMethod(address: String!): PublishedOperation
-  publishedOperationByStatus(address: String!): PublishedOperation
+  publishedOperationByHash(hash: String!): PublishedOperation
+  publishedOperationsByInitiator(initiator: String!): [PublishedOperation]
+  publishedOperationsByMethod(method: String!): [PublishedOperation]
+  publishedOperationsByStatus(status: String!): [PublishedOperation]
 
   settings: Settings!
 }

@@ -1,12 +1,20 @@
 import { Resolvers, MutationResolvers } from '../../generated/graphql_schema';
 import { MichelsonMap } from '@taquito/taquito';
+import PublishedOperation from '../../models/published_operation';
+import { TransactionOperation } from '@taquito/taquito/dist/types/operations/transaction-operation';
+import { Context } from '../../components/context';
+
+async function confirmOperation(
+  { db, tzClient }: Context,
+  operation: TransactionOperation
+) {
+  const constants = await tzClient.rpc.getConstants();
+  const pollingInterval: number = Number(constants.time_between_blocks[0]) / 5;
+  await operation.confirmation(1, pollingInterval);
+  await PublishedOperation.updateStatusByHash(db, operation.hash, 'confirmed');
+}
 
 const Mutation: MutationResolvers = {
-  // publish operation to chain
-  // write operation to database
-  // (async) await confirmation
-  //       | update operation in database
-  //       | publish operation status update to client
   async createNonFungibleToken(_parent, args, ctx) {
     const { db, contractStore } = ctx;
     const nftContract = await contractStore.nftContract();
@@ -18,26 +26,33 @@ const Mutation: MutationResolvers = {
         symbol: args.symbol,
         name: args.name,
         owner: adminAddress,
-        extras: new MichelsonMap<string, string>()
+        extras: new MichelsonMap({
+          prim: 'map',
+          args: [{ prim: 'string' }, { prim: 'string' }]
+        })
       }
     ];
 
-    // ERROR: Operation fails with "NOT_AN_ADMIN" even though the sender address
-    //        matches the admin address passed as initial storage during
-    //        contract origination
     const operation = await minterContract.methods
       .mint(nftContract.address, params)
       .send();
 
-    return {
-      id: 0,
+    await PublishedOperation.create(db, {
       hash: operation.hash,
       initiator: adminAddress,
       method: 'mint',
       params: JSON.stringify(params),
       status: 'published',
-      retry: true
-    };
+      retry: false
+    });
+
+    const publishedOp = await PublishedOperation.byHash(db, operation.hash);
+
+    if (!publishedOp) throw Error('Failed to return published operation');
+
+    confirmOperation(ctx, operation);
+
+    return publishedOp;
   }
 };
 
