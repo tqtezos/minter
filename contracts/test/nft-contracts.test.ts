@@ -155,7 +155,7 @@ describe.each([originateNft, originateNftWithHooks])('test NFT', createNft => {
     await expect(p).rejects.toHaveProperty('message', 'FA2_NOT_OPERATOR');
   });
 
-  test.only('transfer by operator', async () => {
+  test('transfer by operator', async () => {
     const aliceAddress = await tezos.alice.signer.publicKeyHash();
     const bobAddress = await tezos.bob.signer.publicKeyHash();
     const tokenId1 = new BigNumber(0);
