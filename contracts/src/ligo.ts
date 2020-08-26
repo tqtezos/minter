@@ -31,7 +31,7 @@ export const defaultEnv: LigoEnv = defaultLigoEnv();
 function defaultLigoEnv(): LigoEnv {
   const cwd = path.join(__dirname, '..');
   const src = path.join(cwd, 'ligo/src');
-  const out = path.join(cwd, 'bin/contracts');
+  const out = path.join(cwd, 'bin');
   return new LigoEnv(cwd, src, out);
 }
 
