@@ -16,7 +16,7 @@ const readBlobAsArrayBuffer = (blob: Blob): Promise<ArrayBuffer> => (
 
 const ipfsClient = IpfsClient('http://localhost:5001')
 
-interface IpfsContent {
+export interface IpfsContent {
   // Content identifier, also known as 'hash' 
   cid: string; 
 

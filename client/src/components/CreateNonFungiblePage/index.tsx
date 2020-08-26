@@ -8,7 +8,8 @@ import { useLocation } from 'wouter';
 import Page from '../Page';
 import PageTitle from '../common/PageTitle';
 import Form from './Form';
-import ImagePreview from './ImagePreview'
+import ImagePreview from './ImagePreview';
+import { IpfsContent } from '../../api/ipfsUploader';
 
 const Col = styled(AntCol)({
   padding: '2em 3em 0 0'
@@ -16,7 +17,7 @@ const Col = styled(AntCol)({
 
 const CreateNonFungiblePage: FC = () => {
   const [, setLocation] = useLocation();
-  const [imageUrl, setImageUrl] = useState<string>();
+  const [ipfsContent, setIpfsContent] = useState<IpfsContent>();
 
   return (
     <Page>
@@ -26,8 +27,10 @@ const CreateNonFungiblePage: FC = () => {
         onClick={() => {setLocation('/')}}
       />
       <Row align="top" justify="start">
-        <Col offset={3}><Form onChange={info => setImageUrl(info.url)} /></Col>
-        <Col><ImagePreview url={imageUrl} /></Col>
+        <Col offset={3}>
+          <Form ipfsContent={ipfsContent} onChange={info => setIpfsContent(info)} />
+        </Col>
+        <Col><ImagePreview ipfsContent={ipfsContent} /></Col>
       </Row>
     </Page>
   );
