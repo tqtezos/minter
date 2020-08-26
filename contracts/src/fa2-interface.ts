@@ -66,3 +66,25 @@ export async function addOperator(
   await op.confirmation(3);
   $log.info(`consumed gas: ${op.consumedGas}`);
 }
+
+export async function removeOperator(
+  fa2: address,
+  owner: TezosToolkit,
+  operator: address
+): Promise<void> {
+  $log.info('removing operator');
+  const fa2WithOwner = await owner.contract.at(fa2);
+  const ownerAddress = await owner.signer.publicKeyHash();
+  const op = await fa2WithOwner.methods
+    .update_operators([
+      {
+        add_operator: {
+          owner: ownerAddress,
+          operator
+        }
+      }
+    ])
+    .send();
+  await op.confirmation(3);
+  $log.info(`consumed gas: ${op.consumedGas}`);
+}

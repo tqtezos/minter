@@ -10,7 +10,12 @@ import {
   originateNftWithHooks,
   MintNftParam
 } from '../src/nft-contracts';
-import { BalanceOfRequest, transfer, addOperator } from '../src/fa2-interface';
+import {
+  BalanceOfRequest,
+  transfer,
+  addOperator,
+  removeOperator
+} from '../src/fa2-interface';
 import { originateInspector, queryBalances } from './fa2-balance-inspector';
 
 jest.setTimeout(180000); // 3 minutes
@@ -150,7 +155,7 @@ describe.each([originateNft, originateNftWithHooks])('test NFT', createNft => {
     await expect(p).rejects.toHaveProperty('message', 'FA2_NOT_OPERATOR');
   });
 
-  test('transfer by operator', async () => {
+  test.only('transfer by operator', async () => {
     const aliceAddress = await tezos.alice.signer.publicKeyHash();
     const bobAddress = await tezos.bob.signer.publicKeyHash();
     const tokenId1 = new BigNumber(0);
@@ -208,6 +213,8 @@ describe.each([originateNft, originateNftWithHooks])('test NFT', createNft => {
         txs: [{ to_: bobAddress, token_id: tokenId2, amount: nat1 }]
       }
     ]);
+
+    await removeOperator(nft.address, tezos.alice, bobAddress);
 
     // check balances after the swap
     const [

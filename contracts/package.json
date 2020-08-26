@@ -23,7 +23,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/configstore": "^4.0.0",
-    "@types/jest": "^26.0.7",
+    "@types/jest": "^26.0.10",
     "jest": "^26.1.0",
     "prettier": "^2.0.5",
     "ts-jest": "^26.1.3",
