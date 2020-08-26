@@ -8,13 +8,14 @@
     "start-sandbox": "../flextesa/start-sandbox.sh",
     "kill-sandbox": "../flextesa/kill-sandbox.sh",
     "build:watch": "tsc -w -p .",
-    "compile-contracts": "ts-node compile-contracts.ts",
-    "bootstrap-sandbox": "env ENV_NAME=sandbox ts-node bootstrap-contracts-config.ts",
-    "bootstrap-testnet": "env ENV_NAME=testnet ts-node bootstrap-contracts-config.ts"
+    "compile-contracts": "ts-node src/compile-contracts.ts",
+    "bootstrap": "ts-node src/bootstrap-contracts-config.ts",
+    "bootstrap-sandbox": "env ENV_NAME=sandbox ts-node src/bootstrap-contracts-config.ts",
+    "bootstrap-testnet": "env ENV_NAME=testnet ts-node src/bootstrap-contracts-config.ts"
   },
   "bin": {
-    "compile-contracts": "ts-node compile-contracts.ts",
-    "bootstrap": "ts-node bootstrap-contracts-config.ts"
+    "compile-contracts": "ts-node src/compile-contracts.ts",
+    "bootstrap": "ts-node src/bootstrap-contracts-config.ts"
   },
   "author": "",
   "license": "MIT",
