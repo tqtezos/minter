@@ -46,7 +46,7 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange }) => {
         label="IPFS Hash (CID)"
         name="ipfsCid"
       >
-        <Input />
+        <Input readOnly />
       </Form.Item>
       <Form.Item>
         <Button 
