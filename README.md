@@ -29,7 +29,7 @@ Docker  | `19.03.x` | [Link][docker]
 - Tezos sandbox: [Flextesa][flextesa]
 - Blockhain indexer: [TZ Index][tz-index]
 - Database: [PostgreSQL][postgres]
-- InterPlanetary File System [IPFS][ipfs]
+- InterPlanetary File System: [IPFS][ipfs]
 
 [tz-index]: https://github.com/blockwatch-cc/tzindex
 [flextesa]: https://gitlab.com/tezos/flextesa
@@ -88,7 +88,7 @@ Once your've started the docker swarm services with `bin/start` a local instance
 configured and started. No actions needed to use it for file upload. 
 
 However, if you wish to monitor the IPFS server or reconfigure it using its Web UI, you can use:
-[[http://localhost:5001/webui](http://localhost:5001/webui)
+[http://localhost:5001/webui](http://localhost:5001/webui)
 
 ## Development
 
