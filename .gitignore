@@ -76,3 +76,5 @@ nginx.vars
 **/*.pp.mligo
 **/*.pp.ligo
 
+# Server config
+/server/config
