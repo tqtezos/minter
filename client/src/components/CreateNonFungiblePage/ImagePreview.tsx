@@ -21,7 +21,8 @@ const ImagePreview: FC<{ipfsContent?: IpfsContent}> = ({ ipfsContent }) => (
       <ImageContainer>
         {ipfsContent ? (
           <a 
-            href={ipfsContent.publicGatewayUrl} 
+            href={ipfsContent.publicGatewayUrl}
+            title="Click to download this image from the IPFS Public Gateway"
             target="_blank" 
             rel="noopener noreferrer"
           >
