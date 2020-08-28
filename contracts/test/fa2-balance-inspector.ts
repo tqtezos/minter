@@ -8,14 +8,14 @@ import {
   originateContract,
   defaultEnv,
   LigoEnv
-} from './ligo';
-import { address, Contract } from './type-aliases';
-import { BalanceOfRequest, BalanceOfResponse } from './fa2-interface';
+} from '../src/ligo';
+import { address, Contract } from '../src/type-aliases';
+import { BalanceOfRequest, BalanceOfResponse } from '../src/fa2-interface';
 
 export type InspectorStorage = BalanceOfResponse[] | {};
 
 export async function originateInspector(tz: TezosToolkit): Promise<Contract> {
-  const inspectorSrcDir = path.join(defaultEnv.cwd, 'fa2_clients');
+  const inspectorSrcDir = path.join(defaultEnv.cwd, 'ligo/fa2_clients');
   const env = new LigoEnv(defaultEnv.cwd, inspectorSrcDir, defaultEnv.outDir);
 
   const code = await compileAndLoadContract(
@@ -25,7 +25,8 @@ export async function originateInspector(tz: TezosToolkit): Promise<Contract> {
     'inspector.tz'
   );
   const storage = `(Left Unit)`;
-  return originateContract(tz, code, storage, 'inspector');
+  const c = await originateContract(tz, code, storage, 'inspector');
+  return c;
 }
 
 export async function queryBalances(
