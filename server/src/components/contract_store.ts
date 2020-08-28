@@ -2,8 +2,8 @@ import Configstore from 'configstore';
 import path from 'path';
 import { Contract, TezosToolkit } from '@taquito/taquito';
 
-const TZ_ENV = process.env.TZ_NETWORK || 'sandbox';
-const CONFIG_NAME = `minter.${TZ_ENV}.json`;
+const TZ_NETWORK = process.env.TZ_NETWORK || 'sandbox';
+const CONFIG_NAME = `minter.${TZ_NETWORK}.json`;
 const CONFIG_PATH = path.join(__dirname, '../../config/', CONFIG_NAME);
 
 const configStore = new Configstore('', {}, { configPath: CONFIG_PATH });
