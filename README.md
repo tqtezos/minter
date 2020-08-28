@@ -84,8 +84,9 @@ You can now open:
 
 ### Using Local IPFS Server
 
-Once your've started the docker swarm services with `bin/start` a local instance of IPFS server will be automatically
-configured and started. No actions needed to use it for file upload. 
+Once your've started the docker swarm services with `bin/start` a local 
+instance of IPFS server will be automatically configured and started. 
+No actions needed to use it for file upload. 
 
 However, if you wish to monitor the IPFS server or reconfigure it using its Web UI, you can use:
 [http://localhost:5001/webui](http://localhost:5001/webui)

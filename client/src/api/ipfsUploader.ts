@@ -1,4 +1,7 @@
+import url from 'url';
 import IpfsClient from 'ipfs-http-client';
+
+import config from '../config';
 
 /**
  * Promisified version of FileReader.readAsArrayBuffer 
@@ -14,7 +17,7 @@ const readBlobAsArrayBuffer = (blob: Blob): Promise<ArrayBuffer> => (
   })
 )
 
-const ipfsClient = IpfsClient('http://localhost:5001')
+const ipfsClient = IpfsClient(config.ipfs.apiUrl);
 
 export interface IpfsContent {
   // Content identifier, also known as 'hash' 
@@ -37,8 +40,8 @@ const uploadToIpfs = async (blob: Blob): Promise<IpfsContent> => {
   return {
     cid: ipfsFile.cid.toString(),
     size: ipfsFile.size,
-    url: `http://127.0.0.1:8080/ipfs/${ipfsFile.cid}`,
-    publicGatewayUrl: `https://ipfs.io/ipfs/${ipfsFile.cid}`
+    url: url.resolve(config.ipfs.gatewayUrl, `ipfs/${ipfsFile.cid}`),
+    publicGatewayUrl: url.resolve(config.ipfs.publicGatewayUrl, `ipfs/${ipfsFile.cid}`)
   }
 }
 

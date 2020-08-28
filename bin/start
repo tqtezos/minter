@@ -34,6 +34,6 @@ $PROJECT_ROOT_DIR/bin/wait-for-postgres $PROJECT_ROOT_DIR/bin/migrate-db
 
 docker stack deploy -c $API_SERVER_STACK_FILE $STACK_NAME
 
-${BASH_SOURCE%/*}/start-ipfs
+$PROJECT_ROOT_DIR/bin/start-ipfs
 
 docker stack services $STACK_NAME
