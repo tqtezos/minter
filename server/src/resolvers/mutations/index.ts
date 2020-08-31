@@ -3,6 +3,7 @@ import { MichelsonMap } from '@taquito/taquito';
 import PublishedOperation from '../../models/published_operation';
 import { TransactionOperation } from '@taquito/taquito/dist/types/operations/transaction-operation';
 import { Context } from '../../components/context';
+import { BigNumber } from 'bignumber.js';
 
 async function confirmOperation(
   { db, pubsub, tzClient }: Context,
@@ -20,24 +21,26 @@ const Mutation: MutationResolvers = {
   async createNonFungibleToken(_parent, args, ctx) {
     const { db, contractStore } = ctx;
     const nftContract = await contractStore.nftContract();
-    const minterContract = await contractStore.minterContract();
+    const nftStorage = await nftContract.storage<any>();
     const adminAddress = await ctx.tzClient.signer.publicKeyHash();
 
     const params = [
       {
-        symbol: args.symbol,
-        name: args.name,
-        owner: adminAddress,
-        extras: new MichelsonMap({
-          prim: 'map',
-          args: [{ prim: 'string' }, { prim: 'string' }]
-        })
+        metadata: {
+          token_id: nftStorage.assets.next_token_id,
+          symbol: args.symbol,
+          name: args.name,
+          decimals: new BigNumber(0),
+          extras: new MichelsonMap({
+            prim: 'map',
+            args: [{ prim: 'string' }, { prim: 'string' }]
+          })
+        },
+        owner: adminAddress
       }
     ];
 
-    const operation = await minterContract.methods
-      .mint(nftContract.address, params)
-      .send();
+    const operation = await nftContract.methods.mint(params).send();
 
     await PublishedOperation.create(db, {
       hash: operation.hash,
