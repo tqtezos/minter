@@ -52,7 +52,7 @@ const Query: QueryResolvers = {
       token_id: token.value.token_id,
       extras: token.value.extras,
       decimals: parseInt(token.value.decimals),
-      owner: ownerData.find((kv: any) => kv.key === token.key)
+      owner: ownerData.find((kv: any) => kv.key === token.key).value
     }));
   },
 
