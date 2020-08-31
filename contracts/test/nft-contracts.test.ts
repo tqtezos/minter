@@ -2,22 +2,21 @@ import { $log } from '@tsed/logger';
 import { BigNumber } from 'bignumber.js';
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 
-import { bootstrap, TestTz } from './bootstrap-sandbox';
-import { Contract, address, nat } from './type-aliases';
+import { bootstrap, TestTz } from '../src/bootstrap-sandbox';
+import { Contract, nat } from '../src/type-aliases';
 
 import {
-  originateMinter,
   originateNft,
   originateNftWithHooks,
-  MinterStorage,
-  MinterTokenMetadata
-} from './nft-contracts';
-import { BalanceOfRequest, transfer, addOperator } from './fa2-interface';
+  MintNftParam
+} from '../src/nft-contracts';
 import {
-  originateInspector,
-  InspectorStorage,
-  queryBalances
-} from './fa2-balance-inspector';
+  BalanceOfRequest,
+  transfer,
+  addOperator,
+  removeOperator
+} from '../src/fa2-interface';
+import { originateInspector, queryBalances } from './fa2-balance-inspector';
 
 jest.setTimeout(180000); // 3 minutes
 
@@ -25,7 +24,6 @@ const nat1 = new BigNumber(1);
 
 describe.each([originateNft, originateNftWithHooks])('test NFT', createNft => {
   let tezos: TestTz;
-  let minter: Contract;
   let nft: Contract;
   let inspector: Contract;
 
@@ -36,8 +34,7 @@ describe.each([originateNft, originateNftWithHooks])('test NFT', createNft => {
 
   beforeEach(async () => {
     const admin = await tezos.bob.signer.publicKeyHash();
-    minter = await originateMinter(tezos.bob, admin);
-    nft = await createNft(tezos.bob, minter.address);
+    nft = await createNft(tezos.bob, admin);
   });
 
   async function hasTokens(requests: BalanceOfRequest[]): Promise<boolean[]> {
@@ -52,13 +49,12 @@ describe.each([originateNft, originateNftWithHooks])('test NFT', createNft => {
 
   async function mintTokens(
     tz: TezosToolkit,
-    tokens: MinterTokenMetadata[]
-  ): Promise<nat[]> {
-    const op = await minter.methods.mint(nft.address, tokens).send();
-    const hash = await op.confirmation(3);
-    $log.info(`consumed gas: ${op.consumedGas}`);
-    const storage = await minter.storage<MinterStorage>();
-    return storage.last_created_token_ids;
+    tokens: MintNftParam[]
+  ): Promise<void> {
+    $log.info('minting...');
+    const op = await nft.methods.mint(tokens).send();
+    const hash = await op.confirmation();
+    $log.info(`Minted tokens. Consumed gas: ${op.consumedGas}`);
   }
 
   // test.only('update_operators', async () => {
@@ -66,26 +62,28 @@ describe.each([originateNft, originateNftWithHooks])('test NFT', createNft => {
   //   await addOperator(nft.address, tezos.alice, bobAddress);
   // });
 
-  // test('check origination', () => {
-  //   $log.debug(`minter ${minter.address}`);
+  // test.only('check origination', () => {
   //   $log.debug(`nft ${nft.address}`);
-  // })
+  // });
 
   test('mint token', async () => {
     const bobAddress = await tezos.bob.signer.publicKeyHash();
-    $log.info('minting');
-    const [tokenId] = await mintTokens(tezos.bob, [
+
+    await mintTokens(tezos.bob, [
       {
-        symbol: 'TK1',
-        name: 'A token',
-        owner: bobAddress,
-        extras: new MichelsonMap<string, string>()
+        metadata: {
+          token_id: new BigNumber(0),
+          symbol: 'TK1',
+          name: 'A token',
+          decimals: new BigNumber(0),
+          extras: new MichelsonMap<string, string>()
+        },
+        owner: bobAddress
       }
     ]);
-    $log.info(`minted token ${tokenId}`);
 
     const [bobHasToken] = await hasTokens([
-      { owner: bobAddress, token_id: tokenId }
+      { owner: bobAddress, token_id: new BigNumber(0) }
     ]);
     expect(bobHasToken).toBe(true);
   });
@@ -93,16 +91,19 @@ describe.each([originateNft, originateNftWithHooks])('test NFT', createNft => {
   test('transfer token', async () => {
     const aliceAddress = await tezos.alice.signer.publicKeyHash();
     const bobAddress = await tezos.bob.signer.publicKeyHash();
-    $log.info('minting');
-    const [tokenId] = await mintTokens(tezos.bob, [
+    const tokenId = new BigNumber(0);
+    await mintTokens(tezos.bob, [
       {
-        symbol: 'TK1',
-        name: 'A token',
-        owner: bobAddress,
-        extras: new MichelsonMap<string, string>()
+        metadata: {
+          token_id: tokenId,
+          symbol: 'TK1',
+          name: 'A token',
+          decimals: new BigNumber(0),
+          extras: new MichelsonMap<string, string>()
+        },
+        owner: bobAddress
       }
     ]);
-    $log.info(`minted token ${tokenId}`);
 
     const [aliceHasATokenBefore, bobHasATokenBefore] = await hasTokens([
       { owner: aliceAddress, token_id: tokenId },
@@ -129,16 +130,19 @@ describe.each([originateNft, originateNftWithHooks])('test NFT', createNft => {
   test('transfer not by owner must fail', async () => {
     const aliceAddress = await tezos.alice.signer.publicKeyHash();
     const bobAddress = await tezos.bob.signer.publicKeyHash();
-    $log.info('minting');
-    const [tokenId] = await mintTokens(tezos.bob, [
+    const tokenId = new BigNumber(0);
+    await mintTokens(tezos.bob, [
       {
-        symbol: 'TK1',
-        name: 'A token',
         owner: bobAddress,
-        extras: new MichelsonMap<string, string>()
+        metadata: {
+          token_id: tokenId,
+          symbol: 'TK1',
+          name: 'A token',
+          decimals: new BigNumber(0),
+          extras: new MichelsonMap<string, string>()
+        }
       }
     ]);
-    $log.info(`minted token ${tokenId}`);
 
     // alice is trying to transfer tokens on behalf of bob
     const p = transfer(nft.address, tezos.alice, [
@@ -154,22 +158,30 @@ describe.each([originateNft, originateNftWithHooks])('test NFT', createNft => {
   test('transfer by operator', async () => {
     const aliceAddress = await tezos.alice.signer.publicKeyHash();
     const bobAddress = await tezos.bob.signer.publicKeyHash();
-    $log.info('minting');
-    const [tokenId1, tokenId2] = await mintTokens(tezos.bob, [
+    const tokenId1 = new BigNumber(0);
+    const tokenId2 = new BigNumber(1);
+    await mintTokens(tezos.bob, [
       {
-        symbol: 'TK1',
-        name: 'A token',
         owner: bobAddress,
-        extras: new MichelsonMap<string, string>()
+        metadata: {
+          token_id: tokenId1,
+          symbol: 'TK1',
+          name: 'A token',
+          decimals: new BigNumber(0),
+          extras: new MichelsonMap<string, string>()
+        }
       },
       {
-        symbol: 'TK2',
-        name: 'B token',
         owner: aliceAddress,
-        extras: new MichelsonMap<string, string>()
+        metadata: {
+          token_id: tokenId2,
+          symbol: 'TK2',
+          name: 'B token',
+          decimals: new BigNumber(0),
+          extras: new MichelsonMap<string, string>()
+        }
       }
     ]);
-    $log.info(`minted tokens ${tokenId1}, ${tokenId2}`);
 
     // check initial balances
     const [
@@ -201,6 +213,8 @@ describe.each([originateNft, originateNftWithHooks])('test NFT', createNft => {
         txs: [{ to_: bobAddress, token_id: tokenId2, amount: nat1 }]
       }
     ]);
+
+    await removeOperator(nft.address, tezos.alice, bobAddress);
 
     // check balances after the swap
     const [

@@ -1,15 +1,15 @@
 import { $log } from '@tsed/logger';
-import { TezosToolkit } from '@taquito/taquito';
-import { Contract, address, nat } from './type-aliases';
+import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
+import { address, nat } from './type-aliases';
 
 export interface Fa2TransferDestination {
-  to_?: address;
+  to_: address;
   token_id: nat;
   amount: nat;
 }
 
 export interface Fa2Transfer {
-  from_?: address;
+  from_: address;
   txs: Fa2TransferDestination[];
 }
 
@@ -21,6 +21,14 @@ export interface BalanceOfRequest {
 export interface BalanceOfResponse {
   balance: nat;
   request: BalanceOfRequest;
+}
+
+export interface TokenMetadata {
+  token_id: nat;
+  symbol: string;
+  name: string;
+  decimals: nat;
+  extras: MichelsonMap<string, string>;
 }
 
 export async function transfer(
@@ -43,6 +51,28 @@ export async function addOperator(
   operator: address
 ): Promise<void> {
   $log.info('adding operator');
+  const fa2WithOwner = await owner.contract.at(fa2);
+  const ownerAddress = await owner.signer.publicKeyHash();
+  const op = await fa2WithOwner.methods
+    .update_operators([
+      {
+        add_operator: {
+          owner: ownerAddress,
+          operator
+        }
+      }
+    ])
+    .send();
+  await op.confirmation(3);
+  $log.info(`consumed gas: ${op.consumedGas}`);
+}
+
+export async function removeOperator(
+  fa2: address,
+  owner: TezosToolkit,
+  operator: address
+): Promise<void> {
+  $log.info('removing operator');
   const fa2WithOwner = await owner.contract.at(fa2);
   const ownerAddress = await owner.signer.publicKeyHash();
   const op = await fa2WithOwner.methods

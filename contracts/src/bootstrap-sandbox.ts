@@ -9,13 +9,12 @@ type TestKeys = {
 };
 
 async function flextesaKeys(): Promise<TestKeys> {
-  const bobK = InMemorySigner.fromSecretKey(
+  const bob = await InMemorySigner.fromSecretKey(
     'edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx'
   );
-  const aliceK = InMemorySigner.fromSecretKey(
+  const alice = await InMemorySigner.fromSecretKey(
     'edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq'
   );
-  const [bob, alice] = await Promise.all([bobK, aliceK]);
   return { bob, alice };
 }
 
@@ -36,9 +35,8 @@ function signerToToolkit(signer: Signer): TezosToolkit {
 
 export async function bootstrap(): Promise<TestTz> {
   const { bob, alice } = await flextesaKeys();
-  const result = {
+  return {
     bob: signerToToolkit(bob),
     alice: signerToToolkit(alice)
   };
-  return Promise.resolve(result);
 }

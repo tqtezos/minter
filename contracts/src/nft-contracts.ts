@@ -1,40 +1,19 @@
 import { $log } from '@tsed/logger';
 
 import { compileAndLoadContract, originateContract, defaultEnv } from './ligo';
-import { Contract, address, nat } from './type-aliases';
-import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
+import { Contract, address } from './type-aliases';
+import { TezosToolkit } from '@taquito/taquito';
+import { TokenMetadata } from './fa2-interface';
 
-export interface MinterTokenMetadata {
-  symbol: string;
-  name: string;
+export interface MintNftParam {
+  metadata: TokenMetadata;
   owner: address;
-  extras: MichelsonMap<string, string>;
 }
 
 interface AdminStorage {
   admin: string;
   pending_admin?: string;
   paused: boolean;
-}
-
-export interface MinterStorage {
-  admin: AdminStorage;
-  last_fa2_nft?: address;
-  last_created_token_ids: nat[];
-}
-
-export async function originateMinter(
-  tz: TezosToolkit,
-  admin: address
-): Promise<Contract> {
-  const code = await compileAndLoadContract(
-    defaultEnv,
-    'fa2_nft_minter.mligo',
-    'minter_main',
-    'fa2_nft_minter.tz'
-  );
-  const storage = `(Pair (Pair (Pair (Pair "${admin}" False) None) {}) None)`;
-  return originateContract(tz, code, storage, 'minter');
 }
 
 export async function originateNft(

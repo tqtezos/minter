@@ -1,4 +1,4 @@
-import { bootstrap, TestTz } from './bootstrap-sandbox';
+import { bootstrap, TestTz } from '../src/bootstrap-sandbox';
 import { $log } from '@tsed/logger';
 import { TezosToolkit } from '@taquito/taquito';
 
