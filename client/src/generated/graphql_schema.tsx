@@ -140,10 +140,12 @@ export type MutationCreateNonFungibleTokenArgs = {
 
 export type NonFungibleToken = {
   __typename?: 'NonFungibleToken';
-  id: Scalars['Int'];
+  decimals: Scalars['Int'];
+  name: Scalars['String'];
+  symbol: Scalars['String'];
   token_id: Scalars['String'];
-  creator_address: Scalars['String'];
-  operation_address: Scalars['String'];
+  extras: Scalars['JSON'];
+  owner: Scalars['String'];
 };
 
 export type Operation = {
