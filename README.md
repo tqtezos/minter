@@ -29,10 +29,12 @@ Docker  | `19.03.x` | [Link][docker]
 - Tezos sandbox: [Flextesa][flextesa]
 - Blockhain indexer: [TZ Index][tz-index]
 - Database: [PostgreSQL][postgres]
+- InterPlanetary File System: [IPFS][ipfs]
 
 [tz-index]: https://github.com/blockwatch-cc/tzindex
 [flextesa]: https://gitlab.com/tezos/flextesa
 [postgres]: https://www.postgresql.org/
+[ipfs]: https://ipfs.io/
 
 ## Usage
 
@@ -79,6 +81,15 @@ You can now open:
 
 - [http://localhost:9000](http://localhost:9000) to view the application.
 - [http://localhost:9000/graphql](http://localhost:9000/graphql) to open the GraphQL playground.
+
+### Using Local IPFS Server
+
+Once your've started the docker swarm services with `bin/start` a local 
+instance of IPFS server will be automatically configured and started. 
+No actions needed to use it for file upload. 
+
+However, if you wish to monitor the IPFS server or reconfigure it using its Web UI, you can use:
+[http://localhost:5001/webui](http://localhost:5001/webui)
 
 ## Development
 

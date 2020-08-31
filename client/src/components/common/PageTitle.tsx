@@ -49,10 +49,10 @@ const PageTitle: FC<PageTitleProps> = ({ title, description, onClick}) => (
       </Col>
     </Row>
     <Row css={{paddingTop: '1em'}}>
-      <Col><Title>{title}</Title></Col>
+      <Col offset={3}><Title>{title}</Title></Col>
     </Row>
     <Row css={{paddingTop: '1em'}}>
-      <Col><Text>{description}</Text></Col>
+      <Col offset={3}><Text>{description}</Text></Col>
     </Row>
   </Fragment>
 );
