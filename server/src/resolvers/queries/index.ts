@@ -42,6 +42,8 @@ const Query: QueryResolvers = {
     };
   },
 
+  // TODO: Implement paging/limiting - tzindex API supports query params that
+  // enable this behavior
   async nftTokens(_parent, _args, ctx) {
     const { nftData, ownerData } = await extractNftData(ctx);
     return nftData.map((token: any) => ({
