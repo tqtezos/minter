@@ -24,6 +24,14 @@ const Mutation: MutationResolvers = {
     const nftStorage = await nftContract.storage<any>();
     const adminAddress = await ctx.tzClient.signer.publicKeyHash();
 
+    const extras = new MichelsonMap({
+      prim: 'map',
+      args: [{ prim: 'string' }, { prim: 'string' }]
+    });
+
+    extras.set('description', args.description);
+    extras.set('ipfs_hash', args.ipfs_hash);
+
     const params = [
       {
         metadata: {
@@ -31,10 +39,7 @@ const Mutation: MutationResolvers = {
           symbol: args.symbol,
           name: args.name,
           decimals: new BigNumber(0),
-          extras: new MichelsonMap({
-            prim: 'map',
-            args: [{ prim: 'string' }, { prim: 'string' }]
-          })
+          extras
         },
         owner: adminAddress
       }
