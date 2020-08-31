@@ -29,9 +29,9 @@ export class LigoEnv {
 export const defaultEnv: LigoEnv = defaultLigoEnv();
 
 function defaultLigoEnv(): LigoEnv {
-  const cwd = path.join(__dirname, '../ligo/');
-  const src = path.join(cwd, 'src');
-  const out = path.join(cwd, 'out');
+  const cwd = path.join(__dirname, '..');
+  const src = path.join(cwd, 'ligo/src');
+  const out = path.join(cwd, 'bin');
   return new LigoEnv(cwd, src, out);
 }
 
@@ -43,23 +43,38 @@ export async function compileAndLoadContract(
 ): Promise<string> {
   const src = env.srcFilePath(srcFile);
   const out = env.outFilePath(dstFile);
-  await compileContract(env.cwd, src, main, out);
+  await compileContractImpl(env.cwd, src, main, out);
+  const code = await loadFile(out);
+  return code;
+}
 
+export async function loadFile(fileName: string): Promise<string> {
   return new Promise<string>((resolve, reject) =>
-    fs.readFile(out, (err, buff) =>
+    fs.readFile(fileName, (err, buff) =>
       err ? reject(err) : resolve(buff.toString())
     )
   );
 }
 
-async function compileContract(
+export async function compileContract(
+  env: LigoEnv,
+  srcFile: string,
+  main: string,
+  dstFile: string
+): Promise<void> {
+  const src = env.srcFilePath(srcFile);
+  const out = env.outFilePath(dstFile);
+  await compileContractImpl(env.cwd, src, main, out);
+}
+
+async function compileContractImpl(
   cwd: string,
   srcFilePath: string,
   main: string,
   dstFilePath: string
 ): Promise<void> {
   const cmd = `ligo compile-contract ${srcFilePath} ${main} --brief --output=${dstFilePath}`;
-  return runCmd(cwd, cmd);
+  await runCmd(cwd, cmd);
 }
 
 async function runCmd(cwd: string, cmd: string): Promise<void> {
