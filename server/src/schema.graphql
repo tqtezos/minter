@@ -144,7 +144,7 @@ type Settings {
 ## Toplevel Types
 
 type Query {
-  nftTokens(limit: Int): [NonFungibleToken]
+  nfts(limit: Int): [NonFungibleToken]
   nftByTokenId(token_id: String!): NonFungibleToken
 
   nftByOwner(owner_address: String!): NonFungibleToken
