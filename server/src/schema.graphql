@@ -163,7 +163,7 @@ type Mutation {
     name: String!,
     description: String!
     symbol: String!
-    ipfs_hash: String!
+    ipfs_cid: String!
   ): PublishedOperation!
 }
 

@@ -4,6 +4,7 @@ import PublishedOperation from '../../models/published_operation';
 import { TransactionOperation } from '@taquito/taquito/dist/types/operations/transaction-operation';
 import { Context } from '../../components/context';
 import { BigNumber } from 'bignumber.js';
+import CID from 'cids';
 
 async function confirmOperation(
   { db, pubsub, tzClient }: Context,
@@ -17,8 +18,18 @@ async function confirmOperation(
   pubsub.publish('OPERATION_CONFIRMED', { operationConfirmed: publishedOp });
 }
 
+function validateCID(cid: string) {
+  try {
+    new CID(cid);
+  } catch (e) {
+    throw Error('The supplied `ipfs_cid` is invalid');
+  }
+}
+
 const Mutation: MutationResolvers = {
   async createNonFungibleToken(_parent, args, ctx) {
+    validateCID(args.ipfs_cid);
+
     const { db, contractStore } = ctx;
     const nftContract = await contractStore.nftContract();
     const nftStorage = await nftContract.storage<any>();
@@ -30,7 +41,7 @@ const Mutation: MutationResolvers = {
     });
 
     extras.set('description', args.description);
-    extras.set('ipfs_hash', args.ipfs_hash);
+    extras.set('ipfs_cid', args.ipfs_cid);
 
     const params = [
       {
