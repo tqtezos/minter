@@ -135,7 +135,7 @@ export type MutationCreateNonFungibleTokenArgs = {
   name: Scalars['String'];
   description: Scalars['String'];
   symbol: Scalars['String'];
-  ipfs_hash: Scalars['String'];
+  ipfs_cid: Scalars['String'];
 };
 
 export type NonFungibleToken = {
