@@ -19,6 +19,7 @@
     "axios": "^0.19.0",
     "bcrypt": "^3.0.7",
     "bignumber.js": "^9.0.0",
+    "cids": "^1.0.0",
     "concurrently": "^5.0.0",
     "configstore": "^5.0.1",
     "cookie-parser": "^1.4.4",
