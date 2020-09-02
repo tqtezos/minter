@@ -52,7 +52,7 @@ const Mutation: MutationResolvers = {
           decimals: new BigNumber(0),
           extras
         },
-        owner: adminAddress
+        owner: args.owner_address
       }
     ];
 

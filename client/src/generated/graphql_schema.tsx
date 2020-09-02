@@ -132,6 +132,7 @@ export type Mutation = {
 };
 
 export type MutationCreateNonFungibleTokenArgs = {
+  owner_address: Scalars['String'];
   name: Scalars['String'];
   description: Scalars['String'];
   symbol: Scalars['String'];

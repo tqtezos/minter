@@ -12,12 +12,14 @@ interface InputFormProps extends ImageIpfsUploadProps {
 
 const CREATE_NON_FUNGIBLE_TOKEN = gql`
   mutation CreateNonFungibleToken(
+    $owner_address: String!
     $name: String!
     $description: String!
     $symbol: String!
     $ipfs_cid: String!
   ) {
     createNonFungibleToken(
+      owner_address: $owner_address
       name: $name
       description: $description
       symbol: $symbol
@@ -45,6 +47,9 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange }) => {
 
   return (
     <Form form={form} layout="vertical" css={{ width: '30em' }}>
+      <Form.Item label="Onwer Address" name="ownerAddress">
+        <Input placeholder="tz1..." />
+      </Form.Item>
       <Form.Item label="Name" name="name">
         <Input placeholder="Tezos Logo Token" />
       </Form.Item>
@@ -74,6 +79,7 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange }) => {
             e.preventDefault();
             createNonFungibleToken({
               variables: {
+                owner_address: form.getFieldValue('ownerAddress'),
                 name: form.getFieldValue('name'),
                 description: form.getFieldValue('description'),
                 symbol: form.getFieldValue('symbol'),
