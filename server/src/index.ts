@@ -25,9 +25,10 @@ async function run() {
 }
 
 async function main() {
-  if (IS_DEV_ENV) {
-    console.log(process.env);
-  }
+  // Uncomment below to view the environment on startup
+  // if (IS_DEV_ENV) {
+  //   console.log(process.env);
+  // }
   try {
     await run();
   } catch (e) {

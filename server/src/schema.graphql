@@ -160,6 +160,7 @@ type Query {
 
 type Mutation {
   createNonFungibleToken(
+    owner_address: String!
     name: String!,
     description: String!
     symbol: String!
