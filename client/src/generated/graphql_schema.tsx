@@ -132,18 +132,21 @@ export type Mutation = {
 };
 
 export type MutationCreateNonFungibleTokenArgs = {
+  owner_address: Scalars['String'];
   name: Scalars['String'];
   description: Scalars['String'];
   symbol: Scalars['String'];
-  ipfs_hash: Scalars['String'];
+  ipfs_cid: Scalars['String'];
 };
 
 export type NonFungibleToken = {
   __typename?: 'NonFungibleToken';
-  id: Scalars['Int'];
+  name: Scalars['String'];
+  symbol: Scalars['String'];
   token_id: Scalars['String'];
-  creator_address: Scalars['String'];
-  operation_address: Scalars['String'];
+  extras: Scalars['JSON'];
+  decimals: Scalars['Int'];
+  owner: Scalars['String'];
 };
 
 export type Operation = {
@@ -165,10 +168,10 @@ export type PublishedOperation = {
 
 export type Query = {
   __typename?: 'Query';
-  nftTokens?: Maybe<Array<Maybe<NonFungibleToken>>>;
+  nfts?: Maybe<Array<Maybe<NonFungibleToken>>>;
   nftByTokenId?: Maybe<NonFungibleToken>;
-  nftByCreatorAddress?: Maybe<NonFungibleToken>;
-  nftByOperationAddress?: Maybe<NonFungibleToken>;
+  nftByOwner?: Maybe<NonFungibleToken>;
+  nftByOperation?: Maybe<NonFungibleToken>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
   publishedOperationsByInitiator?: Maybe<Array<Maybe<PublishedOperation>>>;
   publishedOperationsByMethod?: Maybe<Array<Maybe<PublishedOperation>>>;
@@ -176,7 +179,7 @@ export type Query = {
   settings: Settings;
 };
 
-export type QueryNftTokensArgs = {
+export type QueryNftsArgs = {
   limit?: Maybe<Scalars['Int']>;
 };
 
@@ -184,11 +187,11 @@ export type QueryNftByTokenIdArgs = {
   token_id: Scalars['String'];
 };
 
-export type QueryNftByCreatorAddressArgs = {
-  creator_address: Scalars['String'];
+export type QueryNftByOwnerArgs = {
+  owner_address: Scalars['String'];
 };
 
-export type QueryNftByOperationAddressArgs = {
+export type QueryNftByOperationArgs = {
   operation_address: Scalars['String'];
 };
 

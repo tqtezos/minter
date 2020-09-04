@@ -116,10 +116,12 @@ type ContractOperation {
 ## Application Types
 
 type NonFungibleToken {
-  id: Int!
+  name: String!
+  symbol: String!
   token_id: String!
-  creator_address: String!
-  operation_address: String!
+  extras: JSON!
+  decimals: Int!
+  owner: String!
 }
 
 type PublishedOperation {
@@ -142,10 +144,11 @@ type Settings {
 ## Toplevel Types
 
 type Query {
-  nftTokens(limit: Int): [NonFungibleToken]
+  nfts(limit: Int): [NonFungibleToken]
   nftByTokenId(token_id: String!): NonFungibleToken
-  nftByCreatorAddress(creator_address: String!): NonFungibleToken
-  nftByOperationAddress(operation_address: String!): NonFungibleToken
+
+  nftByOwner(owner_address: String!): NonFungibleToken
+  nftByOperation(operation_address: String!): NonFungibleToken
 
   publishedOperationByHash(hash: String!): PublishedOperation
   publishedOperationsByInitiator(initiator: String!): [PublishedOperation]
@@ -157,10 +160,11 @@ type Query {
 
 type Mutation {
   createNonFungibleToken(
+    owner_address: String!
     name: String!,
     description: String!
     symbol: String!
-    ipfs_hash: String!
+    ipfs_cid: String!
   ): PublishedOperation!
 }
 

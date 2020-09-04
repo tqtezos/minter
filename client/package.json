@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
+    "@apollo/link-ws": "^2.0.0-beta.3",
+    "@apollo/react-hooks": "^4.0.0",
     "@emotion/core": "^10.0.28",
     "@emotion/styled": "^10.0.27",
     "@testing-library/jest-dom": "^4.2.4",
@@ -14,6 +16,8 @@
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
     "antd": "^4.5.2",
+    "apollo-client": "^2.6.10",
+    "graphql": "^15.3.0",
     "graphql-tag": "^2.11.0",
     "ipfs-http-client": "^46.0.1",
     "prettier": "^2.1.1",
@@ -21,6 +25,7 @@
     "react-awesome-reveal": "^3.0.0",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
+    "subscriptions-transport-ws": "^0.9.18",
     "typescript": "~3.7.2",
     "wouter": "^2.5.1"
   },

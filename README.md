@@ -84,21 +84,51 @@ You can now open:
 
 ### Using Local IPFS Server
 
-Once your've started the docker swarm services with `bin/start` a local 
-instance of IPFS server will be automatically configured and started. 
-No actions needed to use it for file upload. 
+Once your've started the docker swarm services with `bin/start` a local
+instance of IPFS server will be automatically configured and started.
+No actions needed to use it for file upload.
 
 However, if you wish to monitor the IPFS server or reconfigure it using its Web UI, you can use:
 [http://localhost:5001/webui](http://localhost:5001/webui)
 
 ## Development
 
-Note the names of the services printed by the start script and check their log
-output, e.g.:
+To see a list of services running after you've started the system, run:
 
 ```
-docker service logs minter-dev-sandbox_api-server --follow
+docker service ls
 ```
+
+### Accessing Service Logs
+
+To view each service's logs, the `bin/log` command is available. It's a small
+wrapper around `docker service logs` that matches the first service you provide
+it:
+
+```
+bin/log api
+```
+
+...which is a shorter way of doing the following:
+
+```
+docker service logs minter-dev-sandbox_api-server --follow --raw
+```
+
+To view the UI output, for example, run:
+
+```
+bin/log ui
+```
+
+You may also override the script's default [docker service logs arguments](https://docs-stage.docker.com/engine/reference/commandline/service_logs/)
+(`--follow` and `--raw`) by passing them at the end of the command. For example:
+
+```
+bin/log api --since 5m
+```
+
+### Editor Environments
 
 Docker development images are set up to reload server and web ui on source code
 changes.
@@ -112,12 +142,16 @@ pushd client; yarn; popd
 pushd server; yarn; popd
 ```
 
+### Running on Testnet
+
 By default `bin/start` starts sandbox environment. To run against public tezos
 nodes with public instance of tzstats start with
 
 ```sh
 bin/start dev-testnet
 ```
+
+### Exploring the Database
 
 To explore the database with with `psql`:
 
@@ -138,6 +172,8 @@ bin/migrate-db
 ```
 
 or simply stop and start.
+
+### Restarting Services
 
 Individual services in docker stack can be restarted like so:
 

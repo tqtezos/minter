@@ -4,6 +4,7 @@ import PublishedOperation from '../../models/published_operation';
 import { TransactionOperation } from '@taquito/taquito/dist/types/operations/transaction-operation';
 import { Context } from '../../components/context';
 import { BigNumber } from 'bignumber.js';
+import CID from 'cids';
 
 async function confirmOperation(
   { db, pubsub, tzClient }: Context,
@@ -17,12 +18,30 @@ async function confirmOperation(
   pubsub.publish('OPERATION_CONFIRMED', { operationConfirmed: publishedOp });
 }
 
+function validateCID(cid: string) {
+  try {
+    new CID(cid);
+  } catch (e) {
+    throw Error('The supplied `ipfs_cid` is invalid');
+  }
+}
+
 const Mutation: MutationResolvers = {
   async createNonFungibleToken(_parent, args, ctx) {
+    validateCID(args.ipfs_cid);
+
     const { db, contractStore } = ctx;
     const nftContract = await contractStore.nftContract();
     const nftStorage = await nftContract.storage<any>();
     const adminAddress = await ctx.tzClient.signer.publicKeyHash();
+
+    const extras = new MichelsonMap({
+      prim: 'map',
+      args: [{ prim: 'string' }, { prim: 'string' }]
+    });
+
+    extras.set('description', args.description);
+    extras.set('ipfs_cid', args.ipfs_cid);
 
     const params = [
       {
@@ -31,12 +50,9 @@ const Mutation: MutationResolvers = {
           symbol: args.symbol,
           name: args.name,
           decimals: new BigNumber(0),
-          extras: new MichelsonMap({
-            prim: 'map',
-            args: [{ prim: 'string' }, { prim: 'string' }]
-          })
+          extras
         },
-        owner: adminAddress
+        owner: args.owner_address
       }
     ];
 

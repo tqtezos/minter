@@ -141,18 +141,21 @@ export type Mutation = {
 };
 
 export type MutationCreateNonFungibleTokenArgs = {
+  owner_address: Scalars['String'];
   name: Scalars['String'];
   description: Scalars['String'];
   symbol: Scalars['String'];
-  ipfs_hash: Scalars['String'];
+  ipfs_cid: Scalars['String'];
 };
 
 export type NonFungibleToken = {
   __typename?: 'NonFungibleToken';
-  id: Scalars['Int'];
+  name: Scalars['String'];
+  symbol: Scalars['String'];
   token_id: Scalars['String'];
-  creator_address: Scalars['String'];
-  operation_address: Scalars['String'];
+  extras: Scalars['JSON'];
+  decimals: Scalars['Int'];
+  owner: Scalars['String'];
 };
 
 export type Operation = {
@@ -174,10 +177,10 @@ export type PublishedOperation = {
 
 export type Query = {
   __typename?: 'Query';
-  nftTokens?: Maybe<Array<Maybe<NonFungibleToken>>>;
+  nfts?: Maybe<Array<Maybe<NonFungibleToken>>>;
   nftByTokenId?: Maybe<NonFungibleToken>;
-  nftByCreatorAddress?: Maybe<NonFungibleToken>;
-  nftByOperationAddress?: Maybe<NonFungibleToken>;
+  nftByOwner?: Maybe<NonFungibleToken>;
+  nftByOperation?: Maybe<NonFungibleToken>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
   publishedOperationsByInitiator?: Maybe<Array<Maybe<PublishedOperation>>>;
   publishedOperationsByMethod?: Maybe<Array<Maybe<PublishedOperation>>>;
@@ -185,7 +188,7 @@ export type Query = {
   settings: Settings;
 };
 
-export type QueryNftTokensArgs = {
+export type QueryNftsArgs = {
   limit?: Maybe<Scalars['Int']>;
 };
 
@@ -193,11 +196,11 @@ export type QueryNftByTokenIdArgs = {
   token_id: Scalars['String'];
 };
 
-export type QueryNftByCreatorAddressArgs = {
-  creator_address: Scalars['String'];
+export type QueryNftByOwnerArgs = {
+  owner_address: Scalars['String'];
 };
 
-export type QueryNftByOperationAddressArgs = {
+export type QueryNftByOperationArgs = {
   operation_address: Scalars['String'];
 };
 
@@ -353,12 +356,12 @@ export type ResolversTypes = ResolversObject<{
   Int: ResolverTypeWrapper<Scalars['Int']>;
   NonFungibleToken: ResolverTypeWrapper<NonFungibleToken>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  JSON: ResolverTypeWrapper<Scalars['JSON']>;
   PublishedOperation: ResolverTypeWrapper<PublishedOperation>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Settings: ResolverTypeWrapper<Settings>;
   Mutation: ResolverTypeWrapper<{}>;
   Subscription: ResolverTypeWrapper<{}>;
-  JSON: ResolverTypeWrapper<Scalars['JSON']>;
   ContractStorageMeta: ResolverTypeWrapper<ContractStorageMeta>;
   BigMapMeta: ResolverTypeWrapper<BigMapMeta>;
   BigMapKV: ResolverTypeWrapper<BigMapKv>;
@@ -381,12 +384,12 @@ export type ResolversParentTypes = ResolversObject<{
   Int: Scalars['Int'];
   NonFungibleToken: NonFungibleToken;
   String: Scalars['String'];
+  JSON: Scalars['JSON'];
   PublishedOperation: PublishedOperation;
   Boolean: Scalars['Boolean'];
   Settings: Settings;
   Mutation: {};
   Subscription: {};
-  JSON: Scalars['JSON'];
   ContractStorageMeta: ContractStorageMeta;
   BigMapMeta: BigMapMeta;
   BigMapKV: BigMapKv;
@@ -650,7 +653,7 @@ export type MutationResolvers<
     ContextType,
     RequireFields<
       MutationCreateNonFungibleTokenArgs,
-      'name' | 'description' | 'symbol' | 'ipfs_hash'
+      'owner_address' | 'name' | 'description' | 'symbol' | 'ipfs_cid'
     >
   >;
 }>;
@@ -659,14 +662,12 @@ export type NonFungibleTokenResolvers<
   ContextType = Context,
   ParentType extends ResolversParentTypes['NonFungibleToken'] = ResolversParentTypes['NonFungibleToken']
 > = ResolversObject<{
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  symbol?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   token_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  creator_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  operation_address?: Resolver<
-    ResolversTypes['String'],
-    ParentType,
-    ContextType
-  >;
+  extras?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>;
+  decimals?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  owner?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
@@ -697,11 +698,11 @@ export type QueryResolvers<
   ContextType = Context,
   ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
 > = ResolversObject<{
-  nftTokens?: Resolver<
+  nfts?: Resolver<
     Maybe<Array<Maybe<ResolversTypes['NonFungibleToken']>>>,
     ParentType,
     ContextType,
-    RequireFields<QueryNftTokensArgs, never>
+    RequireFields<QueryNftsArgs, never>
   >;
   nftByTokenId?: Resolver<
     Maybe<ResolversTypes['NonFungibleToken']>,
@@ -709,17 +710,17 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryNftByTokenIdArgs, 'token_id'>
   >;
-  nftByCreatorAddress?: Resolver<
+  nftByOwner?: Resolver<
     Maybe<ResolversTypes['NonFungibleToken']>,
     ParentType,
     ContextType,
-    RequireFields<QueryNftByCreatorAddressArgs, 'creator_address'>
+    RequireFields<QueryNftByOwnerArgs, 'owner_address'>
   >;
-  nftByOperationAddress?: Resolver<
+  nftByOperation?: Resolver<
     Maybe<ResolversTypes['NonFungibleToken']>,
     ParentType,
     ContextType,
-    RequireFields<QueryNftByOperationAddressArgs, 'operation_address'>
+    RequireFields<QueryNftByOperationArgs, 'operation_address'>
   >;
   publishedOperationByHash?: Resolver<
     Maybe<ResolversTypes['PublishedOperation']>,

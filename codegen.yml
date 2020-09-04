@@ -22,3 +22,5 @@ generates:
   client/src/generated/fragmentTypes.json:
     plugins:
       - fragment-matcher
+    config:
+      apolloClientVersion: 3
