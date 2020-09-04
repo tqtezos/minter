@@ -25,7 +25,6 @@ const Query: QueryResolvers = {
     return publishedOp || null;
   },
 
-  // TODO: Convert to indexer API getters
   async nftByTokenId(_parent, { token_id }, ctx) {
     const { nftData, ownerData } = await extractNftData(ctx);
     const token = nftData.find((kv: any) => kv.value.token_id === token_id);

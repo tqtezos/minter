@@ -1,4 +1,9 @@
-import { Resolvers, MutationResolvers } from '../../generated/graphql_schema';
+import {
+  Resolvers,
+  MutationResolvers,
+  MutationCreateNonFungibleTokenArgs,
+  PublishedOperation as GQLPublishedOperation
+} from '../../generated/graphql_schema';
 import { MichelsonMap } from '@taquito/taquito';
 import PublishedOperation from '../../models/published_operation';
 import { TransactionOperation } from '@taquito/taquito/dist/types/operations/transaction-operation';
@@ -26,53 +31,67 @@ function validateCID(cid: string) {
   }
 }
 
+async function createNonFungibleToken(
+  args: MutationCreateNonFungibleTokenArgs,
+  ctx: Context
+) {
+  validateCID(args.ipfs_cid);
+
+  const { db, contractStore } = ctx;
+  const nftContract = await contractStore.nftContract();
+  const nftStorage = await nftContract.storage<any>();
+  const adminAddress = await ctx.tzClient.signer.publicKeyHash();
+
+  const extras = new MichelsonMap({
+    prim: 'map',
+    args: [{ prim: 'string' }, { prim: 'string' }]
+  });
+
+  extras.set('description', args.description);
+  extras.set('ipfs_cid', args.ipfs_cid);
+
+  const params = [
+    {
+      metadata: {
+        token_id: nftStorage.assets.next_token_id,
+        symbol: args.symbol,
+        name: args.name,
+        decimals: new BigNumber(0),
+        extras
+      },
+      owner: args.owner_address
+    }
+  ];
+
+  const operation = await nftContract.methods.mint(params).send();
+
+  await PublishedOperation.create(db, {
+    hash: operation.hash,
+    initiator: adminAddress,
+    method: 'mint',
+    params: JSON.stringify(params),
+    status: 'published',
+    retry: false
+  });
+
+  const publishedOp = await PublishedOperation.byHash(db, operation.hash);
+
+  if (!publishedOp) throw Error('Failed to return published operation');
+
+  let returnVal: [TransactionOperation, GQLPublishedOperation];
+  returnVal = [operation, publishedOp];
+  return returnVal;
+}
+
 const Mutation: MutationResolvers = {
   async createNonFungibleToken(_parent, args, ctx) {
-    validateCID(args.ipfs_cid);
-
-    const { db, contractStore } = ctx;
-    const nftContract = await contractStore.nftContract();
-    const nftStorage = await nftContract.storage<any>();
-    const adminAddress = await ctx.tzClient.signer.publicKeyHash();
-
-    const extras = new MichelsonMap({
-      prim: 'map',
-      args: [{ prim: 'string' }, { prim: 'string' }]
-    });
-
-    extras.set('description', args.description);
-    extras.set('ipfs_cid', args.ipfs_cid);
-
-    const params = [
-      {
-        metadata: {
-          token_id: nftStorage.assets.next_token_id,
-          symbol: args.symbol,
-          name: args.name,
-          decimals: new BigNumber(0),
-          extras
-        },
-        owner: args.owner_address
-      }
-    ];
-
-    const operation = await nftContract.methods.mint(params).send();
-
-    await PublishedOperation.create(db, {
-      hash: operation.hash,
-      initiator: adminAddress,
-      method: 'mint',
-      params: JSON.stringify(params),
-      status: 'published',
-      retry: false
-    });
-
-    const publishedOp = await PublishedOperation.byHash(db, operation.hash);
-
-    if (!publishedOp) throw Error('Failed to return published operation');
-
+    const [operation, publishedOp] = await createNonFungibleToken(args, ctx);
     confirmOperation(ctx, operation);
-
+    return publishedOp;
+  },
+  async createNonFungibleTokenSync(_parent, args, ctx) {
+    const [operation, publishedOp] = await createNonFungibleToken(args, ctx);
+    await confirmOperation(ctx, operation);
     return publishedOp;
   }
 };
