@@ -4,6 +4,7 @@ import { jsx } from '@emotion/core';
 import styled from '@emotion/styled';
 import { Row, Col, Button } from 'antd';
 import { useLocation } from 'wouter';
+import { Slide, Zoom } from 'react-awesome-reveal';
 
 import Page from '../Page';
 
@@ -47,14 +48,20 @@ const SplashPage: FC = () => {
     <Page>
       <Row css={{marginTop: '7em'}}>
         <Col offset={3} span={18}>
-          <Title>Create NFTs on Tezos <br /> with the click of a button</Title>
-          <Description>
-            Create and mint a new non-fungible token by using our simple interface. 
-            Just connect your Tezos account.
-          </Description>
-          <MintTokensButton onClick={
-            () => {setLocation('/create-non-fungible')}} 
-          />
+          <Slide triggerOnce>
+            <Title>Create NFTs on Tezos <br /> with the click of a button</Title>
+          </Slide>
+          <Slide direction="right" triggerOnce>
+            <Description>
+              Create and mint a new non-fungible token by using our simple interface. 
+              Just connect your Tezos account.
+            </Description>
+          </Slide>
+          <Zoom delay={500} direction="down" triggerOnce>
+            <MintTokensButton onClick={
+              () => {setLocation('/create-non-fungible')}} 
+            />
+          </Zoom>
           <Description css={{marginTop: '7em'}}>
             Learn more about TZIP-12
             <a href="https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md"> here</a>
