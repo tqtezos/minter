@@ -8,9 +8,9 @@ import { TezosToolkit } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
 
 async function main() {
-  const env = process.env['ENV_NAME'];
+  const env = process.env['TZ_NETWORK'];
   if (!env) {
-    $log.error(`ENV_NAME environment variable is not set`);
+    $log.error(`TZ_NETWORK environment variable is not set`);
     process.exit(1);
   }
 

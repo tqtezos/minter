@@ -10,14 +10,14 @@
     "build:watch": "tsc -w -p .",
     "compile-contracts": "ts-node src/compile-contracts.ts",
     "bootstrap": "ts-node src/bootstrap-contracts-config.ts",
-    "bootstrap-sandbox": "env ENV_NAME=sandbox ts-node src/bootstrap-contracts-config.ts",
-    "bootstrap-testnet": "env ENV_NAME=testnet ts-node src/bootstrap-contracts-config.ts"
+    "bootstrap-sandbox": "env TZ_NETWORK=sandbox ts-node src/bootstrap-contracts-config.ts",
+    "bootstrap-testnet": "env TZ_NETWORK=testnet ts-node src/bootstrap-contracts-config.ts"
   },
   "bin": {
     "compile-contracts": "ts-node src/compile-contracts.ts",
     "bootstrap": "ts-node src/bootstrap-contracts-config.ts",
-    "bootstrap-sandbox": "env ENV_NAME=sandbox ts-node src/bootstrap-contracts-config.ts",
-    "bootstrap-testnet": "env ENV_NAME=testnet ts-node src/bootstrap-contracts-config.ts"
+    "bootstrap-sandbox": "env TZ_NETWORK=sandbox ts-node src/bootstrap-contracts-config.ts",
+    "bootstrap-testnet": "env TZ_NETWORK=testnet ts-node src/bootstrap-contracts-config.ts"
   },
   "author": "",
   "license": "MIT",
