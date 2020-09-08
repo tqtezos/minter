@@ -16,3 +16,6 @@ FLEXTESA_DOCKER_IMG=registry.gitlab.com/tezos/flextesa:ce51babe-run
 
 TZ_INDEX_DB_PATH=$PROJECT_ROOT_DIR/.tzindex
 FLEXTESA_DATA_DIR=$PROJECT_ROOT_DIR/.flextesa
+
+TZ_NETWORK=sandbox
+

@@ -13,16 +13,16 @@ auctions, voting - DAOs, and games).
 
 ## Requirements
 
-Name    | Version   | Download
---------|-----------|----------
-Docker  | `19.03.x` | [Link][docker]
+| Name   | Version   | Download       |
+| ------ | --------- | -------------- |
+| Docker | `19.03.x` | [Link][docker] |
 
 [docker]: https://www.docker.com/
 
 > Note: on Ubuntu add your user to `docker` group so that
 > scripts using docker can be executed without sudo:
 >
->  `sudo usermod -a -G docker <username>`
+> `sudo usermod -a -G docker <username>`
 
 ## Dependencies
 
@@ -55,6 +55,12 @@ printf "edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq" | docker secret 
 
 ### Starting and Stopping
 
+Install bootstrap project first:
+
+```
+pushd contracts; npm install; popd
+```
+
 We can now start our docker swarm services:
 
 ```
@@ -67,15 +73,10 @@ To stop and teardown the services, run:
 bin/stop
 ```
 
-
 ### Originating Contracts
 
-Once you've started the docker swarm services with `bin/start`, the Minter needs
-a set of initial contracts to interact with. To originate them run:
-
-```
-bin/originate-fa2-nft-contracts
-```
+Once you've started the docker swarm services with `bin/start`, it will automatically
+bootstrap a set of initial contracts to interact with.
 
 You can now open:
 
