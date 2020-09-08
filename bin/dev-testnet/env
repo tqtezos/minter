@@ -1,3 +1,5 @@
 TEZOS_RPC_URL=https://rpcalpha.tzbeta.net
 TZSTATS_API_URL=https://api.carthagenet.tzstats.com
 TZSTATS_URL=https://carthagenet.tzstats.com
+
+TZ_NETWORK=testnet

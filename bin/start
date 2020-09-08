@@ -26,6 +26,8 @@ docker stack deploy \
 ENV_START_SCRIPT=$PROJECT_ROOT_DIR/bin/${ENV_NAME}/start
 [ -f $ENV_START_SCRIPT ] && $ENV_START_SCRIPT
 
+pushd $PROJECT_ROOT_DIR/contracts && yarn run bootstrap ; popd
+
 $PROJECT_ROOT_DIR/bin/wait-for-postgres $PROJECT_ROOT_DIR/bin/migrate-db
 
 #knex does not properly handle no db on startup so
