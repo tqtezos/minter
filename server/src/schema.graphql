@@ -1,118 +1,5 @@
 scalar JSON
 
-## Indexer Types
-
-type ContractStorageMeta {
-  contract: String
-  time: String
-  height: Int
-  block: String
-}
-
-type BigMapMeta {
-  contract: String
-  bigmap_id: Int
-  time: String
-  height: Int
-  block: String
-  is_replaced: Boolean
-  is_removed: Boolean
-}
-
-type BigMapKV {
-  key: String
-  key_hash: String
-  key_binary: String
-  value: JSON
-  meta: BigMapMeta
-}
-
-type ContractStorage {
-  meta: ContractStorageMeta
-  value: JSON
-  fa12BigMap: [BigMapKV]
-}
-
-type Operation {
-  hash: String
-  time: String
-}
-
-type ContractOperationParams {
-  entrypoint: String
-  branch: String
-  id: Int
-  value: JSON
-}
-
-type ContractOperationStorageMeta {
-  contract: String
-  time: String
-  height: Int
-  block: String
-}
-
-type ContractOperationStorage {
-  meta: ContractOperationStorageMeta
-  value: JSON
-}
-
-type BigMapDiffItemMeta {
-  contract: String
-  bigmap_id: Int
-  time: String
-  height: Int
-  block: String
-}
-
-type BigMapDiffItem {
-  key: String
-  key_hash: String
-  key_binary: String
-  value: JSON
-  meta: BigMapDiffItemMeta
-  action: String
-}
-
-type ContractOperation {
-  hash: String
-  type: String
-  block: String
-  time: String
-  height: Int
-  cycle: Int
-  counter: Int
-  op_n: Int
-  op_c: Int
-  op_i: Int
-  status: String
-  is_success: Boolean
-  is_contract: Boolean
-  gas_limit: Int
-  gas_used: Int
-  gas_price: Float
-  storage_limit: Int
-  storage_size: Int
-  storage_paid: Int
-  volume: Int
-  fee: Float
-  reward: Int
-  deposit: Int
-  burned: Int
-  is_internal: Boolean
-  has_data: Boolean
-  days_destroyed: Int
-  parameters: ContractOperationParams
-  storage: ContractOperationStorage
-  big_map_diff: [BigMapDiffItem]
-  sender: String
-  receiver: String
-  branch_id: Int
-  branch_height: Int
-  branch_depth: Int
-  branch: String
-}
-
 ## Application Types
 
 type NonFungibleToken {
@@ -146,22 +33,24 @@ type Settings {
 type Query {
   nfts(limit: Int): [NonFungibleToken]
   nftByTokenId(token_id: String!): NonFungibleToken
-
   nftByOwner(owner_address: String!): NonFungibleToken
   nftByOperation(operation_address: String!): NonFungibleToken
-
   publishedOperationByHash(hash: String!): PublishedOperation
-  publishedOperationsByInitiator(initiator: String!): [PublishedOperation]
-  publishedOperationsByMethod(method: String!): [PublishedOperation]
-  publishedOperationsByStatus(status: String!): [PublishedOperation]
-
   settings: Settings!
 }
 
 type Mutation {
   createNonFungibleToken(
     owner_address: String!
-    name: String!,
+    name: String!
+    description: String!
+    symbol: String!
+    ipfs_cid: String!
+  ): PublishedOperation!
+
+  createNonFungibleTokenSync(
+    owner_address: String!
+    name: String!
     description: String!
     symbol: String!
     ipfs_cid: String!

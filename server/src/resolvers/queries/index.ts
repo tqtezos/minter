@@ -19,27 +19,36 @@ async function extractNftData(ctx: Context) {
   return { nftContract, contractData, nftData, ownerData };
 }
 
+async function nftByTokenId(token_id: string, ctx: Context) {
+  const { nftData, ownerData } = await extractNftData(ctx);
+  const token = nftData.find((kv: any) => kv.value.token_id === token_id);
+  if (!token) return null;
+  const owner = ownerData.find((kv: any) => kv.key === token.key);
+  if (!owner) return null;
+  return {
+    name: token.value.name,
+    symbol: token.value.symbol,
+    token_id: token.value.token_id,
+    extras: token.value.extras,
+    decimals: parseInt(token.value.decimals),
+    owner: owner.value
+  };
+}
+
 const Query: QueryResolvers = {
   async publishedOperationByHash(_parent, { hash }, { db }) {
     const publishedOp = await PublishedOperation.byHash(db, hash);
     return publishedOp || null;
   },
 
-  // TODO: Convert to indexer API getters
   async nftByTokenId(_parent, { token_id }, ctx) {
-    const { nftData, ownerData } = await extractNftData(ctx);
-    const token = nftData.find((kv: any) => kv.value.token_id === token_id);
-    if (!token) return null;
-    const owner = ownerData.find((kv: any) => kv.key === token.key);
-    if (!owner) return null;
-    return {
-      name: token.value.name,
-      symbol: token.value.symbol,
-      token_id: token.value.token_id,
-      extras: token.value.extras,
-      decimals: parseInt(token.value.decimals),
-      owner: owner.value
-    };
+    return await nftByTokenId(token_id, ctx);
+  },
+
+  async nftByOperation(_parent, { operation_address }, ctx) {
+    const opData = await getTzStats(ctx, `op/${operation_address}`);
+    const tokenId = opData[0].big_map_diff[0].value.token_id;
+    return await nftByTokenId(tokenId, ctx);
   },
 
   // TODO: Implement paging/limiting - tzindex API supports query params that

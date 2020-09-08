@@ -11,14 +11,14 @@ interface InputFormProps extends ImageIpfsUploadProps {
 }
 
 const CREATE_NON_FUNGIBLE_TOKEN = gql`
-  mutation CreateNonFungibleToken(
+  mutation CreateNonFungibleTokenSync(
     $owner_address: String!
     $name: String!
     $description: String!
     $symbol: String!
     $ipfs_cid: String!
   ) {
-    createNonFungibleToken(
+    createNonFungibleTokenSync(
       owner_address: $owner_address
       name: $name
       description: $description
