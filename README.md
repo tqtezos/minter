@@ -53,6 +53,9 @@ Next, import a Tezos private key. For local development, we can use the default
 printf "edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq" | docker secret create tz_private_key -
 ```
 
+This step is not required for the development environment since the secret key is
+stored and picked up from the config file.
+
 ### Starting and Stopping
 
 Install bootstrap project first:
