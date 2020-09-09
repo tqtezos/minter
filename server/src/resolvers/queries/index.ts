@@ -12,9 +12,10 @@ async function extractNftData(ctx: Context) {
   const nftContract = await ctx.contractStore.nftContract();
   const contractResource = `contract/${nftContract.address}`;
   const contractData = await getTzStats(ctx, contractResource);
-  const nftResource = `bigmap/${contractData.bigmap_ids[0]}/values`;
+  const bigMapIds = contractData.bigmap_ids.sort();
+  const nftResource = `bigmap/${bigMapIds[2]}/values`;
   const nftData = await getTzStats(ctx, nftResource);
-  const ownerResource = `bigmap/${contractData.bigmap_ids[2]}/values`;
+  const ownerResource = `bigmap/${bigMapIds[0]}/values`;
   const ownerData = await getTzStats(ctx, ownerResource);
   return { nftContract, contractData, nftData, ownerData };
 }
