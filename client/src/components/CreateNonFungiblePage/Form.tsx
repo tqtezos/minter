@@ -4,41 +4,16 @@ import { jsx } from '@emotion/core';
 import { Form, Input, Button } from 'antd';
 import ImageIpfsUpload, { ImageIpfsUploadProps } from './ImageIpfsUpload';
 import { IpfsContent } from '../../api/ipfsUploader';
-import { gql, useMutation } from '@apollo/client';
+import useCreateMutation from './useCreateMutation';
 
 interface InputFormProps extends ImageIpfsUploadProps {
   ipfsContent?: IpfsContent;
 }
 
-const CREATE_NON_FUNGIBLE_TOKEN = gql`
-  mutation CreateNonFungibleTokenSync(
-    $owner_address: String!
-    $name: String!
-    $description: String!
-    $symbol: String!
-    $ipfs_cid: String!
-  ) {
-    createNonFungibleTokenSync(
-      owner_address: $owner_address
-      name: $name
-      description: $description
-      symbol: $symbol
-      ipfs_cid: $ipfs_cid
-    ) {
-      hash
-      initiator
-      method
-      params
-      status
-    }
-  }
-`;
-
 const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange }) => {
-  const [createNonFungibleToken, { data }] = useMutation(
-    CREATE_NON_FUNGIBLE_TOKEN
-  );
+  const { createNonFungibleToken, data } = useCreateMutation();
   const [form] = Form.useForm();
+
   form.setFieldsValue({ ipfsCid: ipfsContent?.cid });
 
   // Testing the output - we'd likely want to use callbacks in the useMutation
@@ -79,11 +54,11 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange }) => {
             e.preventDefault();
             createNonFungibleToken({
               variables: {
-                owner_address: form.getFieldValue('ownerAddress'),
+                ownerAddress: form.getFieldValue('ownerAddress'),
                 name: form.getFieldValue('name'),
                 description: form.getFieldValue('description'),
                 symbol: form.getFieldValue('symbol'),
-                ipfs_cid: form.getFieldValue('ipfsCid')
+                ipfsCid: form.getFieldValue('ipfsCid')
               }
             });
           }}
