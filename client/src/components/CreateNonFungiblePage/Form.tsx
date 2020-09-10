@@ -16,17 +16,22 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
   const [form] = Form.useForm();
 
 
-  const handleFinish = (values: any) => {
+  const handleFinish = async (values: any) => {
     console.log('Submitted values: ', values);
+    const hideMessage = message.loading('Creating a new non-fungible token on blockchain...', 0);
     
-    createNonFungibleToken({
-      variables: {
-        ...values,
-        description: values.description || ''
-      }
-    }).catch(
-      error =>  message.error(error.message)
-    );
+    try {
+      await createNonFungibleToken({
+        variables: {
+          ...values,
+          description: values.description || ''
+        }
+      });
+    } catch (error) {
+      message.error(error.message, 10) // Keep for 10 seconds
+    } finally {
+      hideMessage();
+    }
   };
 
   useEffect(() => {

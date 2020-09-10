@@ -36,8 +36,6 @@ interface Data {
   status: string;
 }
 
-type CreateNonFungibleToken = (v: Variables) => void;
-
 export default () => {
   const [createNonFungibleToken, { data, loading, error }] = useMutation<Data, Variables>(
     CREATE_NON_FUNGIBLE_TOKEN
