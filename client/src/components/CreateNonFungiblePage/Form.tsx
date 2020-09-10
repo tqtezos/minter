@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { jsx } from '@emotion/core';
 import { Form, Input, Button, message } from 'antd';
 import ImageIpfsUpload, { ImageIpfsUploadProps } from './ImageIpfsUpload';
@@ -8,16 +8,15 @@ import useCreateMutation from './useCreateMutation';
 
 interface InputFormProps extends ImageIpfsUploadProps {
   ipfsContent?: IpfsContent;
+  onFinish: () => void;
 }
 
-const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange }) => {
+const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
   const { createNonFungibleToken, data, loading } = useCreateMutation();
   const [form] = Form.useForm();
 
-  form.setFieldsValue({ ipfsCid: ipfsContent?.cid });
-  console.log('Reveived data: ', data);
 
-  const onFinish = (values: any) => {
+  const handleFinish = (values: any) => {
     console.log('Submitted values: ', values);
     
     createNonFungibleToken({
@@ -30,10 +29,25 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange }) => {
     );
   };
 
+  useEffect(() => {
+      form.setFieldsValue({ ipfsCid: ipfsContent?.cid });
+    }, 
+    [ipfsContent, form]
+  );
+
+  useEffect(() => {
+      if(data) {
+        console.log('Reveived data: ', data);
+        onFinish();
+      }
+    }, 
+    [data, onFinish]
+  );
+
   return (
     <Form 
       form={form}
-      onFinish={onFinish}
+      onFinish={handleFinish}
       layout="vertical" 
       css={{ width: '30em' }}
     >
