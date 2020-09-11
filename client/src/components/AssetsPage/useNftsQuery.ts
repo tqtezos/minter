@@ -1,5 +1,5 @@
 import { gql, useQuery } from '@apollo/client';
-import { Query } from '../../generated/graphql_schema';
+import { NonFungibleToken } from '../../generated/graphql_schema';
 
 const NON_FUNGIBLE_TOKENS = gql`
   query NonFungibleTokens {
@@ -13,7 +13,14 @@ const NON_FUNGIBLE_TOKENS = gql`
   }
 `;
 
-export default () => useQuery<Query, void>(
-  NON_FUNGIBLE_TOKENS, 
+interface Data {
+  nfts: NonFungibleToken[]
+}
+
+export default () => useQuery<Data, void>(
+  NON_FUNGIBLE_TOKENS,
+  
+  // For some reason Apollo client seems to read it from cache
+  // without 'network-only' option
   { fetchPolicy: 'network-only' }
 );

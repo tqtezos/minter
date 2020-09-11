@@ -3,10 +3,12 @@ import { FC } from 'react';
 import { jsx } from '@emotion/core';
 import { useLocation } from 'wouter';
 import { Row, Col } from 'antd';
+import { Zoom } from 'react-awesome-reveal'
 
 import Page from '../Page';
 import PageTitle from '../common/PageTitle';
 import useNftsQuery from './useNftsQuery';
+import AssetCard from './AssetCard';
 
 const AssetsPage: FC = () => {
   const [, setLocation] = useLocation();
@@ -21,14 +23,22 @@ const AssetsPage: FC = () => {
         description="Your assets on the Tezos blockchain"
         onClick={() => { setLocation('/') }}
       />
-      <Row>
-        <Col offset={3}>
-          <div>Non-Fungible Tokens</div>
-          <ul>
-            {data?.nfts?.map(t => 
-              <li>{t?.token_id} {t?.symbol} {t?.name} {t?.extras.ipfs_cid}</li>
-            )}
-          </ul>
+      <Row css={{marginTop: '2em'}}>
+        <Col offset={3} span={18}>
+          <Row gutter={[16, 16]}>
+            <Zoom cascade triggerOnce duration={200}>
+              {data?.nfts.map(t =>
+                <Col>
+                  <AssetCard
+                    tokenId={t.token_id}
+                    symbol={t.symbol}
+                    name={t.name}
+                    ipfsCid={t.extras.ipfs_cid}
+                  />
+                </Col>
+              )}
+            </Zoom>
+          </Row>
         </Col>
       </Row>
     </Page>

@@ -45,4 +45,6 @@ const uploadToIpfs = async (blob: Blob): Promise<IpfsContent> => {
   }
 }
 
+export const urlFromCid = (cid: string) => url.resolve(config.ipfs.gatewayUrl, `ipfs/${cid}`);
+
 export default uploadToIpfs;
