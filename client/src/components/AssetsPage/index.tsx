@@ -25,8 +25,14 @@ const AssetsPage: FC = () => {
       />
       <Row css={{marginTop: '2em'}}>
         <Col offset={3} span={18}>
-          <Row gutter={[16, 16]}>
-            <Zoom cascade triggerOnce duration={200}>
+          <Row gutter={[24, 24]}>
+            <Zoom 
+              cascade 
+              triggerOnce
+              damping={0.1} 
+              duration={300} 
+              fraction={0.01}
+            >
               {data?.nfts.map(t =>
                 <Col>
                   <AssetCard
