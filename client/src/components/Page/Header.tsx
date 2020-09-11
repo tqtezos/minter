@@ -42,12 +42,12 @@ const Header: FC = () => {
   return (
     <Fragment>
       <Row align="middle">
-        <Col><Logo onClick={() => {setLocation('/')}} /></Col>
+        <Col><Logo onClick={() => { setLocation('/') }} /></Col>
         <Col flex="1" />
         <Col>
           <Space size="middle">
-            <HeaderButton title="Create" onClick={() => {}} />
-            <HeaderButton title="Connect" onClick={() => {}} />
+            <HeaderButton title="Create" onClick={() => { setLocation('/create-non-fungible') }} />
+            <HeaderButton title="Assets" onClick={() => { setLocation('/assets') }} />
           </Space>
         </Col>
       </Row>
