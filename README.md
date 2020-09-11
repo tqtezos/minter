@@ -40,17 +40,17 @@ auctions, voting - DAOs, and games).
 
 ### Setup
 
-First build docker images for development:
+First install all the packages and build docker images for the development:
 
-```
-bin/build-dev-images
+```sh
+$ yarn init-dev
 ```
 
 Next, import a Tezos private key. For local development, we can use the default
 `Alice` secret key that's included in the Tezos sandbox node:
 
-```
-printf "edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq" | docker secret create tz_private_key -
+```sh
+$ printf "edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq" | docker secret create tz_private_key -
 ```
 
 This step is not required for the development environment since the secret key is
@@ -58,49 +58,60 @@ stored and picked up from the config file.
 
 ### Starting and Stopping
 
-Install bootstrap project first:
+We can start development environment either using sandbox or connecting to Tezos
+test net.
 
-```
-pushd contracts; npm install; popd
+To start our docker swarm services use
+
+```sh
+$ yarn start-sandbox
 ```
 
-We can now start our docker swarm services:
+or
 
-```
-bin/start
+```sh
+$ yarn start-testnet
 ```
 
 To stop and teardown the services, run:
 
+```sh
+$ yarn stop-sandbox
 ```
-bin/stop
+
+or
+
+```sh
+$ yarn stop-testnet
 ```
 
 ### Originating Contracts
 
-Once you've started the docker swarm services with `bin/start`, it will automatically
-bootstrap a set of initial contracts to interact with.
+Once you've started the docker swarm services with `yarn start-xxx`, it will
+automatically bootstrap a set of initial contracts to interact with.
 
 You can now open:
 
 - [http://localhost:9000](http://localhost:9000) to view the application.
-- [http://localhost:9000/graphql](http://localhost:9000/graphql) to open the GraphQL playground.
+- [http://localhost:9000/graphql](http://localhost:9000/graphql) to open the
+  GraphQL playground.
 
 ### Using Local IPFS Server
 
-Once your've started the docker swarm services with `bin/start` a local
+Once your have started the docker swarm services with `yarn start-xxx`, a local
 instance of IPFS server will be automatically configured and started.
 No actions needed to use it for file upload.
 
-However, if you wish to monitor the IPFS server or reconfigure it using its Web UI, you can use:
+However, if you wish to monitor the IPFS server or reconfigure it using its Web
+UI, you can use:
 [http://localhost:5001/webui](http://localhost:5001/webui)
 
 ## Development
 
 To see a list of services running after you've started the system, run:
 
-```
-docker service ls
+```sh
+$ docker service ls
 ```
 
 ### Accessing Service Logs
@@ -109,27 +120,27 @@ To view each service's logs, the `bin/log` command is available. It's a small
 wrapper around `docker service logs` that matches the first service you provide
 it:
 
-```
-bin/log api
+```sh
+$ bin/log api
 ```
 
 ...which is a shorter way of doing the following:
 
-```
-docker service logs minter-dev-sandbox_api-server --follow --raw
+```sh
+$ docker service logs minter-dev-sandbox_api-server --follow --raw
 ```
 
 To view the UI output, for example, run:
 
-```
-bin/log ui
+```sh
+$ bin/log ui
 ```
 
 You may also override the script's default [docker service logs arguments](https://docs-stage.docker.com/engine/reference/commandline/service_logs/)
 (`--follow` and `--raw`) by passing them at the end of the command. For example:
 
-```
-bin/log api --since 5m
+```sh
+$ bin/log api --since 5m
 ```
 
 ### Editor Environments
@@ -142,8 +153,8 @@ outside of Docker. Make sure you have [Yarn](https://yarnpkg.com)
 (version `1.22.x` or above) installed:
 
 ```sh
-pushd client; yarn; popd
-pushd server; yarn; popd
+$ pushd client; yarn; popd
+$ pushd server; yarn; popd
 ```
 
 ### Running on Testnet
@@ -152,7 +163,7 @@ By default `bin/start` starts sandbox environment. To run against public tezos
 nodes with public instance of tzstats start with
 
 ```sh
-bin/start dev-testnet
+$ bin/start dev-testnet
 ```
 
 ### Exploring the Database
@@ -160,19 +171,19 @@ bin/start dev-testnet
 To explore the database with with `psql`:
 
 ```sh
-bin/psql
+$ bin/psql
 ```
 
 or, if using `dev-testnet` environment:
 
 ```sh
-bin/psql dev-testnet
+$ bin/psql dev-testnet
 ```
 
 To modify database add migration SQL file(s) to `db/` and perform migrations:
 
 ```sh
-bin/migrate-db
+$ bin/migrate-db
 ```
 
 or simply stop and start.
@@ -181,33 +192,33 @@ or simply stop and start.
 
 Individual services in docker stack can be restarted like so:
 
-```
-docker service scale minter-dev-sandbox_api-server=0
-docker service scale minter-dev-sandbox_api-server=1
+```sh
+$ docker service scale minter-dev-sandbox_api-server=0
+$ docker service scale minter-dev-sandbox_api-server=1
 ```
 
 Or with a helper shell function
 
-```
-svc-restart api-server
+```sh
+$ svc-restart api-server
 ```
 
 where `svc-restart` is defined as
 
-```
-svc-restart(){docker service scale minter-dev-sandbox_$1=0 && docker service scale minter-dev-sandbox_$1=1}
+```sh
+$ svc-restart(){docker service scale minter-dev-sandbox_$1=0 && docker service scale minter-dev-sandbox_$1=1}
 ```
 
 ## Release Builds (WIP)
 
 Development ui and api server builds can be swapped out for release builds:
 
-```
-bin/build-release-images
+```sh
+$ bin/build-release-images
 ```
 
 and then
 
-```
+```sh
 STACK_API_SERVER_DEF=api-server STACK_UI_DEF=ui bin/start
 ```
