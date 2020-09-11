@@ -28,7 +28,11 @@ const CreateNonFungiblePage: FC = () => {
       />
       <Row align="top" justify="start">
         <Col offset={3}>
-          <Form ipfsContent={ipfsContent} onChange={info => setIpfsContent(info)} />
+          <Form 
+            ipfsContent={ipfsContent} 
+            onChange={info => setIpfsContent(info)} 
+            onFinish={() => { setLocation('/assets') }}
+          />
         </Col>
         <Col><ImagePreview ipfsContent={ipfsContent} /></Col>
       </Row>
