@@ -42,8 +42,12 @@ auctions, voting - DAOs, and games).
 
 First install all the packages and build docker images for the development:
 
-```sh
-$ yarn init-dev
+```sh 
+$ yarn
+```
+or
+```sh 
+$ yarn install
 ```
 
 Next, import a Tezos private key. For local development, we can use the default
@@ -61,28 +65,41 @@ stored and picked up from the config file.
 We can start development environment either using sandbox or connecting to Tezos
 test net.
 
-To start our docker swarm services use
+To start our docker swarm services using sandbox run:
 
 ```sh
-$ yarn start-sandbox
+$ yarn start
 ```
 
 or
 
 ```sh
-$ yarn start-testnet
+$ yarn start:sandbox
 ```
 
-To stop and teardown the services, run:
+To stop and teardown the services, using sandbox run:
 
 ```sh
-$ yarn stop-sandbox
+$ yarn stop
 ```
 
 or
 
 ```sh
-$ yarn stop-testnet
+$ yarn stop:sandbox
+
+```
+
+To start our docker swarm services using testnet run:
+
+```sh
+$ yarn start:testnet
+```
+
+To stop and teardown the services, using testnet run:
+
+```sh
+$ yarn stop:testnet
 ```
 
 ### Originating Contracts
