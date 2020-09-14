@@ -2,7 +2,7 @@
 
 ## Description
 
-OpenMinter is an open-source tool to allow anyone
+OpenMinter is in-development open-source tool to allow anyone
 to create, manage, and use assets on the Tezos blockchain
 via the FA2 standard. The tool enables the user to easily
 create any type of asset (fungible, semi-fungible,
