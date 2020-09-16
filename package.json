@@ -7,7 +7,10 @@
     "start:testnet": "bin/start dev-testnet",
     "stop": "bin/stop dev-sandbox",
     "stop:sandbox": "bin/stop dev-sandbox",
-    "stop:testnet": "bin/stop dev-testnet"
+    "stop:testnet": "bin/stop dev-testnet",
+    "log": "bin/log",
+    "log:api": "bin/log api",
+    "log:ui": "bin/log ui"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^1.9.1",

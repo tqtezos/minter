@@ -133,9 +133,16 @@ $ docker service ls
 
 ### Accessing Service Logs
 
-To view each service's logs, the `bin/log` command is available. It's a small
-wrapper around `docker service logs` that matches the first service you provide
+To view each service's logs, the `bin/log` command is available. It can be run
+using yarn scripts `yarn log` or directly. It's a small wrapper around
+`docker service logs` that matches the first service you provide
 it:
+
+```sh
+$ yarn log:api
+```
+
+or
 
 ```sh
 $ bin/log api
@@ -148,6 +155,12 @@ $ docker service logs minter-dev-sandbox_api-server --follow --raw
 ```
 
 To view the UI output, for example, run:
+
+```sh
+$ yarn log:ui
+```
+
+or
 
 ```sh
 $ bin/log ui
