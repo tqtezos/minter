@@ -27,7 +27,7 @@ const AssetCards: FC<{ data: Data }> = ({ data }) => (
       fraction={0.01}
     >
       {data.nfts.map(t =>
-        <Col>
+        <Col key={t.token_id}>
           <AssetCard
             tokenId={t.token_id}
             symbol={t.symbol}
