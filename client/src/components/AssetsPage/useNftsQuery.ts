@@ -13,7 +13,7 @@ const NON_FUNGIBLE_TOKENS = gql`
   }
 `;
 
-interface Data {
+export interface Data {
   nfts: NonFungibleToken[]
 }
 
