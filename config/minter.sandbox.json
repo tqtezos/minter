@@ -1,10 +1,8 @@
 {
-	"rpc": "http://localhost:20000",
-	"admin": {
-		"address": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
-		"secret": "edskRpm2mUhvoUjHjXgMoDRxMKhtKfww1ixmWiHCWhHuMEEbGzdnz8Ks4vgarKDtxok7HmrEo1JzkXkdkvyw7Rtw6BNtSd7MJ7"
-	},
-	"contracts": {
-		"nft": "KT1TF17GWmm3ATxPCAcWtuGdbUwPUQ7471SR"
-	}
+  "rpc": "http://localhost:20000",
+  "admin": {
+    "address": "tz1hWvkWwfHgXh7EP6H7T49m7ZyDJx4YirUx",
+    "secret": "edskRuycScUrc5KqgiWZXWFa4STEAxJSs18ZXLDdfbDGkjLPXf8miygTAYxoR3DDqnczW4KnKkLUnH3h135qp167krTxKwnnbu"
+  },
+  "contracts": {}
 }
