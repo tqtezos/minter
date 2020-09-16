@@ -10,13 +10,19 @@ async function getTzStats(ctx: Context, resource: string) {
 
 async function extractNftData(ctx: Context) {
   const nftContract = await ctx.contractStore.nftContract();
-  const contractResource = `contract/${nftContract.address}`;
-  const contractData = await getTzStats(ctx, contractResource);
-  const bigMapIds = contractData.bigmap_ids.sort();
-  const nftResource = `bigmap/${bigMapIds[2]}/values`;
-  const nftData = await getTzStats(ctx, nftResource);
-  const ownerResource = `bigmap/${bigMapIds[0]}/values`;
-  const ownerData = await getTzStats(ctx, ownerResource);
+
+  const contractData = await getTzStats(ctx, `contract/${nftContract.address}`);
+  const [
+    ledgerId,
+    operatorsId,
+    tokenMetadataId
+  ] = contractData.bigmap_ids.sort();
+
+  const getBigMapValues = async (bigMapId: number) =>
+    getTzStats(ctx, `bigmap/${bigMapId}/values`);
+
+  const nftData = await getBigMapValues(tokenMetadataId);
+  const ownerData = await getBigMapValues(ledgerId);
   return { nftContract, contractData, nftData, ownerData };
 }
 
