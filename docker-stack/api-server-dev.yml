@@ -11,8 +11,15 @@ services:
       TZSTATS_API_URL: ${TZSTATS_API_URL}
       TEZOS_RPC_URL: ${TEZOS_RPC_URL}
       TZSTATS_URL: ${TZSTATS_URL}
+      TZ_NETWORK: ${TZ_NETWORK}
     volumes:
       - ${PROJECT_ROOT_DIR}/server/src:/usr/src/app/server/src
       - ${PROJECT_ROOT_DIR}/server/config:/usr/src/app/server/config
     ports:
       - 3300:3300
+    secrets:
+      - tz_private_key
+
+secrets:
+  tz_private_key:
+    external: true

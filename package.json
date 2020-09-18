@@ -1,6 +1,16 @@
 {
   "scripts": {
-    "gen-gql": "graphql-codegen && prettier --write server/src/generated/graphql_schema.ts client/src/generated/graphql_schema.tsx"
+    "gen:gql": "graphql-codegen && prettier --write server/src/generated/graphql_schema.ts client/src/generated/graphql_schema.tsx",
+    "postinstall": "bin/init-dev",
+    "start": "bin/start dev-sandbox",
+    "start:sandbox": "bin/start dev-sandbox",
+    "start:testnet": "bin/start dev-testnet",
+    "stop": "bin/stop dev-sandbox",
+    "stop:sandbox": "bin/stop dev-sandbox",
+    "stop:testnet": "bin/stop dev-testnet",
+    "log": "bin/log",
+    "log:api": "bin/log api",
+    "log:ui": "bin/log ui"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^1.9.1",

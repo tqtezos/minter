@@ -2,7 +2,7 @@ import { $log } from '@tsed/logger';
 import { BigNumber } from 'bignumber.js';
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 
-import { bootstrap, TestTz } from '../src/bootstrap-sandbox';
+import { bootstrap, TestTz } from './bootstrap-sandbox';
 import { Contract, nat } from '../src/type-aliases';
 
 import {

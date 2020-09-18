@@ -1,66 +1,75 @@
-import { Resolvers, QueryResolvers } from "../../generated/graphql_schema";
-import { SessionContext } from "../../components/context";
-import axios from "axios";
-import NonFungibleToken from "../../models/non_fungible_token";
-import Profile from "../../models/profile";
-import PublishedOperation from "../../models/published_operation";
+import { Resolvers, QueryResolvers } from '../../generated/graphql_schema';
+import { Context } from '../../components/context';
+import PublishedOperation from '../../models/published_operation';
+import axios from 'axios';
 
-const getTzStats = async (ctx: SessionContext, resource: string) =>
-  (await axios.get(`${ctx.tzStatsApiUrl}/${resource}`)).data;
+async function getTzStats(ctx: Context, resource: string) {
+  const response = await axios.get(`${ctx.tzStatsApiUrl}/${resource}`);
+  return response.data;
+}
+
+async function extractNftData(ctx: Context) {
+  const nftContract = await ctx.contractStore.nftContract();
+
+  const contractData = await getTzStats(ctx, `contract/${nftContract.address}`);
+  const [
+    ledgerId,
+    operatorsId,
+    tokenMetadataId
+  ] = contractData.bigmap_ids.sort();
+
+  const getBigMapValues = async (bigMapId: number) =>
+    getTzStats(ctx, `bigmap/${bigMapId}/values`);
+
+  const nftData = await getBigMapValues(tokenMetadataId);
+  const ownerData = await getBigMapValues(ledgerId);
+  return { nftContract, contractData, nftData, ownerData };
+}
+
+async function nftByTokenId(token_id: string, ctx: Context) {
+  const { nftData, ownerData } = await extractNftData(ctx);
+  const token = nftData.find((kv: any) => kv.value.token_id === token_id);
+  if (!token) return null;
+  const owner = ownerData.find((kv: any) => kv.key === token.key);
+  if (!owner) return null;
+  return {
+    name: token.value.name,
+    symbol: token.value.symbol,
+    token_id: token.value.token_id,
+    extras: token.value.extras,
+    decimals: parseInt(token.value.decimals),
+    owner: owner.value
+  };
+}
 
 const Query: QueryResolvers = {
-  contractStorage(_parent, { contract_id }, ctx) {
-    return getTzStats(ctx, `contract/${contract_id}/storage`);
+  async publishedOperationByHash(_parent, { hash }, { db }) {
+    const publishedOp = await PublishedOperation.byHash(db, hash);
+    return publishedOp || null;
   },
 
-  contractOperations(_parent, { contract_id }, ctx) {
-    return getTzStats(ctx, `contract/${contract_id}/calls?order=desc`);
+  async nftByTokenId(_parent, { token_id }, ctx) {
+    return await nftByTokenId(token_id, ctx);
   },
 
-  async nftByTokenId(_parent, { token_id }, { db }) {
-    const nft = await NonFungibleToken.byTokenId(db, token_id);
-    return nft || null;
+  async nftByOperation(_parent, { operation_address }, ctx) {
+    const opData = await getTzStats(ctx, `op/${operation_address}`);
+    const tokenId = opData[0].big_map_diff[0].value.token_id;
+    return await nftByTokenId(tokenId, ctx);
   },
 
-  async nftByCreatorAddress(_parent, { creator_address }, { db }) {
-    const nft = await NonFungibleToken.byCreatorAddress(db, creator_address);
-    return nft || null;
-  },
-
-  async nftByOperationAddress(_parent, { operation_address }, { db }) {
-    const nft = await NonFungibleToken.byOperationAddress(
-      db,
-      operation_address
-    );
-    return nft || null;
-  },
-
-  async nftTokens(_parent, { limit }, { db }) {
-    const nfts = await NonFungibleToken.all(db).limit(limit || 20);
-    return nfts;
-  },
-
-  async profileByAlias(_parent, { alias }, { db }) {
-    const profile = await Profile.byAlias(db, alias);
-    return profile || null;
-  },
-
-  async profileByAddress(_parent, { address }, { db }) {
-    const profile = await Profile.byAlias(db, address);
-    return profile || null;
-  },
-
-  async publishedOperationByAddress(_parent, { address }, { db }) {
-    const publishedOperation = await PublishedOperation.byAddress(db, address);
-    return publishedOperation || null;
-  },
-
-  async publishedOperationByInitiatorAddress(_parent, { address }, { db }) {
-    const publishedOperation = await PublishedOperation.byInitiatorAddress(
-      db,
-      address
-    );
-    return publishedOperation || null;
+  // TODO: Implement paging/limiting - tzindex API supports query params that
+  // enable this behavior
+  async nfts(_parent, _args, ctx) {
+    const { nftData, ownerData } = await extractNftData(ctx);
+    return nftData.map((token: any) => ({
+      name: token.value.name,
+      symbol: token.value.symbol,
+      token_id: token.value.token_id,
+      extras: token.value.extras,
+      decimals: parseInt(token.value.decimals),
+      owner: ownerData.find((kv: any) => kv.key === token.key).value
+    }));
   },
 
   settings(_parent, _args, { tzStatsUrl }) {

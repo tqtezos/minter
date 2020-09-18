@@ -1,21 +1,23 @@
 /** @jsx jsx */
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { jsx } from '@emotion/core';
 import styled from '@emotion/styled';
 import { Row, Col as AntCol } from 'antd';
+import { useLocation } from 'wouter';
 
 import Page from '../Page';
 import PageTitle from '../common/PageTitle';
-import { NonFungibleIcon } from '../BigIcon'
 import Form from './Form';
-import { useLocation } from 'wouter';
+import ImagePreview from './ImagePreview';
+import { IpfsContent } from '../../api/ipfsUploader';
 
 const Col = styled(AntCol)({
-  padding: '1em 3em'
+  padding: '2em 3em 0 0'
 });
 
 const CreateNonFungiblePage: FC = () => {
   const [, setLocation] = useLocation();
+  const [ipfsContent, setIpfsContent] = useState<IpfsContent>();
 
   return (
     <Page>
@@ -25,11 +27,14 @@ const CreateNonFungiblePage: FC = () => {
         onClick={() => {setLocation('/')}}
       />
       <Row align="top" justify="start">
-        <Col>
-          <div css={{marginTop: '2em'}}><NonFungibleIcon /></div>
+        <Col offset={3}>
+          <Form 
+            ipfsContent={ipfsContent} 
+            onChange={info => setIpfsContent(info)} 
+            onFinish={() => { setLocation('/assets') }}
+          />
         </Col>
-        <Col><Form /></Col>
-        <Col>Picture</Col>
+        <Col><ImagePreview ipfsContent={ipfsContent} /></Col>
       </Row>
     </Page>
   );

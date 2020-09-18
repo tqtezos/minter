@@ -151,29 +151,29 @@
                                      PAIR ;
                                      PAIR ;
                                      DUP ;
-                                     CAR ;
                                      CDR ;
                                      SWAP ;
                                      DUP ;
                                      DUG 2 ;
+                                     CAR ;
                                      CDR ;
                                      DIG 2 ;
                                      CAR ;
                                      CAR ;
                                      IF_NONE
-                                       { SWAP ; DROP }
-                                       { SWAP ;
+                                       { DROP }
+                                       { DIG 2 ;
                                          DUP ;
-                                         DUG 2 ;
-                                         DIG 3 ;
+                                         DUG 3 ;
+                                         DIG 2 ;
                                          DUP ;
-                                         DUG 4 ;
+                                         DUG 3 ;
                                          GET ;
                                          IF_NONE
                                            { DROP 3 ; DIG 4 ; DUP ; DUG 5 ; FAILWITH }
                                            { COMPARE ;
                                              EQ ;
-                                             IF { SWAP ; NONE address ; SWAP ; UPDATE }
+                                             IF { NONE address ; SWAP ; UPDATE }
                                                 { DROP 2 ; DIG 4 ; DUP ; DUG 5 ; FAILWITH } } } ;
                                      SWAP ;
                                      DUP ;
@@ -200,12 +200,10 @@
              DROP ;
              DIG 2 ;
              DROP ;
-             NIL operation ;
-             DUG 2 ;
              DIP { DUP ; CDR ; SWAP ; CAR ; CDR } ;
              PAIR ;
              PAIR ;
-             SWAP ;
+             NIL operation ;
              PAIR } ;
          SWAP ;
          APPLY ;
@@ -678,10 +676,6 @@
                          CONS ;
                          PAIR } } ;
              DUP ;
-             CAR ;
-             NONE address ;
-             PAIR ;
-             SWAP ;
              CDR ;
              LAMBDA
                (pair (pair address address) (pair nat (big_map (pair address (pair address nat)) unit)))
@@ -689,6 +683,9 @@
                { DROP ; UNIT } ;
              NIL (pair (option address) (list (pair (pair nat (option address)) nat))) ;
              DIG 3 ;
+             CAR ;
+             NONE address ;
+             PAIR ;
              CONS ;
              PAIR ;
              PAIR ;

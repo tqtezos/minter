@@ -7,7 +7,7 @@ framework.
 
 The first iteration will implement minimal `Create NFT` use-case:
 
-1. the user enters all token metadata, his own tz1 address and initiates the mint
+1. the user enters all token metadata, their own tz1 address and initiates the mint
    operation.
 
 2. Server saves the token image to IPFS and uses IPFS URL and image hash to populate
@@ -21,7 +21,7 @@ The first iteration will implement minimal `Create NFT` use-case:
 
 ## What is Included And What is Not
 
-1. There is no wallet integration. The user should manually type or paste his
+1. There is no wallet integration. The user should manually type or paste their
    tz1 address.
 
 2. There is no IPFS integration. IPFS stub either saves images to the disk or memory

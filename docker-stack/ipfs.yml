@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+  ipfs:
+    image: ipfs/go-ipfs
+    volumes:
+      - $PROJECT_ROOT_DIR/.ipfs:/data/ipfs
+    ports:
+        - 8080:8080
+        - 4001:4001
+        - 5001:5001

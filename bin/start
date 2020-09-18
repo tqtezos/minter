@@ -26,6 +26,8 @@ docker stack deploy \
 ENV_START_SCRIPT=$PROJECT_ROOT_DIR/bin/${ENV_NAME}/start
 [ -f $ENV_START_SCRIPT ] && $ENV_START_SCRIPT
 
+pushd $PROJECT_ROOT_DIR/contracts && yarn run bootstrap ; popd
+
 $PROJECT_ROOT_DIR/bin/wait-for-postgres $PROJECT_ROOT_DIR/bin/migrate-db
 
 #knex does not properly handle no db on startup so
@@ -33,5 +35,7 @@ $PROJECT_ROOT_DIR/bin/wait-for-postgres $PROJECT_ROOT_DIR/bin/migrate-db
 #see https://stackoverflow.com/questions/33823440/knexerror-pool2-error-connect-econnrefused
 
 docker stack deploy -c $API_SERVER_STACK_FILE $STACK_NAME
+
+$PROJECT_ROOT_DIR/bin/start-ipfs
 
 docker stack services $STACK_NAME

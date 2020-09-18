@@ -4,7 +4,7 @@ import { Button, Row, Col, Space } from 'antd';
 import { jsx } from '@emotion/core';
 import { useLocation } from 'wouter';
 
-import LogoImage from './logo.png';
+import LogoImage from './logo.svg';
 
 const Logo: FC<{ onClick: () => void}> = ({onClick}) => (
   <img
@@ -12,7 +12,7 @@ const Logo: FC<{ onClick: () => void}> = ({onClick}) => (
     alt="Logo"
     onClick={onClick}
     css={{
-      height: '4.7em',
+      height: '4em',
       cursor: 'pointer'
     }}
   />
@@ -42,13 +42,12 @@ const Header: FC = () => {
   return (
     <Fragment>
       <Row align="middle">
-        <Col><Logo onClick={() => {setLocation('/')}} /></Col>
+        <Col><Logo onClick={() => { setLocation('/') }} /></Col>
         <Col flex="1" />
         <Col>
           <Space size="middle">
-            <HeaderButton title="FAQ" onClick={() => {}} />
-            <HeaderButton title="Create" onClick={() => {}} />
-            <HeaderButton title="Connect" onClick={() => {}} />
+            <HeaderButton title="Create" onClick={() => { setLocation('/create-non-fungible') }} />
+            <HeaderButton title="Assets" onClick={() => { setLocation('/assets') }} />
           </Space>
         </Col>
       </Row>
