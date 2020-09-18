@@ -71,18 +71,18 @@ let inc_balance(owner, token_id, ledger : address option * token_id * ledger) : 
 Update leger balances according to the specified transfers. Fails if any of the
 permissions or constraints are violated.
 @param txs transfers to be applied to the ledger
-@param owner_validator function that validates of the tokens from the particular owner can be transferred. 
+@param validate_op function that validates of the tokens from the particular owner can be transferred. 
  *)
-let transfer (txs, owner_validator, ops_storage, ledger
-    : (transfer_descriptor list) * ((address * operator_storage) -> unit) * operator_storage * ledger)
+let transfer (txs, validate_op, ops_storage, ledger
+    : (transfer_descriptor list) * operator_validator * operator_storage * ledger)
     : ledger = 
   let make_transfer = fun (l, tx : ledger * transfer_descriptor) ->
-    let u = match tx.from_ with
-    | None -> unit
-    | Some o -> owner_validator (o, ops_storage)
-    in
     List.fold 
       (fun (ll, dst : ledger * transfer_destination_descriptor) ->
+        let u = match tx.from_ with 
+        | None -> unit
+        | Some owner -> validate_op (owner, Tezos.sender, dst.token_id, ops_storage)
+        in
         if dst.amount > 1n
         then (failwith fa2_insufficient_balance : ledger)
         else if dst.amount = 0n
@@ -94,11 +94,11 @@ let transfer (txs, owner_validator, ops_storage, ledger
   in    
   List.fold make_transfer txs ledger
 
-let fa2_transfer (tx_descriptors, validator, storage
-    : (transfer_descriptor list) * ((address * operator_storage)-> unit) * nft_token_storage)
+let fa2_transfer (tx_descriptors, validate_op, storage
+    : (transfer_descriptor list) * operator_validator * nft_token_storage)
     : (operation list) * nft_token_storage =
   
-  let new_ledger = transfer (tx_descriptors, validator, storage.operators, storage.ledger) in
+  let new_ledger = transfer (tx_descriptors, validate_op, storage.operators, storage.ledger) in
   let new_storage = { storage with ledger = new_ledger; } in
   let ops = get_owner_hook_ops (tx_descriptors, storage) in
   ops, new_storage
@@ -133,9 +133,7 @@ let fa2_main (param, storage : fa2_entry_points * nft_token_storage)
     will validate that a sender is either `from_` parameter of each transfer
     or a permitted operator for the owner `from_` address.
     *)
-    let validator = make_default_operator_validator Tezos.sender in
-
-    fa2_transfer (tx_descriptors, validator, storage)
+    fa2_transfer (tx_descriptors, default_operator_validator, storage)
 
   | Balance_of pm ->
     let p = balance_of_param_from_michelson pm in

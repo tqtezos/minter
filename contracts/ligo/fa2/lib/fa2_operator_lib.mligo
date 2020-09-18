@@ -10,10 +10,10 @@ helper functions
 #include "../fa2_errors.mligo"
 
 (** 
-(owner, operator) -> unit
+(owner, operator, token_id) -> unit
 To be part of FA2 storage to manage permitted operators
 *)
-type operator_storage = ((address * address), unit) big_map
+type operator_storage = ((address * (address * token_id)), unit) big_map
 
 (** 
   Updates operator storage using an `update_operator` command.
@@ -23,9 +23,9 @@ let update_operators (update, storage : update_operator * operator_storage)
     : operator_storage =
   match update with
   | Add_operator_p op -> 
-    Big_map.update (op.owner, op.operator) (Some unit) storage
+    Big_map.update (op.owner, (op.operator, op.token_id)) (Some unit) storage
   | Remove_operator_p op -> 
-    Big_map.remove (op.owner, op.operator) storage
+    Big_map.remove (op.owner, (op.operator, op.token_id)) storage
 
 (**
 Validate if operator update is performed by the token owner.
@@ -53,41 +53,43 @@ let fa2_update_operators (updates_michelson, storage
   ) in
   List.fold process_update updates storage
 
+
+type operator_validator = (address * address * token_id * operator_storage)-> unit
+
 (**
 Create an operator validator function based on provided operator policy.
 @param tx_policy operator_transfer_policy defining the constrains on who can transfer.
+@return (owner, operator, token_id, ops_storage) -> unit
  *)
-let make_operator_validator (tx_policy : operator_transfer_policy)
-    : (address * operator_storage)-> unit =
+let make_operator_validator (tx_policy : operator_transfer_policy) : operator_validator =
   let can_owner_tx, can_operator_tx = match tx_policy with
   | No_transfer -> (failwith fa2_tx_denied : bool * bool)
   | Owner_transfer -> true, false
   | Owner_or_operator_transfer -> true, true
   in
-  let operator : address = Tezos.sender in
-  (fun (owner, ops_storage : address * operator_storage) ->
-      if can_owner_tx && owner = operator
-      then unit
-      else
-        if not can_operator_tx
-        then failwith fa2_not_owner
-        else
-          if Big_map.mem  (owner, operator) ops_storage
-          then unit else failwith fa2_not_operator
+  (fun (owner, operator, token_id, ops_storage 
+      : address * address * token_id * operator_storage) ->
+    if can_owner_tx && owner = operator
+    then unit (* transfer by the owner *)
+    else if not can_operator_tx
+    then failwith fa2_not_owner (* an operator transfer not permitted by the policy *)
+    else if Big_map.mem  (owner, (operator, token_id)) ops_storage
+    then unit (* the operator is permitted for the token_id *)
+    else failwith fa2_not_operator (* the operator is not permitted for the token_id *)
   )
 
 (**
 Default implementation of the operator validation function.
 The default implicit `operator_transfer_policy` value is `Owner_or_operator_transfer`
  *)
-let make_default_operator_validator (operator : address)
-    : (address * operator_storage)-> unit =
-  (fun (owner, ops_storage : address * operator_storage) ->
-      if owner = operator
-      then unit
-      else
-        if Big_map.mem  (owner, operator) ops_storage
-        then unit else failwith fa2_not_operator
+let default_operator_validator : operator_validator =
+  (fun (owner, operator, token_id, ops_storage 
+      : address * address * token_id * operator_storage) ->
+    if owner = operator
+    then unit (* transfer by the owner *)
+    else if Big_map.mem (owner, (operator, token_id)) ops_storage
+    then unit (* the operator is permitted for the token_id *)
+    else failwith fa2_not_operator (* the operator is not permitted for the token_id *)
   )
 
 (** 
@@ -97,6 +99,10 @@ Validate operators for all transfers in the batch at once
 let validate_operator (tx_policy, txs, ops_storage 
     : operator_transfer_policy * (transfer list) * operator_storage) : unit =
   let validator = make_operator_validator tx_policy in
-  List.iter (fun (tx : transfer) -> validator (tx.from_, ops_storage)) txs
+  List.iter (fun (tx : transfer) -> 
+    List.iter (fun (dst: transfer_destination) ->
+      validator (tx.from_, Tezos.sender, dst.token_id ,ops_storage)
+    ) tx.txs
+  ) txs
 
 #endif

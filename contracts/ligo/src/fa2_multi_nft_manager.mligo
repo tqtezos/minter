@@ -57,7 +57,8 @@ let mint_tokens (param, storage : mint_tokens_param * nft_token_storage)
     from_ = (None : address option);
     txs = mint1.reversed_txs;
   } in
-  let nop_operator_validator = fun (p : address * operator_storage) -> unit in
+  let nop_operator_validator = 
+    fun (p : address * address * token_id * operator_storage) -> unit in
   fa2_transfer ([tx_descriptor], nop_operator_validator, mint1.storage)
 
 #endif
