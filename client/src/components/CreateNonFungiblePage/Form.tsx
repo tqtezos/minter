@@ -58,7 +58,7 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
     >
       <fieldset disabled={loading}>
         <Form.Item 
-          label="Onwer Address" 
+          label="Owner Address" 
           name="ownerAddress" 
           rules={[{ required: true, message: 'Please input an owner address!' }]}
         >
