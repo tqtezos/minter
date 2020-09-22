@@ -289,6 +289,14 @@
                  SWAP ;
                  DUP ;
                  DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 IF { PUSH string "PAUSED" ; FAILWITH } { UNIT } ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
                  CDR ;
                  SWAP ;
                  IF_LEFT

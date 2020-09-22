@@ -32,7 +32,7 @@ async function main() {
     const toolkit = await createToolkit(config);
     await awaitForNetwork(toolkit);
 
-    await bootstrapNft(config, toolkit);
+    await bootstrapNftFaucet(config, toolkit);
     //add bootstrapping of other contracts here
 
     process.exit(0);
@@ -43,6 +43,24 @@ async function main() {
   }
 }
 
+async function bootstrapNftFaucet(
+  config: Configstore,
+  tz: TezosToolkit
+): Promise<void> {
+  $log.info('bootstrapping NFT faucet contract..');
+
+  const storage = `(Pair (Pair {} 0) (Pair {} {}))`;
+  await bootstrapContract(
+    config,
+    tz,
+    'contracts.nftFaucet',
+    'fa2_multi_nft_faucet.tz',
+    storage
+  );
+
+  $log.info('bootstrapped NFT faucet contract');
+}
+
 async function bootstrapNft(
   config: Configstore,
   tz: TezosToolkit
@@ -50,7 +68,7 @@ async function bootstrapNft(
   $log.info('bootstrapping NFT contract..');
 
   const adminAddress = await tz.signer.publicKeyHash();
-  const storage = `(Pair (Pair (Pair "${adminAddress}" True) None) (Pair (Pair {} 0) (Pair {} {})))`;
+  const storage = `(Pair (Pair (Pair "${adminAddress}" False) None) (Pair (Pair {} 0) (Pair {} {})))`;
   await bootstrapContract(
     config,
     tz,
