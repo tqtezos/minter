@@ -1,10 +1,10 @@
 /** @jsx jsx */
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { jsx } from '@emotion/core';
 import { Form, Input, Button, message } from 'antd';
 import ImageIpfsUpload, { ImageIpfsUploadProps } from './ImageIpfsUpload';
 import { IpfsContent } from '../../api/ipfsUploader';
-import useCreateMutation from './useCreateMutation';
+import mkContracts from '../../api/contracts';
 
 interface InputFormProps extends ImageIpfsUploadProps {
   ipfsContent?: IpfsContent;
@@ -12,24 +12,28 @@ interface InputFormProps extends ImageIpfsUploadProps {
 }
 
 const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
-  const { createNonFungibleToken, data, loading } = useCreateMutation();
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-
 
   const handleFinish = async (values: any) => {
     console.log('Submitted values: ', values);
+    setLoading(true);
     const hideMessage = message.loading('Creating a new non-fungible token on blockchain...', 0);
     
     try {
-      await createNonFungibleToken({
-        variables: {
-          ...values,
-          description: values.description || ''
-        }
+      const contracts = await mkContracts();
+      const nft = await contracts.nft();
+      
+      await nft.createToken({
+        ...values,
+        description: values.description || ''
       });
+      
+      onFinish();
     } catch (error) {
       message.error(error.message, 10) // Keep for 10 seconds
     } finally {
+      setLoading(false)
       hideMessage();
     }
   };
@@ -38,15 +42,6 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
       form.setFieldsValue({ ipfsCid: ipfsContent?.cid });
     }, 
     [ipfsContent, form]
-  );
-
-  useEffect(() => {
-      if(data) {
-        console.log('Reveived data: ', data);
-        onFinish();
-      }
-    }, 
-    [data, onFinish]
   );
 
   return (
