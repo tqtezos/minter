@@ -95,9 +95,13 @@ export type QueryPublishedOperationByHashArgs = {
 export type Settings = {
   __typename?: 'Settings';
   tzStatsUrl: Scalars['String'];
-  minterContractAddress?: Maybe<Scalars['String']>;
-  nftContractAddress?: Maybe<Scalars['String']>;
-  adminAddress?: Maybe<Scalars['String']>;
+  rpc: Scalars['String'];
+  contracts: SettingsContracts;
+};
+
+export type SettingsContracts = {
+  __typename?: 'SettingsContracts';
+  nft: Scalars['String'];
 };
 
 export type Subscription = {
@@ -232,6 +236,7 @@ export type ResolversTypes = ResolversObject<{
   PublishedOperation: ResolverTypeWrapper<PublishedOperation>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Settings: ResolverTypeWrapper<Settings>;
+  SettingsContracts: ResolverTypeWrapper<SettingsContracts>;
   Mutation: ResolverTypeWrapper<{}>;
   Subscription: ResolverTypeWrapper<{}>;
 }>;
@@ -246,6 +251,7 @@ export type ResolversParentTypes = ResolversObject<{
   PublishedOperation: PublishedOperation;
   Boolean: Scalars['Boolean'];
   Settings: Settings;
+  SettingsContracts: SettingsContracts;
   Mutation: {};
   Subscription: {};
 }>;
@@ -348,21 +354,20 @@ export type SettingsResolvers<
   ParentType extends ResolversParentTypes['Settings'] = ResolversParentTypes['Settings']
 > = ResolversObject<{
   tzStatsUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  minterContractAddress?: Resolver<
-    Maybe<ResolversTypes['String']>,
+  rpc?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  contracts?: Resolver<
+    ResolversTypes['SettingsContracts'],
     ParentType,
     ContextType
   >;
-  nftContractAddress?: Resolver<
-    Maybe<ResolversTypes['String']>,
-    ParentType,
-    ContextType
-  >;
-  adminAddress?: Resolver<
-    Maybe<ResolversTypes['String']>,
-    ParentType,
-    ContextType
-  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+}>;
+
+export type SettingsContractsResolvers<
+  ContextType = Context,
+  ParentType extends ResolversParentTypes['SettingsContracts'] = ResolversParentTypes['SettingsContracts']
+> = ResolversObject<{
+  nft?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
@@ -391,6 +396,7 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   PublishedOperation?: PublishedOperationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Settings?: SettingsResolvers<ContextType>;
+  SettingsContracts?: SettingsContractsResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
 }>;
 

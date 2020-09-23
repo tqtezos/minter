@@ -72,8 +72,13 @@ const Query: QueryResolvers = {
     }));
   },
 
-  settings(_parent, _args, { tzStatsUrl }) {
-    return { tzStatsUrl };
+  settings(_parent, _args, { tzStatsUrl, configStore }) {
+    const config = configStore.all;
+    return {
+      tzStatsUrl: tzStatsUrl,
+      rpc: config.rpc,
+      contracts: config.contracts
+    };
   }
 };
 
