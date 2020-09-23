@@ -1,10 +1,13 @@
 /** @jsx jsx */
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState, useRef } from 'react';
 import { jsx } from '@emotion/core';
 import { Form, Input, Button, message } from 'antd';
+import { MessageType } from 'antd/lib/message';
+
 import ImageIpfsUpload, { ImageIpfsUploadProps } from './ImageIpfsUpload';
 import { IpfsContent } from '../../api/ipfsUploader';
 import mkContracts from '../../api/contracts';
+import useSettings from '../common/useSettings';
 
 interface InputFormProps extends ImageIpfsUploadProps {
   ipfsContent?: IpfsContent;
@@ -12,16 +15,32 @@ interface InputFormProps extends ImageIpfsUploadProps {
 }
 
 const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
-  const [loading, setLoading] = useState(false);
+  const { data, loading, error } = useSettings();
+  const [creatingToken, setCreatingToken] = useState(false);
   const [form] = Form.useForm();
+  const hideLoadingMessage = useRef<MessageType>();
+
+  useEffect(() => {
+    if(loading) 
+      hideLoadingMessage.current = message.loading('Loading settings from the server...');
+    else if(error)
+      message.error(`Cannot load settings from the server: ${error}`)
+    else
+      if(hideLoadingMessage.current) 
+        hideLoadingMessage.current();
+    },
+    [loading, error]
+  );
 
   const handleFinish = async (values: any) => {
+    if(!data) return;
+
     console.log('Submitted values: ', values);
-    setLoading(true);
+    setCreatingToken(true);
     const hideMessage = message.loading('Creating a new non-fungible token on blockchain...', 0);
     
     try {
-      const contracts = await mkContracts();
+      const contracts = await mkContracts(data.settings);
       const nft = await contracts.nft();
       
       await nft.createToken({
@@ -33,7 +52,7 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
     } catch (error) {
       message.error(error.message, 10) // Keep for 10 seconds
     } finally {
-      setLoading(false)
+      setCreatingToken(false)
       hideMessage();
     }
   };
@@ -51,7 +70,7 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
       layout="vertical" 
       css={{ width: '30em' }}
     >
-      <fieldset disabled={loading}>
+      <fieldset disabled={loading || creatingToken}>
         <Form.Item 
           label="Owner Address" 
           name="ownerAddress" 
@@ -93,7 +112,8 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
           <Button
             type="primary"
             htmlType="submit"
-            loading={loading}
+            loading={creatingToken}
+            disabled={loading}
             shape="round"
             size="large"
             css={{ width: '12em' }}

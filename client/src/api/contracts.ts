@@ -3,10 +3,11 @@ import { InMemorySigner } from '@taquito/signer';
 
 import config from '../config'
 import mkNftContract from './nftContract';
+import { Settings } from '../generated/graphql_schema';
 
-const mkContracts = async () => {
-  const rpc = config.rpc;
-  const nftAddress = (config.contracts as any).nft as string;
+const mkContracts = async (settings: Settings) => {
+  const rpc = settings.rpc;
+  const nftAddress =settings.contracts.nft;
   const signer = await InMemorySigner.fromSecretKey(config.admin.secret);
 
   const tzClient = new TezosToolkit();
