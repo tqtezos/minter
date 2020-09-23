@@ -1,4 +1,4 @@
-{ parameter address ;
+{ parameter unit ;
   storage unit ;
   code { EMPTY_BIG_MAP nat (pair nat (pair string (pair string (pair nat (map string string))))) ;
          EMPTY_BIG_MAP (pair address (pair address nat)) unit ;
