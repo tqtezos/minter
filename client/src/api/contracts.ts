@@ -7,7 +7,7 @@ import { Settings } from '../generated/graphql_schema';
 
 const mkContracts = async (settings: Settings) => {
   const rpc = settings.rpc;
-  const nftAddress =settings.contracts.nft;
+  const nftAddress = settings.contracts.nft;
   const signer = await InMemorySigner.fromSecretKey(config.admin.secret);
 
   const tzClient = new TezosToolkit();

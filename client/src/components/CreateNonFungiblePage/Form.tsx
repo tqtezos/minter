@@ -1,8 +1,7 @@
 /** @jsx jsx */
-import { FC, useEffect, useState, useRef } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { jsx } from '@emotion/core';
 import { Form, Input, Button, message } from 'antd';
-import { MessageType } from 'antd/lib/message';
 
 import ImageIpfsUpload, { ImageIpfsUploadProps } from './ImageIpfsUpload';
 import { IpfsContent } from '../../api/ipfsUploader';
@@ -15,32 +14,21 @@ interface InputFormProps extends ImageIpfsUploadProps {
 }
 
 const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
-  const { data, loading, error } = useSettings();
+  const { settings, loading } = useSettings();
   const [creatingToken, setCreatingToken] = useState(false);
   const [form] = Form.useForm();
-  const hideLoadingMessage = useRef<MessageType>();
-
-  useEffect(() => {
-    if(loading) 
-      hideLoadingMessage.current = message.loading('Loading settings from the server...');
-    else if(error)
-      message.error(`Cannot load settings from the server: ${error}`)
-    else
-      if(hideLoadingMessage.current) 
-        hideLoadingMessage.current();
-    },
-    [loading, error]
-  );
 
   const handleFinish = async (values: any) => {
-    if(!data) return;
+    // This should never happen as 'Create' button is disabled until
+    // the settings are received
+    if(!settings) return;
 
     console.log('Submitted values: ', values);
     setCreatingToken(true);
     const hideMessage = message.loading('Creating a new non-fungible token on blockchain...', 0);
     
     try {
-      const contracts = await mkContracts(data.settings);
+      const contracts = await mkContracts(settings);
       const nft = await contracts.nft();
       
       await nft.createToken({
