@@ -86,9 +86,13 @@ export type QueryPublishedOperationByHashArgs = {
 export type Settings = {
   __typename?: 'Settings';
   tzStatsUrl: Scalars['String'];
-  minterContractAddress?: Maybe<Scalars['String']>;
-  nftContractAddress?: Maybe<Scalars['String']>;
-  adminAddress?: Maybe<Scalars['String']>;
+  rpc: Scalars['String'];
+  contracts: SettingsContracts;
+};
+
+export type SettingsContracts = {
+  __typename?: 'SettingsContracts';
+  nft: Scalars['String'];
 };
 
 export type Subscription = {
