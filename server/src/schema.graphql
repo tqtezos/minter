@@ -21,11 +21,14 @@ type PublishedOperation {
   retry: Boolean!
 }
 
+type SettingsContracts {
+  nft: String!
+}
+
 type Settings {
   tzStatsUrl: String!
-  minterContractAddress: String
-  nftContractAddress: String
-  adminAddress: String
+  rpc: String!
+  contracts: SettingsContracts!
 }
 
 ## Toplevel Types
