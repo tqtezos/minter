@@ -53,7 +53,7 @@ async function createNonFungibleToken(
   const params = [
     {
       metadata: {
-        token_id: nftStorage.assets.next_token_id,
+        token_id: nftStorage.next_token_id,
         symbol: args.symbol,
         name: args.name,
         decimals: new BigNumber(0),
