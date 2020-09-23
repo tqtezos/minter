@@ -22,8 +22,6 @@ describe('test NFT factory', () => {
   beforeEach(async () => {
     $log.info('originating nft factory...');
     nftFactory = await originateNftFactory(tezos.bob);
-    // const admin = await tezos.bob.signer.publicKeyHash();
-    // nftFactory = await originateNftFaucet(tezos.bob, admin);
   });
 
   test('create contract', async () => {

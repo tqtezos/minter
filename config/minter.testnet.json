@@ -5,6 +5,7 @@
 		"secret": "edskRuycScUrc5KqgiWZXWFa4STEAxJSs18ZXLDdfbDGkjLPXf8miygTAYxoR3DDqnczW4KnKkLUnH3h135qp167krTxKwnnbu"
 	},
 	"contracts": {
-		"nft": "KT1JjUMUxH4yAB8nMJN4Kki4BVE3in1fcpQd"
+		"nft": "KT1JjUMUxH4yAB8nMJN4Kki4BVE3in1fcpQd",
+		"nftFaucet": "KT1VRQ9UeVNrvq3oMqWHpUHKefuUYLn1W8mX"
 	}
 }
