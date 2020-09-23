@@ -1,11 +1,10 @@
 {
-	"rpc": "https://testnet-tezos.giganode.io",
-	"admin": {
-		"address": "tz1hWvkWwfHgXh7EP6H7T49m7ZyDJx4YirUx",
-		"secret": "edskRuycScUrc5KqgiWZXWFa4STEAxJSs18ZXLDdfbDGkjLPXf8miygTAYxoR3DDqnczW4KnKkLUnH3h135qp167krTxKwnnbu"
-	},
-	"contracts": {
-		"nft": "KT1JjUMUxH4yAB8nMJN4Kki4BVE3in1fcpQd",
-		"nftFaucet": "KT1VRQ9UeVNrvq3oMqWHpUHKefuUYLn1W8mX"
-	}
+  "rpc": "https://testnet-tezos.giganode.io",
+  "admin": {
+    "address": "tz1hWvkWwfHgXh7EP6H7T49m7ZyDJx4YirUx",
+    "secret": "edskRuycScUrc5KqgiWZXWFa4STEAxJSs18ZXLDdfbDGkjLPXf8miygTAYxoR3DDqnczW4KnKkLUnH3h135qp167krTxKwnnbu"
+  },
+  "contracts": {
+    "nftFaucet": "KT1VRQ9UeVNrvq3oMqWHpUHKefuUYLn1W8mX"
+  }
 }
