@@ -1,8 +1,4 @@
-import config from './common/minter.sandbox.json'
-
 export default {
-  ...config,
-
   ipfs: {
     // The URL of our IPFS API server, our Web UI uploads files to.
     apiUrl: 'http://localhost:5001',

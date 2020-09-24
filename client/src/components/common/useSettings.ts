@@ -13,6 +13,10 @@ const SETTINGS = gql`
       contracts {
         nft
       }
+      admin {
+        address
+        secret
+      }      
     }
   }
 `;
