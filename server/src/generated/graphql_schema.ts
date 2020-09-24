@@ -101,7 +101,7 @@ export type Settings = {
 
 export type SettingsContracts = {
   __typename?: 'SettingsContracts';
-  nft: Scalars['String'];
+  nftFaucet: Scalars['String'];
 };
 
 export type Subscription = {

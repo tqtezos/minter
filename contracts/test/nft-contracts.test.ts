@@ -6,6 +6,7 @@ import { bootstrap, TestTz } from './bootstrap-sandbox';
 import { Contract, nat } from '../src/type-aliases';
 
 import {
+  originateNftFaucet,
   originateNft,
   originateNftWithHooks,
   MintNftParam
@@ -22,7 +23,7 @@ jest.setTimeout(180000); // 3 minutes
 
 const nat1 = new BigNumber(1);
 
-describe.each([originateNft /*, originateNftWithHooks*/])(
+describe.each([originateNftFaucet, originateNft /*, originateNftWithHooks*/])(
   'test NFT',
   createNft => {
     let tezos: TestTz;
