@@ -14,9 +14,7 @@ export interface NftContract {
 }
 
 interface NftContractStorage {
-  assets: {
-    next_token_id: string;
-  }
+  next_token_id: string;
 }
 
 const mkNftContract =  async (
@@ -38,8 +36,8 @@ const mkNftContract =  async (
       }: CreateTokenArgs
     ): Promise<number> {
       const storage = await contract.storage<NftContractStorage>()
-      const tokenId = storage.assets.next_token_id;
-
+      const tokenId = storage.next_token_id
+      
       const params = [{
         metadata: {
           token_id: tokenId,

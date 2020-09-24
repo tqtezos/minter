@@ -11,7 +11,7 @@ const SETTINGS = gql`
       rpc
       tzStatsUrl
       contracts {
-        nft
+        nftFaucet
       }
       admin {
         address
