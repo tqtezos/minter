@@ -19,6 +19,7 @@ async function main() {
     await awaitForNetwork(toolkit);
 
     await bootstrapNftFaucet(config, toolkit);
+    await bootstrapNftFactory(config, toolkit);
     //add bootstrapping of other contracts here
 
     process.exit(0);
@@ -69,6 +70,23 @@ async function bootstrapNftFaucet(
   );
 
   $log.info('bootstrapped NFT faucet contract');
+}
+
+async function bootstrapNftFactory(
+  config: Configstore,
+  tz: TezosToolkit
+): Promise<void> {
+  $log.info('bootstrapping NFT factory contract..');
+
+  await bootstrapContract(
+    config,
+    tz,
+    'contracts.nftFactory',
+    'fa2_nft_factory.tz',
+    'Unit'
+  );
+
+  $log.info('bootstrapped NFT factory contract');
 }
 
 async function createToolkit(
