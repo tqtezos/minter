@@ -1,4 +1,12 @@
-{ parameter
+#include "fa2_multi_nft_asset.mligo"
+
+
+let create_contract : (key_hash option * tez * nft_asset_storage) -> (operation * address) =
+  [%Michelson ( {| 
+    { 
+        UNPPAIIR ; 
+        CREATE_CONTRACT 
+        { parameter
     (or (or (or %admin (or (unit %confirm_admin) (bool %pause)) (address %set_admin))
             (or %assets
                (or (pair %balance_of
@@ -710,3 +718,26 @@
              CAR ;
              PAIR } } }
 
+
+        ; 
+        PAIR 
+    } 
+  |} : (key_hash option * tez * nft_asset_storage) -> (operation * address))]
+
+
+let factory_main (admin, storage : address * unit) : operation list * unit =
+  let init_storage : nft_asset_storage = {
+    assets = {
+      ledger = (Big_map.empty : ledger);
+      token_metadata = (Big_map.empty : nft_meta);
+      next_token_id = 0n;
+      operators = (Big_map.empty : operator_storage);
+    };
+    admin = {
+      admin = Tezos.sender;
+      pending_admin = (None : address option);
+      paused = false;
+    };
+  } in
+ let op, a = create_contract ((None: key_hash option), 0tez, init_storage) in
+ [op], storage

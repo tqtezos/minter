@@ -18,6 +18,7 @@ let nft_asset_main (param, storage : nft_asset_entrypoints * nft_asset_storage)
     : operation list * nft_asset_storage =
   match param with
   | Assets fa2 -> 
+    let u = fail_if_paused(storage.admin) in
     let ops, new_assets = fa2_main (fa2, storage.assets) in
     let new_storage = { storage with assets = new_assets; } in
     ops, new_storage
