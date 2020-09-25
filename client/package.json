@@ -8,6 +8,7 @@
     "@apollo/react-hooks": "^4.0.0",
     "@emotion/core": "^10.0.28",
     "@emotion/styled": "^10.0.27",
+    "@taquito/signer": "^6.3.5-beta.0",
     "@taquito/taquito": "^6.3.5-beta.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
