@@ -1,10 +1,12 @@
 /** @jsx jsx */
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { jsx } from '@emotion/core';
 import { Form, Input, Button, message } from 'antd';
+
 import ImageIpfsUpload, { ImageIpfsUploadProps } from './ImageIpfsUpload';
 import { IpfsContent } from '../../api/ipfsUploader';
-import useCreateMutation from './useCreateMutation';
+import mkContracts from '../../api/contracts';
+import useSettings from '../common/useSettings';
 
 interface InputFormProps extends ImageIpfsUploadProps {
   ipfsContent?: IpfsContent;
@@ -12,24 +14,33 @@ interface InputFormProps extends ImageIpfsUploadProps {
 }
 
 const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
-  const { createNonFungibleToken, data, loading } = useCreateMutation();
+  const { settings, loading } = useSettings();
+  const [creatingToken, setCreatingToken] = useState(false);
   const [form] = Form.useForm();
 
-
   const handleFinish = async (values: any) => {
+    // This should never happen as 'Create' button is disabled until
+    // the settings are received
+    if(!settings) return;
+
     console.log('Submitted values: ', values);
+    setCreatingToken(true);
     const hideMessage = message.loading('Creating a new non-fungible token on blockchain...', 0);
     
     try {
-      await createNonFungibleToken({
-        variables: {
-          ...values,
-          description: values.description || ''
-        }
+      const contracts = await mkContracts(settings);
+      const nft = await contracts.nft();
+      
+      await nft.createToken({
+        ...values,
+        description: values.description || ''
       });
+      
+      onFinish();
     } catch (error) {
       message.error(error.message, 10) // Keep for 10 seconds
     } finally {
+      setCreatingToken(false)
       hideMessage();
     }
   };
@@ -40,15 +51,6 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
     [ipfsContent, form]
   );
 
-  useEffect(() => {
-      if(data) {
-        console.log('Reveived data: ', data);
-        onFinish();
-      }
-    }, 
-    [data, onFinish]
-  );
-
   return (
     <Form 
       form={form}
@@ -56,9 +58,9 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
       layout="vertical" 
       css={{ width: '30em' }}
     >
-      <fieldset disabled={loading}>
+      <fieldset disabled={loading || creatingToken}>
         <Form.Item 
-          label="Onwer Address" 
+          label="Owner Address" 
           name="ownerAddress" 
           rules={[{ required: true, message: 'Please input an owner address!' }]}
         >
@@ -98,7 +100,8 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
           <Button
             type="primary"
             htmlType="submit"
-            loading={loading}
+            loading={creatingToken}
+            disabled={loading}
             shape="round"
             size="large"
             css={{ width: '12em' }}

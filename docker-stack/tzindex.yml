@@ -5,7 +5,7 @@ services:
     image: blockwatch/tzindex
     environment:
       TZ_RPC_HOST: sandbox
-      TZ_RPC_PORT: ${TEZOS_RPC_PORT}
+      TZ_RPC_PORT: 20000
       TZ_SERVER_CORS_ENABLE: "true"
       TZ_DATABASE_PATH: /var/tzindex/data/${CHAIN_ID}
     volumes:

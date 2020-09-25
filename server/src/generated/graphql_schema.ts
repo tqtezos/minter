@@ -96,7 +96,14 @@ export type Settings = {
   __typename?: 'Settings';
   tzStatsUrl: Scalars['String'];
   rpc: Scalars['String'];
+  admin: SettingsAdmin;
   contracts: SettingsContracts;
+};
+
+export type SettingsAdmin = {
+  __typename?: 'SettingsAdmin';
+  address: Scalars['String'];
+  secret: Scalars['String'];
 };
 
 export type SettingsContracts = {
@@ -237,6 +244,7 @@ export type ResolversTypes = ResolversObject<{
   PublishedOperation: ResolverTypeWrapper<PublishedOperation>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Settings: ResolverTypeWrapper<Settings>;
+  SettingsAdmin: ResolverTypeWrapper<SettingsAdmin>;
   SettingsContracts: ResolverTypeWrapper<SettingsContracts>;
   Mutation: ResolverTypeWrapper<{}>;
   Subscription: ResolverTypeWrapper<{}>;
@@ -252,6 +260,7 @@ export type ResolversParentTypes = ResolversObject<{
   PublishedOperation: PublishedOperation;
   Boolean: Scalars['Boolean'];
   Settings: Settings;
+  SettingsAdmin: SettingsAdmin;
   SettingsContracts: SettingsContracts;
   Mutation: {};
   Subscription: {};
@@ -356,11 +365,21 @@ export type SettingsResolvers<
 > = ResolversObject<{
   tzStatsUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   rpc?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  admin?: Resolver<ResolversTypes['SettingsAdmin'], ParentType, ContextType>;
   contracts?: Resolver<
     ResolversTypes['SettingsContracts'],
     ParentType,
     ContextType
   >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+}>;
+
+export type SettingsAdminResolvers<
+  ContextType = Context,
+  ParentType extends ResolversParentTypes['SettingsAdmin'] = ResolversParentTypes['SettingsAdmin']
+> = ResolversObject<{
+  address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  secret?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
@@ -397,6 +416,7 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   PublishedOperation?: PublishedOperationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Settings?: SettingsResolvers<ContextType>;
+  SettingsAdmin?: SettingsAdminResolvers<ContextType>;
   SettingsContracts?: SettingsContractsResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
 }>;

@@ -77,7 +77,8 @@ const Query: QueryResolvers = {
     return {
       tzStatsUrl: tzStatsUrl,
       rpc: config.rpc,
-      contracts: config.contracts
+      contracts: config.contracts,
+      admin: config.admin
     };
   }
 };

@@ -26,9 +26,15 @@ type SettingsContracts {
   nftFactory: String!
 }
 
+type SettingsAdmin {
+  address: String!
+  secret: String!
+}
+
 type Settings {
   tzStatsUrl: String!
   rpc: String!
+  admin: SettingsAdmin!
   contracts: SettingsContracts!
 }
 
