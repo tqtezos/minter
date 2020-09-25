@@ -1,7 +1,3 @@
-// There is a config directory even though there is only one config file,
-// because in the future, there will be more than one config file, most likely,
-// the "active" one picked based on the value of an environment variable
-
 export default {
   ipfs: {
     // The URL of our IPFS API server, our Web UI uploads files to.

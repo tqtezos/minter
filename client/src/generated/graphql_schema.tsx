@@ -87,7 +87,14 @@ export type Settings = {
   __typename?: 'Settings';
   tzStatsUrl: Scalars['String'];
   rpc: Scalars['String'];
+  admin: SettingsAdmin;
   contracts: SettingsContracts;
+};
+
+export type SettingsAdmin = {
+  __typename?: 'SettingsAdmin';
+  address: Scalars['String'];
+  secret: Scalars['String'];
 };
 
 export type SettingsContracts = {
