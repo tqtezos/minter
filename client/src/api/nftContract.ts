@@ -1,5 +1,6 @@
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 import { BigNumber } from 'bignumber.js';
+import { retrieveStorageField } from './contractUtil';
 
 interface CreateTokenArgs {
   ownerAddress: string;
@@ -11,10 +12,6 @@ interface CreateTokenArgs {
 
 export interface NftContract {
   createToken(args: CreateTokenArgs): Promise<number>;
-}
-
-interface NftContractStorage {
-  next_token_id: string;
 }
 
 const mkNftContract = async (
@@ -31,8 +28,7 @@ const mkNftContract = async (
       description,
       ipfsCid
     }: CreateTokenArgs): Promise<number> {
-      const storage = await contract.storage<NftContractStorage>();
-      const tokenId = storage.next_token_id;
+      const tokenId = await retrieveStorageField(contract, 'next_token_id');
 
       const params = [
         {
