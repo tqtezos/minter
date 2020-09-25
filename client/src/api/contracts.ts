@@ -2,16 +2,19 @@ import { TezosToolkit, Signer } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
 
 import mkNftContract from './nftContract';
+import mkNftFactoryContract from './nftFactoryContract';
 import { Settings } from '../generated/graphql_schema';
 
 const mkContracts = async (settings: Settings) => {
   const rpc = settings.rpc;
   const nftAddress = settings.contracts.nftFaucet;
+  const nftFactoryAddress = settings.contracts.nftFactory;
   const signer = await InMemorySigner.fromSecretKey(settings.admin.secret);
   const tzClient = await createToolkit(rpc, signer);
 
   return {
-    nft: () => mkNftContract(tzClient, nftAddress)
+    nft: () => mkNftContract(tzClient, nftAddress),
+    nftFactory: () => mkNftFactoryContract(tzClient, nftFactoryAddress)
   };
 };
 
