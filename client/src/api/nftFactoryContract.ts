@@ -27,8 +27,7 @@ const mkNftFactoryContract = async (
 };
 
 function extractOriginatedContractAddress(op: TransactionOperation): address {
-  const result = op.results[0];
-  const txResult = result as OperationContentsAndResultTransaction;
+  const txResult = op.results[0] as OperationContentsAndResultTransaction;
   if (!txResult.metadata.internal_operation_results)
     throw new Error('Unavailable internal origination operation');
   const internalResult = txResult.metadata.internal_operation_results[0]
