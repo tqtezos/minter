@@ -24,7 +24,7 @@ function deepFind<TValue>(o: any, propertyName: string): TValue | undefined {
 
   const nested = Object.values(o).filter(v => typeof v === 'object');
   for (var n in nested) {
-    const v: TValue | undefined = deepFind(n, propertyName);
+    const v = deepFind<TValue>(n, propertyName);
     if (v !== undefined) return v;
   }
   return undefined;
