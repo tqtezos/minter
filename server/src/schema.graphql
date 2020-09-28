@@ -23,6 +23,7 @@ type PublishedOperation {
 
 type SettingsContracts {
   nftFaucet: String!
+  nftFactory: String!
 }
 
 type SettingsAdmin {
