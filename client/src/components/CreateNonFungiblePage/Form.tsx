@@ -36,7 +36,7 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
         description: values.description || ''
       });
       
-      onFinish();
+      setTimeout(onFinish, 0);
     } catch (error) {
       message.error(error.message, 10) // Keep for 10 seconds
     } finally {
