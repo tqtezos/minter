@@ -1,18 +1,15 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core';
 import { FC, useState } from 'react';
-import { TezosToolkit } from '@taquito/taquito';
 import { ThanosWallet } from '@thanos-wallet/dapp';
 import { message } from 'antd';
 
 import HeaderButton from '../common/HeaderButton';
+import { useTzToolkit, useTzToolkitSetter } from '../App/TzToolkitContext';
 
-interface Props {
-  tzClient?: TezosToolkit;
-  onChange: (tzClient?: TezosToolkit) => void;
-}
-
-const WalletConnector: FC<Props> = ({ tzClient, onChange }) => {
+const WalletConnector: FC = () => {
+  const tzToolkit = useTzToolkit();
+  const setTzToolkit = useTzToolkitSetter();
   const [connecting, setConnecting] = useState(false);
 
   const connect = async () => {
@@ -35,16 +32,16 @@ const WalletConnector: FC<Props> = ({ tzClient, onChange }) => {
   }
 
   const handleConenct = () => {
-    connect().then(tzClient => onChange(tzClient));
+    connect().then(setTzToolkit);
   }
 
   const handleDisconnect = () => {
     window.localStorage.clear();
-    onChange(undefined);
+    setTzToolkit(undefined);
   }
 
   return (
-    tzClient 
+    tzToolkit 
       ? <HeaderButton 
           title="Disconnect" 
           onClick={handleDisconnect} 

@@ -3,12 +3,12 @@ import { FC, Fragment, useEffect, useState } from 'react';
 import { Row, Col, Space } from 'antd';
 import { jsx } from '@emotion/core';
 import { useLocation } from 'wouter';
-import { TezosToolkit } from '@taquito/taquito';
 import BigNumber from 'bignumber.js';
 
 import LogoImage from './logo.svg';
 import HeaderButton from '../common/HeaderButton';
 import WalletConnector from '../WalletConnector';
+import { useTzToolkit } from '../App/TzToolkitContext';
 
 const Logo: FC<{ onClick: () => void}> = ({onClick}) => (
   <img
@@ -29,14 +29,14 @@ interface AccountInfo {
 
 const Header: FC = () => {
   const [, setLocation] = useLocation();
-  const [tzClient, setTzClient] = useState<TezosToolkit>();
+  const tzToolkit = useTzToolkit();
   const [accountInfo, setAccountInfo] = useState<AccountInfo>();
    
   useEffect(() => {
     const getAaccountInfo = async () => {
-      if(tzClient) {
-        const account = await tzClient.wallet.pkh();
-        const balance = await tzClient.tz.getBalance(account);
+      if(tzToolkit) {
+        const account = await tzToolkit.wallet.pkh();
+        const balance = await tzToolkit.tz.getBalance(account);
         setAccountInfo({ account, balance });
       } else {
         setAccountInfo(undefined);
@@ -44,7 +44,7 @@ const Header: FC = () => {
     }
 
     getAaccountInfo()  
-  }, [tzClient]);
+  }, [tzToolkit]);
 
   return (
     <Fragment>
@@ -63,7 +63,7 @@ const Header: FC = () => {
           <Space size="middle">
             <HeaderButton title="Create" onClick={() => { setLocation('/create-non-fungible') }} />
             <HeaderButton title="Assets" onClick={() => { setLocation('/assets') }} />
-            <WalletConnector tzClient={tzClient} onChange={setTzClient} />
+            <WalletConnector  />
           </Space>
         </Col>
       </Row>
