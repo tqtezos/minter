@@ -5,8 +5,7 @@ import { Form, Input, Button, message } from 'antd';
 
 import ImageIpfsUpload, { ImageIpfsUploadProps } from './ImageIpfsUpload';
 import { IpfsContent } from '../../api/ipfsUploader';
-import mkContracts from '../../api/contracts';
-import useSettings from '../common/useSettings';
+import { useContracts } from '../App/globalContext';
 
 interface InputFormProps extends ImageIpfsUploadProps {
   ipfsContent?: IpfsContent;
@@ -14,21 +13,20 @@ interface InputFormProps extends ImageIpfsUploadProps {
 }
 
 const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
-  const { settings, loading } = useSettings();
   const [creatingToken, setCreatingToken] = useState(false);
   const [form] = Form.useForm();
+  const contracts = useContracts();
 
   const handleFinish = async (values: any) => {
     // This should never happen as 'Create' button is disabled until
     // the settings are received
-    if(!settings) return;
+    if(!contracts) return;
 
     console.log('Submitted values: ', values);
     setCreatingToken(true);
     const hideMessage = message.loading('Creating a new non-fungible token on blockchain...', 0);
     
     try {
-      const contracts = await mkContracts(settings);
       const nft = await contracts.nft();
       
       await nft.createToken({
@@ -36,7 +34,7 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
         description: values.description || ''
       });
       
-      onFinish();
+      setTimeout(onFinish, 0);
     } catch (error) {
       message.error(error.message, 10) // Keep for 10 seconds
     } finally {
@@ -58,14 +56,7 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
       layout="vertical" 
       css={{ width: '30em' }}
     >
-      <fieldset disabled={loading || creatingToken}>
-        <Form.Item 
-          label="Owner Address" 
-          name="ownerAddress" 
-          rules={[{ required: true, message: 'Please input an owner address!' }]}
-        >
-          <Input placeholder="tz1..." />
-        </Form.Item>
+      <fieldset disabled={creatingToken}>
         <Form.Item 
           label="Name" 
           name="name"
@@ -101,7 +92,7 @@ const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
             type="primary"
             htmlType="submit"
             loading={creatingToken}
-            disabled={loading}
+            disabled={!contracts}
             shape="round"
             size="large"
             css={{ width: '12em' }}

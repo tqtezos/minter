@@ -1,33 +1,11 @@
-import { TezosToolkit, Signer } from '@taquito/taquito';
-import { InMemorySigner } from '@taquito/signer';
+import { TezosToolkit } from '@taquito/taquito';
 
 import mkNftContract from './nftContract';
-import mkNftFactoryContract from './nftFactoryContract';
-import { Settings } from '../generated/graphql_schema';
+import { SettingsContracts } from '../generated/graphql_schema';
 
-const mkContracts = async (settings: Settings) => {
-  const rpc = settings.rpc;
-  const nftAddress = settings.contracts.nftFaucet;
-  const nftFactoryAddress = settings.contracts.nftFactory;
-  const signer = await InMemorySigner.fromSecretKey(settings.admin.secret);
-  const tzClient = await createToolkit(rpc, signer);
+const mkContracts = (tzToolkit: TezosToolkit, settings: SettingsContracts) => ({
+  nft: () => mkNftContract(tzToolkit, settings.nftFaucet)
+});
 
-  return {
-    nft: () => mkNftContract(tzClient, nftAddress),
-    nftFactory: () => mkNftFactoryContract(tzClient, nftFactoryAddress)
-  };
-};
-
-const createToolkit = async (rpc: string, signer: Signer) => {
-  const tzClient = new TezosToolkit();
-  tzClient.setProvider({ rpc, signer });
-
-  const constants = await tzClient.rpc.getConstants();
-  const confirmationPollingIntervalSecond: number =
-    Number(constants.time_between_blocks[0]) / 5;
-  tzClient.setProvider({ config: { confirmationPollingIntervalSecond } });
-
-  return tzClient;
-};
-
+export type Contracts = ReturnType<typeof mkContracts>;
 export default mkContracts;

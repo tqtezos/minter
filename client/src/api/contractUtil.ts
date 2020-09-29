@@ -1,9 +1,7 @@
 import { BigNumber } from 'bignumber.js';
-import { ContractAbstraction } from '@taquito/taquito/dist/types/contract';
-import { ContractProvider } from '@taquito/taquito/dist/types/contract/interface';
-import { valueFromAST } from 'graphql';
+import { WalletContract } from '@taquito/taquito/dist/types/contract';
 
-export type Contract = ContractAbstraction<ContractProvider>;
+export type Contract = WalletContract;
 
 export type address = string;
 export type nat = BigNumber;
