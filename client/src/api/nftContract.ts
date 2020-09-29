@@ -1,5 +1,6 @@
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 import { BigNumber } from 'bignumber.js';
+import { retrieveStorageField, address, nat } from './contractUtil';
 
 interface CreateTokenArgs {
   symbol: string;
@@ -12,15 +13,11 @@ export interface NftContract {
   createToken(args: CreateTokenArgs): Promise<void>
 }
 
-interface NftContractStorage {
-  next_token_id: string;
-}
-
-const mkNftContract =  async (
-  tzClient: TezosToolkit, 
-  address: string, 
+const mkNftContract = async (
+  tzClient: TezosToolkit,
+  contractAddress: address
 ): Promise<NftContract> => {
-  const contract = await tzClient.wallet.at(address);
+  const contract = await tzClient.wallet.at(contractAddress);
   const ownerAddress = await tzClient.wallet.pkh();
 
   // Wallet API does not seem to accept polling interval
@@ -36,8 +33,10 @@ const mkNftContract =  async (
         ipfsCid
       }: CreateTokenArgs
     ): Promise<void> {
-      const storage = await contract.storage<NftContractStorage>()
-      const tokenId = storage.next_token_id
+      const tokenId = await retrieveStorageField<nat>(
+        contract,
+        'next_token_id'
+      );
       
       const params = [{
         metadata: {
@@ -53,19 +52,19 @@ const mkNftContract =  async (
       const operation = await contract.methods.mint(params).send();
       await operation.confirmation(3);
     }
-  }
+  };
 };
 
-const createExtras = (description: string, ipfsCid: string) => {   
-    const extras = new MichelsonMap<string, string>({
-      prim: 'map',
-      args: [{ prim: 'string' }, { prim: 'string' }]
-    });
-      
-    extras.set('description', description);
-    extras.set('ipfs_cid', ipfsCid);
+const createExtras = (description: string, ipfsCid: string) => {
+  const extras = new MichelsonMap<string, string>({
+    prim: 'map',
+    args: [{ prim: 'string' }, { prim: 'string' }]
+  });
 
-    return extras;
+  extras.set('description', description);
+  extras.set('ipfs_cid', ipfsCid);
+
+  return extras;
 };
 
 export default mkNftContract;

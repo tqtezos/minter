@@ -9,4 +9,3 @@ const mkContracts = (tzToolkit: TezosToolkit, settings: SettingsContracts) => ({
 
 export type Contracts = ReturnType<typeof mkContracts>;
 export default mkContracts;
-

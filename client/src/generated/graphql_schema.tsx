@@ -100,6 +100,7 @@ export type SettingsAdmin = {
 export type SettingsContracts = {
   __typename?: 'SettingsContracts';
   nftFaucet: Scalars['String'];
+  nftFactory: Scalars['String'];
 };
 
 export type Subscription = {

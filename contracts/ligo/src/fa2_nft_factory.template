@@ -13,7 +13,7 @@ let create_contract : (key_hash option * tez * nft_asset_storage) -> (operation 
   |} : (key_hash option * tez * nft_asset_storage) -> (operation * address))]
 
 
-let factory_main (admin, storage : address * unit) : operation list * unit =
+let factory_main (param, storage : unit * unit) : operation list * unit =
   let init_storage : nft_asset_storage = {
     assets = {
       ledger = (Big_map.empty : ledger);

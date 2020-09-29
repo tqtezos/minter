@@ -24,7 +24,14 @@ const WalletConnector: FC = () => {
       await wallet.connect('sandbox', { forcePermission: true })
     
       const tzToolkit = wallet.toTezos();
-      tzToolkit.setProvider({config: {confirmationPollingIntervalSecond: 2}})
+
+      const constants = await tzToolkit.rpc.getConstants();
+      
+      const confirmationPollingIntervalSecond: number = 
+        Number(constants.time_between_blocks[0]) / 5;
+      
+      tzToolkit.setProvider({ config: { confirmationPollingIntervalSecond } });      
+      
       return tzToolkit;
     } catch (err) {
       message.error(err.message)
