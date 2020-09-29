@@ -57,7 +57,7 @@ async function compileNftFactoryContract(env: LigoEnv): Promise<void> {
 }
 
 function prepareNftFactoryContract(env: LigoEnv): void {
-  const templatePath = env.srcFilePath('fa2_nft_factory.template');
+  const templatePath = env.srcFilePath('fa2_nft_factory.template.mligo');
   const template = fs.readFileSync(templatePath).toString();
   const fs2CodePath = env.outFilePath('fa2_multi_nft_asset.tz');
   const fs2Code = fs.readFileSync(fs2CodePath).toString();

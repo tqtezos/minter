@@ -2,7 +2,7 @@ import { $log } from '@tsed/logger';
 
 import { compileAndLoadContract, originateContract, defaultEnv } from './ligo';
 import { Contract, address } from './type-aliases';
-import { TezosToolkit } from '@taquito/taquito';
+import { MichelsonMap, TezosToolkit } from '@taquito/taquito';
 import { TokenMetadata } from './fa2-interface';
 
 export interface MintNftParam {
@@ -37,7 +37,7 @@ export async function originateNftFactory(tz: TezosToolkit): Promise<Contract> {
     'factory_main',
     'fa2_nft_factory.tz'
   );
-  return originateContract(tz, code, 'Unit', 'nft');
+  return originateContract(tz, code, '{}', 'nft');
 }
 
 export async function originateNftFaucet(

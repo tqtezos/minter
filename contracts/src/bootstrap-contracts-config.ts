@@ -83,7 +83,7 @@ async function bootstrapNftFactory(
     tz,
     'contracts.nftFactory',
     'fa2_nft_factory.tz',
-    'Unit'
+    '{}'
   );
 
   $log.info('bootstrapped NFT factory contract');

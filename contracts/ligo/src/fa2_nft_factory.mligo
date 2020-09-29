@@ -1,5 +1,6 @@
 #include "fa2_multi_nft_asset.mligo"
 
+type storage = (address * address, string) big_map
 
 let create_contract : (key_hash option * tez * nft_asset_storage) -> (operation * address) =
   [%Michelson ( {| 
@@ -725,7 +726,7 @@ let create_contract : (key_hash option * tez * nft_asset_storage) -> (operation 
   |} : (key_hash option * tez * nft_asset_storage) -> (operation * address))]
 
 
-let factory_main (param, storage : unit * unit) : operation list * unit =
+let factory_main (name, storage : string * storage) : operation list * storage =
   let init_storage : nft_asset_storage = {
     assets = {
       ledger = (Big_map.empty : ledger);
@@ -739,5 +740,6 @@ let factory_main (param, storage : unit * unit) : operation list * unit =
       paused = false;
     };
   } in
- let op, a = create_contract ((None: key_hash option), 0tez, init_storage) in
+ let op, fa2_nft = create_contract ((None: key_hash option), 0tez, init_storage) in
+ let new_storage = Big_map.add (Tezos.sender, fa2_nft) name storage in
  [op], storage
