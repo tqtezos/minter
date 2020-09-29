@@ -7,19 +7,18 @@ import {
 import { address } from './contractUtil';
 
 export interface NftFactoryContract {
-  createNftContract(): Promise<string>;
+  createNftContract(name: string): Promise<string>;
 }
 
 const mkNftFactoryContract = async (
   tzClient: TezosToolkit,
   factoryAddress: address
 ): Promise<NftFactoryContract> => {
+  const factory = await tzClient.contract.at(factoryAddress);
+
   return {
-    async createNftContract(): Promise<address> {
-      const operation = await tzClient.contract.transfer({
-        amount: 0,
-        to: factoryAddress
-      });
+    async createNftContract(name: string): Promise<address> {
+      const operation = await factory.methods.main(name).send();
       await operation.confirmation();
       return extractOriginatedContractAddress(operation);
     }
