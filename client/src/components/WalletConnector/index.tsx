@@ -23,7 +23,9 @@ const WalletConnector: FC = () => {
       const wallet = new ThanosWallet('Open Minter');
       await wallet.connect('sandbox', { forcePermission: true })
     
-      return wallet.toTezos();
+      const tzToolkit = wallet.toTezos();
+      tzToolkit.setProvider({config: {confirmationPollingIntervalSecond: 2}})
+      return tzToolkit;
     } catch (err) {
       message.error(err.message)
     } finally {
