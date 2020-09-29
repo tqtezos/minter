@@ -2,7 +2,6 @@ import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 import { BigNumber } from 'bignumber.js';
 
 interface CreateTokenArgs {
-  ownerAddress: string;
   symbol: string;
   name: string;
   description: string;
@@ -10,7 +9,7 @@ interface CreateTokenArgs {
 }
 
 export interface NftContract {
-  createToken(args: CreateTokenArgs): Promise<number>
+  createToken(args: CreateTokenArgs): Promise<void>
 }
 
 interface NftContractStorage {
@@ -21,20 +20,22 @@ const mkNftContract =  async (
   tzClient: TezosToolkit, 
   address: string, 
 ): Promise<NftContract> => {
-  const contract = await tzClient.contract.at(address);
-  
-  const constants = await tzClient.rpc.getConstants();
-  const pollingInterval: number = Number(constants.time_between_blocks[0]) / 5;
+  const contract = await tzClient.wallet.at(address);
+  const ownerAddress = await tzClient.wallet.pkh();
+
+  // Wallet API does not seem to accept polling interval
+  //
+  // const constants = await tzClient.rpc.getConstants();
+  // const pollingInterval: number = Number(constants.time_between_blocks[0]) / 5;
 
   return {    
     async createToken({ 
-        ownerAddress,
         symbol,
         name,
         description,
         ipfsCid
       }: CreateTokenArgs
-    ): Promise<number> {
+    ): Promise<void> {
       const storage = await contract.storage<NftContractStorage>()
       const tokenId = storage.next_token_id
       
@@ -50,7 +51,7 @@ const mkNftContract =  async (
       }];
 
       const operation = await contract.methods.mint(params).send();
-      return operation.confirmation(1, pollingInterval);
+      await operation.confirmation(3);
     }
   }
 };

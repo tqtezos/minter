@@ -3,7 +3,7 @@ import { Switch, Route, useLocation } from 'wouter';
 import { Fade as Reveal} from "react-awesome-reveal";
 
 import './App.css';
-import TzToolkitProvider from './TzToolkitContext';
+import GlobalContextProvider from './globalContext'
 
 import SplashPage from '../SplashPage';
 import CreateNonFungiblePage from '../CreateNonFungiblePage';
@@ -13,7 +13,7 @@ const App: FC = () => {
   const [location] = useLocation();
 
   return (
-    <TzToolkitProvider>
+    <GlobalContextProvider>
       <Reveal key={location} duration={1500}>
         <Switch>
           <Route path="/"><SplashPage /></Route>
@@ -21,7 +21,7 @@ const App: FC = () => {
           <Route path="/assets"><AssetsPage /></Route>
         </Switch>
       </Reveal>
-    </TzToolkitProvider>
+    </GlobalContextProvider>
   );
 };
 

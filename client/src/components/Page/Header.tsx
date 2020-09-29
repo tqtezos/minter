@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js';
 import LogoImage from './logo.svg';
 import HeaderButton from '../common/HeaderButton';
 import WalletConnector from '../WalletConnector';
-import { useTzToolkit } from '../App/TzToolkitContext';
+import { useTzToolkit } from '../App/globalContext';
 
 const Logo: FC<{ onClick: () => void}> = ({onClick}) => (
   <img

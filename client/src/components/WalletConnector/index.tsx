@@ -5,7 +5,7 @@ import { ThanosWallet } from '@thanos-wallet/dapp';
 import { message } from 'antd';
 
 import HeaderButton from '../common/HeaderButton';
-import { useTzToolkit, useTzToolkitSetter } from '../App/TzToolkitContext';
+import { useTzToolkit, useTzToolkitSetter } from '../App/globalContext';
 
 const WalletConnector: FC = () => {
   const tzToolkit = useTzToolkit();
