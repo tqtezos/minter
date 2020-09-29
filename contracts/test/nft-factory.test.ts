@@ -40,10 +40,8 @@ describe('test NFT factory', () => {
 
   test('create contract', async () => {
     $log.info('create contract');
-    const op = await tezos.bob.contract.transfer({
-      amount: 0,
-      to: nftFactory.address
-    });
+
+    const op = await nftFactory.methods.main('test contract').send();
     await op.confirmation();
     const nftAddress = extractOriginatedContractAddress(op);
     const nftContract = await tezos.bob.contract.at(nftAddress);
@@ -52,10 +50,7 @@ describe('test NFT factory', () => {
 
   test('mint token', async () => {
     $log.info('create factory');
-    const opCreate = await tezos.bob.contract.transfer({
-      amount: 0,
-      to: nftFactory.address
-    });
+    const opCreate = await nftFactory.methods.main('test contract').send();
     await opCreate.confirmation();
     const nftAddress = extractOriginatedContractAddress(opCreate);
     $log.info(`new nft contract is created at ${nftAddress}`);

@@ -1,6 +1,8 @@
-{ parameter unit ;
-  storage unit ;
-  code { EMPTY_BIG_MAP nat (pair nat (pair string (pair string (pair nat (map string string))))) ;
+{ parameter string ;
+  storage (big_map (pair address address) string) ;
+  code { DUP ;
+         CDR ;
+         EMPTY_BIG_MAP nat (pair nat (pair string (pair string (pair nat (map string string))))) ;
          EMPTY_BIG_MAP (pair address (pair address nat)) unit ;
          PAIR ;
          PUSH nat 0 ;
@@ -729,7 +731,15 @@
                         PAIR } } } ;
          PAIR ;
          SWAP ;
-         CDR ;
+         DUP ;
+         DUG 2 ;
+         DIG 3 ;
+         CAR ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         DROP 3 ;
+         SWAP ;
          NIL operation ;
          DIG 2 ;
          CAR ;
