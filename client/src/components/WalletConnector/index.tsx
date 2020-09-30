@@ -1,38 +1,27 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core';
 import { FC, useState } from 'react';
-import { ThanosWallet } from '@thanos-wallet/dapp';
 import { message } from 'antd';
 
 import HeaderButton from '../common/HeaderButton';
 import { useTzToolkit, useTzToolkitSetter } from '../App/globalContext';
+import useSettings from '../common/useSettings';
+import * as thanosWallet from './thanosWallet';
 
 const WalletConnector: FC = () => {
+  const { settings } = useSettings();
   const tzToolkit = useTzToolkit();
   const setTzToolkit = useTzToolkitSetter();
   const [connecting, setConnecting] = useState(false);
 
-  const connect = async () => {
+  const handleConenct = async () => {
+    if (!settings)
+      throw Error('Problem gettings settings from the server!')
+
     try {
-      const available = await ThanosWallet.isAvailable();
-    
-      if (!available)
-        throw new Error('Thanos Wallet is not installed!');
-
       setConnecting(true);
-      const wallet = new ThanosWallet('Open Minter');
-      await wallet.connect('sandbox', { forcePermission: true })
-    
-      const tzToolkit = wallet.toTezos();
-
-      const constants = await tzToolkit.rpc.getConstants();
-      
-      const confirmationPollingIntervalSecond: number = 
-        Number(constants.time_between_blocks[0]) / 5;
-      
-      tzToolkit.setProvider({ config: { confirmationPollingIntervalSecond } });      
-      
-      return tzToolkit;
+      const tzToolkit = await thanosWallet.connect(settings.rpc);
+      setTzToolkit(tzToolkit);
     } catch (err) {
       message.error(err.message)
     } finally {
@@ -40,12 +29,7 @@ const WalletConnector: FC = () => {
     }
   }
 
-  const handleConenct = () => {
-    connect().then(setTzToolkit);
-  }
-
   const handleDisconnect = () => {
-    window.localStorage.clear();
     setTzToolkit(undefined);
   }
 
