@@ -42,6 +42,23 @@ async function nftByTokenId(token_id: string, ctx: Context) {
   };
 }
 
+async function nftByOwnerId(owner_address: string, ctx: Context) {
+  const { nftData, ownerData } = await extractNftData(ctx);
+  const owners = ownerData.filter((kv: any) => kv.value === owner_address);
+  if (owners.length === 0) return [];
+  const tokens = nftData.filter((kv: any) =>
+    owners.find((owner: any) => kv.value.token_id === owner.key)
+  );
+  return tokens.map((token: any) => ({
+    name: token.value.name,
+    symbol: token.value.symbol,
+    token_id: token.value.token_id,
+    extras: token.value.extras,
+    decimals: parseInt(token.value.decimals),
+    owner: owners[0].value
+  }));
+}
+
 const Query: QueryResolvers = {
   async publishedOperationByHash(_parent, { hash }, { db }) {
     const publishedOp = await PublishedOperation.byHash(db, hash);
@@ -56,6 +73,10 @@ const Query: QueryResolvers = {
     const opData = await getTzStats(ctx, `op/${operation_address}`);
     const tokenId = opData[0].big_map_diff[0].value.token_id;
     return await nftByTokenId(tokenId, ctx);
+  },
+
+  async nftsByOwner(_parent, { owner_address }, ctx) {
+    return await nftByOwnerId(owner_address, ctx);
   },
 
   // TODO: Implement paging/limiting - tzindex API supports query params that

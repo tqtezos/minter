@@ -57,7 +57,7 @@ export type Query = {
   __typename?: 'Query';
   nfts?: Maybe<Array<Maybe<NonFungibleToken>>>;
   nftByTokenId?: Maybe<NonFungibleToken>;
-  nftByOwner?: Maybe<NonFungibleToken>;
+  nftsByOwner?: Maybe<Array<Maybe<NonFungibleToken>>>;
   nftByOperation?: Maybe<NonFungibleToken>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
   settings: Settings;
@@ -71,7 +71,7 @@ export type QueryNftByTokenIdArgs = {
   token_id: Scalars['String'];
 };
 
-export type QueryNftByOwnerArgs = {
+export type QueryNftsByOwnerArgs = {
   owner_address: Scalars['String'];
 };
 
