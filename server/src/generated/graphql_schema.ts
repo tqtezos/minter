@@ -66,7 +66,7 @@ export type Query = {
   __typename?: 'Query';
   nfts?: Maybe<Array<Maybe<NonFungibleToken>>>;
   nftByTokenId?: Maybe<NonFungibleToken>;
-  nftByOwner?: Maybe<NonFungibleToken>;
+  nftsByOwner?: Maybe<Array<Maybe<NonFungibleToken>>>;
   nftByOperation?: Maybe<NonFungibleToken>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
   settings: Settings;
@@ -80,7 +80,7 @@ export type QueryNftByTokenIdArgs = {
   token_id: Scalars['String'];
 };
 
-export type QueryNftByOwnerArgs = {
+export type QueryNftsByOwnerArgs = {
   owner_address: Scalars['String'];
 };
 
@@ -338,11 +338,11 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryNftByTokenIdArgs, 'token_id'>
   >;
-  nftByOwner?: Resolver<
-    Maybe<ResolversTypes['NonFungibleToken']>,
+  nftsByOwner?: Resolver<
+    Maybe<Array<Maybe<ResolversTypes['NonFungibleToken']>>>,
     ParentType,
     ContextType,
-    RequireFields<QueryNftByOwnerArgs, 'owner_address'>
+    RequireFields<QueryNftsByOwnerArgs, 'owner_address'>
   >;
   nftByOperation?: Resolver<
     Maybe<ResolversTypes['NonFungibleToken']>,
@@ -387,7 +387,8 @@ export type SettingsContractsResolvers<
   ContextType = Context,
   ParentType extends ResolversParentTypes['SettingsContracts'] = ResolversParentTypes['SettingsContracts']
 > = ResolversObject<{
-  nft?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  nftFaucet?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  nftFactory?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 

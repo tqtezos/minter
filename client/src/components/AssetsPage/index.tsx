@@ -7,8 +7,9 @@ import { Zoom } from 'react-awesome-reveal'
 
 import Page from '../Page';
 import PageTitle from '../common/PageTitle';
-import useNftsQuery, { Data } from './useNftsQuery';
+import { useNftsQuery } from './useNftsQuery';
 import AssetCard from './AssetCard';
+import { NonFungibleToken } from '../../generated/graphql_schema';
 
 const Spinner = () => (
   <div css={{marginTop: '5em'}}>
@@ -17,7 +18,7 @@ const Spinner = () => (
   </div>
 )
 
-const AssetCards: FC<{ data: Data }> = ({ data }) => (
+const AssetCards: FC<{ data: NonFungibleToken[] }> = ({ data }) => (
   <Row gutter={[24, 24]}>
     <Zoom 
       cascade 
@@ -26,7 +27,7 @@ const AssetCards: FC<{ data: Data }> = ({ data }) => (
       duration={300} 
       fraction={0.01}
     >
-      {data.nfts.map(t =>
+      {data.map(t =>
         <Col key={t.token_id}>
           <AssetCard
             tokenId={t.token_id}
