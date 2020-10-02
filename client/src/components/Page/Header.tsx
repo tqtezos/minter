@@ -1,14 +1,13 @@
 /** @jsx jsx */
-import { FC, Fragment, useEffect, useState } from 'react';
+import { FC, Fragment } from 'react';
 import { Row, Col, Space } from 'antd';
 import { jsx } from '@emotion/core';
 import { useLocation } from 'wouter';
-import BigNumber from 'bignumber.js';
 
 import LogoImage from './logo.svg';
 import HeaderButton from '../common/HeaderButton';
 import WalletConnector from '../WalletConnector';
-import { useTzToolkit } from '../App/globalContext';
+import AddressInfo from './AddressInfo';
 
 const Logo: FC<{ onClick: () => void}> = ({onClick}) => (
   <img
@@ -22,42 +21,14 @@ const Logo: FC<{ onClick: () => void}> = ({onClick}) => (
   />
 );
 
-interface AccountInfo {
-  account: string;
-  balance: BigNumber;
-}
-
 const Header: FC = () => {
   const [, setLocation] = useLocation();
-  const tzToolkit = useTzToolkit();
-  const [accountInfo, setAccountInfo] = useState<AccountInfo>();
-   
-  useEffect(() => {
-    const getAaccountInfo = async () => {
-      if(tzToolkit) {
-        const account = await tzToolkit.wallet.pkh();
-        const balance = await tzToolkit.tz.getBalance(account);
-        setAccountInfo({ account, balance });
-      } else {
-        setAccountInfo(undefined);
-      }
-    }
-
-    getAaccountInfo()  
-  }, [tzToolkit]);
 
   return (
     <Fragment>
       <Row align="middle">
         <Col><Logo onClick={() => { setLocation('/') }} /></Col>
-        <Col> 
-          { accountInfo &&
-            <div>
-              <div>{accountInfo.account}</div>
-              <div>{accountInfo.balance.toString()}</div>
-            </div>
-          }
-        </Col>
+        <Col><AddressInfo /></Col>
         <Col flex="1" />
         <Col>
           <Space size="middle">
