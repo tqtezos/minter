@@ -1,10 +1,13 @@
 /** @jsx jsx */
 import { FC, Fragment } from 'react';
-import { Button, Row, Col, Space } from 'antd';
+import { Row, Col, Space } from 'antd';
 import { jsx } from '@emotion/core';
 import { useLocation } from 'wouter';
 
 import LogoImage from './logo.svg';
+import HeaderButton from '../common/HeaderButton';
+import WalletConnector from '../WalletConnector';
+import AddressInfo from './AddressInfo';
 
 const Logo: FC<{ onClick: () => void}> = ({onClick}) => (
   <img
@@ -18,24 +21,6 @@ const Logo: FC<{ onClick: () => void}> = ({onClick}) => (
   />
 );
 
-type HeaderButtonProps = {
-  title: string;
-  onClick: () => void;
-}
-
-const HeaderButton: FC<HeaderButtonProps> = ({title, onClick}) => (
-  <Button
-    size="large"
-    shape="round" 
-    type="primary"
-    onClick={onClick}
-    css={{ width: '7em'}}
-  >
-    {title}
-  </Button>
-);
-
-
 const Header: FC = () => {
   const [, setLocation] = useLocation();
 
@@ -43,11 +28,13 @@ const Header: FC = () => {
     <Fragment>
       <Row align="middle">
         <Col><Logo onClick={() => { setLocation('/') }} /></Col>
+        <Col><AddressInfo /></Col>
         <Col flex="1" />
         <Col>
           <Space size="middle">
             <HeaderButton title="Create" onClick={() => { setLocation('/create-non-fungible') }} />
             <HeaderButton title="Assets" onClick={() => { setLocation('/assets') }} />
+            <WalletConnector  />
           </Space>
         </Col>
       </Row>

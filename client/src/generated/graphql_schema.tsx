@@ -57,7 +57,7 @@ export type Query = {
   __typename?: 'Query';
   nfts?: Maybe<Array<Maybe<NonFungibleToken>>>;
   nftByTokenId?: Maybe<NonFungibleToken>;
-  nftByOwner?: Maybe<NonFungibleToken>;
+  nftsByOwner?: Maybe<Array<Maybe<NonFungibleToken>>>;
   nftByOperation?: Maybe<NonFungibleToken>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
   settings: Settings;
@@ -71,7 +71,7 @@ export type QueryNftByTokenIdArgs = {
   token_id: Scalars['String'];
 };
 
-export type QueryNftByOwnerArgs = {
+export type QueryNftsByOwnerArgs = {
   owner_address: Scalars['String'];
 };
 
@@ -86,9 +86,21 @@ export type QueryPublishedOperationByHashArgs = {
 export type Settings = {
   __typename?: 'Settings';
   tzStatsUrl: Scalars['String'];
-  minterContractAddress?: Maybe<Scalars['String']>;
-  nftContractAddress?: Maybe<Scalars['String']>;
-  adminAddress?: Maybe<Scalars['String']>;
+  rpc: Scalars['String'];
+  admin: SettingsAdmin;
+  contracts: SettingsContracts;
+};
+
+export type SettingsAdmin = {
+  __typename?: 'SettingsAdmin';
+  address: Scalars['String'];
+  secret: Scalars['String'];
+};
+
+export type SettingsContracts = {
+  __typename?: 'SettingsContracts';
+  nftFaucet: Scalars['String'];
+  nftFactory: Scalars['String'];
 };
 
 export type Subscription = {

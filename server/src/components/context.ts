@@ -24,6 +24,7 @@ export interface Context {
   tzStatsApiUrl: string;
   tzStatsUrl: string;
   tzClient: TezosToolkit;
+  configStore: Configstore;
 }
 
 export interface SessionContext extends Context {
@@ -71,6 +72,7 @@ export default async function createContext(): Promise<Context> {
     tzStatsApiUrl,
     tzStatsUrl,
     tzRpcUrl,
-    tzClient
+    tzClient,
+    configStore
   };
 }

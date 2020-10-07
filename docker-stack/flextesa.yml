@@ -4,7 +4,8 @@ services:
   sandbox:
     image: ${FLEXTESA_DOCKER_IMG}
     environment:
-      block_time: 5   
+      block_time: 5
+      flextesa_node_cors_origin: "*"
     command: "carthagebox start --keep-root --genesis-block-hash random"
     volumes:
       - ${FLEXTESA_DATA_DIR}:/tmp/mini-box

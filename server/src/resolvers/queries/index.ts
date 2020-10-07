@@ -71,9 +71,39 @@ const Query: QueryResolvers = {
       owner: ownerData.find((kv: any) => kv.key === token.key).value
     }));
   },
+  
+  async nftsByOwner(_parent, { owner_address }, ctx) {
+    const { nftData, ownerData } = await extractNftData(ctx);
+    
+    const ownerKeys = new Set(
+      ownerData
+        .filter((o: any) => o.value === owner_address)
+        .map((o: any) => o.key)
+    );
 
-  settings(_parent, _args, { tzStatsUrl }) {
-    return { tzStatsUrl };
+    if (ownerKeys.size === 0)
+      return [];
+
+    return nftData
+      .filter((t: any) => ownerKeys.has(t.key))
+      .map((t: any) => ({
+        name: t.value.name,
+        symbol: t.value.symbol,
+        token_id: t.value.token_id,
+        extras: t.value.extras,
+        decimals: parseInt(t.value.decimals),
+        owner: owner_address
+      }));
+  },
+
+  settings(_parent, _args, { tzStatsUrl, configStore }) {
+    const config = configStore.all;
+    return {
+      tzStatsUrl: tzStatsUrl,
+      rpc: config.rpc,
+      contracts: config.contracts,
+      admin: config.admin
+    };
   }
 };
 

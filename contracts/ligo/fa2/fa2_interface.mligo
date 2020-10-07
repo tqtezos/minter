@@ -57,6 +57,7 @@ type balance_of_param_michelson = balance_of_param_aux michelson_pair_right_comb
 type operator_param = {
   owner : address;
   operator : address;
+  token_id: token_id;
 }
 
 type operator_param_michelson = operator_param michelson_pair_right_comb

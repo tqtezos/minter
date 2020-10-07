@@ -6,33 +6,20 @@ import Configstore from 'configstore';
 import { defaultEnv, originateContract, loadFile } from './ligo';
 import { TezosToolkit } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
+import { sandboxBootstrapKey, testnetBootstrapKey } from './bootstrap-keys';
 
 async function main() {
-  const env = process.env['TZ_NETWORK'];
-  if (!env) {
-    $log.error(`TZ_NETWORK environment variable is not set`);
-    process.exit(1);
-  }
-
-  const configFileName = path.join(__dirname, `../config/minter.${env}.json`);
-  if (!fs.existsSync(configFileName)) {
-    $log.error(`Environment config file ${configFileName} does not exist`);
-    process.exit(1);
-  }
-
+  const env = getEnv();
+  const bootstrapKey = getBootstrapKey(env);
   try {
     $log.info(`bootstrapping ${env} environment config...`);
 
-    const config = new Configstore(
-      'minter',
-      {},
-      { configPath: configFileName }
-    );
-
-    const toolkit = await createToolkit(config);
+    const config = getConfig(env);
+    const toolkit = await createToolkit(config, bootstrapKey);
     await awaitForNetwork(toolkit);
 
-    await bootstrapNft(config, toolkit);
+    await bootstrapNftFaucet(config, toolkit);
+    await bootstrapNftFactory(config, toolkit);
     //add bootstrapping of other contracts here
 
     process.exit(0);
@@ -43,29 +30,70 @@ async function main() {
   }
 }
 
-async function bootstrapNft(
+function getEnv(): string {
+  const env = process.env['TZ_NETWORK'];
+  if (!env) {
+    $log.error(`TZ_NETWORK environment variable is not set`);
+    process.exit(1);
+  }
+  return env;
+}
+
+function getConfig(env: string): Configstore {
+  const configFileName = path.join(__dirname, `../config/minter.${env}.json`);
+  if (!fs.existsSync(configFileName)) {
+    $log.error(`Environment config file ${configFileName} does not exist`);
+    process.exit(1);
+  }
+  return new Configstore('minter', {}, { configPath: configFileName });
+}
+
+function getBootstrapKey(env: string): string {
+  if (env === 'sandbox') return sandboxBootstrapKey;
+  if (env === 'testnet') return testnetBootstrapKey;
+  throw new Error(`unsupported env ${env}`);
+}
+
+async function bootstrapNftFaucet(
   config: Configstore,
   tz: TezosToolkit
 ): Promise<void> {
-  $log.info('bootstrapping NFT contract..');
+  $log.info('bootstrapping NFT faucet contract..');
 
-  const adminAddress = await tz.signer.publicKeyHash();
-  const storage = `(Pair (Pair (Pair "${adminAddress}" True) None) (Pair (Pair {} 0) (Pair {} {})))`;
+  const storage = `(Pair (Pair {} 0) (Pair {} {}))`;
   await bootstrapContract(
     config,
     tz,
-    'contracts.nft',
-    'fa2_multi_nft_asset.tz',
+    'contracts.nftFaucet',
+    'fa2_multi_nft_faucet.tz',
     storage
   );
 
-  $log.info('bootstrapped NFT contract');
+  $log.info('bootstrapped NFT faucet contract');
 }
 
-async function createToolkit(config: Configstore): Promise<TezosToolkit> {
-  const adminKey = config.get('admin.secret');
-  if (!adminKey) throw new Error('cannot read admin secret key');
-  const signer = await InMemorySigner.fromSecretKey(adminKey);
+async function bootstrapNftFactory(
+  config: Configstore,
+  tz: TezosToolkit
+): Promise<void> {
+  $log.info('bootstrapping NFT factory contract..');
+
+  await bootstrapContract(
+    config,
+    tz,
+    'contracts.nftFactory',
+    'fa2_nft_factory.tz',
+    '{}'
+  );
+
+  $log.info('bootstrapped NFT factory contract');
+}
+
+async function createToolkit(
+  config: Configstore,
+  key: string
+): Promise<TezosToolkit> {
+  const signer = await InMemorySigner.fromSecretKey(key);
   const rpc = config.get('rpc');
   if (!rpc) throw new Error('cannot read node rpc');
 

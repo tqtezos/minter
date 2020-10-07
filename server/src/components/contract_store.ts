@@ -10,7 +10,7 @@ export default async function buildContractStore(
 ): Promise<ContractStore> {
   return {
     nftContract() {
-      const nftContractAddress = configStore.get('contracts.nft');
+      const nftContractAddress = configStore.get('contracts.nftFaucet');
       return tzClient.contract.at(nftContractAddress);
     }
   };

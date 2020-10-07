@@ -21,11 +21,21 @@ type PublishedOperation {
   retry: Boolean!
 }
 
+type SettingsContracts {
+  nftFaucet: String!
+  nftFactory: String!
+}
+
+type SettingsAdmin {
+  address: String!
+  secret: String!
+}
+
 type Settings {
   tzStatsUrl: String!
-  minterContractAddress: String
-  nftContractAddress: String
-  adminAddress: String
+  rpc: String!
+  admin: SettingsAdmin!
+  contracts: SettingsContracts!
 }
 
 ## Toplevel Types
@@ -33,7 +43,7 @@ type Settings {
 type Query {
   nfts(limit: Int): [NonFungibleToken]
   nftByTokenId(token_id: String!): NonFungibleToken
-  nftByOwner(owner_address: String!): NonFungibleToken
+  nftsByOwner(owner_address: String!): [NonFungibleToken]
   nftByOperation(operation_address: String!): NonFungibleToken
   publishedOperationByHash(hash: String!): PublishedOperation
   settings: Settings!
