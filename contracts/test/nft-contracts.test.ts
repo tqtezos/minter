@@ -8,7 +8,6 @@ import { Contract, nat } from '../src/type-aliases';
 import {
   originateNftFaucet,
   originateNft,
-  originateNftWithHooks,
   MintNftParam
 } from '../src/nft-contracts';
 import {
@@ -23,7 +22,7 @@ jest.setTimeout(180000); // 3 minutes
 
 const nat1 = new BigNumber(1);
 
-describe.each([originateNftFaucet, originateNft /*, originateNftWithHooks*/])(
+describe.each([originateNftFaucet /*, originateNft*/])(
   'test NFT',
   createNft => {
     let tezos: TestTz;

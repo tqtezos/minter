@@ -2,7 +2,7 @@ import { $log } from '@tsed/logger';
 
 import { compileAndLoadContract, originateContract, defaultEnv } from './ligo';
 import { Contract, address } from './type-aliases';
-import { MichelsonMap, TezosToolkit } from '@taquito/taquito';
+import { TezosToolkit } from '@taquito/taquito';
 import { TokenMetadata } from './fa2-interface';
 
 export interface MintNftParam {
@@ -26,7 +26,7 @@ export async function originateNft(
     'nft_asset_main',
     'fa2_multi_nft_asset.tz'
   );
-  const storage = `(Pair (Pair (Pair "${admin}" False) None) (Pair (Pair {} 0) (Pair {} {})))`;
+  const storage = `(Pair (Pair {} 0) (Pair {} {}))`;
   return originateContract(tz, code, storage, 'nft');
 }
 
@@ -37,7 +37,7 @@ export async function originateNftFactory(tz: TezosToolkit): Promise<Contract> {
     'factory_main',
     'fa2_nft_factory.tz'
   );
-  return originateContract(tz, code, '{}', 'nft');
+  return originateContract(tz, code, '{}', 'nftFactory');
 }
 
 export async function originateNftFaucet(
@@ -51,26 +51,5 @@ export async function originateNftFaucet(
     'fa2_multi_nft_faucet.tz'
   );
   const storage = `(Pair (Pair {} 0) (Pair {} {}))`;
-  return originateContract(tz, code, storage, 'nft');
+  return originateContract(tz, code, storage, 'nftFaucet');
 }
-
-export async function originateNftWithHooks(
-  tz: TezosToolkit,
-  admin: address
-): Promise<Contract> {
-  const code = await compileAndLoadContract(
-    defaultEnv,
-    'fa2_multi_nft_asset_with_hooks.mligo',
-    'nft_asset_main_with_hooks',
-    'fa2_multi_nft_asset_with_hooks.tz'
-  );
-  const storage = `(Pair (Pair (Pair "${admin}" False) None)\
-  (Pair (Pair (Pair {} 0)\
-              (Pair {} (Pair (Pair None (Left (Right Unit))) (Pair (Left (Left Unit)) (Left (Left Unit))))))\
-        {}))`;
-  return originateContract(tz, code, storage, 'nft');
-}
-
-// function delay(ms: number) {
-//   return new Promise<void>(resolve => setTimeout(resolve, ms));
-// }
