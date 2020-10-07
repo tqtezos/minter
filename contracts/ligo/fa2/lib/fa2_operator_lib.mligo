@@ -6,7 +6,6 @@ helper functions
 #if !FA2_OPERATOR_LIB
 #define FA2_OPERATOR_LIB
 
-#include "fa2_convertors.mligo"
 #include "../fa2_errors.mligo"
 
 (** 
@@ -17,14 +16,14 @@ type operator_storage = ((address * (address * token_id)), unit) big_map
 
 (** 
   Updates operator storage using an `update_operator` command.
-  Helper function to implement `Update_operators` FA2 entry point
+  Helper function to implement `Update_operators` FA2 entrypoint
 *)
 let update_operators (update, storage : update_operator * operator_storage)
     : operator_storage =
   match update with
-  | Add_operator_p op -> 
+  | Add_operator op -> 
     Big_map.update (op.owner, (op.operator, op.token_id)) (Some unit) storage
-  | Remove_operator_p op -> 
+  | Remove_operator op -> 
     Big_map.remove (op.owner, (op.operator, op.token_id)) storage
 
 (**
@@ -34,18 +33,17 @@ Validate if operator update is performed by the token owner.
 let validate_update_operators_by_owner (update, updater : update_operator * address)
     : unit =
   let op = match update with
-  | Add_operator_p op -> op
-  | Remove_operator_p op -> op
+  | Add_operator op -> op
+  | Remove_operator op -> op
   in
   if op.owner = updater then unit else failwith fa2_not_owner
 
 (**
-  Generic implementation of the FA2 `%update_operators` entry point.
+  Generic implementation of the FA2 `%update_operators` entrypoint.
   Assumes that only the token owner can change its operators.
  *)
-let fa2_update_operators (updates_michelson, storage
-    : (update_operator_michelson list) * operator_storage) : operator_storage =
-  let updates = operator_updates_from_michelson updates_michelson in
+let fa2_update_operators (updates, storage
+    : (update_operator list) * operator_storage) : operator_storage =
   let updater = Tezos.sender in
   let process_update = (fun (ops, update : operator_storage * update_operator) ->
     let u = validate_update_operators_by_owner (update, updater) in
@@ -53,7 +51,9 @@ let fa2_update_operators (updates_michelson, storage
   ) in
   List.fold process_update updates storage
 
-
+(** 
+  owner * operator * token_id * ops_storage -> unit
+*)
 type operator_validator = (address * address * token_id * operator_storage)-> unit
 
 (**

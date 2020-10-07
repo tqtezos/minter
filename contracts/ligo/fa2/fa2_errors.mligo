@@ -21,7 +21,7 @@ and it is initiated neither by the token owner nor a permitted operator
  *)
 let fa2_not_operator = "FA2_NOT_OPERATOR"
 (** 
-`update_operators` entry point is invoked and `operator_transfer_policy` is
+`update_operators` entrypoint is invoked and `operator_transfer_policy` is
 `No_transfer` or `Owner_transfer`
 *)
 let fa2_operators_not_supported = "FA2_OPERATORS_UNSUPPORTED"
