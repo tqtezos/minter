@@ -4,7 +4,7 @@
   "description": "smart contracts tests using flextesa sandbox and taquito",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --runInBand",
     "start-sandbox": "../flextesa/start-sandbox.sh",
     "kill-sandbox": "../flextesa/kill-sandbox.sh",
     "build:watch": "tsc -w -p .",
