@@ -7,7 +7,7 @@
 
 type nft_asset_with_hooks_entrypoints =
   | Nft_asset of nft_asset_entrypoints
-  | Permissions_descriptor of permissions_descriptor_michelson contract 
+  | Permissions_descriptor of permissions_descriptor contract 
 
 
 let nft_asset_main_with_hooks (param, storage
@@ -17,9 +17,8 @@ let nft_asset_main_with_hooks (param, storage
   | Nft_asset p -> nft_asset_main (p, storage)
 
   | Permissions_descriptor callback ->
-     let pd_michelson =
-      permissions_descriptor_to_michelson storage.assets.permissions_descriptor in
-    let callback_op = Operation.transaction pd_michelson 0mutez callback in
+    let callback_op =
+      Operation.transaction storage.assets.permissions_descriptor 0mutez callback in
     [callback_op], storage
 
 let sample_storage : nft_asset_storage = {
