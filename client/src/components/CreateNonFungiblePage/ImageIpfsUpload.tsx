@@ -54,7 +54,7 @@ const ImageIpfsUpload: FC<ImageIpfsUploadProps> = ({ onChange }) => {
       onChange={onChangeHandler}
     >
       <Button 
-        type="primary" 
+        type="default" 
         shape="round"
         size="large"
         css={{width: '12em'}}
