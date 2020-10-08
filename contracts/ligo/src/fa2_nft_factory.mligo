@@ -626,4 +626,4 @@ let factory_main (name, storage : string * storage) : operation list * storage =
   } in
  let op, fa2_nft = create_contract ((None: key_hash option), 0tez, init_storage) in
  let new_storage = Big_map.add (Tezos.sender, fa2_nft) name storage in
- [op], storage
+ [op], new_storage
