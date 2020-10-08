@@ -64,7 +64,7 @@ const InputForm: FC<InputFormProps> = ({ onFinish }) => {
             <LeftSide onChange={setIpfsContent} />
           </Col>
           <Col offset={2} span={10}>
-            <RightSide ipfsContent={ipfsContent} />
+            <RightSide ipfsContent={ipfsContent} form={form} />
           </Col>
         </Row>
         <Row>
