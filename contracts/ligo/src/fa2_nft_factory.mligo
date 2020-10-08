@@ -31,7 +31,9 @@ let create_contract : (key_hash option * tez * nft_asset_storage) -> (operation 
     (pair (pair %admin (pair (address %admin) (bool %paused)) (option %pending_admin address))
           (pair %assets
              (pair (big_map %ledger nat address) (nat %next_token_id))
-             (pair (big_map %operators (pair address (pair address nat)) unit)
+             (pair (big_map %operators
+                      (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                      unit)
                    (big_map %token_metadata
                       nat
                       (pair (nat %token_id)
@@ -479,21 +481,11 @@ let create_contract : (key_hash option * tez * nft_asset_storage) -> (operation 
                          DUP ;
                          CAR ;
                          MAP { IF_LEFT
-                                 { LEFT (pair (address %owner) (pair (address %operator) (nat %token_id))) }
-                                 { RIGHT (pair (address %owner) (pair (address %operator) (nat %token_id))) } ;
+                                 { LEFT (pair address (pair address nat)) }
+                                 { RIGHT (pair address (pair address nat)) } ;
                                IF_LEFT
-                                 { DIG 4 ;
-                                   DUP ;
-                                   DUG 5 ;
-                                   SWAP ;
-                                   EXEC ;
-                                   LEFT (pair (pair (address %operator) (address %owner)) (nat %token_id)) }
-                                 { DIG 4 ;
-                                   DUP ;
-                                   DUG 5 ;
-                                   SWAP ;
-                                   EXEC ;
-                                   RIGHT (pair (pair (address %operator) (address %owner)) (nat %token_id)) } } ;
+                                 { DIG 4 ; DUP ; DUG 5 ; SWAP ; EXEC ; LEFT (pair (pair address address) nat) }
+                                 { DIG 4 ; DUP ; DUG 5 ; SWAP ; EXEC ; RIGHT (pair (pair address address) nat) } } ;
                          DIG 4 ;
                          DROP ;
                          SENDER ;
@@ -742,4 +734,4 @@ let factory_main (name, storage : string * storage) : operation list * storage =
   } in
  let op, fa2_nft = create_contract ((None: key_hash option), 0tez, init_storage) in
  let new_storage = Big_map.add (Tezos.sender, fa2_nft) name storage in
- [op], storage
+ [op], new_storage

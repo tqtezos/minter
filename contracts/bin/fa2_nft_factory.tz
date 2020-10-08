@@ -1,8 +1,6 @@
 { parameter string ;
   storage (big_map (pair address address) string) ;
-  code { DUP ;
-         CDR ;
-         EMPTY_BIG_MAP nat (pair nat (pair string (pair string (pair nat (map string string))))) ;
+  code { EMPTY_BIG_MAP nat (pair nat (pair string (pair string (pair nat (map string string))))) ;
          EMPTY_BIG_MAP (pair address (pair address nat)) unit ;
          PAIR ;
          PUSH nat 0 ;
@@ -17,6 +15,9 @@
          PAIR ;
          PUSH mutez 0 ;
          NONE key_hash ;
+         PAIR ;
+         PAIR ;
+         UNPPAIIR ;
          CREATE_CONTRACT
            { parameter
                (or (or (or %admin (or (unit %confirm_admin) (bool %pause)) (address %set_admin))
@@ -42,7 +43,9 @@
                (pair (pair %admin (pair (address %admin) (bool %paused)) (option %pending_admin address))
                      (pair %assets
                         (pair (big_map %ledger nat address) (nat %next_token_id))
-                        (pair (big_map %operators (pair address (pair address nat)) unit)
+                        (pair (big_map %operators
+                                 (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                 unit)
                               (big_map %token_metadata
                                  nat
                                  (pair (nat %token_id)
@@ -490,21 +493,11 @@
                                     DUP ;
                                     CAR ;
                                     MAP { IF_LEFT
-                                            { LEFT (pair (address %owner) (pair (address %operator) (nat %token_id))) }
-                                            { RIGHT (pair (address %owner) (pair (address %operator) (nat %token_id))) } ;
+                                            { LEFT (pair address (pair address nat)) }
+                                            { RIGHT (pair address (pair address nat)) } ;
                                           IF_LEFT
-                                            { DIG 4 ;
-                                              DUP ;
-                                              DUG 5 ;
-                                              SWAP ;
-                                              EXEC ;
-                                              LEFT (pair (pair (address %operator) (address %owner)) (nat %token_id)) }
-                                            { DIG 4 ;
-                                              DUP ;
-                                              DUG 5 ;
-                                              SWAP ;
-                                              EXEC ;
-                                              RIGHT (pair (pair (address %operator) (address %owner)) (nat %token_id)) } } ;
+                                            { DIG 4 ; DUP ; DUG 5 ; SWAP ; EXEC ; LEFT (pair (pair address address) nat) }
+                                            { DIG 4 ; DUP ; DUG 5 ; SWAP ; EXEC ; RIGHT (pair (pair address address) nat) } } ;
                                     DIG 4 ;
                                     DROP ;
                                     SENDER ;
@@ -733,13 +726,19 @@
          SWAP ;
          DUP ;
          DUG 2 ;
-         DIG 3 ;
+         CDR ;
+         DIG 2 ;
          CAR ;
          DIG 2 ;
          DUP ;
          DUG 3 ;
-         DROP 3 ;
+         CDR ;
+         SENDER ;
+         PAIR ;
          SWAP ;
+         SOME ;
+         SWAP ;
+         UPDATE ;
          NIL operation ;
          DIG 2 ;
          CAR ;
