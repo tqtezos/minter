@@ -73,14 +73,14 @@ async function compileContractImpl(
   main: string,
   dstFilePath: string
 ): Promise<void> {
-  const cmd = `ligo compile-contract ${srcFilePath} ${main} --brief --output=${dstFilePath}`;
+  const cmd = `ligo compile-contract ${srcFilePath} ${main} --output=${dstFilePath}`;
   await runCmd(cwd, cmd);
 }
 
 async function runCmd(cwd: string, cmd: string): Promise<void> {
   return new Promise<void>((resolve, reject) =>
     child.exec(cmd, { cwd }, (err, stdout, errout) =>
-      errout ? reject(errout) : resolve()
+      err ? reject(err) : resolve()
     )
   );
 }

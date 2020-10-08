@@ -4,8 +4,10 @@
 
 #include "fa2_multi_nft_token.mligo"
 
-type mint_token_param = {
-  metadata : token_metadata_michelson;
+type mint_token_param = 
+[@layout:comb]
+{
+  metadata : token_metadata;
   owner : address;
 }
 
@@ -25,21 +27,21 @@ let update_meta_and_create_txs (param, storage
   } in
   List.fold
     (fun (acc, t : minted1 * mint_token_param) ->
-      let meta : token_metadata = Layout.convert_from_right_comb t.metadata in
-      if meta.token_id < acc.storage.next_token_id
+      let new_token_id = t.metadata.token_id in
+      if new_token_id < acc.storage.next_token_id
       then (failwith "FA2_INVALID_TOKEN_ID" : minted1)
       else
         let new_token_metadata =
-          Big_map.add meta.token_id t.metadata acc.storage.token_metadata in
+          Big_map.add new_token_id t.metadata acc.storage.token_metadata in
 
         let new_storage = { acc.storage with
           token_metadata = new_token_metadata;
-          next_token_id = meta.token_id + 1n;
+          next_token_id = new_token_id + 1n;
         } in
 
         let tx : transfer_destination_descriptor = {
           to_ = Some t.owner;
-          token_id = meta.token_id;
+          token_id = new_token_id;
           amount = 1n;
         } in
 
