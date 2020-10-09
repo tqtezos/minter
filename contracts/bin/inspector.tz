@@ -5,7 +5,7 @@
            (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))) ;
   storage
     (or (unit %empty)
-        (list %state (pair (nat %balance) (pair %request (address %owner) (nat %token_id))))) ;
+        (list %state (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))) ;
   code { DUP ;
          CDR ;
          SWAP ;
@@ -13,15 +13,17 @@
          IF_LEFT
            { IF_LEFT
                { DROP ; NIL operation ; PAIR }
-               { DUP ;
-                 CDR ;
-                 SELF ;
+               { SELF ;
                  ADDRESS ;
                  CONTRACT %response
                    (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance))) ;
                  IF_NONE
                    { PUSH string "bad address for get_entrypoint (%response)" ; FAILWITH }
                    {} ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
                  PAIR ;
                  SWAP ;
                  CAR ;
@@ -34,38 +36,11 @@
                    {} ;
                  PUSH mutez 0 ;
                  DIG 2 ;
-                 DUP ;
-                 DUG 3 ;
-                 CAR ;
-                 DIG 3 ;
-                 CDR ;
-                 PAIR ;
                  TRANSFER_TOKENS ;
                  SWAP ;
                  NIL operation ;
                  DIG 2 ;
                  CONS ;
                  PAIR } }
-           { SWAP ;
-             DROP ;
-             MAP { DUP ;
-                   CAR ;
-                   SWAP ;
-                   CDR ;
-                   PAIR ;
-                   DUP ;
-                   CDR ;
-                   CDR ;
-                   SWAP ;
-                   DUP ;
-                   DUG 2 ;
-                   CDR ;
-                   CAR ;
-                   PAIR ;
-                   SWAP ;
-                   CAR ;
-                   PAIR } ;
-             RIGHT unit ;
-             NIL operation ;
-             PAIR } } }
+           { SWAP ; DROP ; RIGHT unit ; NIL operation ; PAIR } } }
 

@@ -80,7 +80,7 @@ async function compileContractImpl(
 async function runCmd(cwd: string, cmd: string): Promise<void> {
   return new Promise<void>((resolve, reject) =>
     child.exec(cmd, { cwd }, (err, stdout, errout) =>
-      errout ? reject(errout) : resolve()
+      err ? reject(err) : resolve()
     )
   );
 }
