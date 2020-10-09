@@ -17,6 +17,15 @@ export type Scalars = {
   Int: number;
   Float: number;
   JSON: any;
+  Upload: any;
+};
+
+export type IpfsContent = {
+  __typename?: 'IpfsContent';
+  cid: Scalars['String'];
+  size: Scalars['Int'];
+  url: Scalars['String'];
+  publicGatewayUrl: Scalars['String'];
 };
 
 export type Mutation = {
@@ -64,9 +73,9 @@ export type PublishedOperation = {
 
 export type Query = {
   __typename?: 'Query';
-  nfts?: Maybe<Array<Maybe<NonFungibleToken>>>;
+  nfts: Array<NonFungibleToken>;
   nftByTokenId?: Maybe<NonFungibleToken>;
-  nftsByOwner?: Maybe<Array<Maybe<NonFungibleToken>>>;
+  nftsByOwner: Array<NonFungibleToken>;
   nftByOperation?: Maybe<NonFungibleToken>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
   settings: Settings;
@@ -248,6 +257,8 @@ export type ResolversTypes = ResolversObject<{
   SettingsContracts: ResolverTypeWrapper<SettingsContracts>;
   Mutation: ResolverTypeWrapper<{}>;
   Subscription: ResolverTypeWrapper<{}>;
+  Upload: ResolverTypeWrapper<Scalars['Upload']>;
+  IpfsContent: ResolverTypeWrapper<IpfsContent>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -264,6 +275,23 @@ export type ResolversParentTypes = ResolversObject<{
   SettingsContracts: SettingsContracts;
   Mutation: {};
   Subscription: {};
+  Upload: Scalars['Upload'];
+  IpfsContent: IpfsContent;
+}>;
+
+export type IpfsContentResolvers<
+  ContextType = Context,
+  ParentType extends ResolversParentTypes['IpfsContent'] = ResolversParentTypes['IpfsContent']
+> = ResolversObject<{
+  cid?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  size?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  publicGatewayUrl?: Resolver<
+    ResolversTypes['String'],
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
 export interface JsonScalarConfig
@@ -327,7 +355,7 @@ export type QueryResolvers<
   ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
 > = ResolversObject<{
   nfts?: Resolver<
-    Maybe<Array<Maybe<ResolversTypes['NonFungibleToken']>>>,
+    Array<ResolversTypes['NonFungibleToken']>,
     ParentType,
     ContextType,
     RequireFields<QueryNftsArgs, never>
@@ -339,7 +367,7 @@ export type QueryResolvers<
     RequireFields<QueryNftByTokenIdArgs, 'token_id'>
   >;
   nftsByOwner?: Resolver<
-    Maybe<Array<Maybe<ResolversTypes['NonFungibleToken']>>>,
+    Array<ResolversTypes['NonFungibleToken']>,
     ParentType,
     ContextType,
     RequireFields<QueryNftsByOwnerArgs, 'owner_address'>
@@ -410,7 +438,13 @@ export type SubscriptionResolvers<
   >;
 }>;
 
+export interface UploadScalarConfig
+  extends GraphQLScalarTypeConfig<ResolversTypes['Upload'], any> {
+  name: 'Upload';
+}
+
 export type Resolvers<ContextType = Context> = ResolversObject<{
+  IpfsContent?: IpfsContentResolvers<ContextType>;
   JSON?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   NonFungibleToken?: NonFungibleTokenResolvers<ContextType>;
@@ -420,6 +454,7 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   SettingsAdmin?: SettingsAdminResolvers<ContextType>;
   SettingsContracts?: SettingsContractsResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
+  Upload?: GraphQLScalarType;
 }>;
 
 /**

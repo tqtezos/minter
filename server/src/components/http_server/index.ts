@@ -1,21 +1,14 @@
-import { execute, subscribe } from "graphql";
-import { SubscriptionServer } from "subscriptions-transport-ws";
-import { makeExecutableSchema } from "graphql-tools";
-import { ApolloServer } from "apollo-server-express";
-import express, { Express } from "express";
-import bodyParser from "body-parser";
-import path from "path";
-import http from "http";
-
-import { Context } from "./context";
-import resolvers from "../resolvers";
-
-function applyRoutes(app: Express) {
-  app.get("/*", async (_req, res) => {
-    res.setHeader("Content-Type", "text/html");
-    res.sendFile(path.join(process.cwd(), "build", "index.html"));
-  });
-}
+import { execute, subscribe } from 'graphql';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
+import { makeExecutableSchema } from 'graphql-tools';
+import { ApolloServer } from 'apollo-server-express';
+import express, { Express } from 'express';
+import bodyParser from 'body-parser';
+import fileUpload from 'express-fileupload';
+import http from 'http';
+import { Context } from '../context';
+import resolvers from '../../resolvers';
+import applyHandlers from './handlers';
 
 function createApolloServer(context: Context, typeDefs: string) {
   return new ApolloServer({
@@ -41,15 +34,16 @@ function createHttpServer(app: Express, context: Context, typeDefs: string) {
   app.locals = context;
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
-  applyRoutes(app);
+  app.use(fileUpload());
+  applyHandlers(app);
 
   const subServer = createSubScriptionServer(context, typeDefs);
   const httpServer = http.createServer(app);
 
-  httpServer.on("upgrade", (req, sock, head) => {
-    if (req.url === "/graphql") {
+  httpServer.on('upgrade', (req, sock, head) => {
+    if (req.url === '/graphql') {
       subServer.server.handleUpgrade(req, sock, head, ws => {
-        subServer.server.emit("connection", ws, req);
+        subServer.server.emit('connection', ws, req);
       });
     }
   });

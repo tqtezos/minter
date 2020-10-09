@@ -8,6 +8,15 @@ export type Scalars = {
   Int: number;
   Float: number;
   JSON: any;
+  Upload: any;
+};
+
+export type IpfsContent = {
+  __typename?: 'IpfsContent';
+  cid: Scalars['String'];
+  size: Scalars['Int'];
+  url: Scalars['String'];
+  publicGatewayUrl: Scalars['String'];
 };
 
 export type Mutation = {
@@ -55,9 +64,9 @@ export type PublishedOperation = {
 
 export type Query = {
   __typename?: 'Query';
-  nfts?: Maybe<Array<Maybe<NonFungibleToken>>>;
+  nfts: Array<NonFungibleToken>;
   nftByTokenId?: Maybe<NonFungibleToken>;
-  nftsByOwner?: Maybe<Array<Maybe<NonFungibleToken>>>;
+  nftsByOwner: Array<NonFungibleToken>;
   nftByOperation?: Maybe<NonFungibleToken>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
   settings: Settings;
