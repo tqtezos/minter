@@ -1,5 +1,5 @@
 import Configstore from 'configstore';
-import { TzStats, Address } from './TzStats';
+import { TzStats, Address } from './tzStats';
 import { Context } from '../../components/context';
 
 interface ContractBigMapValue {
@@ -12,8 +12,8 @@ export interface Contract {
   name: string;
 }
 
-export const contractsByOwner = async (
-  ownerAddress: string,
+export const contractNamesByOwner = async (
+  ownerAddress: string | null | undefined,
   ctx: Context
 ): Promise<Contract[]> => {
   const factoryAddress = ctx.configStore.get('contracts.nftFactory') as string;

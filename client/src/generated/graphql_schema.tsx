@@ -10,8 +10,8 @@ export type Scalars = {
   JSON: any;
 };
 
-export type Contract = {
-  __typename?: 'Contract';
+export type ContractInfo = {
+  __typename?: 'ContractInfo';
   address: Scalars['String'];
   name: Scalars['String'];
 };
@@ -65,7 +65,7 @@ export type Query = {
   nftByTokenId?: Maybe<NonFungibleToken>;
   nftsByOwner?: Maybe<Array<Maybe<NonFungibleToken>>>;
   nftByOperation?: Maybe<NonFungibleToken>;
-  contractsByOwner: Array<Contract>;
+  contractNamesByOwner: Array<ContractInfo>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
   settings: Settings;
 };
@@ -86,8 +86,8 @@ export type QueryNftByOperationArgs = {
   operation_address: Scalars['String'];
 };
 
-export type QueryContractsByOwnerArgs = {
-  owner_address: Scalars['String'];
+export type QueryContractNamesByOwnerArgs = {
+  owner_address?: Maybe<Scalars['String']>;
 };
 
 export type QueryPublishedOperationByHashArgs = {

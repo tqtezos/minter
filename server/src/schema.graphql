@@ -38,7 +38,7 @@ type Settings {
   contracts: SettingsContracts!
 }
 
-type Contract {
+type ContractInfo {
   address: String!
   name: String!
 }
@@ -51,7 +51,7 @@ type Query {
   nftsByOwner(owner_address: String!): [NonFungibleToken]
   nftByOperation(operation_address: String!): NonFungibleToken
   
-  contractsByOwner(owner_address: String!): [Contract!]!
+  contractNamesByOwner(owner_address: String): [ContractInfo!]!
 
   publishedOperationByHash(hash: String!): PublishedOperation
   settings: Settings!

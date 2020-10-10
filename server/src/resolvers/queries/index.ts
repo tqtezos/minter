@@ -2,7 +2,7 @@ import { Resolvers, QueryResolvers } from '../../generated/graphql_schema';
 import { Context } from '../../components/context';
 import PublishedOperation from '../../models/published_operation';
 import axios from 'axios';
-import { contractsByOwner as contractsByOwnerImpl } from './contractsByOwner';
+import { contractNamesByOwner as contractNamesByOwnerImpl } from './contractNamesByOwner';
 
 async function getTzStats(ctx: Context, resource: string) {
   const response = await axios.get(`${ctx.tzStatsApiUrl}/${resource}`);
@@ -96,8 +96,8 @@ const Query: QueryResolvers = {
       }));
   },
 
-  async contractsByOwner(_parent, { owner_address }, ctx) {
-    return contractsByOwnerImpl(owner_address, ctx);
+  async contractNamesByOwner(_parent, { owner_address }, ctx) {
+    return contractNamesByOwnerImpl(owner_address, ctx);
   },
 
   settings(_parent, _args, { tzStatsUrl, configStore }) {
