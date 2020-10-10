@@ -19,6 +19,12 @@ export type Scalars = {
   JSON: any;
 };
 
+export type Contract = {
+  __typename?: 'Contract';
+  address: Scalars['String'];
+  name: Scalars['String'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createNonFungibleToken: PublishedOperation;
@@ -68,6 +74,7 @@ export type Query = {
   nftByTokenId?: Maybe<NonFungibleToken>;
   nftsByOwner?: Maybe<Array<Maybe<NonFungibleToken>>>;
   nftByOperation?: Maybe<NonFungibleToken>;
+  contractsByOwner: Array<Contract>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
   settings: Settings;
 };
@@ -86,6 +93,10 @@ export type QueryNftsByOwnerArgs = {
 
 export type QueryNftByOperationArgs = {
   operation_address: Scalars['String'];
+};
+
+export type QueryContractsByOwnerArgs = {
+  owner_address: Scalars['String'];
 };
 
 export type QueryPublishedOperationByHashArgs = {
@@ -241,6 +252,7 @@ export type ResolversTypes = ResolversObject<{
   NonFungibleToken: ResolverTypeWrapper<NonFungibleToken>;
   String: ResolverTypeWrapper<Scalars['String']>;
   JSON: ResolverTypeWrapper<Scalars['JSON']>;
+  Contract: ResolverTypeWrapper<Contract>;
   PublishedOperation: ResolverTypeWrapper<PublishedOperation>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Settings: ResolverTypeWrapper<Settings>;
@@ -257,6 +269,7 @@ export type ResolversParentTypes = ResolversObject<{
   NonFungibleToken: NonFungibleToken;
   String: Scalars['String'];
   JSON: Scalars['JSON'];
+  Contract: Contract;
   PublishedOperation: PublishedOperation;
   Boolean: Scalars['Boolean'];
   Settings: Settings;
@@ -264,6 +277,15 @@ export type ResolversParentTypes = ResolversObject<{
   SettingsContracts: SettingsContracts;
   Mutation: {};
   Subscription: {};
+}>;
+
+export type ContractResolvers<
+  ContextType = Context,
+  ParentType extends ResolversParentTypes['Contract'] = ResolversParentTypes['Contract']
+> = ResolversObject<{
+  address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
 export interface JsonScalarConfig
@@ -350,6 +372,12 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryNftByOperationArgs, 'operation_address'>
   >;
+  contractsByOwner?: Resolver<
+    Array<ResolversTypes['Contract']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryContractsByOwnerArgs, 'owner_address'>
+  >;
   publishedOperationByHash?: Resolver<
     Maybe<ResolversTypes['PublishedOperation']>,
     ParentType,
@@ -411,6 +439,7 @@ export type SubscriptionResolvers<
 }>;
 
 export type Resolvers<ContextType = Context> = ResolversObject<{
+  Contract?: ContractResolvers<ContextType>;
   JSON?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   NonFungibleToken?: NonFungibleTokenResolvers<ContextType>;

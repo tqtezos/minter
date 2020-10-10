@@ -19,9 +19,7 @@
                  (address %owner)))) ;
   storage
     (pair (pair (big_map %ledger nat address) (nat %next_token_id))
-          (pair (big_map %operators
-                   (pair (address %owner) (pair (address %operator) (nat %token_id)))
-                   unit)
+          (pair (big_map %operators (pair address (pair address nat)) unit)
                 (big_map %token_metadata
                    nat
                    (pair (nat %token_id)

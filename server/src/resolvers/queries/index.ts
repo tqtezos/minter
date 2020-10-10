@@ -2,6 +2,7 @@ import { Resolvers, QueryResolvers } from '../../generated/graphql_schema';
 import { Context } from '../../components/context';
 import PublishedOperation from '../../models/published_operation';
 import axios from 'axios';
+import { contractsByOwner as contractsByOwnerImpl } from './contractsByOwner';
 
 async function getTzStats(ctx: Context, resource: string) {
   const response = await axios.get(`${ctx.tzStatsApiUrl}/${resource}`);
@@ -71,18 +72,17 @@ const Query: QueryResolvers = {
       owner: ownerData.find((kv: any) => kv.key === token.key).value
     }));
   },
-  
+
   async nftsByOwner(_parent, { owner_address }, ctx) {
     const { nftData, ownerData } = await extractNftData(ctx);
-    
+
     const ownerKeys = new Set(
       ownerData
         .filter((o: any) => o.value === owner_address)
         .map((o: any) => o.key)
     );
 
-    if (ownerKeys.size === 0)
-      return [];
+    if (ownerKeys.size === 0) return [];
 
     return nftData
       .filter((t: any) => ownerKeys.has(t.key))
@@ -94,6 +94,10 @@ const Query: QueryResolvers = {
         decimals: parseInt(t.value.decimals),
         owner: owner_address
       }));
+  },
+
+  async contractsByOwner(_parent, { owner_address }, ctx) {
+    return contractsByOwnerImpl(owner_address, ctx);
   },
 
   settings(_parent, _args, { tzStatsUrl, configStore }) {

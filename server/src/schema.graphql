@@ -38,6 +38,11 @@ type Settings {
   contracts: SettingsContracts!
 }
 
+type Contract {
+  address: String!
+  name: String!
+}
+
 ## Toplevel Types
 
 type Query {
@@ -45,6 +50,9 @@ type Query {
   nftByTokenId(token_id: String!): NonFungibleToken
   nftsByOwner(owner_address: String!): [NonFungibleToken]
   nftByOperation(operation_address: String!): NonFungibleToken
+  
+  contractsByOwner(owner_address: String!): [Contract!]!
+
   publishedOperationByHash(hash: String!): PublishedOperation
   settings: Settings!
 }
