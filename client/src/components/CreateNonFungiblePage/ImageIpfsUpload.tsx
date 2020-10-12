@@ -5,64 +5,74 @@ import { Upload, Button, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { UploadChangeParam } from 'antd/lib/upload';
 import { RcCustomRequestOptions, RcFile } from 'antd/lib/upload/interface';
-import uploadToIpfs, { IpfsContent } from '../../api/ipfsUploader';
-
+import { IpfsContent } from '../../generated/graphql_schema';
 
 export interface ImageIpfsUploadProps {
-  onChange: (info: IpfsContent) => void
+  onChange: (info: IpfsContent) => void;
 }
-  
-const ImageIpfsUpload: FC<ImageIpfsUploadProps> = ({ onChange }) => {
-  const onChangeHandler = async (info: UploadChangeParam) => {
-    if (info.file.status === 'done') {
-      const hideLoadingMessage = message.loading('Uploading image to IPFS Server...', 0);;
-      
-      try {
-        const ipfsContent = await uploadToIpfs(info.file.originFileObj as Blob);
-        message.success('Succesfully uploaded image to IPFS Server.')
-        onChange(ipfsContent) 
-      } catch (error) {
-        message.error(`Problems uploading image to IPFS Server! Please try later.`, 10);
-        console.error(`Problem uploading to IPFS: ${error.toString()}`)
-      } finally {
-        hideLoadingMessage();
-      }
-    }    
+
+const onChangeHandler = async (
+  info: UploadChangeParam,
+  onChange: ImageIpfsUploadProps['onChange']
+) => {
+  if (!info.file.originFileObj) {
+    return;
   }
 
-  const dummyRequest = ({ file, onSuccess }: RcCustomRequestOptions) => {
-    setTimeout(() => {
-      onSuccess({}, file);
-    }, 0);
-  };
-  
-  const validateImageType = (file: RcFile) => {
-    const isImage = file.type.startsWith('image')
-        
-    if (!isImage) {
-      message.error(`${file.name} is not an image file`);
+  if (info.file.status === 'done') {
+    const loadingMessage = 'Uploading image to IPFS Server...';
+    const hideLoadingMessage = message.loading(loadingMessage, 0);
+
+    const formData = new FormData();
+    formData.append('file', info.file.originFileObj);
+
+    try {
+      const response = await fetch('/ipfs-upload', {
+        method: 'POST',
+        body: formData
+      });
+      const data: IpfsContent = await response.json();
+      message.success('Succesfully uploaded image to IPFS Server.');
+      onChange(data);
+    } catch (error) {
+      console.error(error);
+      message.error(
+        'Problems uploading image to IPFS Server! Please try later.',
+        10
+      );
+    } finally {
+      hideLoadingMessage();
     }
-    
-    return isImage;
   }
+};
 
+const dummyRequest = ({ file, onSuccess }: RcCustomRequestOptions) => {
+  setTimeout(() => {
+    onSuccess({}, file);
+  }, 0);
+};
+
+const validateImageType = (file: RcFile) => {
+  const isImage = file.type.startsWith('image');
+  if (!isImage) {
+    message.error(`${file.name} is not an image file`);
+  }
+  return isImage;
+};
+
+const ImageIpfsUpload: FC<ImageIpfsUploadProps> = ({ onChange }) => {
   return (
     <Upload
       customRequest={dummyRequest}
       showUploadList={false}
       beforeUpload={validateImageType}
-      onChange={onChangeHandler}
+      onChange={info => onChangeHandler(info, onChange)}
     >
-      <Button 
-        type="primary" 
-        shape="round"
-        size="large"
-        css={{width: '12em'}}
-      >
+      <Button type="primary" shape="round" size="large" css={{ width: '12em' }}>
         <UploadOutlined /> Click to Upload
       </Button>
     </Upload>
   );
-}
+};
 
 export default ImageIpfsUpload;
