@@ -30,9 +30,16 @@ const RightSide: FC<Props> = ({ ipfsContent, form }) => {
     } else {
       form.setFieldsValue({ contract: undefined });
     }
-  }, [data]);
+  }, [data, form]);
 
   const handleCreateContract = async () => {
+    try {
+      await form.validateFields(['newContractName']);
+    } catch (error) {
+      message.error('Please provide a new contract name');
+      return;
+    }
+
     const hideMessage = message.loading(
       'Creating a new contract on blockchain...',
       0
@@ -68,7 +75,11 @@ const RightSide: FC<Props> = ({ ipfsContent, form }) => {
           ))}
         </Select>
       </Form.Item>
-      <Form.Item label="New Contract Name" name="newContractName">
+      <Form.Item
+        label="New Contract Name"
+        name="newContractName"
+        rules={[{ required: true, message: 'Please input a name!' }]}
+      >
         <Input />
       </Form.Item>
       <Form.Item>

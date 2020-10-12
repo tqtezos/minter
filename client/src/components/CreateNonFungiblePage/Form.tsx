@@ -18,12 +18,21 @@ const InputForm: FC<InputFormProps> = ({ onFinish }) => {
   const [form] = Form.useForm();
   const contracts = useContracts();
 
-  const handleFinish = async (values: any) => {
+  const handleCreateToken = async () => {
+    try {
+      await form.validateFields(['name', 'description', 'symbol', 'ipfsCid']);
+    } catch (error) {
+      message.error('Please fix the errors and try to submit again');
+      return;
+    }
+
     // This should never happen as 'Create' button is disabled until
     // the settings are received
     if (!contracts) return;
 
+    const values = form.getFieldsValue() as any;
     console.log('Submitted values: ', values);
+
     setCreatingToken(true);
     const hideMessage = message.loading(
       'Creating a new non-fungible token on blockchain...',
@@ -52,12 +61,7 @@ const InputForm: FC<InputFormProps> = ({ onFinish }) => {
   }, [ipfsContent, form]);
 
   return (
-    <Form
-      form={form}
-      onFinish={handleFinish}
-      layout="vertical"
-      css={{ marginTop: '2em' }}
-    >
+    <Form form={form} layout="vertical" css={{ marginTop: '2em' }}>
       <fieldset disabled={creatingToken}>
         <Row>
           <Col span={10}>
@@ -71,8 +75,8 @@ const InputForm: FC<InputFormProps> = ({ onFinish }) => {
           <Col span={24}>
             <Form.Item>
               <Button
+                onClick={handleCreateToken}
                 type="primary"
-                htmlType="submit"
                 loading={creatingToken}
                 disabled={!contracts}
                 shape="round"
