@@ -41,8 +41,9 @@ const InputForm: FC<InputFormProps> = ({ onFinish }) => {
 
     try {
       const nft = await contracts.nft();
+      const contract = await nft.contractByAddress(values.contract)
 
-      await nft.createToken({
+      await contract.createToken({
         ...values,
         description: values.description || ''
       });

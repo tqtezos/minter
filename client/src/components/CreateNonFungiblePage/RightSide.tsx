@@ -46,9 +46,9 @@ const RightSide: FC<Props> = ({ ipfsContent, form }) => {
     );
 
     try {
-      const factory = await contracts!.nftFactory();
+      const nft = await contracts!.nft();
 
-      const address = await factory.createNftContract(
+      const address = await nft.createContract(
         form.getFieldValue('newContractName')
       );
 

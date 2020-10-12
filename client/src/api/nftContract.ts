@@ -1,6 +1,7 @@
-import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 import { BigNumber } from 'bignumber.js';
-import { retrieveStorageField, address, nat } from './contractUtil';
+import { MichelsonMap, WalletContract } from '@taquito/taquito';
+
+import { retrieveStorageField, Address, Nat } from './contractUtil';
 
 interface CreateTokenArgs {
   symbol: string;
@@ -10,35 +11,29 @@ interface CreateTokenArgs {
 }
 
 export interface NftContract {
-  createToken(args: CreateTokenArgs): Promise<void>
+  createToken(args: CreateTokenArgs): Promise<void>;
 }
 
 const mkNftContract = async (
-  tzClient: TezosToolkit,
-  contractAddress: address
-): Promise<NftContract> => {
-  const contract = await tzClient.wallet.at(contractAddress);
-  const ownerAddress = await tzClient.wallet.pkh();
+  contract: WalletContract,
+  ownerAddress: Address
+): Promise<NftContract> => ({
+  async createToken({
+    symbol,
+    name,
+    description,
+    ipfsCid
+  }: CreateTokenArgs): Promise<void> {
+    let tokenId: Nat;
 
-  // Wallet API does not seem to accept polling interval
-  //
-  // const constants = await tzClient.rpc.getConstants();
-  // const pollingInterval: number = Number(constants.time_between_blocks[0]) / 5;
+    try {
+      tokenId = await retrieveStorageField<Nat>(contract, 'next_token_id');
+    } catch {
+      tokenId = new BigNumber(0);
+    }
 
-  return {    
-    async createToken({ 
-        symbol,
-        name,
-        description,
-        ipfsCid
-      }: CreateTokenArgs
-    ): Promise<void> {
-      const tokenId = await retrieveStorageField<nat>(
-        contract,
-        'next_token_id'
-      );
-      
-      const params = [{
+    const params = [
+      {
         metadata: {
           token_id: tokenId,
           symbol,
@@ -47,13 +42,13 @@ const mkNftContract = async (
           extras: createExtras(description, ipfsCid)
         },
         owner: ownerAddress
-      }];
+      }
+    ];
 
-      const operation = await contract.methods.mint(params).send();
-      await operation.confirmation();
-    }
-  };
-};
+    const operation = await contract.methods.mint(params).send();
+    await operation.confirmation();
+  }
+});
 
 const createExtras = (description: string, ipfsCid: string) => {
   const extras = new MichelsonMap<string, string>({

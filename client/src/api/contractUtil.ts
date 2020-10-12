@@ -3,8 +3,8 @@ import { WalletContract } from '@taquito/taquito/dist/types/contract';
 
 export type Contract = WalletContract;
 
-export type address = string;
-export type nat = BigNumber;
+export type Address = string;
+export type Nat = BigNumber;
 
 export async function retrieveStorageField<TValue>(
   contract: Contract,

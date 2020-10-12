@@ -4,7 +4,7 @@ import {
   OperationContentsAndResultTransaction,
   OperationResultTransaction
 } from '@taquito/rpc';
-import { address } from './contractUtil';
+import { Address } from './contractUtil';
 
 export interface NftFactoryContract {
   createNftContract(name: string): Promise<string>;
@@ -12,12 +12,12 @@ export interface NftFactoryContract {
 
 const mkNftFactoryContract = async (
   tzClient: TezosToolkit,
-  factoryAddress: address
+  factoryAddress: Address
 ): Promise<NftFactoryContract> => {
   const factory = await tzClient.wallet.at(factoryAddress);
 
   return {
-    async createNftContract(name: string): Promise<address> {
+    async createNftContract(name: string): Promise<Address> {
       const operation = await factory.methods.main(name).send();
       await operation.confirmation();
       return extractOriginatedContractAddress(operation);
@@ -27,7 +27,7 @@ const mkNftFactoryContract = async (
 
 async function extractOriginatedContractAddress(
   op: TransactionWalletOperation
-): Promise<address> {
+): Promise<Address> {
   const txResults = await op.operationResults();
   const txResult = txResults[0] as OperationContentsAndResultTransaction;
 
