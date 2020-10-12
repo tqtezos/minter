@@ -34,7 +34,11 @@ function createHttpServer(app: Express, context: Context, typeDefs: string) {
   app.locals = context;
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
-  app.use(fileUpload());
+  app.use(
+    fileUpload({
+      limits: { fileSize: 10 * 1024 * 1024 } // 20MB
+    })
+  );
   applyHandlers(app);
 
   const subServer = createSubScriptionServer(context, typeDefs);
