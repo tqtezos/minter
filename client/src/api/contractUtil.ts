@@ -12,18 +12,24 @@ export async function retrieveStorageField<TValue>(
 ): Promise<TValue> {
   const storage = await contract.storage<any>();
   const value = deepFind<TValue>(storage, fieldName);
+
   if (value === undefined)
     throw new Error(`storage field ${fieldName} not found`);
+
   return value;
 }
 
-function deepFind<TValue>(o: any, propertyName: string): TValue | undefined {
+function deepFind<TValue>(
+  o: { [key: string]: any },
+  propertyName: string
+): TValue | undefined {
+  if (!o || typeof o !== 'object') return undefined;
   if (o.hasOwnProperty(propertyName)) return o[propertyName] as TValue;
 
-  const nested = Object.values(o).filter(v => typeof v === 'object');
-  for (var n in nested) {
-    const v = deepFind<TValue>(n, propertyName);
-    if (v !== undefined) return v;
+  for (const key in o) {
+    const v = deepFind<TValue>(o[key], propertyName);
+    if (v) return v;
   }
+
   return undefined;
 }

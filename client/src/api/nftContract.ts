@@ -24,13 +24,7 @@ const mkNftContract = async (
     description,
     ipfsCid
   }: CreateTokenArgs): Promise<void> {
-    let tokenId: Nat;
-
-    try {
-      tokenId = await retrieveStorageField<Nat>(contract, 'next_token_id');
-    } catch {
-      tokenId = new BigNumber(0);
-    }
+    const tokenId = await retrieveStorageField<Nat>(contract, 'next_token_id');
 
     const params = [
       {
