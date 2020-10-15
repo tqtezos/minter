@@ -39,6 +39,11 @@ type Settings {
   contracts: SettingsContracts!
 }
 
+type ContractInfo {
+  address: String!
+  name: String!
+}
+
 type IpfsContent {
   cid: String!
   size: Int!
@@ -53,6 +58,9 @@ type Query {
   nftByTokenId(token_id: String!): NonFungibleToken
   nftsByOwner(owner_address: String!): [NonFungibleToken!]!
   nftByOperation(operation_address: String!): NonFungibleToken
+  
+  contractNamesByOwner(owner_address: String): [ContractInfo!]!
+
   publishedOperationByHash(hash: String!): PublishedOperation
   settings: Settings!
 }

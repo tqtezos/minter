@@ -68,7 +68,7 @@ const ImageIpfsUpload: FC<ImageIpfsUploadProps> = ({ onChange }) => {
       beforeUpload={validateImageType}
       onChange={info => onChangeHandler(info, onChange)}
     >
-      <Button type="primary" shape="round" size="large" css={{ width: '12em' }}>
+      <Button type="default" shape="round" size="large" css={{ width: '12em' }}>
         <UploadOutlined /> Click to Upload
       </Button>
     </Upload>

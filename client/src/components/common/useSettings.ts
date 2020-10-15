@@ -12,6 +12,7 @@ const SETTINGS = gql`
       tzStatsUrl
       contracts {
         nftFaucet
+        nftFactory
       }
       admin {
         address

@@ -11,6 +11,12 @@ export type Scalars = {
   Upload: any;
 };
 
+export type ContractInfo = {
+  __typename?: 'ContractInfo';
+  address: Scalars['String'];
+  name: Scalars['String'];
+};
+
 export type IpfsContent = {
   __typename?: 'IpfsContent';
   cid: Scalars['String'];
@@ -68,6 +74,7 @@ export type Query = {
   nftByTokenId?: Maybe<NonFungibleToken>;
   nftsByOwner: Array<NonFungibleToken>;
   nftByOperation?: Maybe<NonFungibleToken>;
+  contractNamesByOwner: Array<ContractInfo>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
   settings: Settings;
 };
@@ -86,6 +93,10 @@ export type QueryNftsByOwnerArgs = {
 
 export type QueryNftByOperationArgs = {
   operation_address: Scalars['String'];
+};
+
+export type QueryContractNamesByOwnerArgs = {
+  owner_address?: Maybe<Scalars['String']>;
 };
 
 export type QueryPublishedOperationByHashArgs = {
