@@ -3,7 +3,6 @@ import {
   Query,
   QueryContractNamesByOwnerArgs
 } from '../../generated/graphql_schema';
-import { useWalletAddress } from '../App/globalContext';
 
 const CONTRACTS = gql`
   query contractNamesByOwner($owner_address: String) {
@@ -14,11 +13,9 @@ const CONTRACTS = gql`
   }
 `;
 
-export const useContractNamesQuery = () => {
-  const address = useWalletAddress();
-
+export const useContractNamesQuery = (ownerAddress?: string) => {
   return useQuery<Query, QueryContractNamesByOwnerArgs>(CONTRACTS, {
-    variables: { owner_address: address },
+    variables: { owner_address: ownerAddress },
     fetchPolicy: 'network-only'
   });
 };

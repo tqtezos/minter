@@ -1,8 +1,8 @@
 /** @jsx jsx */
-import { FC, Fragment } from 'react';
+import { FC } from 'react';
 import { jsx } from '@emotion/core';
 import { Select, Skeleton, Form } from 'antd';
-import { useContractNamesQuery } from '../CreateNonFungiblePage/useContractNamesQuery';
+import { useContractNamesQuery } from '../common/useContractNamesQuery';
 
 const { Option } = Select;
 

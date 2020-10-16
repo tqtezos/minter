@@ -1,4 +1,5 @@
-import Configstore from 'configstore';
+import _ from 'lodash';
+
 import { TzStats, Address } from './tzStats';
 import { Context } from '../../components/context';
 
@@ -24,11 +25,16 @@ export const contractNamesByOwner = async (
   const bigMapId = contract.bigmap_ids[0];
 
   const bigMap = await tzStats.bigMapById<ContractBigMapValue>(bigMapId);
-  const contacts = await bigMap.values();
+  const contracts = await bigMap.values();
 
-  const filteredContracts = contacts
-    .filter(i => i.value.owner === ownerAddress)
-    .map(i => ({ address: i.key, name: i.value.name }));
+  const filterContracts = !_.isNil(ownerAddress)
+    ? contracts.filter(i => i.value.owner === ownerAddress)
+    : contracts;
 
-  return [{ address: faucetAddress, name: 'Minter' }, ...filteredContracts];
+  const result = filterContracts.map(i => ({
+    address: i.key,
+    name: i.value.name
+  }));
+
+  return [{ address: faucetAddress, name: 'Minter' }, ...result];
 };
