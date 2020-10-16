@@ -8,7 +8,7 @@ interface Contract {
   bigmap_ids: [number];
 }
 
-interface BigMapItem<T> {
+export interface BigMapItem<T> {
   key: string;
   value: T;
 }
