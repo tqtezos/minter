@@ -12,6 +12,7 @@ import AssetCard from './AssetCard';
 import ContractsFilter from './ContractsFilter';
 import ContractsTitle from './ContractsTitle';
 import { NonFungibleToken } from '../../generated/graphql_schema';
+import { ContractInfo } from '../../generated/graphql_schema';
 
 const Spinner = () => (
   <div css={{ marginTop: '5em' }}>
@@ -40,7 +41,7 @@ const AssetCards: FC<{ data: NonFungibleToken[] }> = ({ data }) => (
 const AssetsPage: FC = () => {
   const [, setLocation] = useLocation();
   const { data, loading } = useNftsQuery();
-  const [address, setAddress] = useState<string>();
+  const [contractInfo, setContractInfo] = useState<ContractInfo>();
 
   return (
     <Page>
@@ -53,12 +54,15 @@ const AssetsPage: FC = () => {
       />
       <Row>
         <Col offset={3} span={18}>
-          <ContractsFilter onChange={setAddress} />
+          <ContractsFilter
+            address={contractInfo?.address}
+            onChange={setContractInfo}
+          />
         </Col>
       </Row>
       <Row>
         <Col offset={3} span={18}>
-          <ContractsTitle address={address} />
+          <ContractsTitle contract={contractInfo} />
         </Col>
       </Row>
       <Row css={{ marginTop: '2em' }}>
