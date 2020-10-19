@@ -2,7 +2,8 @@ import { Resolvers, QueryResolvers } from '../../generated/graphql_schema';
 import { Context } from '../../components/context';
 import PublishedOperation from '../../models/published_operation';
 import axios from 'axios';
-import { contractNamesByOwner as contractNamesByOwnerImpl } from './contractNamesByOwner';
+import { contractNames } from './contractNames';
+import { nfts } from './nfts';
 
 async function getTzStats(ctx: Context, resource: string) {
   const response = await axios.get(`${ctx.tzStatsApiUrl}/${resource}`);
@@ -59,45 +60,12 @@ const Query: QueryResolvers = {
     return await nftByTokenId(tokenId, ctx);
   },
 
-  // TODO: Implement paging/limiting - tzindex API supports query params that
-  // enable this behavior
-  async nfts(_parent, _args, ctx) {
-    const { nftData, ownerData } = await extractNftData(ctx);
-    return nftData.map((token: any) => ({
-      name: token.value.name,
-      symbol: token.value.symbol,
-      token_id: token.value.token_id,
-      extras: token.value.extras,
-      decimals: parseInt(token.value.decimals),
-      owner: ownerData.find((kv: any) => kv.key === token.key).value
-    }));
+  async nfts(_parent, { ownerAddress, contractAddress }, ctx) {
+    return nfts(ownerAddress, contractAddress, ctx);
   },
 
-  async nftsByOwner(_parent, { owner_address }, ctx) {
-    const { nftData, ownerData } = await extractNftData(ctx);
-
-    const ownerKeys = new Set(
-      ownerData
-        .filter((o: any) => o.value === owner_address)
-        .map((o: any) => o.key)
-    );
-
-    if (ownerKeys.size === 0) return [];
-
-    return nftData
-      .filter((t: any) => ownerKeys.has(t.key))
-      .map((t: any) => ({
-        name: t.value.name,
-        symbol: t.value.symbol,
-        token_id: t.value.token_id,
-        extras: t.value.extras,
-        decimals: parseInt(t.value.decimals),
-        owner: owner_address
-      }));
-  },
-
-  async contractNamesByOwner(_parent, { owner_address }, ctx) {
-    return contractNamesByOwnerImpl(owner_address, ctx);
+  async contractNames(_parent, { ownerAddress }, ctx) {
+    return contractNames(ownerAddress, ctx);
   },
 
   settings(_parent, _args, { tzStatsUrl, configStore }) {

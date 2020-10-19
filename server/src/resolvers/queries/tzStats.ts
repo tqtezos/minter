@@ -19,7 +19,7 @@ export const BigMap = <T>(url: string) => ({
   }
 });
 
-export const TzStats = (url: string) => ({
+export const mkTzStats = (url: string) => ({
   async contractByAddress(address: Address): Promise<Contract> {
     return axios.get(`${url}/contract/${address}`).then(r => r.data);
   },
@@ -28,3 +28,6 @@ export const TzStats = (url: string) => ({
     return BigMap<T>(`${url}/bigmap/${id}`);
   }
 });
+
+export type TzStats = ReturnType<typeof mkTzStats>;
+

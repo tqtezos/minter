@@ -1,12 +1,12 @@
 import { gql, useQuery } from '@apollo/client';
 import {
   Query,
-  QueryContractNamesByOwnerArgs
+  QueryContractNamesArgs
 } from '../../generated/graphql_schema';
 
 const CONTRACTS = gql`
-  query contractNamesByOwner($owner_address: String) {
-    contractNamesByOwner(owner_address: $owner_address) {
+  query contractNames($ownerAddress: String) {
+    contractNames(ownerAddress: $ownerAddress) {
       address
       name
     }
@@ -14,8 +14,8 @@ const CONTRACTS = gql`
 `;
 
 export const useContractNamesQuery = (ownerAddress?: string) => {
-  return useQuery<Query, QueryContractNamesByOwnerArgs>(CONTRACTS, {
-    variables: { owner_address: ownerAddress },
+  return useQuery<Query, QueryContractNamesArgs>(CONTRACTS, {
+    variables: { ownerAddress: ownerAddress },
     fetchPolicy: 'network-only'
   });
 };

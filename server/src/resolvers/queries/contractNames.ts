@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { TzStats, Address } from './tzStats';
+import { mkTzStats, Address } from './tzStats';
 import { Context } from '../../components/context';
 
 interface ContractBigMapValue {
@@ -13,13 +13,13 @@ export interface Contract {
   name: string;
 }
 
-export const contractNamesByOwner = async (
+export const contractNames = async (
   ownerAddress: string | null | undefined,
   ctx: Context
 ): Promise<Contract[]> => {
   const factoryAddress = ctx.configStore.get('contracts.nftFactory') as string;
   const faucetAddress = ctx.configStore.get('contracts.nftFaucet') as string;
-  const tzStats = TzStats(ctx.tzStatsApiUrl);
+  const tzStats = mkTzStats(ctx.tzStatsApiUrl);
 
   const contract = await tzStats.contractByAddress(factoryAddress);
   const bigMapId = contract.bigmap_ids[0];

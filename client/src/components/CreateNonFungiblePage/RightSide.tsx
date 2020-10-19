@@ -19,7 +19,7 @@ const RightSide: FC<Props> = ({ ipfsContent, form }) => {
   const contracts = useContracts();
   const ownerAddress = useWalletAddress();
   const { data, loading, refetch } = useContractNamesQuery(ownerAddress);
-  const contractNames = data?.contractNamesByOwner;
+  const contractNames = data?.contractNames;
 
   useEffect(() => {
     if (contractNames && contractNames.length === 1)
@@ -71,7 +71,7 @@ const RightSide: FC<Props> = ({ ipfsContent, form }) => {
           disabled={!ownerAddress}
           placeholder="Select a contract"
         >
-          {data?.contractNamesByOwner.map(c => (
+          {data?.contractNames.map(c => (
             <Option key={c.address} value={c.address}>
               {c.name} - {c.address}
             </Option>

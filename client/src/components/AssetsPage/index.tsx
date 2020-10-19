@@ -40,8 +40,8 @@ const AssetCards: FC<{ data: NonFungibleToken[] }> = ({ data }) => (
 
 const AssetsPage: FC = () => {
   const [, setLocation] = useLocation();
-  const { data, loading } = useNftsQuery();
   const [contractInfo, setContractInfo] = useState<ContractInfo>();
+  const { data, loading } = useNftsQuery(contractInfo?.address);
 
   return (
     <Page>
@@ -67,7 +67,7 @@ const AssetsPage: FC = () => {
       </Row>
       <Row css={{ marginTop: '2em' }}>
         <Col offset={3} span={18} css={{ height: '100%' }}>
-          {data && !loading ? <AssetCards data={data} /> : <Spinner />}
+          {data && !loading ? <AssetCards data={data.nfts} /> : <Spinner />}
         </Col>
       </Row>
     </Page>
