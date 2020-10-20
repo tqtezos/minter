@@ -3,9 +3,33 @@ import _ from 'lodash';
 import { mkTzStats, TzStats, Address } from './tzStats';
 import { Context } from '../../components/context';
 import { NonFungibleToken } from '../../generated/graphql_schema';
+import { contractNames } from './contractNames';
 
-type NftBigMapValue = Omit<NonFungibleToken, 'owner'>;
+type Nft = Omit<NonFungibleToken, 'owner'>;
+
+interface BrokenNft {
+  '0@nat': string;
+  '1@string': string;
+  '2@string': string;
+  '3@nat': string;
+  '4@map': any;
+}
+
+type NftBigMapValue = Nft | BrokenNft;
 type LedgerBigMapValue = NonFungibleToken['owner'];
+
+const convertNft = (nft: NftBigMapValue): Nft => {
+  if (nft.hasOwnProperty('symbol')) return nft as Nft;
+
+  const brokenNft = nft as BrokenNft;
+  return {
+    token_id: brokenNft['0@nat'],
+    symbol: brokenNft['1@string'],
+    name: brokenNft['2@string'],
+    decimals: 0,
+    extras: brokenNft['4@map']
+  };
+};
 
 const nftsByContractAddress = async (
   tzStats: TzStats,
@@ -31,7 +55,7 @@ const nftsByContractAddress = async (
     .value();
 
   const nfts = tokenItems.map(i => ({
-    ...i.value,
+    ...convertNft(i.value),
     owner: ownerByTokenId[i.key]
   }));
 
@@ -47,6 +71,16 @@ export const nfts = async (
 ): Promise<NonFungibleToken[]> => {
   const tzStats = mkTzStats(ctx.tzStatsApiUrl);
   const faucetAddress = ctx.configStore.get('contracts.nftFaucet') as string;
+
+  if (!_.isNil(contractAddress))
+    return nftsByContractAddress(tzStats, contractAddress || '', ownerAddress);
+
+  const contracts = await contractNames(null, ctx);
   
-  return nftsByContractAddress(tzStats, faucetAddress, ownerAddress);
+  const promises = contracts.map(({ address }) =>
+    nftsByContractAddress(tzStats, address, ownerAddress)
+  );
+  
+  const nftArrays = await Promise.all(promises);
+  return _.flatten(nftArrays);
 };
