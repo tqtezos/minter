@@ -20,7 +20,13 @@ const InputForm: FC<InputFormProps> = ({ onFinish }) => {
 
   const handleCreateToken = async () => {
     try {
-      await form.validateFields(['name', 'description', 'symbol', 'ipfsCid']);
+      await form.validateFields([
+        'name',
+        'description',
+        'symbol',
+        'ipfsCid',
+        'contract'
+      ]);
     } catch (error) {
       message.error('Please fix the errors and try to submit again');
       return;
@@ -41,7 +47,7 @@ const InputForm: FC<InputFormProps> = ({ onFinish }) => {
 
     try {
       const nft = await contracts.nft();
-      const contract = await nft.contractByAddress(values.contract)
+      const contract = await nft.contractByAddress(values.contract);
 
       await contract.createToken({
         ...values,

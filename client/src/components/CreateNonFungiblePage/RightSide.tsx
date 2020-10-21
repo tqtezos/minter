@@ -6,8 +6,8 @@ import { FormInstance } from 'antd/lib/form/hooks/useForm';
 
 import ImagePreview from './ImagePreview';
 import { IpfsContent } from '../../api/ipfsUploader';
-import { useContracts } from '../App/globalContext';
-import { useContractNamesQuery } from './useContractNamesQuery';
+import { useContracts, useWalletAddress } from '../App/globalContext';
+import { useContractNamesQuery } from '../common/useContractNamesQuery';
 
 const { Option } = Select;
 interface Props {
@@ -17,20 +17,20 @@ interface Props {
 
 const RightSide: FC<Props> = ({ ipfsContent, form }) => {
   const contracts = useContracts();
-  const { data, loading, refetch } = useContractNamesQuery();
+  const ownerAddress = useWalletAddress();
+  const { data, loading, refetch } = useContractNamesQuery(ownerAddress);
+  const contractNames = data?.contractNames;
 
   useEffect(() => {
-    if (data) {
-      const oldAddress = form.getFieldValue('contract');
-
-      if (!data.contractNamesByOwner.find(c => c.address === oldAddress))
-        form.setFieldsValue({
-          contract: data.contractNamesByOwner[0].address
-        });
-    } else {
+    if (!contractNames)
       form.setFieldsValue({ contract: undefined });
+    else if(contractNames.length === 1)
+      form.setFieldsValue({ contract: contractNames[0].address });
+    else {
+      const contractAddress = form.getFieldValue('contract')
+      if(!contractNames.find(c => c.address === contractAddress)) form.setFieldsValue({ contract: undefined });
     }
-  }, [data, form]);
+  }, [contractNames, form]);
 
   const handleCreateContract = async () => {
     try {
@@ -66,9 +66,13 @@ const RightSide: FC<Props> = ({ ipfsContent, form }) => {
 
   return (
     <Fragment>
-      <Form.Item label="Contract" name="contract">
-        <Select loading={loading}>
-          {data?.contractNamesByOwner.map(c => (
+      <Form.Item
+        label="Contract"
+        name="contract"
+        rules={[{ required: true, message: 'Please select a contract!' }]}
+      >
+        <Select loading={loading} placeholder="Select a contract">
+          {data?.contractNames.map(c => (
             <Option key={c.address} value={c.address}>
               {c.name} - {c.address}
             </Option>
