@@ -1,0 +1,5 @@
+TEZOS_RPC_URL=https://delphinet-tezos.giganode.io
+TZSTATS_API_URL=https://api.delphi.tzstats.com/
+TZSTATS_URL=https://delphi.tzstats.com/
+
+TZ_NETWORK=delphinet

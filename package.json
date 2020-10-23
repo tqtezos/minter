@@ -5,9 +5,11 @@
     "start": "bin/start dev-sandbox",
     "start:sandbox": "bin/start dev-sandbox",
     "start:testnet": "bin/start dev-testnet",
+    "start:delphinet": "bin/start dev-delphinet",
     "stop": "bin/stop dev-sandbox",
     "stop:sandbox": "bin/stop dev-sandbox",
     "stop:testnet": "bin/stop dev-testnet",
+    "stop:delphinet": "bin/stop dev-delphinet",
     "log": "bin/log",
     "log:api": "bin/log api",
     "log:ui": "bin/log ui"

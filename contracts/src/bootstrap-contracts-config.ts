@@ -6,7 +6,11 @@ import Configstore from 'configstore';
 import { defaultEnv, originateContract, loadFile } from './ligo';
 import { TezosToolkit } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
-import { sandboxBootstrapKey, testnetBootstrapKey } from './bootstrap-keys';
+import {
+  sandboxBootstrapKey,
+  testnetBootstrapKey,
+  delphinetBootstrapKey
+} from './bootstrap-keys';
 
 async function main() {
   const env = getEnv();
@@ -51,6 +55,7 @@ function getConfig(env: string): Configstore {
 function getBootstrapKey(env: string): string {
   if (env === 'sandbox') return sandboxBootstrapKey;
   if (env === 'testnet') return testnetBootstrapKey;
+  if (env === 'delphinet') return delphinetBootstrapKey;
   throw new Error(`unsupported env ${env}`);
 }
 

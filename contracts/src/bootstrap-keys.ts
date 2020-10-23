@@ -3,3 +3,6 @@ export const sandboxBootstrapKey =
 
 export const testnetBootstrapKey =
   'edskRuycScUrc5KqgiWZXWFa4STEAxJSs18ZXLDdfbDGkjLPXf8miygTAYxoR3DDqnczW4KnKkLUnH3h135qp167krTxKwnnbu';
+
+export const delphinetBootstrapKey =
+  'edskRuycScUrc5KqgiWZXWFa4STEAxJSs18ZXLDdfbDGkjLPXf8miygTAYxoR3DDqnczW4KnKkLUnH3h135qp167krTxKwnnbu';
