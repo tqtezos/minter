@@ -8,6 +8,8 @@ then
   rm -rf $PROJECT_ROOT_DIR/.pgdata
   rm -rf $PROJECT_ROOT_DIR/.tzindex
   rm -rf $PROJECT_ROOT_DIR/.flextesa
+  docker volume rm minter-dev-sandbox_esdata
+  docker volume rm minter-dev-sandbox_mqdata
   echo "Done"
   exit 0
 fi

@@ -2,8 +2,10 @@ version: '3.7'
 
 services:
   bcdmetrics:
-    image: bakingbad/bcdhub-metrics:${TAG:-latest}
-    command: -f config.yml -f config.box.yml
+    image: bakingbad/bcdhub-metrics:2.6
+    command: -f config.yml -f config.box.yml -f config.bbbox.yml
+    volumes:
+      - ./bbbox/config.yml:/app/metrics/config.bbbox.yml
     environment:
       - GIN_MODE=release
       - POSTGRES_USER=root
