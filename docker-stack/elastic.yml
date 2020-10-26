@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  elastic:
+    image: bakingbad/bcdhub-elastic:${TAG:-latest}
+    restart: always
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    environment:
+      - discovery.type=single-node
+      - 'ES_JAVA_OPTS=-Xms108m -Xmx108m'
+    logging:
+      options:
+        max-size: 10m
+        max-file: '5'
+
+volumes:
+  esdata:

@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  bcdindexer:
+    restart: always
+    image: bakingbad/bcdhub-indexer:${TAG:-latest}
+    command: -f config.yml -f config.box.yml
+    environment:
+      - GIN_MODE=release
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=bcd
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    depends_on:
+      - elastic
+      - mq
+    extra_hosts:
+      sandbox: 172.17.0.1
+    logging:
+      options:
+        max-size: 10m
+        max-file: '5'
