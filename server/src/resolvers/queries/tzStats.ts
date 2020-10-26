@@ -30,4 +30,3 @@ export const mkTzStats = (url: string) => ({
 });
 
 export type TzStats = ReturnType<typeof mkTzStats>;
-

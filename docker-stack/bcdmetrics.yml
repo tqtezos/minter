@@ -5,7 +5,7 @@ services:
     image: bakingbad/bcdhub-metrics:2.6
     command: -f config.yml -f config.box.yml -f config.bbbox.yml
     volumes:
-      - ./bbbox/config.yml:/app/metrics/config.bbbox.yml
+      - ${PROJECT_ROOT_DIR}/bbbox/config.yml:/app/metrics/config.bbbox.yml
     environment:
       - GIN_MODE=release
       - POSTGRES_USER=root
