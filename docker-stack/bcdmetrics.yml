@@ -2,7 +2,6 @@ version: '3.7'
 
 services:
   bcdmetrics:
-    restart: always
     image: bakingbad/bcdhub-metrics:${TAG:-latest}
     command: -f config.yml -f config.box.yml
     environment:

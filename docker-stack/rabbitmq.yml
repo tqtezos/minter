@@ -3,7 +3,6 @@ version: '3.7'
 services:
   mq:
     image: rabbitmq:latest
-    restart: always
     volumes:
       - mqdata:/var/lib/rabbitmq
     environment:

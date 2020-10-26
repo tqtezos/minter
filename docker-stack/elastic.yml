@@ -3,7 +3,6 @@ version: '3.7'
 services:
   elastic:
     image: bakingbad/bcdhub-elastic:${TAG:-latest}
-    restart: always
     volumes:
       - esdata:/usr/share/elasticsearch/data
     environment:

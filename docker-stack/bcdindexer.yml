@@ -2,7 +2,6 @@ version: '3.7'
 
 services:
   bcdindexer:
-    restart: always
     image: bakingbad/bcdhub-indexer:${TAG:-latest}
     command: -f config.yml -f config.box.yml
     environment:

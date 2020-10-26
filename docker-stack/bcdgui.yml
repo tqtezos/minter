@@ -2,7 +2,6 @@ version: '3.7'
 
 services:
   bcdgui:
-    restart: always
     image: bakingbad/bcdhub-gui:${TAG:-latest}
     entrypoint: /bin/bash
     command: -c "mv config.box.json config.json && nginx -g 'daemon off;'"
