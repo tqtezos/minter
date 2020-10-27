@@ -2,14 +2,31 @@
 
 source ${BASH_SOURCE%/*}/env
 
+rm_volume() {
+  docker volume rm -f "$1" > /dev/null 2>&1
+}
+
 if [[ $@ =~ "--confirm" ]]
 then
   echo "Resetting database, blockchain, and indexer..."
   rm -rf $PROJECT_ROOT_DIR/.pgdata
   rm -rf $PROJECT_ROOT_DIR/.tzindex
   rm -rf $PROJECT_ROOT_DIR/.flextesa
-  docker volume rm minter-dev-sandbox_esdata
-  docker volume rm minter-dev-sandbox_mqdata
+
+  echo "Attempting to remove volume minter-dev-sandbox_esdata"
+  until rm_volume "minter-dev-sandbox_esdata"; do
+    >&2 echo "Volume in use - trying again in 1 second..."
+    sleep 1
+  done
+  echo "Removed volume minter-dev-sandbox_esdata"
+
+  echo "Attempting to remove minter-dev-sandbox_mqdata"
+  until rm_volume "minter-dev-sandbox_mqdata"; do
+    >&2 echo "Volume in use - trying again in 1 second..."
+    sleep 1
+  done
+  echo "Removed volume minter-dev-sandbox_mqdata"
+
   echo "Done"
   exit 0
 fi
