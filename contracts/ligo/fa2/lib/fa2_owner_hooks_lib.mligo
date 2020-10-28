@@ -13,18 +13,13 @@ which supports sender/receiver hooks.
 
 type get_owners = transfer_descriptor -> (address option) list
 
-type hook_entry_point = transfer_descriptor_param_michelson contract
+type hook_entry_point = transfer_descriptor_param contract
 
 type hook_result =
   | Hook_entry_point of hook_entry_point
   | Hook_undefined of string
 
 type to_hook = address -> hook_result
-
-(* type transfer_hook_params = {
-  ligo_param : transfer_descriptor_param;
-  michelson_param : transfer_descriptor_param_michelson;
-} *)
 
 (**
 Extracts a set of unique `from_` or `to_` addresses from the transfer batch.
@@ -72,7 +67,7 @@ let validate_owner(p, policy, get_owners, to_hook :
   | Required_owner_hook -> validate_owner_hook (p, get_owners, to_hook, true)
 
 (**
-Given an address of the token receiver, tries to get an entry point for
+Given an address of the token receiver, tries to get an entrypoint for
 `fa2_token_receiver` interface.
  *)
 let to_receiver_hook : to_hook = fun (a : address) ->
@@ -94,7 +89,7 @@ let validate_receivers (p, receiver_policy : transfer_descriptor_param * owner_h
   validate_owner (p, receiver_policy, get_receivers, to_receiver_hook)
 
 (**
-Given an address of the token sender, tries to get an entry point for
+Given an address of the token sender, tries to get an entrypoint for
 `fa2_token_sender` interface.
  *)
 let to_sender_hook : to_hook = fun (a : address) ->
@@ -163,9 +158,8 @@ let get_owner_hook_ops_for (tx_descriptor, pd
   match hook_calls with
   | [] -> ([] : operation list)
   | h :: t -> 
-    let tx_descriptor_michelson = transfer_descriptor_param_to_michelson tx_descriptor in 
     List.map (fun(call: hook_entry_point) -> 
-      Operation.transaction tx_descriptor_michelson 0mutez call) 
+      Operation.transaction tx_descriptor 0mutez call) 
       hook_calls
 
 #endif

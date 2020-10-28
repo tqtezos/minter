@@ -1,4 +1,5 @@
 scalar JSON
+scalar Upload
 
 ## Application Types
 
@@ -38,13 +39,27 @@ type Settings {
   contracts: SettingsContracts!
 }
 
+type ContractInfo {
+  address: String!
+  name: String!
+}
+
+type IpfsContent {
+  cid: String!
+  size: Int!
+  url: String!
+  publicGatewayUrl: String!
+}
+
 ## Toplevel Types
 
 type Query {
-  nfts(limit: Int): [NonFungibleToken]
+  nfts(ownerAddress: String, contractAddress: String): [NonFungibleToken!]!
+  contractNames(ownerAddress: String): [ContractInfo!]!
+
   nftByTokenId(token_id: String!): NonFungibleToken
-  nftsByOwner(owner_address: String!): [NonFungibleToken]
   nftByOperation(operation_address: String!): NonFungibleToken
+  
   publishedOperationByHash(hash: String!): PublishedOperation
   settings: Settings!
 }

@@ -1,105 +1,100 @@
 /** @jsx jsx */
 import { FC, useEffect, useState } from 'react';
 import { jsx } from '@emotion/core';
-import { Form, Input, Button, message } from 'antd';
+import { Form, Button, message, Row, Col } from 'antd';
 
-import ImageIpfsUpload, { ImageIpfsUploadProps } from './ImageIpfsUpload';
 import { IpfsContent } from '../../api/ipfsUploader';
 import { useContracts } from '../App/globalContext';
+import LeftSide from './LeftSide';
+import RightSide from './RightSide';
 
-interface InputFormProps extends ImageIpfsUploadProps {
-  ipfsContent?: IpfsContent;
+interface InputFormProps {
   onFinish: () => void;
 }
 
-const InputForm: FC<InputFormProps> = ({ ipfsContent, onChange, onFinish }) => {
+const InputForm: FC<InputFormProps> = ({ onFinish }) => {
+  const [ipfsContent, setIpfsContent] = useState<IpfsContent>();
   const [creatingToken, setCreatingToken] = useState(false);
   const [form] = Form.useForm();
   const contracts = useContracts();
 
-  const handleFinish = async (values: any) => {
+  const handleCreateToken = async () => {
+    try {
+      await form.validateFields([
+        'name',
+        'description',
+        'symbol',
+        'ipfsCid',
+        'contract'
+      ]);
+    } catch (error) {
+      message.error('Please fix the errors and try to submit again');
+      return;
+    }
+
     // This should never happen as 'Create' button is disabled until
     // the settings are received
-    if(!contracts) return;
+    if (!contracts) return;
 
+    const values = form.getFieldsValue() as any;
     console.log('Submitted values: ', values);
+
     setCreatingToken(true);
-    const hideMessage = message.loading('Creating a new non-fungible token on blockchain...', 0);
-    
+    const hideMessage = message.loading(
+      'Creating a new non-fungible token on blockchain...',
+      0
+    );
+
     try {
       const nft = await contracts.nft();
-      
-      await nft.createToken({
+      const contract = await nft.contractByAddress(values.contract);
+
+      await contract.createToken({
         ...values,
         description: values.description || ''
       });
-      
+
       setTimeout(onFinish, 0);
     } catch (error) {
-      message.error(error.message, 10) // Keep for 10 seconds
+      message.error(error.message, 10); // Keep for 10 seconds
     } finally {
-      setCreatingToken(false)
+      setCreatingToken(false);
       hideMessage();
     }
   };
 
   useEffect(() => {
-      form.setFieldsValue({ ipfsCid: ipfsContent?.cid });
-    }, 
-    [ipfsContent, form]
-  );
+    form.setFieldsValue({ ipfsCid: ipfsContent?.cid });
+  }, [ipfsContent, form]);
 
   return (
-    <Form 
-      form={form}
-      onFinish={handleFinish}
-      layout="vertical" 
-      css={{ width: '30em' }}
-    >
+    <Form form={form} layout="vertical" css={{ marginTop: '2em' }}>
       <fieldset disabled={creatingToken}>
-        <Form.Item 
-          label="Name" 
-          name="name"
-          rules={[{ required: true, message: 'Please input a name!' }]}
-        >
-          <Input placeholder="Tezos Logo Token" />
-        </Form.Item>
-        <Form.Item label="Description" name="description">
-          <Input.TextArea
-            placeholder="Lorem ipsum"
-            autoSize={{ minRows: 3, maxRows: 6 }}
-          />
-        </Form.Item>
-        <Form.Item 
-          label="Symbol" 
-          name="symbol"
-          rules={[{ required: true, message: 'Please input a symbol!' }]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item label="Image Upload" name="image">
-          <ImageIpfsUpload onChange={onChange} />
-        </Form.Item>
-        <Form.Item 
-          label="IPFS Hash (CID)" 
-          name="ipfsCid"
-          rules={[{ required: true, message: 'Please upload an image!' }]}
-        >
-          <Input readOnly />
-        </Form.Item>
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={creatingToken}
-            disabled={!contracts}
-            shape="round"
-            size="large"
-            css={{ width: '12em' }}
-          >
-            Create
-          </Button>
-        </Form.Item>
+        <Row>
+          <Col span={10}>
+            <LeftSide onChange={setIpfsContent} />
+          </Col>
+          <Col offset={2} span={10}>
+            <RightSide ipfsContent={ipfsContent} form={form} />
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <Form.Item>
+              <Button
+                onClick={handleCreateToken}
+                type="primary"
+                loading={creatingToken}
+                disabled={!contracts}
+                shape="round"
+                size="large"
+                css={{ width: '12em' }}
+              >
+                Create
+              </Button>
+            </Form.Item>
+          </Col>
+        </Row>
       </fieldset>
     </Form>
   );

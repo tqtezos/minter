@@ -1,11 +1,11 @@
 import { TezosToolkit } from '@taquito/taquito';
 
-import mkNftContract from './nftContract';
-import mkNftFactoryContract from './nftFactoryContract';
 import { SettingsContracts } from '../generated/graphql_schema';
+import mkNftFactoryContract from './nftFactoryContract';
+import mkNftContractApi from './nftContractApi';
 
 const mkContracts = (tzToolkit: TezosToolkit, settings: SettingsContracts) => ({
-  nft: () => mkNftContract(tzToolkit, settings.nftFaucet),
+  nft: () => mkNftContractApi(tzToolkit, settings),
   nftFactory: () => mkNftFactoryContract(tzToolkit, settings.nftFactory)
 });
 
