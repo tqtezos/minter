@@ -51,12 +51,18 @@ const AssetCard: FC<NonFungibleToken> = ({
   extras
 }) => {
   const [transferVisible, setTransferVisible] = useState(false);
+  
+  const handleOk = (values: any) => {
+    setTransferVisible(false);
+    console.log('Success:', values);
+  };
 
   return (
     <Fragment>
       <AssetTransfer
         visible={transferVisible}
         onCancel={() => setTransferVisible(false)}
+        onOk={handleOk}
       />
       <Card>
         <Row align="top" gutter={[8, 8]}>
