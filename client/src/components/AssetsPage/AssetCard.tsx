@@ -2,13 +2,14 @@
 import { FC } from 'react';
 import { jsx } from '@emotion/core';
 import styled from '@emotion/styled';
-import { Row, Col } from 'antd';
+import { Row, Col, Typography, Button } from 'antd';
 
+import { NonFungibleToken } from '../../generated/graphql_schema';
 import { urlFromCid } from '../../api/ipfsUploader';
 
 const Card = styled.div({
-  width: '20em',
-  height: '10em',
+  width: '22em',
+  height: '11em',
   border: '1px solid #E8E8E8',
   padding: '1em'
 });
@@ -23,40 +24,81 @@ const Header = styled.div({
   fontWeight: 300,
   fontSize: '18px',
   lineHeight: '100%',
-  letterSpacing: '-0.02em',
+  letterSpacing: '-0.02em'
 });
 
-const Body = styled.div({
-  fontFamily: 'sans-serif',
-  fontWeight: 500,
-  fontSize: '12px',
-  letterSpacing: '-0.02em',
-  color: '#838393'
-});
-  
+const Body: FC = ({ children }) => (
+  <Typography.Text
+    type="secondary"
+    ellipsis
+    css={{
+      fontWeight: 500,
+      fontSize: '12px',
+      letterSpacing: '-0.02em',
+      width: '17em'
+    }}
+  >
+    {children}
+  </Typography.Text>
+);
+
 interface AssetCardProps {
+  contractAddress: string;
   tokenId: string;
   symbol: string;
   name: string;
   ipfsCid: string;
 }
 
-const rowGutter: [number, number] = [8, 8];
+const rowGutter: [number, number] = [8, 0];
 
-const AssetCard: FC<AssetCardProps> = ({tokenId, symbol, name, ipfsCid}) => (
+const AssetCard: FC<NonFungibleToken> = ({
+  contractInfo,
+  tokenId,
+  symbol,
+  name,
+  extras
+}) => (
   <Card>
-    <Row gutter={rowGutter} align="middle">
-      <Col span={8}>
-        <Image src={urlFromCid(ipfsCid)} alt="token" />
+    <Row align="top" gutter={[8, 8]}>
+      <Col span={6}>
+        <Image src={urlFromCid(extras.ipfs_cid)} alt="token" />
       </Col>
-      <Col span={8}><Header>{name}</Header></Col>
-      <Col span={8}><Header>{symbol}</Header></Col>
+      <Col span={18}>
+        <Row gutter={[8, 16]}>
+          <Col>
+            <Header>{name}</Header>
+          </Col>
+          <Col>
+            <Header>{symbol}</Header>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Body>
+              Contract: {contractInfo.name} - {contractInfo.address}
+            </Body>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Body>IPFS: {extras.ipfs_cid}</Body>
+          </Col>
+        </Row>
+        <Row gutter={rowGutter}>
+          <Col>
+            <Body>Token ID: {tokenId}</Body>
+          </Col>
+        </Row>
+      </Col>
     </Row>
-    <Row gutter={rowGutter}>
-      <Col offset={8}><Body>Token ID: {tokenId}</Body></Col>
-    </Row>
-    <Row gutter={rowGutter}>
-      <Col offset={8}><Body>Number of Holders: 1</Body></Col>
+    <Row gutter={[8, 200]}>
+      <Col span={12} css={{ textAlign: 'center' }}>
+        <Button type="link">TRANSFER</Button>
+      </Col>
+      <Col span={12} css={{ textAlign: 'center' }}>
+        <Button type="link">DETAILS</Button>
+      </Col>
     </Row>
   </Card>
 );

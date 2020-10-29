@@ -25,13 +25,8 @@ const AssetCards: FC<{ data: NonFungibleToken[] }> = ({ data }) => (
   <Row gutter={[24, 24]}>
     <Zoom cascade triggerOnce damping={0.1} duration={300} fraction={0.01}>
       {data.map(t => (
-        <Col key={t.token_id}>
-          <AssetCard
-            tokenId={t.token_id}
-            symbol={t.symbol}
-            name={t.name}
-            ipfsCid={t.extras.ipfs_cid}
-          />
+        <Col key={`${t.contractInfo.address}:${t.tokenId}`}>
+          <AssetCard {...t} />
         </Col>
       ))}
     </Zoom>
