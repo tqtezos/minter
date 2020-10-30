@@ -10,20 +10,21 @@ interface CreateTokenArgs {
   ipfsCid: string;
 }
 
+interface TransferTokenArgs {
+  to: Address;
+  tokenId: BigNumber;
+}
+
 export interface NftContract {
   createToken(args: CreateTokenArgs): Promise<void>;
+  transferToken(args: TransferTokenArgs): Promise<void>;
 }
 
 const mkNftContract = async (
   contract: WalletContract,
   ownerAddress: Address
 ): Promise<NftContract> => ({
-  async createToken({
-    symbol,
-    name,
-    description,
-    ipfsCid
-  }: CreateTokenArgs): Promise<void> {
+  async createToken({ symbol, name, description, ipfsCid }) {
     const tokenId = await retrieveStorageField<Nat>(contract, 'next_token_id');
 
     const params = [
@@ -40,6 +41,18 @@ const mkNftContract = async (
     ];
 
     const operation = await contract.methods.mint(params).send();
+    await operation.confirmation();
+  },
+
+  async transferToken({ to, tokenId }) {
+    const params = [
+      {
+        from_: ownerAddress,
+        txs: [{ to_: to, token_id: tokenId, amount: new BigNumber(1) }]
+      }
+    ];
+
+    const operation = await contract.methods.transfer(params).send();
     await operation.confirmation();
   }
 });

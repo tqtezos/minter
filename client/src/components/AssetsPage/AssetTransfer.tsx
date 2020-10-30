@@ -23,7 +23,7 @@ const AssetTransfer: FC<Props> = ({ visible, onCancel, onOk }) => {
       </Paragraph>
       <Form layout="vertical" onFinish={onOk}>
         <Form.Item
-          name="account"
+          name="address"
           label="Account"
           css={{ marginTop: '3em' }}
           rules={[keyHashValidator]}

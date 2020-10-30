@@ -3,10 +3,12 @@ import { FC, Fragment, useState } from 'react';
 import { jsx } from '@emotion/core';
 import styled from '@emotion/styled';
 import { Row, Col, Typography, Button } from 'antd';
+import { BigNumber } from 'bignumber.js';
 
 import { NonFungibleToken } from '../../generated/graphql_schema';
 import { urlFromCid } from '../../api/ipfsUploader';
 import AssetTransfer from './AssetTransfer';
+import { useContracts } from '../App/globalContext';
 
 const Card = styled.div({
   width: '22em',
@@ -51,10 +53,19 @@ const AssetCard: FC<NonFungibleToken> = ({
   extras
 }) => {
   const [transferVisible, setTransferVisible] = useState(false);
-  
-  const handleOk = (values: any) => {
+  const contracts = useContracts();
+
+  const handleOk = async (values: { address: string }) => {
     setTransferVisible(false);
-    console.log('Success:', values);
+    console.log('Submitted address:', values.address);
+    if (!contracts) return;
+
+    const nft = await contracts.nft();
+    const contract = await nft.contractByAddress(contractInfo.address);
+    await contract.transferToken({
+      to: values.address,
+      tokenId: new BigNumber(tokenId)
+    });
   };
 
   return (
