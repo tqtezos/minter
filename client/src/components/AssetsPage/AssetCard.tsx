@@ -2,7 +2,7 @@
 import { FC, Fragment, useState } from 'react';
 import { jsx } from '@emotion/core';
 import styled from '@emotion/styled';
-import { Row, Col, Typography, Button } from 'antd';
+import { Row, Col, Typography, Button, message } from 'antd';
 import { BigNumber } from 'bignumber.js';
 
 import Copyable from '../common/Copyable';
@@ -47,28 +47,57 @@ const Body: FC = ({ children }) => (
   </Typography.Text>
 );
 
-const AssetCard: FC<NonFungibleToken> = ({
-  contractInfo,
-  tokenId,
-  symbol,
-  name,
-  extras
-}) => {
+interface Props {
+  token: NonFungibleToken;
+  onChange: () => void;
+}
+
+const AssetCard: FC<Props> = ({ token, onChange }) => {
   const [transferVisible, setTransferVisible] = useState(false);
   const contracts = useContracts();
   const { settings } = useSettings();
 
+  const handleTransfer = () => {
+    if (!contracts) {
+      setTransferVisible(false);
+      message.error(
+        'Please connect to your wallet first in order to do transfers!'
+      );
+    } else {
+      setTransferVisible(true);
+    }
+  };
+
   const handleOk = async (values: { address: string }) => {
     setTransferVisible(false);
     console.log('Submitted address:', values.address);
-    if (!contracts) return;
 
-    const nft = await contracts.nft();
-    const contract = await nft.contractByAddress(contractInfo.address);
-    await contract.transferToken({
-      to: values.address,
-      tokenId: new BigNumber(tokenId)
-    });
+    if (!contracts) {
+      message.error(
+        'Please connect to your wallet first in order to do transfers!'
+      );
+      return;
+    }
+
+    const hideMessage = message.loading(
+      `Transfering token ${token.tokenId} to ${values.address}`,
+      0
+    );
+
+    try {
+      const nft = await contracts.nft();
+      const contract = await nft.contractByAddress(token.contractInfo.address);
+      await contract.transferToken({
+        to: values.address,
+        tokenId: new BigNumber(token.tokenId)
+      });
+      
+      setTimeout(onChange, 0)
+    } catch (error) {
+      message.error(error.message, 10); // Keep for 10 seconds
+    } finally {
+      hideMessage();
+    }
   };
 
   return (
@@ -81,47 +110,47 @@ const AssetCard: FC<NonFungibleToken> = ({
       <Card>
         <Row align="top" gutter={[8, 8]}>
           <Col span={6}>
-            <Image src={urlFromCid(extras.ipfs_cid)} alt="token" />
+            <Image src={urlFromCid(token.extras.ipfs_cid)} alt="token" />
           </Col>
           <Col span={18}>
             <Row gutter={[8, 16]}>
               <Col>
-                <Header>{name}</Header>
+                <Header>{token.name}</Header>
               </Col>
               <Col>
-                <Header>{symbol}</Header>
+                <Header>{token.symbol}</Header>
               </Col>
             </Row>
             <Row>
               <Col>
                 <Body>
-                  Contract: {contractInfo.name} - {contractInfo.address}
+                  Contract: {token.contractInfo.name} - {token.contractInfo.address}
                 </Body>
-                <Copyable text={contractInfo.address} />
+                <Copyable text={token.contractInfo.address} />
               </Col>
             </Row>
             <Row>
               <Col>
-                <Body>IPFS: {extras.ipfs_cid}</Body>
-                <Copyable text={extras.ipfs_cid} />
+                <Body>IPFS: {token.extras.ipfs_cid}</Body>
+                <Copyable text={token.extras.ipfs_cid} />
               </Col>
             </Row>
             <Row>
               <Col>
-                <Body>Token ID: {tokenId}</Body>
+                <Body>Token ID: {token.tokenId}</Body>
               </Col>
             </Row>
           </Col>
         </Row>
         <Row gutter={[8, 8]}>
           <Col span={12} css={{ textAlign: 'center' }}>
-            <Button type="link" onClick={() => setTransferVisible(true)}>
+            <Button type="link" onClick={handleTransfer}>
               TRANSFER
             </Button>
           </Col>
           <Col span={12} css={{ textAlign: 'center' }}>
             <Typography.Link
-              href={`${settings?.tzStatsUrl}/${contractInfo.address}`}
+              href={`${settings?.tzStatsUrl}/${token.contractInfo.address}`}
               target="_blank"
             >
               DETAILS
