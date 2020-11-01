@@ -10,6 +10,7 @@ import { NonFungibleToken } from '../../generated/graphql_schema';
 import { urlFromCid } from '../../api/ipfsUploader';
 import AssetTransfer from './AssetTransfer';
 import { useContracts } from '../App/globalContext';
+import useSettings from '../common/useSettings';
 
 const Card = styled.div({
   width: '22em',
@@ -55,6 +56,7 @@ const AssetCard: FC<NonFungibleToken> = ({
 }) => {
   const [transferVisible, setTransferVisible] = useState(false);
   const contracts = useContracts();
+  const { settings } = useSettings();
 
   const handleOk = async (values: { address: string }) => {
     setTransferVisible(false);
@@ -118,7 +120,12 @@ const AssetCard: FC<NonFungibleToken> = ({
             </Button>
           </Col>
           <Col span={12} css={{ textAlign: 'center' }}>
-            <Button type="link">DETAILS</Button>
+            <Typography.Link
+              href={`${settings?.tzStatsUrl}/${contractInfo.address}`}
+              target="_blank"
+            >
+              DETAILS
+            </Typography.Link>
           </Col>
         </Row>
       </Card>
