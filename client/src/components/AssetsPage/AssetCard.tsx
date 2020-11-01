@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 import { Row, Col, Typography, Button } from 'antd';
 import { BigNumber } from 'bignumber.js';
 
+import Copyable from '../common/Copyable';
 import { NonFungibleToken } from '../../generated/graphql_schema';
 import { urlFromCid } from '../../api/ipfsUploader';
 import AssetTransfer from './AssetTransfer';
@@ -38,7 +39,7 @@ const Body: FC = ({ children }) => (
       fontWeight: 500,
       fontSize: '12px',
       letterSpacing: '-0.02em',
-      width: '17em'
+      width: '15em'
     }}
   >
     {children}
@@ -94,11 +95,13 @@ const AssetCard: FC<NonFungibleToken> = ({
                 <Body>
                   Contract: {contractInfo.name} - {contractInfo.address}
                 </Body>
+                <Copyable text={contractInfo.address} />
               </Col>
             </Row>
             <Row>
               <Col>
                 <Body>IPFS: {extras.ipfs_cid}</Body>
+                <Copyable text={extras.ipfs_cid} />
               </Col>
             </Row>
             <Row>
@@ -108,7 +111,7 @@ const AssetCard: FC<NonFungibleToken> = ({
             </Row>
           </Col>
         </Row>
-        <Row gutter={[8, 200]}>
+        <Row gutter={[8, 8]}>
           <Col span={12} css={{ textAlign: 'center' }}>
             <Button type="link" onClick={() => setTransferVisible(true)}>
               TRANSFER
