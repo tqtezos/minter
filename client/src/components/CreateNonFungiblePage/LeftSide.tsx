@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { ChangeEvent, FC, Fragment } from 'react';
+import { FC, Fragment } from 'react';
 import { jsx } from '@emotion/core';
 import { Form, Input, Row, Col } from 'antd';
 
