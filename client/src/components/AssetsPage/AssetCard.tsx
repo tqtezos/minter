@@ -14,7 +14,7 @@ import useSettings from '../common/useSettings';
 
 const Card = styled.div({
   width: '22em',
-  height: '11em',
+  height: '12em',
   border: '1px solid #E8E8E8',
   padding: '1em'
 });
@@ -24,13 +24,28 @@ const Image = styled.img({
   maxHeight: '4em'
 });
 
-const Header = styled.div({
-  fontFamily: 'sans-serif',
-  fontWeight: 300,
-  fontSize: '18px',
-  lineHeight: '100%',
-  letterSpacing: '-0.02em'
-});
+// const Header = styled.div({
+//   fontFamily: 'sans-serif',
+//   fontWeight: 300,
+//   fontSize: '18px',
+//   lineHeight: '100%',
+//   letterSpacing: '-0.02em'
+// });
+
+const Header: FC = ({ children }) => (
+  <Typography.Paragraph
+    ellipsis={{ rows: 2 }}
+    css={{
+      fontWeight: 300,
+      fontSize: '18px',
+      letterSpacing: '-0.02em',
+      lineHeight: '100%'
+      // width: '15em'
+    }}
+  >
+    {children}
+  </Typography.Paragraph>
+);
 
 const Body: FC = ({ children }) => (
   <Typography.Text
@@ -91,8 +106,8 @@ const AssetCard: FC<Props> = ({ token, onChange }) => {
         to: values.address,
         tokenId: new BigNumber(token.tokenId)
       });
-      
-      setTimeout(onChange, 0)
+
+      setTimeout(onChange, 0);
     } catch (error) {
       message.error(error.message, 10); // Keep for 10 seconds
     } finally {
@@ -113,11 +128,11 @@ const AssetCard: FC<Props> = ({ token, onChange }) => {
             <Image src={urlFromCid(token.extras.ipfs_cid)} alt="token" />
           </Col>
           <Col span={18}>
-            <Row gutter={[8, 16]}>
-              <Col>
+            <Row gutter={[8, 16]} css={{ height: '3.5em' }}>
+              <Col span={15}>
                 <Header>{token.name}</Header>
               </Col>
-              <Col>
+              <Col span={9}>
                 <Header>{token.symbol}</Header>
               </Col>
             </Row>
@@ -148,8 +163,9 @@ const AssetCard: FC<Props> = ({ token, onChange }) => {
               TRANSFER
             </Button>
           </Col>
-          <Col span={12} css={{ textAlign: 'center' }}>
+          <Col span={12} css={{ display: 'flex', alignItems: 'center' }}>
             <Typography.Link
+              css={{ margin: 'auto' }}
               href={`${settings?.tzStatsUrl}/${token.contractInfo.address}`}
               target="_blank"
             >
