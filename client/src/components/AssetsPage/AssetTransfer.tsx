@@ -23,7 +23,7 @@ const AssetTransfer: FC<Props> = ({ visible, onCancel, onOk }) => {
       address !== walletAddress
         ? Promise.resolve()
         : Promise.reject(
-            'You cannot send token to yourself! Please enter a different address'
+            'You cannot send tokens to yourself! Please enter a different address.'
           )
   });
 
