@@ -2,8 +2,8 @@ import { Resolvers, QueryResolvers } from '../../generated/graphql_schema';
 import { Context } from '../../components/context';
 import PublishedOperation from '../../models/published_operation';
 import axios from 'axios';
-import { contractNames } from './contractNames';
-import { nfts } from './nfts';
+import { contractNames, contractNamesBcd } from './contractNames';
+import { nfts, nftsBcd } from './nfts';
 
 async function getTzStats(ctx: Context, resource: string) {
   const response = await axios.get(`${ctx.tzStatsApiUrl}/${resource}`);
@@ -66,6 +66,14 @@ const Query: QueryResolvers = {
 
   async contractNames(_parent, { ownerAddress }, ctx) {
     return contractNames(ownerAddress, ctx);
+  },
+
+  async nftsBcd(_parent, { ownerAddress, contractAddress }, ctx) {
+    return nftsBcd(ownerAddress, contractAddress, ctx);
+  },
+
+  async contractNamesBcd(_parent, { ownerAddress }, ctx) {
+    return contractNamesBcd(ownerAddress, ctx);
   },
 
   settings(_parent, _args, { tzStatsUrl, configStore }) {

@@ -19,16 +19,16 @@ const RightSide: FC<Props> = ({ ipfsContent, form }) => {
   const contracts = useContracts();
   const ownerAddress = useWalletAddress();
   const { data, loading, refetch } = useContractNamesQuery(ownerAddress);
-  const contractNames = data?.contractNames;
+  const contractNames = data?.contractNamesBcd;
 
   useEffect(() => {
-    if (!contractNames)
-      form.setFieldsValue({ contract: undefined });
-    else if(contractNames.length === 1)
+    if (!contractNames) form.setFieldsValue({ contract: undefined });
+    else if (contractNames.length === 1)
       form.setFieldsValue({ contract: contractNames[0].address });
     else {
-      const contractAddress = form.getFieldValue('contract')
-      if(!contractNames.find(c => c.address === contractAddress)) form.setFieldsValue({ contract: undefined });
+      const contractAddress = form.getFieldValue('contract');
+      if (!contractNames.find(c => c.address === contractAddress))
+        form.setFieldsValue({ contract: undefined });
     }
   }, [contractNames, form]);
 
@@ -72,7 +72,7 @@ const RightSide: FC<Props> = ({ ipfsContent, form }) => {
         rules={[{ required: true, message: 'Please select a contract!' }]}
       >
         <Select loading={loading} placeholder="Select a contract">
-          {data?.contractNames.map(c => (
+          {data?.contractNamesBcd.map(c => (
             <Option key={c.address} value={c.address}>
               {c.name} - {c.address}
             </Option>

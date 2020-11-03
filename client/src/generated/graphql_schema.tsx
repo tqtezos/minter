@@ -72,6 +72,8 @@ export type Query = {
   __typename?: 'Query';
   nfts: Array<NonFungibleToken>;
   contractNames: Array<ContractInfo>;
+  nftsBcd: Array<NonFungibleToken>;
+  contractNamesBcd: Array<ContractInfo>;
   nftByTokenId?: Maybe<NonFungibleToken>;
   nftByOperation?: Maybe<NonFungibleToken>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
@@ -84,6 +86,15 @@ export type QueryNftsArgs = {
 };
 
 export type QueryContractNamesArgs = {
+  ownerAddress?: Maybe<Scalars['String']>;
+};
+
+export type QueryNftsBcdArgs = {
+  ownerAddress?: Maybe<Scalars['String']>;
+  contractAddress?: Maybe<Scalars['String']>;
+};
+
+export type QueryContractNamesBcdArgs = {
   ownerAddress?: Maybe<Scalars['String']>;
 };
 

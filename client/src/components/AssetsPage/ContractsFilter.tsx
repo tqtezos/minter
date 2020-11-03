@@ -18,7 +18,7 @@ const ContractsFilter: FC<Props> = ({ address, onChange }) => {
 
   const handleOnChange = (address: string) => {
     if (address === 'all') return onChange(undefined);
-    onChange(data?.contractNames.find(c => c.address === address));
+    onChange(data?.contractNamesBcd.find(c => c.address === address));
   };
 
   const selectedAddress = (c: ContractInfo[]) =>
@@ -30,15 +30,15 @@ const ContractsFilter: FC<Props> = ({ address, onChange }) => {
         {loading && <Skeleton.Input />}
         {data && (
           <Select
-            value={selectedAddress(data.contractNames)}
+            value={selectedAddress(data.contractNamesBcd)}
             onChange={handleOnChange}
           >
-            {data.contractNames.length > 1 && (
+            {data.contractNamesBcd.length > 1 && (
               <Option key="all" value="all">
                 All
               </Option>
             )}
-            {data.contractNames.map(c => (
+            {data.contractNamesBcd.map(c => (
               <Option key={c.address} value={c.address}>
                 {c.name} - {c.address}
               </Option>

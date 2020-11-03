@@ -1,12 +1,9 @@
 import { gql, useQuery } from '@apollo/client';
-import {
-  Query,
-  QueryContractNamesArgs
-} from '../../generated/graphql_schema';
+import { Query, QueryContractNamesArgs } from '../../generated/graphql_schema';
 
 const CONTRACTS = gql`
   query contractNames($ownerAddress: String) {
-    contractNames(ownerAddress: $ownerAddress) {
+    contractNamesBcd(ownerAddress: $ownerAddress) {
       address
       name
     }

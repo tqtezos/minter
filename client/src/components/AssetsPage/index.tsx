@@ -67,7 +67,7 @@ const AssetsPage: FC = () => {
       </Row>
       <Row css={{ marginTop: '2em' }}>
         <Col offset={3} span={18} css={{ height: '100%' }}>
-          {data && !loading ? <AssetCards data={data.nfts} /> : <Spinner />}
+          {data && !loading ? <AssetCards data={data.nftsBcd} /> : <Spinner />}
         </Col>
       </Row>
     </Page>
