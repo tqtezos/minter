@@ -21,17 +21,17 @@ const Spinner = () => (
   </div>
 );
 
-const AssetCards: FC<{ data: NonFungibleToken[] }> = ({ data }) => (
+interface AssetCardsProps {
+  data: NonFungibleToken[];
+  onChange: () => void;
+}
+
+const AssetCards: FC<AssetCardsProps> = ({ data, onChange }) => (
   <Row gutter={[24, 24]}>
     <Zoom cascade triggerOnce damping={0.1} duration={300} fraction={0.01}>
       {data.map(t => (
-        <Col key={t.token_id}>
-          <AssetCard
-            tokenId={t.token_id}
-            symbol={t.symbol}
-            name={t.name}
-            ipfsCid={t.extras.ipfs_cid}
-          />
+        <Col key={`${t.contractInfo.address}:${t.tokenId}`}>
+          <AssetCard token={t} onChange={onChange} />
         </Col>
       ))}
     </Zoom>
@@ -41,7 +41,7 @@ const AssetCards: FC<{ data: NonFungibleToken[] }> = ({ data }) => (
 const AssetsPage: FC = () => {
   const [, setLocation] = useLocation();
   const [contractInfo, setContractInfo] = useState<ContractInfo>();
-  const { data, loading } = useNftsQuery(contractInfo?.address);
+  const { data, loading, refetch } = useNftsQuery(contractInfo?.address);
 
   return (
     <Page>
@@ -67,7 +67,11 @@ const AssetsPage: FC = () => {
       </Row>
       <Row css={{ marginTop: '2em' }}>
         <Col offset={3} span={18} css={{ height: '100%' }}>
-          {data && !loading ? <AssetCards data={data.nfts} /> : <Spinner />}
+          {data && !loading ? (
+            <AssetCards data={data.nfts} onChange={refetch} />
+          ) : (
+            <Spinner />
+          )}
         </Col>
       </Row>
     </Page>
