@@ -2,6 +2,8 @@
 import { FC, Fragment } from 'react';
 import { jsx } from '@emotion/core';
 import styled from '@emotion/styled';
+import { Typography } from 'antd';
+
 import { ContractInfo } from '../../generated/graphql_schema';
 
 const SubTitle = styled.span({
@@ -16,20 +18,18 @@ const SubTitle = styled.span({
 
 const SelectedContractTitle: FC<{ contract?: ContractInfo }> = ({
   contract
-}) => {
-  return (
-    <Fragment>
-      {contract ? (
-        <span>
-          <SubTitle>{contract.name}</SubTitle>
-          &nbsp; &nbsp;
-          <span>{contract.address}</span>
-        </span>
-      ) : (
-        <SubTitle>All Assets</SubTitle>
-      )}
-    </Fragment>
-  );
-};
+}) => (
+  <Fragment>
+    {contract ? (
+      <span>
+        <SubTitle>{contract.name}</SubTitle>
+        &nbsp; &nbsp;
+        <Typography.Text copyable>{contract.address}</Typography.Text>
+      </span>
+    ) : (
+      <SubTitle>All Assets</SubTitle>
+    )}
+  </Fragment>
+);
 
 export default SelectedContractTitle;
