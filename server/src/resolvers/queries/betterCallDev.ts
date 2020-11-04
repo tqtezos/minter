@@ -34,23 +34,36 @@ export const BigMap = <T>(baseUrl: string, network: string, id: number) => ({
   }
 });
 
+function extractBigMapIds(storage: any): number[] {
+  if (storage.type === 'big_map') {
+    return [storage.value];
+  }
+  if (storage.children && storage.children[1]?.type === 'namedtuple') {
+    return storage.children[1].children
+      .filter((v: any) => v.type === 'big_map')
+      .map((v: any) => v.value);
+  }
+  if (storage.children) {
+    return storage.children
+      .filter((v: any) => v.type === 'big_map')
+      .map((v: any) => v.value);
+  }
+  return [];
+}
+
 export async function contractByAddress(
   baseUrl: string,
   network: string,
   address: string
 ): Promise<Contract> {
   const contractUrl = `${baseUrl}/v1/contract/${network}/${address}`;
-  const { manager } = (await axios.get(contractUrl)).data;
-  const { children } = (await axios.get(`${contractUrl}/storage`)).data;
+  const contract = (await axios.get(contractUrl)).data;
+  const storage = (await axios.get(`${contractUrl}/storage`)).data;
 
   return {
     address,
-    manager,
-    bigmap_ids: children
-      ? children
-          .filter((v: any) => v.type === 'big_map')
-          .map((v: any) => v.value)
-      : []
+    manager: contract.manager,
+    bigmap_ids: extractBigMapIds(storage)
   };
 }
 

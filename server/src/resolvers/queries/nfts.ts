@@ -89,14 +89,13 @@ export const nfts = async (
   const contracts = await contractNames(null, ctx);
 
   if (!_.isNil(contractAddress)) {
-    const contractInfo = contracts.find(c => c.address === contractAddress)
-    if (!contractInfo) throw Error(`Cannot find contract address: ${contractAddress}`)
+    const contractInfo = contracts.find(c => c.address === contractAddress);
+    if (!contractInfo)
+      throw Error(`Cannot find contract address: ${contractAddress}`);
     return nftsByContract(tzStats, contractInfo, ownerAddress);
   }
 
-  const contracts = await contractNames(null, ctx);
-
-  const promises = contracts.map((contractInfo) =>
+  const promises = contracts.map(contractInfo =>
     nftsByContract(tzStats, contractInfo, ownerAddress)
   );
 
@@ -106,15 +105,19 @@ export const nfts = async (
 
 const nftsByContractAddressBcd = async (
   betterCallDev: BetterCallDev,
-  contractAddress: string,
+  contractInfo: ContractInfo,
   ownerAddress: string | null | undefined
 ): Promise<NonFungibleToken[]> => {
-  const contract = await betterCallDev.contractByAddress(contractAddress);
+  const contract = await betterCallDev.contractByAddress(contractInfo.address);
 
   const [ledgerId, , tokenMetadataId] = _(contract.bigmap_ids)
     .uniq()
     .sort()
     .value();
+
+  if (contract.bigmap_ids.length === 0) {
+    return [];
+  }
 
   const tokenBigMap = betterCallDev.bigMapById<NftBigMapValue>(tokenMetadataId);
   const tokenItems = await tokenBigMap.values();
@@ -127,16 +130,23 @@ const nftsByContractAddressBcd = async (
     .mapValues(v => v.value)
     .value();
 
-  console.log(tokenItems);
-
   const nfts = tokenItems.map(i => ({
     ...(i.value as Nft),
     owner: ownerByTokenId[i.key]
   }));
 
+  const transformedNfts = nfts.map(nft => ({
+    contractInfo: contractInfo,
+    tokenId: nft.token_id,
+    symbol: nft.symbol,
+    name: nft.name,
+    extras: nft.extras,
+    owner: nft.owner
+  }));
+
   return _.isNil(ownerAddress)
-    ? nfts
-    : nfts.filter(i => i.owner === ownerAddress);
+    ? transformedNfts
+    : transformedNfts.filter(i => i.owner === ownerAddress);
 };
 
 export const nftsBcd = async (
@@ -146,24 +156,18 @@ export const nftsBcd = async (
 ): Promise<NonFungibleToken[]> => {
   const betterCallDev = mkBetterCallDev('http://bcdapi:14000', 'sandboxnet');
 
-  if (!_.isNil(contractAddress))
-    return nftsByContractAddressBcd(
-      betterCallDev,
-      contractAddress || '',
-      ownerAddress
-    );
-
   const contracts = await contractNames(null, ctx);
 
-  const promises = contracts.map(({ address }) =>
-    nftsByContractAddressBcd(betterCallDev, address, ownerAddress)
-  );
+  if (!_.isNil(contractAddress)) {
+    const contractInfo = contracts.find(c => c.address === contractAddress);
+    if (!contractInfo)
+      throw Error(`Cannot find contract address: ${contractAddress}`);
+    return nftsByContractAddressBcd(betterCallDev, contractInfo, ownerAddress);
+  }
 
-  const promises = contracts.map((contractInfo) =>
-    nftsByContract(tzStats, contractInfo, ownerAddress)
-  );
-
+  const promises = contracts.map(contractInfo => {
+    return nftsByContractAddressBcd(betterCallDev, contractInfo, ownerAddress);
+  });
   const nftArrays = await Promise.all(promises);
-  console.log(nftArrays);
   return _.flatten(nftArrays);
 };
