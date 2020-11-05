@@ -4,6 +4,7 @@ import { jsx } from '@emotion/core';
 import { Select, Skeleton, Form } from 'antd';
 
 import { useContractNamesQuery } from '../common/useContractNamesQuery';
+import { useWalletAddress } from '../App/globalContext';
 import { ContractInfo } from '../../generated/graphql_schema';
 
 const { Option } = Select;
@@ -14,7 +15,8 @@ interface Props {
 }
 
 const ContractsFilter: FC<Props> = ({ address, onChange }) => {
-  const { data, loading } = useContractNamesQuery();
+  const walletAddress = useWalletAddress();
+  const { data, loading } = useContractNamesQuery(undefined, walletAddress);
 
   const handleOnChange = (address: string) => {
     if (address === 'all') return onChange(undefined);
