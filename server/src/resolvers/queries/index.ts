@@ -70,8 +70,8 @@ const Query: QueryResolvers = {
     return nfts(ownerAddress, contractAddress, ctx);
   },
 
-  async contractNames(_parent, { ownerAddress }, ctx) {
-    return contractNames(ownerAddress, ctx);
+  async contractNames(_parent, { contractOwnerAddress, nftOwnerAddress }, ctx) {
+    return contractNames(contractOwnerAddress, nftOwnerAddress, ctx);
   },
 
   settings(_parent, _args, { tzStatsUrl, configStore }) {
