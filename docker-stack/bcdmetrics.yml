@@ -17,8 +17,6 @@ services:
       - elastic
       - mq
       - db
-    # extra_hosts:
-    #   sandbox: 172.17.0.1
     logging:
       options:
         max-size: 10m

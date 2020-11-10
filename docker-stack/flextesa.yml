@@ -11,5 +11,3 @@ services:
       - ${FLEXTESA_DATA_DIR}:/tmp/mini-box
     ports:
       - ${TEZOS_RPC_PORT}:20000
-    # extra_hosts:
-    #   sandbox: 172.17.0.1
