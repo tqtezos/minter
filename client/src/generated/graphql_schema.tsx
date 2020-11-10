@@ -118,6 +118,8 @@ export type Settings = {
   rpc: Scalars['String'];
   admin: SettingsAdmin;
   contracts: SettingsContracts;
+  bcdGuiUrl: Scalars['String'];
+  bcdNetwork: Scalars['String'];
 };
 
 export type SettingsAdmin = {

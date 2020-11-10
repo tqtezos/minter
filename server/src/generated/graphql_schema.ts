@@ -127,6 +127,8 @@ export type Settings = {
   rpc: Scalars['String'];
   admin: SettingsAdmin;
   contracts: SettingsContracts;
+  bcdGuiUrl: Scalars['String'];
+  bcdNetwork: Scalars['String'];
 };
 
 export type SettingsAdmin = {
@@ -446,6 +448,8 @@ export type SettingsResolvers<
     ParentType,
     ContextType
   >;
+  bcdGuiUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  bcdNetwork?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 

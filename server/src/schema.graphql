@@ -38,6 +38,7 @@ type Settings {
   admin: SettingsAdmin!
   contracts: SettingsContracts!
   bcdGuiUrl: String!
+  bcdNetwork: String!
 }
 
 type ContractInfo {
