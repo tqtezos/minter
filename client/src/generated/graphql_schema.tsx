@@ -114,7 +114,6 @@ export type QueryPublishedOperationByHashArgs = {
 
 export type Settings = {
   __typename?: 'Settings';
-  tzStatsUrl: Scalars['String'];
   rpc: Scalars['String'];
   admin: SettingsAdmin;
   contracts: SettingsContracts;

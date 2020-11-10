@@ -123,7 +123,6 @@ export type QueryPublishedOperationByHashArgs = {
 
 export type Settings = {
   __typename?: 'Settings';
-  tzStatsUrl: Scalars['String'];
   rpc: Scalars['String'];
   admin: SettingsAdmin;
   contracts: SettingsContracts;
@@ -440,7 +439,6 @@ export type SettingsResolvers<
   ContextType = Context,
   ParentType extends ResolversParentTypes['Settings'] = ResolversParentTypes['Settings']
 > = ResolversObject<{
-  tzStatsUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   rpc?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   admin?: Resolver<ResolversTypes['SettingsAdmin'], ParentType, ContextType>;
   contracts?: Resolver<

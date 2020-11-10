@@ -9,7 +9,6 @@ const SETTINGS = gql`
   query Settings {
     settings {
       rpc
-      tzStatsUrl
       bcdGuiUrl
       bcdNetwork
       contracts {

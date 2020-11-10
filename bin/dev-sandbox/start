@@ -14,8 +14,3 @@ export CHAIN_ID=$(docker run --rm -it --network=${STACK_NAME}_default \
                          bashcurl bash -c "/bin/chain-id 2> /dev/null")
 
 echo "Chain id: " $CHAIN_ID
-
-docker stack deploy \
-       -c $DOCKER_STACK_DIR/tzindex.yml \
-       -c $DOCKER_STACK_DIR/tzstats.yml \
-       $STACK_NAME

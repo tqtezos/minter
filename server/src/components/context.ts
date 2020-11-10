@@ -24,8 +24,6 @@ export interface Context {
   bcdGuiUrl: string;
   bcdNetwork: string;
   tzRpcUrl: string;
-  tzStatsApiUrl: string;
-  tzStatsUrl: string;
   tzClient: TezosToolkit;
   configStore: Configstore;
 }
@@ -64,8 +62,6 @@ export default async function createContext(): Promise<Context> {
   const db = await connect();
   const pubsub = new PubSub();
   const tzRpcUrl = getEnv('TEZOS_RPC_URL');
-  const tzStatsApiUrl = `${getEnv('TZSTATS_API_URL')}/explorer`;
-  const tzStatsUrl = getEnv('TZSTATS_URL');
   const tzClient = await buildTzClient(tzRpcUrl);
   const bcdApiUrl = getEnv('BCD_API_URL');
   const bcdGuiUrl = getEnv('BCD_GUI_URL');
@@ -78,8 +74,6 @@ export default async function createContext(): Promise<Context> {
     bcdApiUrl,
     bcdGuiUrl,
     bcdNetwork,
-    tzStatsApiUrl,
-    tzStatsUrl,
     tzRpcUrl,
     tzClient,
     configStore

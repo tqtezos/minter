@@ -33,7 +33,6 @@ type SettingsAdmin {
 }
 
 type Settings {
-  tzStatsUrl: String!
   rpc: String!
   admin: SettingsAdmin!
   contracts: SettingsContracts!
