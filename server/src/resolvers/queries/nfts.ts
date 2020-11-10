@@ -4,7 +4,7 @@ import { mkTzStats, TzStats } from './tzStats';
 import { mkBetterCallDev, BetterCallDev } from './betterCallDev';
 import { Context } from '../../components/context';
 import { NonFungibleToken, ContractInfo } from '../../generated/graphql_schema';
-import { contractNames } from './contractNames';
+import { contractNames, contractNamesBcd } from './contractNames';
 
 interface BrokenNft {
   '0@nat': string;
@@ -156,7 +156,7 @@ export const nftsBcd = async (
 ): Promise<NonFungibleToken[]> => {
   const betterCallDev = mkBetterCallDev('http://bcdapi:14000', 'sandboxnet');
 
-  const contracts = await contractNames(null, ctx);
+  const contracts = await contractNamesBcd(null, null, ctx);
 
   if (!_.isNil(contractAddress)) {
     const contractInfo = contracts.find(c => c.address === contractAddress);

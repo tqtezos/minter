@@ -96,7 +96,8 @@ export type QueryNftsBcdArgs = {
 };
 
 export type QueryContractNamesBcdArgs = {
-  ownerAddress?: Maybe<Scalars['String']>;
+  contractOwnerAddress?: Maybe<Scalars['String']>;
+  nftOwnerAddress?: Maybe<Scalars['String']>;
 };
 
 export type QueryNftByTokenIdArgs = {

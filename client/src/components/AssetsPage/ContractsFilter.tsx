@@ -17,7 +17,7 @@ interface Props {
 const ContractsFilter: FC<Props> = ({ contract, onChange }) => {
   const walletAddress = useWalletAddress();
   const { data, loading } = useContractNamesQuery(undefined, walletAddress);
-  const contracts = data?.contractNames;
+  const contracts = data?.contractNamesBcd;
 
   const selectedValue = (contract?: ContractInfo) =>
     contract ? contract.address : 'all';

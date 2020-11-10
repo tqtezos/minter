@@ -40,10 +40,7 @@ const RightSide: FC<Props> = ({ ipfsContent, form }) => {
       return;
     }
 
-    const hideMessage = message.loading(
-      'Creating a new smart contract',
-      0
-    );
+    const hideMessage = message.loading('Creating a new smart contract', 0);
 
     try {
       const nft = await contracts!.nft();

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { mkTzStats, TzStats, Address } from './tzStats';
-import { mkBetterCallDev } from './betterCallDev';
+import { mkBetterCallDev, BetterCallDev } from './betterCallDev';
 import { Context } from '../../components/context';
 
 interface ContractBigMapValue {
@@ -26,6 +26,19 @@ const contractNftOwners = async (
   return values.map(v => v.value);
 };
 
+// TODO: Test implementation
+const contractNftOwnersBcd = async (
+  betterCallDev: BetterCallDev,
+  contractAddress: Address
+): Promise<Address[]> => {
+  const contract = await betterCallDev.contractByAddress(contractAddress);
+  const [ledgerId] = _(contract.bigmap_ids).uniq().sort().value();
+
+  const ledgerBigMap = betterCallDev.bigMapById<string>(ledgerId);
+  const values = await ledgerBigMap.values();
+  return values.map(v => v.value);
+};
+
 const filterContractsByNftOwner = async (
   tzStats: TzStats,
   contracts: Contract[],
@@ -34,6 +47,26 @@ const filterContractsByNftOwner = async (
   const PairPromises = contracts.map(
     async (c): Promise<[string, Set<string>]> => {
       const owners = await contractNftOwners(tzStats, c.address);
+      return [c.address, new Set(owners)];
+    }
+  );
+
+  const pairs = await Promise.all(PairPromises);
+  const contractToNftOwners = _.fromPairs(pairs);
+  return contracts.filter(c =>
+    contractToNftOwners[c.address].has(nftOwnerAddress)
+  );
+};
+
+// TODO: Test implementation
+const filterContractsByNftOwnerBcd = async (
+  betterCallDev: BetterCallDev,
+  contracts: Contract[],
+  nftOwnerAddress: Address
+) => {
+  const PairPromises = contracts.map(
+    async (c): Promise<[string, Set<string>]> => {
+      const owners = await contractNftOwnersBcd(betterCallDev, c.address);
       return [c.address, new Set(owners)];
     }
   );
@@ -80,7 +113,8 @@ export const contractNames = async (
 };
 
 export const contractNamesBcd = async (
-  ownerAddress: string | null | undefined,
+  contractOwnerAddress: string | null | undefined,
+  nftOwnerAddress: string | null | undefined,
   ctx: Context
 ): Promise<Contract[]> => {
   const factoryAddress = ctx.configStore.get('contracts.nftFactory') as string;
@@ -97,8 +131,8 @@ export const contractNamesBcd = async (
   const bigMap = betterCallDev.bigMapById<ContractBigMapValue>(bigMapId);
   const contracts = await bigMap.values();
 
-  const filterContracts = !_.isNil(ownerAddress)
-    ? contracts.filter(i => i.value.owner === ownerAddress)
+  const filterContracts = !_.isNil(contractOwnerAddress)
+    ? contracts.filter(i => i.value.owner === contractOwnerAddress)
     : contracts;
 
   const result = filterContracts.map(i => ({
@@ -106,5 +140,15 @@ export const contractNamesBcd = async (
     name: i.value.name
   }));
 
-  return [{ address: faucetAddress, name: 'Minter' }, ...result];
+  const allContracts = [{ address: faucetAddress, name: 'Minter' }, ...result];
+
+  // TODO: Implement filtering by NFT owner
+
+  if (_.isNil(nftOwnerAddress)) return allContracts;
+
+  return filterContractsByNftOwnerBcd(
+    betterCallDev,
+    allContracts,
+    nftOwnerAddress
+  );
 };

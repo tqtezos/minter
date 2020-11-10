@@ -58,7 +58,7 @@ type Query {
   contractNames(contractOwnerAddress: String, nftOwnerAddress: String): [ContractInfo!]!
 
   nftsBcd(ownerAddress: String, contractAddress: String): [NonFungibleToken!]!
-  contractNamesBcd(ownerAddress: String): [ContractInfo!]!
+  contractNamesBcd(contractOwnerAddress: String, nftOwnerAddress: String): [ContractInfo!]!
 
   nftByTokenId(token_id: String!): NonFungibleToken
   nftByOperation(operation_address: String!): NonFungibleToken

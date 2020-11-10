@@ -3,7 +3,7 @@ import { Query, QueryContractNamesArgs } from '../../generated/graphql_schema';
 
 const CONTRACTS = gql`
   query contractNames($contractOwnerAddress: String, $nftOwnerAddress: String) {
-    contractNames(
+    contractNamesBcd(
       contractOwnerAddress: $contractOwnerAddress
       nftOwnerAddress: $nftOwnerAddress
     ) {
