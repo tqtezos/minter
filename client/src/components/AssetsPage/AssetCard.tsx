@@ -119,7 +119,13 @@ const AssetCard: FC<Props> = ({ token, onChange }) => {
       <Card>
         <Row align="top" gutter={[8, 8]}>
           <Col span={6}>
-            <Image src={urlFromCid(token.extras.ipfs_cid)} alt="token" />
+            <Link
+              title={token.extras.ipfs_cid}
+              href={urlFromCid(token.extras.ipfs_cid)}
+              target="_blank"
+            >
+              <Image src={urlFromCid(token.extras.ipfs_cid)} alt="token" />
+            </Link>
           </Col>
           <Col span={18}>
             <Row gutter={[8, 16]} css={{ height: '3.5em' }}>
