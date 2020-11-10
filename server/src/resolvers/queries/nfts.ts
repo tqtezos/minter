@@ -86,7 +86,7 @@ export const nfts = async (
   ctx: Context
 ): Promise<NonFungibleToken[]> => {
   const tzStats = mkTzStats(ctx.tzStatsApiUrl);
-  const contracts = await contractNames(null, ctx);
+  const contracts = await contractNames(null, null, ctx);
 
   if (!_.isNil(contractAddress)) {
     const contractInfo = contracts.find(c => c.address === contractAddress);

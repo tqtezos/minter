@@ -41,7 +41,7 @@ const InputForm: FC<InputFormProps> = ({ onFinish }) => {
 
     setCreatingToken(true);
     const hideMessage = message.loading(
-      'Creating a new non-fungible token on blockchain...',
+      'Creating a new non-fungible token...',
       0
     );
 

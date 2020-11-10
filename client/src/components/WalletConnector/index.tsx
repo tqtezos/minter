@@ -15,36 +15,34 @@ const WalletConnector: FC = () => {
   const [connecting, setConnecting] = useState(false);
 
   const handleConenct = async () => {
-    if (!settings)
-      throw Error('Problem gettings settings from the server!')
+    if (!settings) throw Error('Problem gettings settings from the server!');
 
     try {
       setConnecting(true);
       const tzToolkit = await thanosWallet.connect(settings.rpc);
       setTzToolkit(tzToolkit);
     } catch (err) {
-      message.error(err.message)
+      if (err.name === 'NotGrantedThanosWalletError')
+        message.error('Transaction rejected');
+      else message.error(err.message);
     } finally {
       setConnecting(false);
     }
-  }
+  };
 
   const handleDisconnect = () => {
     setTzToolkit(undefined);
-  }
+  };
 
-  return (
-    tzToolkit 
-      ? <HeaderButton 
-          title="Disconnect" 
-          onClick={handleDisconnect} 
-        />
-      : <HeaderButton 
-          title="Connect" 
-          onClick={handleConenct} 
-          loading={connecting} 
-        />
+  return tzToolkit ? (
+    <HeaderButton title="Disconnect" onClick={handleDisconnect} />
+  ) : (
+    <HeaderButton
+      title="Connect"
+      onClick={handleConenct}
+      loading={connecting}
+    />
   );
-}
+};
 
 export default WalletConnector;

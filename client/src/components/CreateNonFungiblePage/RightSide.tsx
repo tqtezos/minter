@@ -41,7 +41,7 @@ const RightSide: FC<Props> = ({ ipfsContent, form }) => {
     }
 
     const hideMessage = message.loading(
-      'Creating a new contract on blockchain...',
+      'Creating a new smart contract',
       0
     );
 
