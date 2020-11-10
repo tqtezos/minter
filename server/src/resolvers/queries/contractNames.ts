@@ -26,7 +26,6 @@ const contractNftOwners = async (
   return values.map(v => v.value);
 };
 
-// TODO: Test implementation
 const contractNftOwnersBcd = async (
   betterCallDev: BetterCallDev,
   contractAddress: Address
@@ -58,7 +57,6 @@ const filterContractsByNftOwner = async (
   );
 };
 
-// TODO: Test implementation
 const filterContractsByNftOwnerBcd = async (
   betterCallDev: BetterCallDev,
   contracts: Contract[],
@@ -141,8 +139,6 @@ export const contractNamesBcd = async (
   }));
 
   const allContracts = [{ address: faucetAddress, name: 'Minter' }, ...result];
-
-  // TODO: Implement filtering by NFT owner
 
   if (_.isNil(nftOwnerAddress)) return allContracts;
 
