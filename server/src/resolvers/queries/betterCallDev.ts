@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-type Address = string;
+export type Address = string;
 
 interface Contract {
   address: Address;

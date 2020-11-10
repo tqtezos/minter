@@ -54,7 +54,7 @@ const Assets: FC = () => {
       <Row css={{ marginTop: '2em' }}>
         <Col offset={3} span={18} css={{ height: '100%' }}>
           {data && !loading ? (
-            <AssetCards data={data.nftsBcd} onChange={refetch} />
+            <AssetCards data={data.nfts} onChange={refetch} />
           ) : (
             <Spinner />
           )}

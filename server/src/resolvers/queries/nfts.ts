@@ -1,18 +1,9 @@
 import _ from 'lodash';
-
-import { mkTzStats, TzStats } from './tzStats';
 import { mkBetterCallDev, BetterCallDev } from './betterCallDev';
 import { Context } from '../../components/context';
 import { NonFungibleToken, ContractInfo } from '../../generated/graphql_schema';
-import { contractNames, contractNamesBcd } from './contractNames';
+import { contractNames } from './contractNames';
 
-interface BrokenNft {
-  '0@nat': string;
-  '1@string': string;
-  '2@string': string;
-  '3@nat': string;
-  '4@map': any;
-}
 interface Nft {
   token_id: string;
   symbol: string;
@@ -21,89 +12,10 @@ interface Nft {
   extras: string;
 }
 
-type NftBigMapValue = Nft | BrokenNft;
+type NftBigMapValue = Nft;
 type LedgerBigMapValue = string;
 
-const convertNft = (nftValue: NftBigMapValue) => {
-  if (nftValue.hasOwnProperty('symbol')) {
-    const nft = nftValue as Nft;
-
-    return {
-      tokenId: nft.token_id, // rename according to naming convention
-      symbol: nft.symbol,
-      name: nft.name,
-      extras: nft.extras
-    };
-  }
-
-  const brokenNft = nftValue as BrokenNft;
-
-  return {
-    tokenId: brokenNft['0@nat'],
-    symbol: brokenNft['1@string'],
-    name: brokenNft['2@string'],
-    extras: brokenNft['4@map']
-  };
-};
-
-const nftsByContract = async (
-  tzStats: TzStats,
-  contractInfo: ContractInfo,
-  ownerAddress: string | null | undefined
-): Promise<NonFungibleToken[]> => {
-  const contract = await tzStats.contractByAddress(contractInfo.address);
-
-  const [ledgerId, , tokenMetadataId] = _(contract.bigmap_ids)
-    .uniq()
-    .sort()
-    .value();
-
-  const tokenBigMap = await tzStats.bigMapById<NftBigMapValue>(tokenMetadataId);
-  const tokenItems = await tokenBigMap.values();
-
-  const ledgerBigMap = await tzStats.bigMapById<LedgerBigMapValue>(ledgerId);
-  const ledgerItems = await ledgerBigMap.values();
-
-  const ownerByTokenId = _(ledgerItems)
-    .keyBy(i => i.key)
-    .mapValues(v => v.value)
-    .value();
-
-  const nfts = tokenItems.map(i => ({
-    contractInfo,
-    ...convertNft(i.value),
-    owner: ownerByTokenId[i.key]
-  }));
-
-  return _.isNil(ownerAddress)
-    ? nfts
-    : nfts.filter(i => i.owner === ownerAddress);
-};
-
-export const nfts = async (
-  ownerAddress: string | null | undefined,
-  contractAddress: string | null | undefined,
-  ctx: Context
-): Promise<NonFungibleToken[]> => {
-  const tzStats = mkTzStats(ctx.tzStatsApiUrl);
-  const contracts = await contractNames(null, null, ctx);
-
-  if (!_.isNil(contractAddress)) {
-    const contractInfo = contracts.find(c => c.address === contractAddress);
-    if (!contractInfo)
-      throw Error(`Cannot find contract address: ${contractAddress}`);
-    return nftsByContract(tzStats, contractInfo, ownerAddress);
-  }
-
-  const promises = contracts.map(contractInfo =>
-    nftsByContract(tzStats, contractInfo, ownerAddress)
-  );
-
-  const nftArrays = await Promise.all(promises);
-  return _.flatten(nftArrays);
-};
-
-const nftsByContractAddressBcd = async (
+const nftsByContractAddress = async (
   betterCallDev: BetterCallDev,
   contractInfo: ContractInfo,
   ownerAddress: string | null | undefined
@@ -149,24 +61,24 @@ const nftsByContractAddressBcd = async (
     : transformedNfts.filter(i => i.owner === ownerAddress);
 };
 
-export const nftsBcd = async (
+export const nfts = async (
   ownerAddress: string | null | undefined,
   contractAddress: string | null | undefined,
   ctx: Context
 ): Promise<NonFungibleToken[]> => {
   const betterCallDev = mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork);
 
-  const contracts = await contractNamesBcd(null, null, ctx);
+  const contracts = await contractNames(null, null, ctx);
 
   if (!_.isNil(contractAddress)) {
     const contractInfo = contracts.find(c => c.address === contractAddress);
     if (!contractInfo)
       throw Error(`Cannot find contract address: ${contractAddress}`);
-    return nftsByContractAddressBcd(betterCallDev, contractInfo, ownerAddress);
+    return nftsByContractAddress(betterCallDev, contractInfo, ownerAddress);
   }
 
   const promises = contracts.map(contractInfo => {
-    return nftsByContractAddressBcd(betterCallDev, contractInfo, ownerAddress);
+    return nftsByContractAddress(betterCallDev, contractInfo, ownerAddress);
   });
   const nftArrays = await Promise.all(promises);
   return _.flatten(nftArrays);

@@ -1,13 +1,9 @@
-import {
-  Resolvers,
-  QueryResolvers,
-  NonFungibleToken
-} from '../../generated/graphql_schema';
+import { Resolvers, QueryResolvers } from '../../generated/graphql_schema';
 import { Context } from '../../components/context';
 import PublishedOperation from '../../models/published_operation';
 import axios from 'axios';
-import { contractNames, contractNamesBcd } from './contractNames';
-import { nfts, nftsBcd } from './nfts';
+import { contractNames } from './contractNames';
+import { nfts } from './nfts';
 
 async function getTzStats(ctx: Context, resource: string) {
   const response = await axios.get(`${ctx.tzStatsApiUrl}/${resource}`);
@@ -72,18 +68,6 @@ const Query: QueryResolvers = {
 
   async contractNames(_parent, { contractOwnerAddress, nftOwnerAddress }, ctx) {
     return contractNames(contractOwnerAddress, nftOwnerAddress, ctx);
-  },
-
-  async nftsBcd(_parent, { ownerAddress, contractAddress }, ctx) {
-    return nftsBcd(ownerAddress, contractAddress, ctx);
-  },
-
-  async contractNamesBcd(
-    _parent,
-    { contractOwnerAddress, nftOwnerAddress },
-    ctx
-  ) {
-    return contractNamesBcd(contractOwnerAddress, nftOwnerAddress, ctx);
   },
 
   settings(_parent, _args, { tzStatsUrl, configStore, bcdGuiUrl, bcdNetwork }) {
