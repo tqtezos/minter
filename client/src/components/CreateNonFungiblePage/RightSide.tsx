@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { FC, Fragment, useEffect, useState } from 'react';
 import { jsx } from '@emotion/core';
-import { Form, Input, Select, Button, message } from 'antd';
+import { Form, Select, message } from 'antd';
 import { FormInstance } from 'antd/lib/form/hooks/useForm';
 
 import ImagePreview from './ImagePreview';
