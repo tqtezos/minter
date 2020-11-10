@@ -119,7 +119,7 @@ export const contractNamesBcd = async (
 ): Promise<Contract[]> => {
   const factoryAddress = ctx.configStore.get('contracts.nftFactory') as string;
   const faucetAddress = ctx.configStore.get('contracts.nftFaucet') as string;
-  const betterCallDev = mkBetterCallDev('http://bcdapi:14000', 'sandboxnet');
+  const betterCallDev = mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork);
 
   const contract = await betterCallDev.contractByAddress(factoryAddress);
 

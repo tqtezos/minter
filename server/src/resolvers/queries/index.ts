@@ -86,9 +86,10 @@ const Query: QueryResolvers = {
     return contractNamesBcd(contractOwnerAddress, nftOwnerAddress, ctx);
   },
 
-  settings(_parent, _args, { tzStatsUrl, configStore }) {
+  settings(_parent, _args, { tzStatsUrl, configStore, bcdGuiUrl }) {
     const config = configStore.all;
     return {
+      bcdGuiUrl: bcdGuiUrl,
       tzStatsUrl: tzStatsUrl,
       rpc: config.rpc,
       contracts: config.contracts,

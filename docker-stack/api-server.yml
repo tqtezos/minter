@@ -4,6 +4,9 @@ services:
   api-server:
     image: minter-ui-api
     environment:
+      BCD_GUI_URL: ${BCD_GUI_URL}
+      BCD_API_URL: ${BCD_API_URL}
+      BCD_NETWORK: ${BCD_NETWORK}
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}
       POSTGRES_USER: ${POSTGRES_USER}

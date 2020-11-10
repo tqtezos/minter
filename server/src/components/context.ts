@@ -20,6 +20,9 @@ export interface Context {
   db: DB;
   contractStore: ContractStore;
   pubsub: PubSub;
+  bcdApiUrl: string;
+  bcdGuiUrl: string;
+  bcdNetwork: string;
   tzRpcUrl: string;
   tzStatsApiUrl: string;
   tzStatsUrl: string;
@@ -64,11 +67,17 @@ export default async function createContext(): Promise<Context> {
   const tzStatsApiUrl = `${getEnv('TZSTATS_API_URL')}/explorer`;
   const tzStatsUrl = getEnv('TZSTATS_URL');
   const tzClient = await buildTzClient(tzRpcUrl);
+  const bcdApiUrl = getEnv('BCD_API_URL');
+  const bcdGuiUrl = getEnv('BCD_GUI_URL');
+  const bcdNetwork = getEnv('BCD_NETWORK');
   const contractStore = await buildContractStore(tzClient);
   return {
     db,
     contractStore,
     pubsub,
+    bcdApiUrl,
+    bcdGuiUrl,
+    bcdNetwork,
     tzStatsApiUrl,
     tzStatsUrl,
     tzRpcUrl,

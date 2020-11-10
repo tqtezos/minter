@@ -37,6 +37,7 @@ type Settings {
   rpc: String!
   admin: SettingsAdmin!
   contracts: SettingsContracts!
+  bcdGuiUrl: String!
 }
 
 type ContractInfo {

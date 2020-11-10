@@ -154,7 +154,7 @@ export const nftsBcd = async (
   contractAddress: string | null | undefined,
   ctx: Context
 ): Promise<NonFungibleToken[]> => {
-  const betterCallDev = mkBetterCallDev('http://bcdapi:14000', 'sandboxnet');
+  const betterCallDev = mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork);
 
   const contracts = await contractNamesBcd(null, null, ctx);
 
