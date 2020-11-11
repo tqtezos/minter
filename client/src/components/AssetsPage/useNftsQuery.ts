@@ -5,7 +5,11 @@ import { useWalletAddress } from '../App/globalContext';
 const NFTS = gql`
   query Nfts($ownerAddress: String, $contractAddress: String) {
     nfts(ownerAddress: $ownerAddress, contractAddress: $contractAddress) {
-      token_id
+      contractInfo {
+        name
+        address
+      }
+      tokenId
       symbol
       name
       owner

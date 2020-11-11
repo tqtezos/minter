@@ -1,4 +1,8 @@
-import { Resolvers, QueryResolvers } from '../../generated/graphql_schema';
+import {
+  Resolvers,
+  QueryResolvers,
+  NonFungibleToken
+} from '../../generated/graphql_schema';
 import { Context } from '../../components/context';
 import PublishedOperation from '../../models/published_operation';
 import axios from 'axios';
@@ -28,18 +32,20 @@ async function extractNftData(ctx: Context) {
   return { nftContract, contractData, nftData, ownerData };
 }
 
+// This function only works for minter built-in contract.
+// It has to be removed or generalized to work with multiple contracts
 async function nftByTokenId(token_id: string, ctx: Context) {
-  const { nftData, ownerData } = await extractNftData(ctx);
+  const { nftContract, nftData, ownerData } = await extractNftData(ctx);
   const token = nftData.find((kv: any) => kv.value.token_id === token_id);
   if (!token) return null;
   const owner = ownerData.find((kv: any) => kv.key === token.key);
   if (!owner) return null;
   return {
+    contractInfo: { name: 'Minter', address: nftContract.address },
+    tokenId: token.value.token_id,
     name: token.value.name,
     symbol: token.value.symbol,
-    token_id: token.value.token_id,
     extras: token.value.extras,
-    decimals: parseInt(token.value.decimals),
     owner: owner.value
   };
 }
@@ -64,8 +70,8 @@ const Query: QueryResolvers = {
     return nfts(ownerAddress, contractAddress, ctx);
   },
 
-  async contractNames(_parent, { ownerAddress }, ctx) {
-    return contractNames(ownerAddress, ctx);
+  async contractNames(_parent, { contractOwnerAddress, nftOwnerAddress }, ctx) {
+    return contractNames(contractOwnerAddress, nftOwnerAddress, ctx);
   },
 
   settings(_parent, _args, { tzStatsUrl, configStore }) {

@@ -4,12 +4,12 @@ scalar Upload
 ## Application Types
 
 type NonFungibleToken {
-  name: String!
+  contractInfo: ContractInfo!
+  tokenId: String!
   symbol: String!
-  token_id: String!
-  extras: JSON!
-  decimals: Int!
+  name: String!
   owner: String!
+  extras: JSON!
 }
 
 type PublishedOperation {
@@ -55,7 +55,7 @@ type IpfsContent {
 
 type Query {
   nfts(ownerAddress: String, contractAddress: String): [NonFungibleToken!]!
-  contractNames(ownerAddress: String): [ContractInfo!]!
+  contractNames(contractOwnerAddress: String, nftOwnerAddress: String): [ContractInfo!]!
 
   nftByTokenId(token_id: String!): NonFungibleToken
   nftByOperation(operation_address: String!): NonFungibleToken

@@ -1,21 +1,24 @@
 import { gql, useQuery } from '@apollo/client';
-import {
-  Query,
-  QueryContractNamesArgs
-} from '../../generated/graphql_schema';
+import { Query, QueryContractNamesArgs } from '../../generated/graphql_schema';
 
 const CONTRACTS = gql`
-  query contractNames($ownerAddress: String) {
-    contractNames(ownerAddress: $ownerAddress) {
+  query contractNames($contractOwnerAddress: String, $nftOwnerAddress: String) {
+    contractNames(
+      contractOwnerAddress: $contractOwnerAddress
+      nftOwnerAddress: $nftOwnerAddress
+    ) {
       address
       name
     }
   }
 `;
 
-export const useContractNamesQuery = (ownerAddress?: string) => {
+export const useContractNamesQuery = (
+  contractOwnerAddress?: string,
+  nftOwnerAddress?: string
+) => {
   return useQuery<Query, QueryContractNamesArgs>(CONTRACTS, {
-    variables: { ownerAddress: ownerAddress },
+    variables: { contractOwnerAddress, nftOwnerAddress },
     fetchPolicy: 'network-only'
   });
 };

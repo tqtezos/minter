@@ -58,12 +58,12 @@ export type MutationCreateNonFungibleTokenSyncArgs = {
 
 export type NonFungibleToken = {
   __typename?: 'NonFungibleToken';
-  name: Scalars['String'];
+  contractInfo: ContractInfo;
+  tokenId: Scalars['String'];
   symbol: Scalars['String'];
-  token_id: Scalars['String'];
-  extras: Scalars['JSON'];
-  decimals: Scalars['Int'];
+  name: Scalars['String'];
   owner: Scalars['String'];
+  extras: Scalars['JSON'];
 };
 
 export type PublishedOperation = {
@@ -93,7 +93,8 @@ export type QueryNftsArgs = {
 };
 
 export type QueryContractNamesArgs = {
-  ownerAddress?: Maybe<Scalars['String']>;
+  contractOwnerAddress?: Maybe<Scalars['String']>;
+  nftOwnerAddress?: Maybe<Scalars['String']>;
 };
 
 export type QueryNftByTokenIdArgs = {
@@ -255,10 +256,10 @@ export type ResolversTypes = ResolversObject<{
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
   NonFungibleToken: ResolverTypeWrapper<NonFungibleToken>;
-  JSON: ResolverTypeWrapper<Scalars['JSON']>;
-  Int: ResolverTypeWrapper<Scalars['Int']>;
   ContractInfo: ResolverTypeWrapper<ContractInfo>;
+  JSON: ResolverTypeWrapper<Scalars['JSON']>;
   PublishedOperation: ResolverTypeWrapper<PublishedOperation>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Settings: ResolverTypeWrapper<Settings>;
   SettingsAdmin: ResolverTypeWrapper<SettingsAdmin>;
@@ -274,10 +275,10 @@ export type ResolversParentTypes = ResolversObject<{
   Query: {};
   String: Scalars['String'];
   NonFungibleToken: NonFungibleToken;
-  JSON: Scalars['JSON'];
-  Int: Scalars['Int'];
   ContractInfo: ContractInfo;
+  JSON: Scalars['JSON'];
   PublishedOperation: PublishedOperation;
+  Int: Scalars['Int'];
   Boolean: Scalars['Boolean'];
   Settings: Settings;
   SettingsAdmin: SettingsAdmin;
@@ -345,12 +346,16 @@ export type NonFungibleTokenResolvers<
   ContextType = Context,
   ParentType extends ResolversParentTypes['NonFungibleToken'] = ResolversParentTypes['NonFungibleToken']
 > = ResolversObject<{
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  contractInfo?: Resolver<
+    ResolversTypes['ContractInfo'],
+    ParentType,
+    ContextType
+  >;
+  tokenId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   symbol?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  token_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  extras?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>;
-  decimals?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   owner?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  extras?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 

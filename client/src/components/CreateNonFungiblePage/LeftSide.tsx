@@ -1,10 +1,22 @@
 /** @jsx jsx */
 import { FC, Fragment } from 'react';
 import { jsx } from '@emotion/core';
-import { Form, Input } from 'antd';
+import { Form, Input, Row, Col } from 'antd';
 
 import ImageIpfsUpload from './ImageIpfsUpload';
 import { ImageIpfsUploadProps } from './ImageIpfsUpload';
+import Copyable from '../common/Copyable';
+
+const IpfsCid = ({ value }: { value?: string }) => (
+  <Row align="middle">
+    <Col flex={1}>
+      <Input value={value} readOnly />
+    </Col>
+    <Col>
+      <Copyable text={value} />
+    </Col>
+  </Row>
+);
 
 const LeftSide: FC<ImageIpfsUploadProps> = ({ onChange }) => {
   return (
@@ -37,7 +49,7 @@ const LeftSide: FC<ImageIpfsUploadProps> = ({ onChange }) => {
         name="ipfsCid"
         rules={[{ required: true, message: 'Please upload an image!' }]}
       >
-        <Input readOnly />
+        <IpfsCid />
       </Form.Item>
     </Fragment>
   );

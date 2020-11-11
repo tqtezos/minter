@@ -2,10 +2,8 @@ import _ from 'lodash';
 
 import { mkTzStats, TzStats, Address } from './tzStats';
 import { Context } from '../../components/context';
-import { NonFungibleToken } from '../../generated/graphql_schema';
+import { NonFungibleToken, ContractInfo } from '../../generated/graphql_schema';
 import { contractNames } from './contractNames';
-
-type Nft = Omit<NonFungibleToken, 'owner'>;
 
 interface BrokenNft {
   '0@nat': string;
@@ -14,29 +12,45 @@ interface BrokenNft {
   '3@nat': string;
   '4@map': any;
 }
+interface Nft {
+  token_id: string;
+  symbol: string;
+  name: string;
+  decimals: number;
+  extras: string;
+}
 
 type NftBigMapValue = Nft | BrokenNft;
-type LedgerBigMapValue = NonFungibleToken['owner'];
+type LedgerBigMapValue = string;
 
-const convertNft = (nft: NftBigMapValue): Nft => {
-  if (nft.hasOwnProperty('symbol')) return nft as Nft;
+const convertNft = (nftValue: NftBigMapValue) => {
+  if (nftValue.hasOwnProperty('symbol')) {
+    const nft = nftValue as Nft;
 
-  const brokenNft = nft as BrokenNft;
+    return {
+      tokenId: nft.token_id, // rename according to naming convention
+      symbol: nft.symbol,
+      name: nft.name,
+      extras: nft.extras
+    };
+  }
+
+  const brokenNft = nftValue as BrokenNft;
+
   return {
-    token_id: brokenNft['0@nat'],
+    tokenId: brokenNft['0@nat'],
     symbol: brokenNft['1@string'],
     name: brokenNft['2@string'],
-    decimals: 0,
     extras: brokenNft['4@map']
   };
 };
 
-const nftsByContractAddress = async (
+const nftsByContract = async (
   tzStats: TzStats,
-  contractAddress: string,
+  contractInfo: ContractInfo,
   ownerAddress: string | null | undefined
 ): Promise<NonFungibleToken[]> => {
-  const contract = await tzStats.contractByAddress(contractAddress);
+  const contract = await tzStats.contractByAddress(contractInfo.address);
 
   const [ledgerId, , tokenMetadataId] = _(contract.bigmap_ids)
     .uniq()
@@ -55,6 +69,7 @@ const nftsByContractAddress = async (
     .value();
 
   const nfts = tokenItems.map(i => ({
+    contractInfo,
     ...convertNft(i.value),
     owner: ownerByTokenId[i.key]
   }));
@@ -70,17 +85,18 @@ export const nfts = async (
   ctx: Context
 ): Promise<NonFungibleToken[]> => {
   const tzStats = mkTzStats(ctx.tzStatsApiUrl);
-  const faucetAddress = ctx.configStore.get('contracts.nftFaucet') as string;
+  const contracts = await contractNames(null, null, ctx);
 
-  if (!_.isNil(contractAddress))
-    return nftsByContractAddress(tzStats, contractAddress || '', ownerAddress);
+  if (!_.isNil(contractAddress)) {
+    const contractInfo = contracts.find(c => c.address === contractAddress)
+    if (!contractInfo) throw Error(`Cannot find contract address: ${contractAddress}`)
+    return nftsByContract(tzStats, contractInfo, ownerAddress);
+  }
 
-  const contracts = await contractNames(null, ctx);
-  
-  const promises = contracts.map(({ address }) =>
-    nftsByContractAddress(tzStats, address, ownerAddress)
+  const promises = contracts.map((contractInfo) =>
+    nftsByContract(tzStats, contractInfo, ownerAddress)
   );
-  
+
   const nftArrays = await Promise.all(promises);
   return _.flatten(nftArrays);
 };

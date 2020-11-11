@@ -49,12 +49,12 @@ export type MutationCreateNonFungibleTokenSyncArgs = {
 
 export type NonFungibleToken = {
   __typename?: 'NonFungibleToken';
-  name: Scalars['String'];
+  contractInfo: ContractInfo;
+  tokenId: Scalars['String'];
   symbol: Scalars['String'];
-  token_id: Scalars['String'];
-  extras: Scalars['JSON'];
-  decimals: Scalars['Int'];
+  name: Scalars['String'];
   owner: Scalars['String'];
+  extras: Scalars['JSON'];
 };
 
 export type PublishedOperation = {
@@ -84,7 +84,8 @@ export type QueryNftsArgs = {
 };
 
 export type QueryContractNamesArgs = {
-  ownerAddress?: Maybe<Scalars['String']>;
+  contractOwnerAddress?: Maybe<Scalars['String']>;
+  nftOwnerAddress?: Maybe<Scalars['String']>;
 };
 
 export type QueryNftByTokenIdArgs = {
