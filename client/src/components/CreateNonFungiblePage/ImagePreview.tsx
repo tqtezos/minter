@@ -7,7 +7,7 @@ import { IpfsContent } from '../../api/ipfsUploader';
 import { Flip } from 'react-awesome-reveal';
 
 const Image = styled.img({
-  height: '11em',
+  height: '15em',
   maxWidth: '30em'
 });
 
@@ -32,7 +32,7 @@ const ImagePreview: FC<{ ipfsContent?: IpfsContent }> = ({ ipfsContent }) => (
         </a>
       ) : (
         <Empty
-          css={{ width: '14em' }}
+          css={{ width: '17em' }}
           description="Upload an Image"
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         />

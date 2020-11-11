@@ -12,6 +12,8 @@ import AssetTransfer from './AssetTransfer';
 import { useContracts } from '../App/globalContext';
 import useSettings from '../common/useSettings';
 
+const { Paragraph, Text, Link } = Typography;
+
 const Card = styled.div({
   width: '22em',
   height: '12em',
@@ -24,16 +26,8 @@ const Image = styled.img({
   maxHeight: '4em'
 });
 
-// const Header = styled.div({
-//   fontFamily: 'sans-serif',
-//   fontWeight: 300,
-//   fontSize: '18px',
-//   lineHeight: '100%',
-//   letterSpacing: '-0.02em'
-// });
-
 const Header: FC = ({ children }) => (
-  <Typography.Paragraph
+  <Paragraph
     ellipsis={{ rows: 2 }}
     css={{
       fontWeight: 300,
@@ -44,11 +38,11 @@ const Header: FC = ({ children }) => (
     }}
   >
     {children}
-  </Typography.Paragraph>
+  </Paragraph>
 );
 
 const Body: FC = ({ children }) => (
-  <Typography.Text
+  <Text
     type="secondary"
     ellipsis
     css={{
@@ -59,7 +53,7 @@ const Body: FC = ({ children }) => (
     }}
   >
     {children}
-  </Typography.Text>
+  </Text>
 );
 
 interface Props {
@@ -125,7 +119,13 @@ const AssetCard: FC<Props> = ({ token, onChange }) => {
       <Card>
         <Row align="top" gutter={[8, 8]}>
           <Col span={6}>
-            <Image src={urlFromCid(token.extras.ipfs_cid)} alt="token" />
+            <Link
+              title={token.extras.ipfs_cid}
+              href={urlFromCid(token.extras.ipfs_cid)}
+              target="_blank"
+            >
+              <Image src={urlFromCid(token.extras.ipfs_cid)} alt="token" />
+            </Link>
           </Col>
           <Col span={18}>
             <Row gutter={[8, 16]} css={{ height: '3.5em' }}>
@@ -139,15 +139,30 @@ const AssetCard: FC<Props> = ({ token, onChange }) => {
             <Row>
               <Col>
                 <Body>
-                  Contract: {token.contractInfo.name} -{' '}
-                  {token.contractInfo.address}
+                  Contract:{' '}
+                  <Link
+                    title={token.contractInfo.address}
+                    href={`${settings?.bcdGuiUrl}/${settings?.bcdNetwork}/${token.contractInfo.address}`}
+                    target="_blank"
+                  >
+                    {token.contractInfo.name} - {token.contractInfo.address}
+                  </Link>
                 </Body>
                 <Copyable text={token.contractInfo.address} />
               </Col>
             </Row>
             <Row>
               <Col>
-                <Body>IPFS: {token.extras.ipfs_cid}</Body>
+                <Body>
+                  IPFS:{' '}
+                  <Link
+                    title={token.extras.ipfs_cid}
+                    href={urlFromCid(token.extras.ipfs_cid)}
+                    target="_blank"
+                  >
+                    {token.extras.ipfs_cid}
+                  </Link>
+                </Body>
                 <Copyable text={token.extras.ipfs_cid} />
               </Col>
             </Row>
@@ -165,13 +180,13 @@ const AssetCard: FC<Props> = ({ token, onChange }) => {
             </Button>
           </Col>
           <Col span={12} css={{ display: 'flex', alignItems: 'center' }}>
-            <Typography.Link
+            <Link
               css={{ margin: 'auto' }}
               href={`${settings?.bcdGuiUrl}/${settings?.bcdNetwork}/${token.contractInfo.address}`}
               target="_blank"
             >
               DETAILS
-            </Typography.Link>
+            </Link>
           </Col>
         </Row>
       </Card>
