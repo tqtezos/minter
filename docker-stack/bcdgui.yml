@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  bcdgui:
+    image: bakingbad/bcdhub-gui:2.6
+    entrypoint: /bin/bash
+    command: -c "mv config.box.json config.json && nginx -g 'daemon off;'"
+    depends_on:
+      - api
+    ports:
+      - 8009:80
+    logging:
+      options:
+        max-size: 10m
+        max-file: '5'

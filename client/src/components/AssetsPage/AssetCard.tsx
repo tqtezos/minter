@@ -142,7 +142,7 @@ const AssetCard: FC<Props> = ({ token, onChange }) => {
                   Contract:{' '}
                   <Link
                     title={token.contractInfo.address}
-                    href={`${settings?.tzStatsUrl}/${token.contractInfo.address}`}
+                    href={`${settings?.bcdGuiUrl}/${settings?.bcdNetwork}/${token.contractInfo.address}`}
                     target="_blank"
                   >
                     {token.contractInfo.name} - {token.contractInfo.address}
@@ -182,7 +182,7 @@ const AssetCard: FC<Props> = ({ token, onChange }) => {
           <Col span={12} css={{ display: 'flex', alignItems: 'center' }}>
             <Link
               css={{ margin: 'auto' }}
-              href={`${settings?.tzStatsUrl}/${token.contractInfo.address}`}
+              href={`${settings?.bcdGuiUrl}/${settings?.bcdNetwork}/${token.contractInfo.address}`}
               target="_blank"
             >
               DETAILS

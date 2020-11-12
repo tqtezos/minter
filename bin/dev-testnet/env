@@ -1,5 +1,8 @@
 TEZOS_RPC_URL=https://rpcalpha.tzbeta.net
-TZSTATS_API_URL=https://api.carthagenet.tzstats.com
-TZSTATS_URL=https://carthagenet.tzstats.com
+
+BCD_API_URL=https://api.better-call.dev
+BCD_GUI_URL=https://better-call.dev
+
+BCD_NETWORK="carthagenet"
 
 TZ_NETWORK=testnet

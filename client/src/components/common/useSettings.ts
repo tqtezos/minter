@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { MessageType } from 'antd/lib/message';
 import { message } from 'antd';
@@ -9,7 +9,8 @@ const SETTINGS = gql`
   query Settings {
     settings {
       rpc
-      tzStatsUrl
+      bcdGuiUrl
+      bcdNetwork
       contracts {
         nftFaucet
         nftFactory
@@ -17,32 +18,28 @@ const SETTINGS = gql`
       admin {
         address
         secret
-      }      
+      }
     }
   }
 `;
 
 export interface Data {
-  settings: Settings
+  settings: Settings;
 }
-  
+
 export default () => {
   const { data, loading, error } = useQuery<Data, void>(SETTINGS);
   const hideLoadingMessage = useRef<MessageType>();
-  
+
   useEffect(() => {
-    if(loading) 
-      hideLoadingMessage.current = message.loading('Loading settings from the server...');
-    else if(error)
-      message.error(`Cannot load settings from the server: ${error}`)
-    else
-      if(hideLoadingMessage.current) 
-        hideLoadingMessage.current();
-    },
-    [loading, error]
-  );
+    if (loading)
+      hideLoadingMessage.current = message.loading(
+        'Loading settings from the server...'
+      );
+    else if (error)
+      message.error(`Cannot load settings from the server: ${error}`);
+    else if (hideLoadingMessage.current) hideLoadingMessage.current();
+  }, [loading, error]);
 
   return { settings: data?.settings, loading, error };
-}
-  
-
+};

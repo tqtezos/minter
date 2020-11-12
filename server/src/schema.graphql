@@ -33,10 +33,11 @@ type SettingsAdmin {
 }
 
 type Settings {
-  tzStatsUrl: String!
   rpc: String!
   admin: SettingsAdmin!
   contracts: SettingsContracts!
+  bcdGuiUrl: String!
+  bcdNetwork: String!
 }
 
 type ContractInfo {
@@ -57,9 +58,12 @@ type Query {
   nfts(ownerAddress: String, contractAddress: String): [NonFungibleToken!]!
   contractNames(contractOwnerAddress: String, nftOwnerAddress: String): [ContractInfo!]!
 
+  nftsBcd(ownerAddress: String, contractAddress: String): [NonFungibleToken!]!
+  contractNamesBcd(contractOwnerAddress: String, nftOwnerAddress: String): [ContractInfo!]!
+
   nftByTokenId(token_id: String!): NonFungibleToken
   nftByOperation(operation_address: String!): NonFungibleToken
-  
+
   publishedOperationByHash(hash: String!): PublishedOperation
   settings: Settings!
 }

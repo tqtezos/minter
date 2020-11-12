@@ -7,6 +7,7 @@ run_psql() {
          -e PGUSER=$POSTGRES_USER \
          -e PGHOST=$POSTGRES_HOST \
          -e PGPORT=$POSTGRES_PORT \
+         -e PGDATABASE=bcd \
          postgres psql -c '\q'
 }
 

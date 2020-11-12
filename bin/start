@@ -20,6 +20,12 @@ docker stack deploy \
        -c $DOCKER_STACK_DIR/network.yml \
        -c $DOCKER_STACK_DIR/postgres.yml \
        -c $DOCKER_STACK_DIR/gateway.yml \
+       -c $DOCKER_STACK_DIR/elastic.yml \
+       -c $DOCKER_STACK_DIR/rabbitmq.yml \
+       -c $DOCKER_STACK_DIR/bcdapi.yml \
+       -c $DOCKER_STACK_DIR/bcdgui.yml \
+       -c $DOCKER_STACK_DIR/bcdindexer.yml \
+       -c $DOCKER_STACK_DIR/bcdmetrics.yml \
        -c $UI_STACK_FILE \
        $STACK_NAME
 

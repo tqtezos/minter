@@ -1,17 +1,9 @@
 import _ from 'lodash';
-
-import { mkTzStats, TzStats, Address } from './tzStats';
+import { mkBetterCallDev, BetterCallDev } from './betterCallDev';
 import { Context } from '../../components/context';
 import { NonFungibleToken, ContractInfo } from '../../generated/graphql_schema';
 import { contractNames } from './contractNames';
 
-interface BrokenNft {
-  '0@nat': string;
-  '1@string': string;
-  '2@string': string;
-  '3@nat': string;
-  '4@map': any;
-}
 interface Nft {
   token_id: string;
   symbol: string;
@@ -20,47 +12,29 @@ interface Nft {
   extras: string;
 }
 
-type NftBigMapValue = Nft | BrokenNft;
+type NftBigMapValue = Nft;
 type LedgerBigMapValue = string;
 
-const convertNft = (nftValue: NftBigMapValue) => {
-  if (nftValue.hasOwnProperty('symbol')) {
-    const nft = nftValue as Nft;
-
-    return {
-      tokenId: nft.token_id, // rename according to naming convention
-      symbol: nft.symbol,
-      name: nft.name,
-      extras: nft.extras
-    };
-  }
-
-  const brokenNft = nftValue as BrokenNft;
-
-  return {
-    tokenId: brokenNft['0@nat'],
-    symbol: brokenNft['1@string'],
-    name: brokenNft['2@string'],
-    extras: brokenNft['4@map']
-  };
-};
-
-const nftsByContract = async (
-  tzStats: TzStats,
+const nftsByContractAddress = async (
+  betterCallDev: BetterCallDev,
   contractInfo: ContractInfo,
   ownerAddress: string | null | undefined
 ): Promise<NonFungibleToken[]> => {
-  const contract = await tzStats.contractByAddress(contractInfo.address);
+  const contract = await betterCallDev.contractByAddress(contractInfo.address);
 
   const [ledgerId, , tokenMetadataId] = _(contract.bigmap_ids)
     .uniq()
     .sort()
     .value();
 
-  const tokenBigMap = await tzStats.bigMapById<NftBigMapValue>(tokenMetadataId);
+  if (contract.bigmap_ids.length === 0) {
+    return [];
+  }
+
+  const tokenBigMap = betterCallDev.bigMapById<NftBigMapValue>(tokenMetadataId);
   const tokenItems = await tokenBigMap.values();
 
-  const ledgerBigMap = await tzStats.bigMapById<LedgerBigMapValue>(ledgerId);
+  const ledgerBigMap = betterCallDev.bigMapById<LedgerBigMapValue>(ledgerId);
   const ledgerItems = await ledgerBigMap.values();
 
   const ownerByTokenId = _(ledgerItems)
@@ -69,14 +43,22 @@ const nftsByContract = async (
     .value();
 
   const nfts = tokenItems.map(i => ({
-    contractInfo,
-    ...convertNft(i.value),
+    ...(i.value as Nft),
     owner: ownerByTokenId[i.key]
   }));
 
+  const transformedNfts = nfts.map(nft => ({
+    contractInfo: contractInfo,
+    tokenId: nft.token_id,
+    symbol: nft.symbol,
+    name: nft.name,
+    extras: nft.extras,
+    owner: nft.owner
+  }));
+
   return _.isNil(ownerAddress)
-    ? nfts
-    : nfts.filter(i => i.owner === ownerAddress);
+    ? transformedNfts
+    : transformedNfts.filter(i => i.owner === ownerAddress);
 };
 
 export const nfts = async (
@@ -84,19 +66,20 @@ export const nfts = async (
   contractAddress: string | null | undefined,
   ctx: Context
 ): Promise<NonFungibleToken[]> => {
-  const tzStats = mkTzStats(ctx.tzStatsApiUrl);
+  const betterCallDev = mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork);
+
   const contracts = await contractNames(null, null, ctx);
 
   if (!_.isNil(contractAddress)) {
-    const contractInfo = contracts.find(c => c.address === contractAddress)
-    if (!contractInfo) throw Error(`Cannot find contract address: ${contractAddress}`)
-    return nftsByContract(tzStats, contractInfo, ownerAddress);
+    const contractInfo = contracts.find(c => c.address === contractAddress);
+    if (!contractInfo)
+      throw Error(`Cannot find contract address: ${contractAddress}`);
+    return nftsByContractAddress(betterCallDev, contractInfo, ownerAddress);
   }
 
-  const promises = contracts.map((contractInfo) =>
-    nftsByContract(tzStats, contractInfo, ownerAddress)
-  );
-
+  const promises = contracts.map(contractInfo => {
+    return nftsByContractAddress(betterCallDev, contractInfo, ownerAddress);
+  });
   const nftArrays = await Promise.all(promises);
   return _.flatten(nftArrays);
 };

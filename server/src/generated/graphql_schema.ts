@@ -81,6 +81,8 @@ export type Query = {
   __typename?: 'Query';
   nfts: Array<NonFungibleToken>;
   contractNames: Array<ContractInfo>;
+  nftsBcd: Array<NonFungibleToken>;
+  contractNamesBcd: Array<ContractInfo>;
   nftByTokenId?: Maybe<NonFungibleToken>;
   nftByOperation?: Maybe<NonFungibleToken>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
@@ -93,6 +95,16 @@ export type QueryNftsArgs = {
 };
 
 export type QueryContractNamesArgs = {
+  contractOwnerAddress?: Maybe<Scalars['String']>;
+  nftOwnerAddress?: Maybe<Scalars['String']>;
+};
+
+export type QueryNftsBcdArgs = {
+  ownerAddress?: Maybe<Scalars['String']>;
+  contractAddress?: Maybe<Scalars['String']>;
+};
+
+export type QueryContractNamesBcdArgs = {
   contractOwnerAddress?: Maybe<Scalars['String']>;
   nftOwnerAddress?: Maybe<Scalars['String']>;
 };
@@ -111,10 +123,11 @@ export type QueryPublishedOperationByHashArgs = {
 
 export type Settings = {
   __typename?: 'Settings';
-  tzStatsUrl: Scalars['String'];
   rpc: Scalars['String'];
   admin: SettingsAdmin;
   contracts: SettingsContracts;
+  bcdGuiUrl: Scalars['String'];
+  bcdNetwork: Scalars['String'];
 };
 
 export type SettingsAdmin = {
@@ -389,6 +402,18 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryContractNamesArgs, never>
   >;
+  nftsBcd?: Resolver<
+    Array<ResolversTypes['NonFungibleToken']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryNftsBcdArgs, never>
+  >;
+  contractNamesBcd?: Resolver<
+    Array<ResolversTypes['ContractInfo']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryContractNamesBcdArgs, never>
+  >;
   nftByTokenId?: Resolver<
     Maybe<ResolversTypes['NonFungibleToken']>,
     ParentType,
@@ -414,7 +439,6 @@ export type SettingsResolvers<
   ContextType = Context,
   ParentType extends ResolversParentTypes['Settings'] = ResolversParentTypes['Settings']
 > = ResolversObject<{
-  tzStatsUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   rpc?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   admin?: Resolver<ResolversTypes['SettingsAdmin'], ParentType, ContextType>;
   contracts?: Resolver<
@@ -422,6 +446,8 @@ export type SettingsResolvers<
     ParentType,
     ContextType
   >;
+  bcdGuiUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  bcdNetwork?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 

@@ -1,0 +1,26 @@
+version: '3.7'
+
+services:
+  bcdapi:
+    image: bakingbad/bcdhub-api:2.6
+    command: -f config.yml -f config.box.yml -f config.bbbox.yml
+    volumes:
+      - ${PROJECT_ROOT_DIR}/bbbox/config.yml:/app/api/config.bbbox.yml
+    environment:
+      - GIN_MODE=release
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=bcd
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    depends_on:
+      - elastic
+      - db
+      - mq
+    ports:
+      - 42000:14000
+    logging:
+      options:
+        max-size: 10m
+        max-file: '5'
+
