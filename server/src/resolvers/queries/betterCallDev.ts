@@ -1,11 +1,16 @@
 import axios from 'axios';
+import { selectObjectByKeys } from '../../util';
 
 export type Address = string;
 
 interface Contract {
   address: Address;
   manager: Address;
-  bigmap_ids: number[];
+  bigmaps: {
+    ledger?: number;
+    operators?: number;
+    token_metadata?: number;
+  };
 }
 
 export interface BigMapItem<T> {
@@ -13,42 +18,29 @@ export interface BigMapItem<T> {
   value: T;
 }
 
+function gatherBigMapChildren(children: any) {
+  return children.reduce((acc: any, v: any) => {
+    const value =
+      v.value !== undefined ? v.value : gatherBigMapChildren(v.children);
+    return { ...acc, [v.name]: value };
+  }, {});
+}
+
 export const BigMap = <T>(baseUrl: string, network: string, id: number) => ({
   async values(): Promise<BigMapItem<T>[]> {
     const resp = await axios.get(`${baseUrl}/v1/bigmap/${network}/${id}/keys`);
-    return resp.data.map((i: any) => ({
-      key: i.data.key_string,
-      value: i.data.value.value
-        ? i.data.value.value
-        : i.data.value.children.reduce((acc: any, v: any) => {
-            return {
-              ...acc,
-              [v.name]: v.value
-                ? v.value
-                : v.children.reduce((acc: any, v2: any) => {
-                    return { ...acc, [v2.name]: v2.value };
-                  }, {})
-            };
-          }, {})
-    }));
+    return resp.data.map((i: any) => {
+      const { value, children } = i.data.value;
+      return {
+        key: i.data.key_string,
+        value: value !== undefined ? value : gatherBigMapChildren(children)
+      };
+    });
   }
 });
 
-function extractBigMapIds(storage: any): number[] {
-  if (storage.type === 'big_map') {
-    return [storage.value];
-  }
-  if (storage.children && storage.children[1]?.type === 'namedtuple') {
-    return storage.children[1].children
-      .filter((v: any) => v.type === 'big_map')
-      .map((v: any) => v.value);
-  }
-  if (storage.children) {
-    return storage.children
-      .filter((v: any) => v.type === 'big_map')
-      .map((v: any) => v.value);
-  }
-  return [];
+function selectBigMap(storage: any, name: string) {
+  return selectObjectByKeys(storage, { type: 'big_map', name });
 }
 
 export async function contractByAddress(
@@ -63,7 +55,11 @@ export async function contractByAddress(
   return {
     address,
     manager: contract.manager,
-    bigmap_ids: extractBigMapIds(storage)
+    bigmaps: {
+      ledger: selectBigMap(storage, 'ledger')?.value,
+      operators: selectBigMap(storage, 'operators')?.value,
+      token_metadata: selectBigMap(storage, 'token_metadata')?.value
+    }
   };
 }
 

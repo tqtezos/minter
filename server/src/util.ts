@@ -1,9 +1,9 @@
-import fs from "fs";
-import { TezosToolkit } from "@taquito/taquito";
-import { Operation } from "@taquito/taquito/dist/types/operations/operations";
-import { SessionContext } from "./components/context";
-import { ApolloError } from "apollo-server-express";
-import { importKey } from "@taquito/signer";
+import fs from 'fs';
+import { TezosToolkit } from '@taquito/taquito';
+import { Operation } from '@taquito/taquito/dist/types/operations/operations';
+import { SessionContext } from './components/context';
+import { ApolloError } from 'apollo-server-express';
+import { importKey } from '@taquito/signer';
 
 export async function importKeyFromFile(
   client: TezosToolkit,
@@ -14,10 +14,10 @@ export async function importKeyFromFile(
   }
   const json = JSON.parse(fs.readFileSync(jsonFile).toString());
   const { email, password, mnemonic, secret } = json;
-  await importKey(client, email, password, mnemonic.join(" "), secret);
+  await importKey(client, email, password, mnemonic.join(' '), secret);
   console.log(
-    "[Tezos]",
-    "Imported key (pkh):",
+    '[Tezos]',
+    'Imported key (pkh):',
     await client.signer.publicKeyHash()
   );
   return json;
@@ -28,7 +28,7 @@ export async function handleErr(fn: () => void) {
     return fn();
   } catch (e) {
     const jsonErr = JSON.stringify(e, null, 2);
-    return jsonErr === "{}" ? e.toString() : jsonErr;
+    return jsonErr === '{}' ? e.toString() : jsonErr;
   }
 }
 
@@ -47,7 +47,7 @@ async function confirmOperation(
       Number(constants.time_between_blocks[0]) / 5;
     await operation.confirmation(1, pollingInterval);
   } catch (e) {
-    console.log("[Tezos]", "Error during confirmation:", e);
+    console.log('[Tezos]', 'Error during confirmation:', e);
     return;
   }
   const event = {
@@ -85,8 +85,8 @@ function reportFailWith(e: OpError) {
   if (!failWith) {
     throw e;
   } else {
-    const message = "Operation failed with error";
-    const code = "OPERATION_FAIL_WITH";
+    const message = 'Operation failed with error';
+    const code = 'OPERATION_FAIL_WITH';
     const extensions = { failWith, message: e.message };
     throw new ApolloError(message, code, extensions);
   }
@@ -112,4 +112,35 @@ export async function publishOperation<A>(
     })
     .catch((e: OpError) => reportFailWith(e))
     .then(a => a || null);
+}
+
+export function selectObjectByKeys(
+  object: any,
+  ks: Record<string, any>
+): Record<string, any> | null {
+  if (object === null) {
+    return null;
+  }
+
+  if (
+    Object.keys(ks).every(
+      k =>
+        object.hasOwnProperty(k) &&
+        (ks[k] === null ? true : ks[k] === object[k])
+    )
+  ) {
+    return object;
+  }
+
+  const keys = Object.keys(object);
+  for (let key of keys) {
+    if (typeof object[key] == 'object') {
+      const result = selectObjectByKeys(object[key], ks);
+      if (result !== null) {
+        return result;
+      }
+    }
+  }
+
+  return null;
 }
