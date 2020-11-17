@@ -81,6 +81,7 @@ export type Query = {
   __typename?: 'Query';
   nfts: Array<NonFungibleToken>;
   contractNames: Array<ContractInfo>;
+  nftExists: Scalars['Boolean'];
   nftsBcd: Array<NonFungibleToken>;
   contractNamesBcd: Array<ContractInfo>;
   nftByTokenId?: Maybe<NonFungibleToken>;
@@ -97,6 +98,11 @@ export type QueryNftsArgs = {
 export type QueryContractNamesArgs = {
   contractOwnerAddress?: Maybe<Scalars['String']>;
   nftOwnerAddress?: Maybe<Scalars['String']>;
+};
+
+export type QueryNftExistsArgs = {
+  contractAddress: Scalars['String'];
+  tokenId: Scalars['Int'];
 };
 
 export type QueryNftsBcdArgs = {
@@ -271,9 +277,9 @@ export type ResolversTypes = ResolversObject<{
   NonFungibleToken: ResolverTypeWrapper<NonFungibleToken>;
   ContractInfo: ResolverTypeWrapper<ContractInfo>;
   JSON: ResolverTypeWrapper<Scalars['JSON']>;
-  PublishedOperation: ResolverTypeWrapper<PublishedOperation>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  PublishedOperation: ResolverTypeWrapper<PublishedOperation>;
   Settings: ResolverTypeWrapper<Settings>;
   SettingsAdmin: ResolverTypeWrapper<SettingsAdmin>;
   SettingsContracts: ResolverTypeWrapper<SettingsContracts>;
@@ -290,9 +296,9 @@ export type ResolversParentTypes = ResolversObject<{
   NonFungibleToken: NonFungibleToken;
   ContractInfo: ContractInfo;
   JSON: Scalars['JSON'];
-  PublishedOperation: PublishedOperation;
   Int: Scalars['Int'];
   Boolean: Scalars['Boolean'];
+  PublishedOperation: PublishedOperation;
   Settings: Settings;
   SettingsAdmin: SettingsAdmin;
   SettingsContracts: SettingsContracts;
@@ -401,6 +407,12 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QueryContractNamesArgs, never>
+  >;
+  nftExists?: Resolver<
+    ResolversTypes['Boolean'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryNftExistsArgs, 'contractAddress' | 'tokenId'>
   >;
   nftsBcd?: Resolver<
     Array<ResolversTypes['NonFungibleToken']>,

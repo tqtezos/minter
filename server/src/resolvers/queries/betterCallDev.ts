@@ -8,13 +8,13 @@ interface Contract {
   bigmap_ids: number[];
 }
 
-export interface BigMapItem<T> {
-  key: string;
-  value: T;
+export interface BigMapItem<K, V> {
+  key: K;
+  value: V;
 }
 
-export const BigMap = <T>(baseUrl: string, network: string, id: number) => ({
-  async values(): Promise<BigMapItem<T>[]> {
+export const BigMap = <K, V>(baseUrl: string, network: string, id: number) => ({
+  async values(): Promise<BigMapItem<K, V>[]> {
     const resp = await axios.get(`${baseUrl}/v1/bigmap/${network}/${id}/keys`);
     return resp.data.map((i: any) => ({
       key: i.data.key_string,
@@ -72,8 +72,8 @@ export const mkBetterCallDev = (baseUrl: string, network: string) => ({
     return contractByAddress(baseUrl, network, address);
   },
 
-  bigMapById<T>(id: number) {
-    return BigMap<T>(baseUrl, network, id);
+  bigMapById<K, V>(id: number) {
+    return BigMap<K, V>(baseUrl, network, id);
   }
 });
 

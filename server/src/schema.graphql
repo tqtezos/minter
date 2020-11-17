@@ -57,6 +57,7 @@ type IpfsContent {
 type Query {
   nfts(ownerAddress: String, contractAddress: String): [NonFungibleToken!]!
   contractNames(contractOwnerAddress: String, nftOwnerAddress: String): [ContractInfo!]!
+  nftExists(contractAddress: String!, tokenId: Int!): Boolean!
 
   nftsBcd(ownerAddress: String, contractAddress: String): [NonFungibleToken!]!
   contractNamesBcd(contractOwnerAddress: String, nftOwnerAddress: String): [ContractInfo!]!

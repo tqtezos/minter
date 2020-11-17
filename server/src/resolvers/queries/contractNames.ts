@@ -19,7 +19,7 @@ const contractNftOwners = async (
   const contract = await betterCallDev.contractByAddress(contractAddress);
   const [ledgerId] = _(contract.bigmap_ids).uniq().sort().value();
 
-  const ledgerBigMap = betterCallDev.bigMapById<string>(ledgerId);
+  const ledgerBigMap = betterCallDev.bigMapById<string, string>(ledgerId);
   const values = await ledgerBigMap.values();
   return values.map(v => v.value);
 };
@@ -62,7 +62,7 @@ export const contractNames = async (
   const [bigMapId] = contract.bigmap_ids;
 
   const contracts = await betterCallDev
-    .bigMapById<ContractBigMapValue>(bigMapId)
+    .bigMapById<string, ContractBigMapValue>(bigMapId)
     .values();
 
   const filterContracts = !_.isNil(contractOwnerAddress)

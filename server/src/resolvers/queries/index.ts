@@ -1,9 +1,7 @@
 import { Resolvers, QueryResolvers } from '../../generated/graphql_schema';
-import { Context } from '../../components/context';
 import PublishedOperation from '../../models/published_operation';
-import axios from 'axios';
 import { contractNames } from './contractNames';
-import { nfts } from './nfts';
+import { nfts, nftExists } from './nfts';
 
 // This function only works for minter built-in contract.
 // It has to be removed or generalized to work with multiple contracts
@@ -19,6 +17,10 @@ const Query: QueryResolvers = {
 
   async contractNames(_parent, { contractOwnerAddress, nftOwnerAddress }, ctx) {
     return contractNames(contractOwnerAddress, nftOwnerAddress, ctx);
+  },
+
+  async nftExists(_parent, { contractAddress, tokenId }, ctx) {
+    return nftExists(contractAddress, tokenId, ctx);
   },
 
   settings(_parent, _args, { configStore, bcdGuiUrl, bcdNetwork }) {

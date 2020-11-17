@@ -31,10 +31,14 @@ const nftsByContractAddress = async (
     return [];
   }
 
-  const tokenBigMap = betterCallDev.bigMapById<NftBigMapValue>(tokenMetadataId);
+  const tokenBigMap = betterCallDev.bigMapById<string, NftBigMapValue>(
+    tokenMetadataId
+  );
   const tokenItems = await tokenBigMap.values();
 
-  const ledgerBigMap = betterCallDev.bigMapById<LedgerBigMapValue>(ledgerId);
+  const ledgerBigMap = betterCallDev.bigMapById<string, LedgerBigMapValue>(
+    ledgerId
+  );
   const ledgerItems = await ledgerBigMap.values();
 
   const ownerByTokenId = _(ledgerItems)
@@ -82,4 +86,20 @@ export const nfts = async (
   });
   const nftArrays = await Promise.all(promises);
   return _.flatten(nftArrays);
+};
+
+export const nftExists = async (
+  contractAddress: string,
+  tokenId: number,
+  ctx: Context
+): Promise<boolean> => {
+  const bcd = mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork);
+
+  const contract = await bcd.contractByAddress(contractAddress);
+  const [ledgerId] = _(contract.bigmap_ids).uniq().sort().value();
+
+  const ledgerBigMap = bcd.bigMapById<string, LedgerBigMapValue>(ledgerId);
+  const ledgerItems = await ledgerBigMap.values();
+
+  return ledgerItems.find(i => i.key === tokenId.toString()) !== undefined;
 };
