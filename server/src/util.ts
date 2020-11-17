@@ -114,6 +114,8 @@ export async function publishOperation<A>(
     .then(a => a || null);
 }
 
+export const anyValue = Symbol('any');
+
 export function selectObjectByKeys(
   object: any,
   ks: Record<string, any>
@@ -126,7 +128,7 @@ export function selectObjectByKeys(
     Object.keys(ks).every(
       k =>
         object.hasOwnProperty(k) &&
-        (ks[k] === null ? true : ks[k] === object[k])
+        (ks[k] === anyValue ? true : ks[k] === object[k])
     )
   ) {
     return object;

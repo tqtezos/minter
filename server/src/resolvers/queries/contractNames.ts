@@ -58,13 +58,14 @@ export const contractNames = async (
   const betterCallDev = mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork);
 
   const contract = await betterCallDev.contractByAddress(factoryAddress);
+  const { ledger } = contract.bigmaps;
 
-  if (contract.bigmaps.ledger === undefined) {
+  if (ledger === undefined) {
     return [faucetContract];
   }
 
   const contracts = await betterCallDev
-    .bigMapById<ContractBigMapValue>(contract.bigmaps.ledger)
+    .bigMapById<ContractBigMapValue>(ledger)
     .values();
 
   const filterContracts = !_.isNil(contractOwnerAddress)
