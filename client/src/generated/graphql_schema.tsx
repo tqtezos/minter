@@ -50,7 +50,7 @@ export type MutationCreateNonFungibleTokenSyncArgs = {
 export type NonFungibleToken = {
   __typename?: 'NonFungibleToken';
   contractInfo: ContractInfo;
-  tokenId: Scalars['String'];
+  tokenId: Scalars['Int'];
   symbol: Scalars['String'];
   name: Scalars['String'];
   owner: Scalars['String'];

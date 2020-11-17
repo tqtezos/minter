@@ -59,7 +59,7 @@ export type MutationCreateNonFungibleTokenSyncArgs = {
 export type NonFungibleToken = {
   __typename?: 'NonFungibleToken';
   contractInfo: ContractInfo;
-  tokenId: Scalars['String'];
+  tokenId: Scalars['Int'];
   symbol: Scalars['String'];
   name: Scalars['String'];
   owner: Scalars['String'];
@@ -276,8 +276,8 @@ export type ResolversTypes = ResolversObject<{
   String: ResolverTypeWrapper<Scalars['String']>;
   NonFungibleToken: ResolverTypeWrapper<NonFungibleToken>;
   ContractInfo: ResolverTypeWrapper<ContractInfo>;
-  JSON: ResolverTypeWrapper<Scalars['JSON']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
+  JSON: ResolverTypeWrapper<Scalars['JSON']>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   PublishedOperation: ResolverTypeWrapper<PublishedOperation>;
   Settings: ResolverTypeWrapper<Settings>;
@@ -295,8 +295,8 @@ export type ResolversParentTypes = ResolversObject<{
   String: Scalars['String'];
   NonFungibleToken: NonFungibleToken;
   ContractInfo: ContractInfo;
-  JSON: Scalars['JSON'];
   Int: Scalars['Int'];
+  JSON: Scalars['JSON'];
   Boolean: Scalars['Boolean'];
   PublishedOperation: PublishedOperation;
   Settings: Settings;
@@ -370,7 +370,7 @@ export type NonFungibleTokenResolvers<
     ParentType,
     ContextType
   >;
-  tokenId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tokenId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   symbol?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   owner?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
