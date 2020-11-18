@@ -59,12 +59,6 @@ type Query {
   contractNames(contractOwnerAddress: String, nftOwnerAddress: String): [ContractInfo!]!
   nftExists(contractAddress: String!, tokenId: Int!): Boolean!
 
-  nftsBcd(ownerAddress: String, contractAddress: String): [NonFungibleToken!]!
-  contractNamesBcd(contractOwnerAddress: String, nftOwnerAddress: String): [ContractInfo!]!
-
-  nftByTokenId(token_id: String!): NonFungibleToken
-  nftByOperation(operation_address: String!): NonFungibleToken
-
   publishedOperationByHash(hash: String!): PublishedOperation
   settings: Settings!
 }

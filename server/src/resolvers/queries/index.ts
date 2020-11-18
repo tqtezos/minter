@@ -3,8 +3,6 @@ import PublishedOperation from '../../models/published_operation';
 import { contractNames } from './contractNames';
 import { nfts, nftExists } from './nfts';
 
-// This function only works for minter built-in contract.
-// It has to be removed or generalized to work with multiple contracts
 const Query: QueryResolvers = {
   async publishedOperationByHash(_parent, { hash }, { db }) {
     const publishedOp = await PublishedOperation.byHash(db, hash);

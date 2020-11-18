@@ -1,56 +1,69 @@
 import axios from 'axios';
+import { selectObjectByKeys } from '../../util';
+import { isNil } from 'lodash';
 
 export type Address = string;
 
-interface Contract {
+export interface BaseContract {
   address: Address;
   manager: Address;
-  bigmap_ids: number[];
+  storage: any;
 }
+
+export interface GenericContract extends BaseContract {
+  contractType: 'GenericContract';
+}
+
+export interface FA2FactoryContract extends BaseContract {
+  contractType: 'FA2FactoryContract';
+  address: Address;
+  manager: Address;
+  contractsBigMapId: number;
+}
+
+export interface FA2Contract extends BaseContract {
+  contractType: 'FA2Contract';
+  bigMaps: {
+    ledger: number;
+    operators: number;
+    token_metadata: number;
+  };
+}
+
+export type Contract = FA2Contract | FA2FactoryContract | GenericContract;
 
 export interface BigMapItem<K, V> {
   key: K;
   value: V;
 }
 
+function gatherBigMapChildren(children: any) {
+  return children.reduce((acc: any, v: any) => {
+    const value =
+      v.value !== undefined ? v.value : gatherBigMapChildren(v.children);
+    return { ...acc, [v.name]: value };
+  }, {});
+}
+
 export const BigMap = <K, V>(baseUrl: string, network: string, id: number) => ({
   async values(): Promise<BigMapItem<K, V>[]> {
     const resp = await axios.get(`${baseUrl}/v1/bigmap/${network}/${id}/keys`);
-    return resp.data.map((i: any) => ({
-      key: i.data.key_string,
-      value: i.data.value.value
-        ? i.data.value.value
-        : i.data.value.children.reduce((acc: any, v: any) => {
-            return {
-              ...acc,
-              [v.name]: v.value
-                ? v.value
-                : v.children.reduce((acc: any, v2: any) => {
-                    return { ...acc, [v2.name]: v2.value };
-                  }, {})
-            };
-          }, {})
-    }));
+    return resp.data.map((i: any) => {
+      const { value, children } = i.data.value;
+      return {
+        key: i.data.key_string,
+        value: value !== undefined ? value : gatherBigMapChildren(children)
+      };
+    });
   }
 });
 
-function extractBigMapIds(storage: any): number[] {
-  if (storage.type === 'big_map') {
-    return [storage.value];
-  }
-  if (storage.children && storage.children[1]?.type === 'namedtuple') {
-    return storage.children[1].children
-      .filter((v: any) => v.type === 'big_map')
-      .map((v: any) => v.value);
-  }
-  if (storage.children) {
-    return storage.children
-      .filter((v: any) => v.type === 'big_map')
-      .map((v: any) => v.value);
-  }
-  return [];
+function selectBigMap(storage: any, name: string) {
+  return selectObjectByKeys(storage, { type: 'big_map', name });
 }
 
+// TODO: This function should return various well-typed contracts based on their
+// metadata, which relies on TZIP-16 support
 export async function contractByAddress(
   baseUrl: string,
   network: string,
@@ -59,16 +72,41 @@ export async function contractByAddress(
   const contractUrl = `${baseUrl}/v1/contract/${network}/${address}`;
   const contract = (await axios.get(contractUrl)).data;
   const storage = (await axios.get(`${contractUrl}/storage`)).data;
+  const manager = contract.manager;
 
-  return {
-    address,
-    manager: contract.manager,
-    bigmap_ids: extractBigMapIds(storage)
-  };
+  const baseContract = { address, manager, storage };
+
+  const ledger = selectBigMap(storage, 'ledger')?.value;
+  const operators = selectBigMap(storage, 'operators')?.value;
+  const token_metadata = selectBigMap(storage, 'token_metadata')?.value;
+
+  if ([ledger, operators, token_metadata].every((i: any) => !isNil(i))) {
+    return {
+      ...baseContract,
+      contractType: 'FA2Contract',
+      bigMaps: {
+        ledger,
+        operators,
+        token_metadata
+      }
+    };
+  }
+
+  const contractsBigMapId = storage.value;
+
+  if (!isNil(contractsBigMapId) && typeof storage.value === 'number') {
+    return {
+      ...baseContract,
+      contractType: 'FA2FactoryContract',
+      contractsBigMapId
+    };
+  }
+
+  return { ...baseContract, contractType: 'GenericContract' };
 }
 
 export const mkBetterCallDev = (baseUrl: string, network: string) => ({
-  contractByAddress(address: string): Promise<Contract> {
+  contractByAddress(address: string) {
     return contractByAddress(baseUrl, network, address);
   },
 

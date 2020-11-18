@@ -7,7 +7,7 @@ interface ContractBigMapValue {
   name: string;
 }
 
-export interface Contract {
+export interface ContractIdentifier {
   address: string;
   name: string;
 }
@@ -17,16 +17,20 @@ const contractNftOwners = async (
   contractAddress: Address
 ): Promise<Address[]> => {
   const contract = await betterCallDev.contractByAddress(contractAddress);
-  const [ledgerId] = _(contract.bigmap_ids).uniq().sort().value();
+  if (contract.contractType !== 'FA2Contract') {
+    return [];
+  }
 
-  const ledgerBigMap = betterCallDev.bigMapById<string, string>(ledgerId);
+  const ledgerBigMap = betterCallDev.bigMapById<string, string>(
+    contract.bigMaps.ledger
+  );
   const values = await ledgerBigMap.values();
   return values.map(v => v.value);
 };
 
 const filterContractsByNftOwner = async (
   betterCallDev: BetterCallDev,
-  contracts: Contract[],
+  contracts: ContractIdentifier[],
   nftOwnerAddress: Address
 ) => {
   const PairPromises = contracts.map(
@@ -47,40 +51,41 @@ export const contractNames = async (
   contractOwnerAddress: string | null | undefined,
   nftOwnerAddress: string | null | undefined,
   ctx: Context
-): Promise<Contract[]> => {
+): Promise<ContractIdentifier[]> => {
   const factoryAddress = ctx.configStore.get('contracts.nftFactory') as string;
   const faucetAddress = ctx.configStore.get('contracts.nftFaucet') as string;
   const faucetContract = { address: faucetAddress, name: 'Minter' };
   const betterCallDev = mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork);
-
   const contract = await betterCallDev.contractByAddress(factoryAddress);
 
-  if (contract.bigmap_ids.length === 0) {
-    return [faucetContract];
+  switch (contract.contractType) {
+    case 'GenericContract':
+      return [];
+    case 'FA2Contract':
+      return [faucetContract];
+    case 'FA2FactoryContract': {
+      const contracts = await betterCallDev
+        .bigMapById<string, ContractBigMapValue>(contract.contractsBigMapId)
+        .values();
+
+      const filterContracts = !_.isNil(contractOwnerAddress)
+        ? contracts.filter(i => i.value.owner === contractOwnerAddress)
+        : contracts;
+
+      const result = filterContracts.map(i => ({
+        address: i.key,
+        name: i.value.name
+      }));
+
+      const allContracts = [faucetContract, ...result];
+
+      if (_.isNil(nftOwnerAddress)) return allContracts;
+
+      return filterContractsByNftOwner(
+        betterCallDev,
+        allContracts,
+        nftOwnerAddress
+      );
+    }
   }
-
-  const [bigMapId] = contract.bigmap_ids;
-
-  const contracts = await betterCallDev
-    .bigMapById<string, ContractBigMapValue>(bigMapId)
-    .values();
-
-  const filterContracts = !_.isNil(contractOwnerAddress)
-    ? contracts.filter(i => i.value.owner === contractOwnerAddress)
-    : contracts;
-
-  const result = filterContracts.map(i => ({
-    address: i.key,
-    name: i.value.name
-  }));
-
-  const allContracts = [faucetContract, ...result];
-
-  if (_.isNil(nftOwnerAddress)) return allContracts;
-
-  return filterContractsByNftOwner(
-    betterCallDev,
-    allContracts,
-    nftOwnerAddress
-  );
 };

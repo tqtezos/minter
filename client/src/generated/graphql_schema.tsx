@@ -73,10 +73,6 @@ export type Query = {
   nfts: Array<NonFungibleToken>;
   contractNames: Array<ContractInfo>;
   nftExists: Scalars['Boolean'];
-  nftsBcd: Array<NonFungibleToken>;
-  contractNamesBcd: Array<ContractInfo>;
-  nftByTokenId?: Maybe<NonFungibleToken>;
-  nftByOperation?: Maybe<NonFungibleToken>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
   settings: Settings;
 };
@@ -94,24 +90,6 @@ export type QueryContractNamesArgs = {
 export type QueryNftExistsArgs = {
   contractAddress: Scalars['String'];
   tokenId: Scalars['Int'];
-};
-
-export type QueryNftsBcdArgs = {
-  ownerAddress?: Maybe<Scalars['String']>;
-  contractAddress?: Maybe<Scalars['String']>;
-};
-
-export type QueryContractNamesBcdArgs = {
-  contractOwnerAddress?: Maybe<Scalars['String']>;
-  nftOwnerAddress?: Maybe<Scalars['String']>;
-};
-
-export type QueryNftByTokenIdArgs = {
-  token_id: Scalars['String'];
-};
-
-export type QueryNftByOperationArgs = {
-  operation_address: Scalars['String'];
 };
 
 export type QueryPublishedOperationByHashArgs = {
