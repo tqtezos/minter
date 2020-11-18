@@ -1,17 +1,36 @@
 import axios from 'axios';
 import { selectObjectByKeys } from '../../util';
+import { isNil } from 'lodash';
 
 export type Address = string;
 
-interface Contract {
+export interface BaseContract {
   address: Address;
   manager: Address;
-  bigmaps: {
-    ledger?: number;
-    operators?: number;
-    token_metadata?: number;
+  storage: any;
+}
+
+export interface GenericContract extends BaseContract {
+  contractType: 'GenericContract';
+}
+
+export interface FA2FactoryContract extends BaseContract {
+  contractType: 'FA2FactoryContract';
+  address: Address;
+  manager: Address;
+  contractsBigMapId: number;
+}
+
+export interface FA2Contract extends BaseContract {
+  contractType: 'FA2Contract';
+  bigMaps: {
+    ledger: number;
+    operators: number;
+    token_metadata: number;
   };
 }
+
+export type Contract = FA2Contract | FA2FactoryContract | GenericContract;
 
 export interface BigMapItem<T> {
   key: string;
@@ -43,6 +62,8 @@ function selectBigMap(storage: any, name: string) {
   return selectObjectByKeys(storage, { type: 'big_map', name });
 }
 
+// TODO: This function should return various well-typed contracts based on their
+// metadata, which relies on TZIP-16 support
 export async function contractByAddress(
   baseUrl: string,
   network: string,
@@ -51,20 +72,41 @@ export async function contractByAddress(
   const contractUrl = `${baseUrl}/v1/contract/${network}/${address}`;
   const contract = (await axios.get(contractUrl)).data;
   const storage = (await axios.get(`${contractUrl}/storage`)).data;
+  const manager = contract.manager;
 
-  return {
-    address,
-    manager: contract.manager,
-    bigmaps: {
-      ledger: selectBigMap(storage, 'ledger')?.value,
-      operators: selectBigMap(storage, 'operators')?.value,
-      token_metadata: selectBigMap(storage, 'token_metadata')?.value
-    }
-  };
+  const baseContract = { address, manager, storage };
+
+  const ledger = selectBigMap(storage, 'ledger')?.value;
+  const operators = selectBigMap(storage, 'operators')?.value;
+  const token_metadata = selectBigMap(storage, 'token_metadata')?.value;
+
+  if ([ledger, operators, token_metadata].every((i: any) => !isNil(i))) {
+    return {
+      ...baseContract,
+      contractType: 'FA2Contract',
+      bigMaps: {
+        ledger,
+        operators,
+        token_metadata
+      }
+    };
+  }
+
+  const contractsBigMapId = storage.value;
+
+  if (!isNil(contractsBigMapId) && typeof storage.value === 'number') {
+    return {
+      ...baseContract,
+      contractType: 'FA2FactoryContract',
+      contractsBigMapId
+    };
+  }
+
+  return { ...baseContract, contractType: 'GenericContract' };
 }
 
 export const mkBetterCallDev = (baseUrl: string, network: string) => ({
-  contractByAddress(address: string): Promise<Contract> {
+  contractByAddress(address: string) {
     return contractByAddress(baseUrl, network, address);
   },
 
