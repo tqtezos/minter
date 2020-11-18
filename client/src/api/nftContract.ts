@@ -2,6 +2,11 @@ import { BigNumber } from 'bignumber.js';
 import { MichelsonMap, WalletContract } from '@taquito/taquito';
 
 import { retrieveStorageField, Address, Nat } from './contractUtil';
+import {
+  waitUntilNftExists,
+  waitUntilNftDoesNotExist
+} from '../utils/waitForNft';
+import { ApolloClient } from '@apollo/react-hooks';
 
 interface CreateTokenArgs {
   symbol: string;
@@ -21,6 +26,7 @@ export interface NftContract {
 }
 
 const mkNftContract = async (
+  client: ApolloClient<object>,
   contract: WalletContract,
   ownerAddress: Address
 ): Promise<NftContract> => ({
@@ -40,8 +46,8 @@ const mkNftContract = async (
       }
     ];
 
-    const operation = await contract.methods.mint(params).send();
-    await operation.confirmation();
+    await contract.methods.mint(params).send();
+    return waitUntilNftExists(client, contract.address, tokenId.toNumber());
   },
 
   async transferToken({ to, tokenId }) {
@@ -52,8 +58,13 @@ const mkNftContract = async (
       }
     ];
 
-    const operation = await contract.methods.transfer(params).send();
-    await operation.confirmation();
+    await contract.methods.transfer(params).send();
+    
+    return waitUntilNftDoesNotExist(
+      client,
+      contract.address,
+      tokenId.toNumber()
+    );
   }
 });
 

@@ -5,6 +5,7 @@ import { Address } from './contractUtil';
 import { NftContract } from './nftContract';
 import mkNftContract from './nftContract';
 import mkNftFactoryContract from './nftFactoryContract';
+import { ApolloClient } from '@apollo/react-hooks';
 
 export interface NftContractApi {
   faucetContractAddress: Address;
@@ -13,6 +14,7 @@ export interface NftContractApi {
 }
 
 const mkContractApi = async (
+  client: ApolloClient<object>,
   tzToolkit: TezosToolkit,
   settings: SettingsContracts
 ): Promise<NftContractApi> => {
@@ -31,7 +33,7 @@ const mkContractApi = async (
     async contractByAddress(address: Address) {
       const contract = await tzToolkit.wallet.at(address);
       const ownerAddress = await tzToolkit.wallet.pkh();
-      return mkNftContract(contract, ownerAddress);
+      return mkNftContract(client, contract, ownerAddress);
     }
   };
 };
