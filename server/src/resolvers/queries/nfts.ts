@@ -22,19 +22,16 @@ const nftsByContractAddress = async (
 ): Promise<NonFungibleToken[]> => {
   const contract = await betterCallDev.contractByAddress(contractInfo.address);
 
-  const [ledgerId, , tokenMetadataId] = _(contract.bigmap_ids)
-    .uniq()
-    .sort()
-    .value();
-
-  if (contract.bigmap_ids.length === 0) {
+  if (contract.contractType !== 'FA2Contract') {
     return [];
   }
 
-  const tokenBigMap = betterCallDev.bigMapById<NftBigMapValue>(tokenMetadataId);
+  const { ledger, token_metadata } = contract.bigMaps;
+
+  const tokenBigMap = betterCallDev.bigMapById<NftBigMapValue>(token_metadata);
   const tokenItems = await tokenBigMap.values();
 
-  const ledgerBigMap = betterCallDev.bigMapById<LedgerBigMapValue>(ledgerId);
+  const ledgerBigMap = betterCallDev.bigMapById<LedgerBigMapValue>(ledger);
   const ledgerItems = await ledgerBigMap.values();
 
   const ownerByTokenId = _(ledgerItems)
