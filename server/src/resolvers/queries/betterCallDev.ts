@@ -1,4 +1,5 @@
 import axios, { AxiosError } from 'axios';
+import axiosRetry from 'axios-retry';
 import { isNil } from 'lodash';
 
 import { selectObjectByKeys } from '../../util';
@@ -111,6 +112,8 @@ export async function contractByAddress(
   return { ...baseContract, contractType: 'GenericContract' };
 }
 
+axiosRetry(axios, { retries: 3 });
+
 export const mkBetterCallDev = (baseUrl: string, network: string) => ({
   contractByAddress(address: string) {
     return contractByAddress(baseUrl, network, address);
@@ -130,6 +133,11 @@ export const mkBetterCallDev = (baseUrl: string, network: string) => ({
 
       const operations = await axios.get<{ operations: Operation[] }>(
         `${baseUrl}/v1/contract/${network}/${contractAddress}/operations?from=${from}`,
+        {
+          'axios-retry': {
+            retries: 0
+          }
+        }
       );
 
       return operations.data.operations.find(o => o.hash === hash);

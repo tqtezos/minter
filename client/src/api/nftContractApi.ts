@@ -19,6 +19,7 @@ const mkContractApi = async (
   settings: SettingsContracts
 ): Promise<NftContractApi> => {
   const factoryContract = await mkNftFactoryContract(
+    client,
     tzToolkit,
     settings.nftFactory
   );
