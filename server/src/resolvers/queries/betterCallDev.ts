@@ -1,6 +1,7 @@
-import axios from 'axios';
-import { selectObjectByKeys } from '../../util';
+import axios, { AxiosError } from 'axios';
 import { isNil } from 'lodash';
+
+import { selectObjectByKeys } from '../../util';
 
 export type Address = string;
 
@@ -29,12 +30,17 @@ export interface FA2Contract extends BaseContract {
     token_metadata: number;
   };
 }
-
 export type Contract = FA2Contract | FA2FactoryContract | GenericContract;
+export interface Operation {
+  hash: string;
+  status: 'applied' | 'failed' | 'skipped' | 'backtracked';
+  timestamp: string;
+  errors: [any] | undefined;
+}
 
-export interface BigMapItem<K, V> {
-  key: K;
-  value: V;
+export interface BigMapItem<T> {
+  key: string;
+  value: T;
 }
 
 function gatherBigMapChildren(children: any) {
@@ -45,8 +51,8 @@ function gatherBigMapChildren(children: any) {
   }, {});
 }
 
-export const BigMap = <K, V>(baseUrl: string, network: string, id: number) => ({
-  async values(): Promise<BigMapItem<K, V>[]> {
+export const BigMap = <T>(baseUrl: string, network: string, id: number) => ({
+  async values(): Promise<BigMapItem<T>[]> {
     const resp = await axios.get(`${baseUrl}/v1/bigmap/${network}/${id}/keys`);
     return resp.data.map((i: any) => {
       const { value, children } = i.data.value;
@@ -110,8 +116,27 @@ export const mkBetterCallDev = (baseUrl: string, network: string) => ({
     return contractByAddress(baseUrl, network, address);
   },
 
-  bigMapById<K, V>(id: number) {
-    return BigMap<K, V>(baseUrl, network, id);
+  bigMapById<T>(id: number) {
+    return BigMap<T>(baseUrl, network, id);
+  },
+
+  async contractOperation(
+    contractAddress: string,
+    hash: string
+  ): Promise<Operation | undefined> {
+    try {
+      const delta = 3 * 60 * 60 * 1000; // 3 hours
+      const from = Date.now() - delta; // request operations happened in the last 3 hours
+
+      const operations = await axios.get<{ operations: Operation[] }>(
+        `${baseUrl}/v1/contract/${network}/${contractAddress}/operations?from=${from}`,
+      );
+
+      return operations.data.operations.find(o => o.hash === hash);
+    } catch (e) {
+      if ((e as AxiosError).response?.status === 500) return undefined;
+      else throw e;
+    }
   }
 });
 

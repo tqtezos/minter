@@ -57,6 +57,18 @@ export type NonFungibleToken = {
   extras: Scalars['JSON'];
 };
 
+export type OperationStatus = {
+  __typename?: 'OperationStatus';
+  status: OperationStatusType;
+  timestamp: Scalars['String'];
+  error?: Maybe<Scalars['JSON']>;
+};
+
+export enum OperationStatusType {
+  Applied = 'APPLIED',
+  Failed = 'FAILED'
+}
+
 export type PublishedOperation = {
   __typename?: 'PublishedOperation';
   id: Scalars['Int'];
@@ -72,7 +84,7 @@ export type Query = {
   __typename?: 'Query';
   nfts: Array<NonFungibleToken>;
   contractNames: Array<ContractInfo>;
-  nftExists: Scalars['Boolean'];
+  contractOperationStatus?: Maybe<OperationStatus>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
   settings: Settings;
 };
@@ -87,9 +99,9 @@ export type QueryContractNamesArgs = {
   nftOwnerAddress?: Maybe<Scalars['String']>;
 };
 
-export type QueryNftExistsArgs = {
+export type QueryContractOperationStatusArgs = {
   contractAddress: Scalars['String'];
-  tokenId: Scalars['Int'];
+  hash: Scalars['String'];
 };
 
 export type QueryPublishedOperationByHashArgs = {

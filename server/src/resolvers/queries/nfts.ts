@@ -28,12 +28,12 @@ const nftsByContractAddress = async (
 
   const { ledger, token_metadata } = contract.bigMaps;
 
-  const tokenBigMap = betterCallDev.bigMapById<string, NftBigMapValue>(
+  const tokenBigMap = betterCallDev.bigMapById<NftBigMapValue>(
     token_metadata
   );
   const tokenItems = await tokenBigMap.values();
 
-  const ledgerBigMap = betterCallDev.bigMapById<string, LedgerBigMapValue>(
+  const ledgerBigMap = betterCallDev.bigMapById<LedgerBigMapValue>(
     ledger
   );
   const ledgerItems = await ledgerBigMap.values();
@@ -83,22 +83,4 @@ export const nfts = async (
   });
   const nftArrays = await Promise.all(promises);
   return _.flatten(nftArrays);
-};
-
-export const nftExists = async (
-  contractAddress: string,
-  tokenId: number,
-  ctx: Context
-): Promise<boolean> => {
-  const bcd = mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork);
-
-  const contract = await bcd.contractByAddress(contractAddress);
-  
-  if (contract.contractType !== 'FA2Contract')
-    throw Error(`nftExists: '${contractAddress} is not an FA2 contract`);
-
-  const ledgerBigMap = bcd.bigMapById<string, LedgerBigMapValue>(contract.bigMaps.ledger);
-  const ledgerItems = await ledgerBigMap.values();
-
-  return ledgerItems.find(i => i.key === tokenId.toString()) !== undefined;
 };
