@@ -59,12 +59,24 @@ export type MutationCreateNonFungibleTokenSyncArgs = {
 export type NonFungibleToken = {
   __typename?: 'NonFungibleToken';
   contractInfo: ContractInfo;
-  tokenId: Scalars['String'];
+  tokenId: Scalars['Int'];
   symbol: Scalars['String'];
   name: Scalars['String'];
   owner: Scalars['String'];
   extras: Scalars['JSON'];
 };
+
+export type OperationStatus = {
+  __typename?: 'OperationStatus';
+  status: OperationStatusType;
+  timestamp: Scalars['String'];
+  error?: Maybe<Scalars['JSON']>;
+};
+
+export enum OperationStatusType {
+  Applied = 'APPLIED',
+  Failed = 'FAILED'
+}
 
 export type PublishedOperation = {
   __typename?: 'PublishedOperation';
@@ -81,10 +93,7 @@ export type Query = {
   __typename?: 'Query';
   nfts: Array<NonFungibleToken>;
   contractNames: Array<ContractInfo>;
-  nftsBcd: Array<NonFungibleToken>;
-  contractNamesBcd: Array<ContractInfo>;
-  nftByTokenId?: Maybe<NonFungibleToken>;
-  nftByOperation?: Maybe<NonFungibleToken>;
+  contractOperationStatus?: Maybe<OperationStatus>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
   settings: Settings;
 };
@@ -99,22 +108,9 @@ export type QueryContractNamesArgs = {
   nftOwnerAddress?: Maybe<Scalars['String']>;
 };
 
-export type QueryNftsBcdArgs = {
-  ownerAddress?: Maybe<Scalars['String']>;
-  contractAddress?: Maybe<Scalars['String']>;
-};
-
-export type QueryContractNamesBcdArgs = {
-  contractOwnerAddress?: Maybe<Scalars['String']>;
-  nftOwnerAddress?: Maybe<Scalars['String']>;
-};
-
-export type QueryNftByTokenIdArgs = {
-  token_id: Scalars['String'];
-};
-
-export type QueryNftByOperationArgs = {
-  operation_address: Scalars['String'];
+export type QueryContractOperationStatusArgs = {
+  contractAddress: Scalars['String'];
+  hash: Scalars['String'];
 };
 
 export type QueryPublishedOperationByHashArgs = {
@@ -270,9 +266,11 @@ export type ResolversTypes = ResolversObject<{
   String: ResolverTypeWrapper<Scalars['String']>;
   NonFungibleToken: ResolverTypeWrapper<NonFungibleToken>;
   ContractInfo: ResolverTypeWrapper<ContractInfo>;
-  JSON: ResolverTypeWrapper<Scalars['JSON']>;
-  PublishedOperation: ResolverTypeWrapper<PublishedOperation>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
+  JSON: ResolverTypeWrapper<Scalars['JSON']>;
+  OperationStatus: ResolverTypeWrapper<OperationStatus>;
+  OperationStatusType: OperationStatusType;
+  PublishedOperation: ResolverTypeWrapper<PublishedOperation>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Settings: ResolverTypeWrapper<Settings>;
   SettingsAdmin: ResolverTypeWrapper<SettingsAdmin>;
@@ -289,9 +287,10 @@ export type ResolversParentTypes = ResolversObject<{
   String: Scalars['String'];
   NonFungibleToken: NonFungibleToken;
   ContractInfo: ContractInfo;
-  JSON: Scalars['JSON'];
-  PublishedOperation: PublishedOperation;
   Int: Scalars['Int'];
+  JSON: Scalars['JSON'];
+  OperationStatus: OperationStatus;
+  PublishedOperation: PublishedOperation;
   Boolean: Scalars['Boolean'];
   Settings: Settings;
   SettingsAdmin: SettingsAdmin;
@@ -364,11 +363,25 @@ export type NonFungibleTokenResolvers<
     ParentType,
     ContextType
   >;
-  tokenId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tokenId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   symbol?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   owner?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   extras?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+}>;
+
+export type OperationStatusResolvers<
+  ContextType = Context,
+  ParentType extends ResolversParentTypes['OperationStatus'] = ResolversParentTypes['OperationStatus']
+> = ResolversObject<{
+  status?: Resolver<
+    ResolversTypes['OperationStatusType'],
+    ParentType,
+    ContextType
+  >;
+  timestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  error?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
@@ -402,29 +415,11 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryContractNamesArgs, never>
   >;
-  nftsBcd?: Resolver<
-    Array<ResolversTypes['NonFungibleToken']>,
+  contractOperationStatus?: Resolver<
+    Maybe<ResolversTypes['OperationStatus']>,
     ParentType,
     ContextType,
-    RequireFields<QueryNftsBcdArgs, never>
-  >;
-  contractNamesBcd?: Resolver<
-    Array<ResolversTypes['ContractInfo']>,
-    ParentType,
-    ContextType,
-    RequireFields<QueryContractNamesBcdArgs, never>
-  >;
-  nftByTokenId?: Resolver<
-    Maybe<ResolversTypes['NonFungibleToken']>,
-    ParentType,
-    ContextType,
-    RequireFields<QueryNftByTokenIdArgs, 'token_id'>
-  >;
-  nftByOperation?: Resolver<
-    Maybe<ResolversTypes['NonFungibleToken']>,
-    ParentType,
-    ContextType,
-    RequireFields<QueryNftByOperationArgs, 'operation_address'>
+    RequireFields<QueryContractOperationStatusArgs, 'contractAddress' | 'hash'>
   >;
   publishedOperationByHash?: Resolver<
     Maybe<ResolversTypes['PublishedOperation']>,
@@ -498,6 +493,7 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   JSON?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   NonFungibleToken?: NonFungibleTokenResolvers<ContextType>;
+  OperationStatus?: OperationStatusResolvers<ContextType>;
   PublishedOperation?: PublishedOperationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Settings?: SettingsResolvers<ContextType>;

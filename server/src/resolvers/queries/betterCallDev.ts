@@ -1,6 +1,8 @@
-import axios from 'axios';
-import { selectObjectByKeys } from '../../util';
+import axios, { AxiosError } from 'axios';
+import axiosRetry from 'axios-retry';
 import { isNil } from 'lodash';
+
+import { selectObjectByKeys } from '../../util';
 
 export type Address = string;
 
@@ -29,8 +31,13 @@ export interface FA2Contract extends BaseContract {
     token_metadata: number;
   };
 }
-
 export type Contract = FA2Contract | FA2FactoryContract | GenericContract;
+export interface Operation {
+  hash: string;
+  status: 'applied' | 'failed' | 'skipped' | 'backtracked';
+  timestamp: string;
+  errors: [any] | undefined;
+}
 
 export interface BigMapItem<T> {
   key: string;
@@ -105,6 +112,8 @@ export async function contractByAddress(
   return { ...baseContract, contractType: 'GenericContract' };
 }
 
+axiosRetry(axios, { retries: 3 });
+
 export const mkBetterCallDev = (baseUrl: string, network: string) => ({
   contractByAddress(address: string) {
     return contractByAddress(baseUrl, network, address);
@@ -112,6 +121,30 @@ export const mkBetterCallDev = (baseUrl: string, network: string) => ({
 
   bigMapById<T>(id: number) {
     return BigMap<T>(baseUrl, network, id);
+  },
+
+  async contractOperation(
+    contractAddress: string,
+    hash: string
+  ): Promise<Operation | undefined> {
+    try {
+      const delta = 3 * 60 * 60 * 1000; // 3 hours
+      const from = Date.now() - delta; // request operations happened in the last 3 hours
+
+      const operations = await axios.get<{ operations: Operation[] }>(
+        `${baseUrl}/v1/contract/${network}/${contractAddress}/operations?from=${from}`,
+        {
+          'axios-retry': {
+            retries: 0
+          }
+        }
+      );
+
+      return operations.data.operations.find(o => o.hash === hash);
+    } catch (e) {
+      if ((e as AxiosError).response?.status === 500) return undefined;
+      else throw e;
+    }
   }
 });
 

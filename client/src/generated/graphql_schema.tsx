@@ -50,12 +50,24 @@ export type MutationCreateNonFungibleTokenSyncArgs = {
 export type NonFungibleToken = {
   __typename?: 'NonFungibleToken';
   contractInfo: ContractInfo;
-  tokenId: Scalars['String'];
+  tokenId: Scalars['Int'];
   symbol: Scalars['String'];
   name: Scalars['String'];
   owner: Scalars['String'];
   extras: Scalars['JSON'];
 };
+
+export type OperationStatus = {
+  __typename?: 'OperationStatus';
+  status: OperationStatusType;
+  timestamp: Scalars['String'];
+  error?: Maybe<Scalars['JSON']>;
+};
+
+export enum OperationStatusType {
+  Applied = 'APPLIED',
+  Failed = 'FAILED'
+}
 
 export type PublishedOperation = {
   __typename?: 'PublishedOperation';
@@ -72,10 +84,7 @@ export type Query = {
   __typename?: 'Query';
   nfts: Array<NonFungibleToken>;
   contractNames: Array<ContractInfo>;
-  nftsBcd: Array<NonFungibleToken>;
-  contractNamesBcd: Array<ContractInfo>;
-  nftByTokenId?: Maybe<NonFungibleToken>;
-  nftByOperation?: Maybe<NonFungibleToken>;
+  contractOperationStatus?: Maybe<OperationStatus>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
   settings: Settings;
 };
@@ -90,22 +99,9 @@ export type QueryContractNamesArgs = {
   nftOwnerAddress?: Maybe<Scalars['String']>;
 };
 
-export type QueryNftsBcdArgs = {
-  ownerAddress?: Maybe<Scalars['String']>;
-  contractAddress?: Maybe<Scalars['String']>;
-};
-
-export type QueryContractNamesBcdArgs = {
-  contractOwnerAddress?: Maybe<Scalars['String']>;
-  nftOwnerAddress?: Maybe<Scalars['String']>;
-};
-
-export type QueryNftByTokenIdArgs = {
-  token_id: Scalars['String'];
-};
-
-export type QueryNftByOperationArgs = {
-  operation_address: Scalars['String'];
+export type QueryContractOperationStatusArgs = {
+  contractAddress: Scalars['String'];
+  hash: Scalars['String'];
 };
 
 export type QueryPublishedOperationByHashArgs = {

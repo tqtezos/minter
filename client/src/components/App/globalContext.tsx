@@ -11,6 +11,7 @@ import React, {
 import { TezosToolkit } from '@taquito/taquito';
 import useSettings from '../common/useSettings';
 import mkContracts, { Contracts } from '../../api/contracts';
+import { useApolloClient } from '@apollo/react-hooks';
 
 const TzToolkitContext = createContext<TezosToolkit | undefined>(undefined);
 
@@ -20,15 +21,16 @@ const TzToolkitSetterContext = createContext<TztSetter>(undefined!);
 const ContractsContext = createContext<Contracts | undefined>(undefined);
 
 const GlobalContextProvider: FC = ({ children }) => {
+  const apolloClient = useApolloClient();
   const [tzToolkit, setTzToolkit] = React.useState<TezosToolkit | undefined>();
   const [contracts, setContracts] = React.useState<Contracts | undefined>();
   const { settings, loading } = useSettings();
 
   useEffect(() => {
     if (tzToolkit && settings)
-      setContracts(mkContracts(tzToolkit, settings.contracts));
+      setContracts(mkContracts(apolloClient, tzToolkit, settings.contracts));
     else setContracts(undefined);
-  }, [tzToolkit, settings]);
+  }, [apolloClient, tzToolkit, settings]);
 
   return (
     <>

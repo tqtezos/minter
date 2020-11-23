@@ -1,7 +1,8 @@
-import { Resolvers, QueryResolvers } from '../../generated/graphql_schema';
+import { Resolvers, QueryResolvers, OperationStatusType } from '../../generated/graphql_schema';
 import PublishedOperation from '../../models/published_operation';
 import { contractNames } from './contractNames';
 import { nfts } from './nfts';
+import { mkBetterCallDev } from './betterCallDev';
 
 const Query: QueryResolvers = {
   async publishedOperationByHash(_parent, { hash }, { db }) {
@@ -15,6 +16,17 @@ const Query: QueryResolvers = {
 
   async contractNames(_parent, { contractOwnerAddress, nftOwnerAddress }, ctx) {
     return contractNames(contractOwnerAddress, nftOwnerAddress, ctx);
+  },
+
+  async contractOperationStatus(_parent, { contractAddress, hash }, ctx) {
+    const bcd = mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork);
+    const op = await bcd.contractOperation(contractAddress, hash)
+    
+    return op ? {
+      status: op.status === 'applied' ? OperationStatusType.Applied : OperationStatusType.Failed,
+      timestamp: op.timestamp,
+      error: op.errors && op.errors.length > 0 ? op.errors[0] : undefined
+    } : null;
   },
 
   settings(_parent, _args, { configStore, bcdGuiUrl, bcdNetwork }) {
