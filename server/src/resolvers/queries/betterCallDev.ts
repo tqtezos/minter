@@ -114,7 +114,23 @@ export async function contractByAddress(
 
 axiosRetry(axios, { retries: 3 });
 
+interface Stats {
+  chainId: string;
+  hash: string;
+  level: number;
+  network: string;
+  predecessor: string;
+  protocol: string;
+  timestamp: string;
+}
+
 export const mkBetterCallDev = (baseUrl: string, network: string) => ({
+  async stats(): Promise<Stats[]> {
+    type BcdStats = Omit<Stats, 'chainId'> & { chain_id: string };
+    const r = await axios.get<BcdStats[]>(`${baseUrl}/v1/stats`);
+    return r.data.map(s => ({ chainId: s.chain_id, ...s }));
+  },
+
   contractByAddress(address: string) {
     return contractByAddress(baseUrl, network, address);
   },

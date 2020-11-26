@@ -1,4 +1,8 @@
-import { Resolvers, QueryResolvers, OperationStatusType } from '../../generated/graphql_schema';
+import {
+  Resolvers,
+  QueryResolvers,
+  OperationStatusType
+} from '../../generated/graphql_schema';
 import PublishedOperation from '../../models/published_operation';
 import { contractNames } from './contractNames';
 import { nfts } from './nfts';
@@ -20,13 +24,18 @@ const Query: QueryResolvers = {
 
   async contractOperationStatus(_parent, { contractAddress, hash }, ctx) {
     const bcd = mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork);
-    const op = await bcd.contractOperation(contractAddress, hash)
-    
-    return op ? {
-      status: op.status === 'applied' ? OperationStatusType.Applied : OperationStatusType.Failed,
-      timestamp: op.timestamp,
-      error: op.errors && op.errors.length > 0 ? op.errors[0] : undefined
-    } : null;
+    const op = await bcd.contractOperation(contractAddress, hash);
+
+    return op
+      ? {
+          status:
+            op.status === 'applied'
+              ? OperationStatusType.Applied
+              : OperationStatusType.Failed,
+          timestamp: op.timestamp,
+          error: op.errors && op.errors.length > 0 ? op.errors[0] : undefined
+        }
+      : null;
   },
 
   settings(_parent, _args, { configStore, bcdGuiUrl, bcdNetwork }) {
@@ -38,6 +47,10 @@ const Query: QueryResolvers = {
       contracts: config.contracts,
       admin: config.admin
     };
+  },
+
+  async indexerStats(_parent, {}, ctx) {
+    return mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork).stats();
   }
 };
 
