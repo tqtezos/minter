@@ -15,7 +15,7 @@ import mkContracts, { Contracts } from '../../api/contracts';
 const TzToolkitContext = createContext<TezosToolkit | undefined>(undefined);
 
 type TztSetter = Dispatch<SetStateAction<TezosToolkit | undefined>>;
-const TzToolkitSetterContext = createContext<TztSetter>(undefined!);
+const TzToolkitSetterContext = createContext<TztSetter>(() => null);
 
 const ContractsContext = createContext<Contracts | undefined>(undefined);
 

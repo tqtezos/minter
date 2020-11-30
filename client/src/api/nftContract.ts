@@ -40,7 +40,9 @@ const mkNftContract = async (
       }
     ];
 
-    const operation = await contract.methods.mint(params).send();
+    const preOp = contract.methods.mint(params);
+    console.log(preOp);
+    const operation = await preOp.send();
     await operation.confirmation();
   },
 
