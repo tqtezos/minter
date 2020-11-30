@@ -2,6 +2,8 @@ import { BigNumber } from 'bignumber.js';
 import { MichelsonMap, WalletContract } from '@taquito/taquito';
 
 import { retrieveStorageField, Address, Nat } from './contractUtil';
+import { waitForConfirmation } from '../utils/waitForConfirmation';
+import { ApolloClient } from '@apollo/react-hooks';
 
 interface CreateTokenArgs {
   symbol: string;
@@ -21,6 +23,7 @@ export interface NftContract {
 }
 
 const mkNftContract = async (
+  client: ApolloClient<object>,
   contract: WalletContract,
   ownerAddress: Address
 ): Promise<NftContract> => ({
@@ -54,8 +57,8 @@ const mkNftContract = async (
       }
     ];
 
-    const operation = await contract.methods.transfer(params).send();
-    await operation.confirmation();
+    const op = await contract.methods.transfer(params).send();
+    return waitForConfirmation(client, contract.address, op.opHash);
   }
 });
 

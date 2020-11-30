@@ -28,10 +28,14 @@ const nftsByContractAddress = async (
 
   const { ledger, token_metadata } = contract.bigMaps;
 
-  const tokenBigMap = betterCallDev.bigMapById<NftBigMapValue>(token_metadata);
+  const tokenBigMap = betterCallDev.bigMapById<NftBigMapValue>(
+    token_metadata
+  );
   const tokenItems = await tokenBigMap.values();
 
-  const ledgerBigMap = betterCallDev.bigMapById<LedgerBigMapValue>(ledger);
+  const ledgerBigMap = betterCallDev.bigMapById<LedgerBigMapValue>(
+    ledger
+  );
   const ledgerItems = await ledgerBigMap.values();
 
   const ownerByTokenId = _(ledgerItems)
@@ -46,7 +50,7 @@ const nftsByContractAddress = async (
 
   const transformedNfts = nfts.map(nft => ({
     contractInfo: contractInfo,
-    tokenId: nft.token_id,
+    tokenId: parseInt(nft.token_id),
     symbol: nft.symbol,
     name: nft.name,
     extras: nft.extras,

@@ -5,12 +5,15 @@ import {
   OperationResultTransaction
 } from '@taquito/rpc';
 import { Address } from './contractUtil';
+import { waitForConfirmation } from '../utils/waitForConfirmation';
+import { ApolloClient } from '@apollo/react-hooks';
 
 export interface NftFactoryContract {
   createNftContract(name: string): Promise<string>;
 }
 
 const mkNftFactoryContract = async (
+  client: ApolloClient<object>,
   tzClient: TezosToolkit,
   factoryAddress: Address
 ): Promise<NftFactoryContract> => {
@@ -19,7 +22,7 @@ const mkNftFactoryContract = async (
   return {
     async createNftContract(name: string): Promise<Address> {
       const operation = await factory.methods.main(name).send();
-      await operation.confirmation();
+      await waitForConfirmation(client, factoryAddress, operation.opHash)
       return extractOriginatedContractAddress(operation);
     }
   };
