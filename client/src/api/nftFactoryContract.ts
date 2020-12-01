@@ -21,9 +21,11 @@ const mkNftFactoryContract = async (
 
   return {
     async createNftContract(name: string): Promise<Address> {
-      const operation = await factory.methods.main(name).send();
-      await waitForConfirmation(client, factoryAddress, operation.opHash)
-      return extractOriginatedContractAddress(operation);
+      const op = await waitForConfirmation(client, factoryAddress, () =>
+        factory.methods.main(name).send()
+      );
+      
+      return extractOriginatedContractAddress(op);
     }
   };
 };

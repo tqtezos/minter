@@ -91,6 +91,7 @@ export type PublishedOperation = {
 
 export type Query = {
   __typename?: 'Query';
+  indexerStats: Stats;
   nfts: Array<NonFungibleToken>;
   contractNames: Array<ContractInfo>;
   contractOperationStatus?: Maybe<OperationStatus>;
@@ -111,6 +112,7 @@ export type QueryContractNamesArgs = {
 export type QueryContractOperationStatusArgs = {
   contractAddress: Scalars['String'];
   hash: Scalars['String'];
+  since?: Maybe<Scalars['String']>;
 };
 
 export type QueryPublishedOperationByHashArgs = {
@@ -136,6 +138,17 @@ export type SettingsContracts = {
   __typename?: 'SettingsContracts';
   nftFaucet: Scalars['String'];
   nftFactory: Scalars['String'];
+};
+
+export type Stats = {
+  __typename?: 'Stats';
+  chainId: Scalars['String'];
+  hash: Scalars['String'];
+  level: Scalars['Int'];
+  network: Scalars['String'];
+  predecessor: Scalars['String'];
+  protocol: Scalars['String'];
+  timestamp: Scalars['String'];
 };
 
 export type Subscription = {
@@ -263,10 +276,11 @@ export type DirectiveResolverFn<
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Query: ResolverTypeWrapper<{}>;
+  Stats: ResolverTypeWrapper<Stats>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
   NonFungibleToken: ResolverTypeWrapper<NonFungibleToken>;
   ContractInfo: ResolverTypeWrapper<ContractInfo>;
-  Int: ResolverTypeWrapper<Scalars['Int']>;
   JSON: ResolverTypeWrapper<Scalars['JSON']>;
   OperationStatus: ResolverTypeWrapper<OperationStatus>;
   OperationStatusType: OperationStatusType;
@@ -284,10 +298,11 @@ export type ResolversTypes = ResolversObject<{
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Query: {};
+  Stats: Stats;
   String: Scalars['String'];
+  Int: Scalars['Int'];
   NonFungibleToken: NonFungibleToken;
   ContractInfo: ContractInfo;
-  Int: Scalars['Int'];
   JSON: Scalars['JSON'];
   OperationStatus: OperationStatus;
   PublishedOperation: PublishedOperation;
@@ -403,6 +418,7 @@ export type QueryResolvers<
   ContextType = Context,
   ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
 > = ResolversObject<{
+  indexerStats?: Resolver<ResolversTypes['Stats'], ParentType, ContextType>;
   nfts?: Resolver<
     Array<ResolversTypes['NonFungibleToken']>,
     ParentType,
@@ -464,6 +480,20 @@ export type SettingsContractsResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 }>;
 
+export type StatsResolvers<
+  ContextType = Context,
+  ParentType extends ResolversParentTypes['Stats'] = ResolversParentTypes['Stats']
+> = ResolversObject<{
+  chainId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  hash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  level?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  network?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  predecessor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  protocol?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  timestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+}>;
+
 export type SubscriptionResolvers<
   ContextType = Context,
   ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']
@@ -499,6 +529,7 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   Settings?: SettingsResolvers<ContextType>;
   SettingsAdmin?: SettingsAdminResolvers<ContextType>;
   SettingsContracts?: SettingsContractsResolvers<ContextType>;
+  Stats?: StatsResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
   Upload?: GraphQLScalarType;
 }>;
