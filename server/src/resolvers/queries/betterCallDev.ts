@@ -141,21 +141,21 @@ export const mkBetterCallDev = (baseUrl: string, network: string) => ({
 
   async contractOperation(
     contractAddress: string,
-    hash: string
+    hash: string,
+    since?: string
   ): Promise<Operation | undefined> {
     try {
-      const delta = 3 * 60 * 60 * 1000; // 3 hours
-      const from = Date.now() - delta; // request operations happened in the last 3 hours
+      const from = since ? `?from=${new Date(since).getTime()}` : ''
 
       const operations = await axios.get<{ operations: Operation[] }>(
-        `${baseUrl}/v1/contract/${network}/${contractAddress}/operations?from=${from}`,
+        `${baseUrl}/v1/contract/${network}/${contractAddress}/operations${from}`,
         {
           'axios-retry': {
             retries: 0
           }
         }
       );
-
+      
       return operations.data.operations.find(o => o.hash === hash);
     } catch (e) {
       if ((e as AxiosError).response?.status === 500) return undefined;

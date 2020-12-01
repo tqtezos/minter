@@ -22,9 +22,9 @@ const Query: QueryResolvers = {
     return contractNames(contractOwnerAddress, nftOwnerAddress, ctx);
   },
 
-  async contractOperationStatus(_parent, { contractAddress, hash }, ctx) {
+  async contractOperationStatus(_parent, { contractAddress, hash, since }, ctx) {
     const bcd = mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork);
-    const op = await bcd.contractOperation(contractAddress, hash);
+    const op = await bcd.contractOperation(contractAddress, hash, since ? since : undefined);
 
     return op
       ? {
@@ -50,7 +50,8 @@ const Query: QueryResolvers = {
   },
 
   async indexerStats(_parent, {}, ctx) {
-    return mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork).stats();
+    const s = await mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork).stats();
+    return s[0];
   }
 };
 

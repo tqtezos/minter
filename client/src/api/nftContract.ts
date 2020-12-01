@@ -43,8 +43,9 @@ const mkNftContract = async (
       }
     ];
 
-    const op = await contract.methods.mint(params).send();
-    return waitForConfirmation(client, contract.address, op.opHash);
+    await waitForConfirmation(client, contract.address, () =>
+      contract.methods.mint(params).send()
+    );
   },
 
   async transferToken({ to, tokenId }) {
@@ -55,8 +56,9 @@ const mkNftContract = async (
       }
     ];
 
-    const op = await contract.methods.transfer(params).send();
-    return waitForConfirmation(client, contract.address, op.opHash);
+    await waitForConfirmation(client, contract.address, () =>
+      contract.methods.transfer(params).send()
+    );
   }
 });
 

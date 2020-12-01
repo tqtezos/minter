@@ -76,10 +76,10 @@ type Stats {
 ## Toplevel Types
 
 type Query {
-  indexerStats: [Stats]!
+  indexerStats: Stats!
   nfts(ownerAddress: String, contractAddress: String): [NonFungibleToken!]!
   contractNames(contractOwnerAddress: String, nftOwnerAddress: String): [ContractInfo!]!
-  contractOperationStatus(contractAddress: String!, hash: String!): OperationStatus
+  contractOperationStatus(contractAddress: String!, hash: String!, since: String): OperationStatus
 
   publishedOperationByHash(hash: String!): PublishedOperation
   settings: Settings!

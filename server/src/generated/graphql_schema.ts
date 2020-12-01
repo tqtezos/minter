@@ -91,7 +91,7 @@ export type PublishedOperation = {
 
 export type Query = {
   __typename?: 'Query';
-  indexerStats: Array<Maybe<Stats>>;
+  indexerStats: Stats;
   nfts: Array<NonFungibleToken>;
   contractNames: Array<ContractInfo>;
   contractOperationStatus?: Maybe<OperationStatus>;
@@ -112,6 +112,7 @@ export type QueryContractNamesArgs = {
 export type QueryContractOperationStatusArgs = {
   contractAddress: Scalars['String'];
   hash: Scalars['String'];
+  since?: Maybe<Scalars['String']>;
 };
 
 export type QueryPublishedOperationByHashArgs = {
@@ -417,11 +418,7 @@ export type QueryResolvers<
   ContextType = Context,
   ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
 > = ResolversObject<{
-  indexerStats?: Resolver<
-    Array<Maybe<ResolversTypes['Stats']>>,
-    ParentType,
-    ContextType
-  >;
+  indexerStats?: Resolver<ResolversTypes['Stats'], ParentType, ContextType>;
   nfts?: Resolver<
     Array<ResolversTypes['NonFungibleToken']>,
     ParentType,
