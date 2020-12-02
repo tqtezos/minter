@@ -2,11 +2,12 @@ version: '3.7'
 
 services:
   bcdapi:
-    image: bakingbad/bcdhub-api:2.6
+    image: bakingbad/bcdhub-api:3.0
     command: -f config.yml -f config.box.yml -f config.bbbox.yml
     volumes:
       - ${PROJECT_ROOT_DIR}/bbbox/config.yml:/app/api/config.bbbox.yml
     environment:
+      - BCD_ENV=sandbox
       - GIN_MODE=release
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
