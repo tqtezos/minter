@@ -82,6 +82,7 @@ export type PublishedOperation = {
 
 export type Query = {
   __typename?: 'Query';
+  indexerStats: Stats;
   nfts: Array<NonFungibleToken>;
   contractNames: Array<ContractInfo>;
   contractOperationStatus?: Maybe<OperationStatus>;
@@ -102,6 +103,7 @@ export type QueryContractNamesArgs = {
 export type QueryContractOperationStatusArgs = {
   contractAddress: Scalars['String'];
   hash: Scalars['String'];
+  since?: Maybe<Scalars['String']>;
 };
 
 export type QueryPublishedOperationByHashArgs = {
@@ -127,6 +129,17 @@ export type SettingsContracts = {
   __typename?: 'SettingsContracts';
   nftFaucet: Scalars['String'];
   nftFactory: Scalars['String'];
+};
+
+export type Stats = {
+  __typename?: 'Stats';
+  chainId: Scalars['String'];
+  hash: Scalars['String'];
+  level: Scalars['Int'];
+  network: Scalars['String'];
+  predecessor: Scalars['String'];
+  protocol: Scalars['String'];
+  timestamp: Scalars['String'];
 };
 
 export type Subscription = {

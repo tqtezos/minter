@@ -114,7 +114,23 @@ export async function contractByAddress(
 
 axiosRetry(axios, { retries: 3 });
 
+interface Stats {
+  chainId: string;
+  hash: string;
+  level: number;
+  network: string;
+  predecessor: string;
+  protocol: string;
+  timestamp: string;
+}
+
 export const mkBetterCallDev = (baseUrl: string, network: string) => ({
+  async stats(): Promise<Stats[]> {
+    type BcdStats = Omit<Stats, 'chainId'> & { chain_id: string };
+    const r = await axios.get<BcdStats[]>(`${baseUrl}/v1/stats`);
+    return r.data.map(s => ({ chainId: s.chain_id, ...s }));
+  },
+
   contractByAddress(address: string) {
     return contractByAddress(baseUrl, network, address);
   },
@@ -125,21 +141,21 @@ export const mkBetterCallDev = (baseUrl: string, network: string) => ({
 
   async contractOperation(
     contractAddress: string,
-    hash: string
+    hash: string,
+    since?: string
   ): Promise<Operation | undefined> {
     try {
-      const delta = 3 * 60 * 60 * 1000; // 3 hours
-      const from = Date.now() - delta; // request operations happened in the last 3 hours
+      const from = since ? `?from=${new Date(since).getTime()}` : ''
 
       const operations = await axios.get<{ operations: Operation[] }>(
-        `${baseUrl}/v1/contract/${network}/${contractAddress}/operations?from=${from}`,
+        `${baseUrl}/v1/contract/${network}/${contractAddress}/operations${from}`,
         {
           'axios-retry': {
             retries: 0
           }
         }
       );
-
+      
       return operations.data.operations.find(o => o.hash === hash);
     } catch (e) {
       if ((e as AxiosError).response?.status === 500) return undefined;
