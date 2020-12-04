@@ -33,6 +33,10 @@ const WalletConnector: FC = () => {
   };
 
   const handleDisconnect = () => {
+    if (tzToolkit) {
+      const [, beaconWallet] = tzToolkit;
+      beaconWallet.disconnect();
+    }
     setTzToolkit(undefined);
   };
 

@@ -3,7 +3,9 @@ import { NetworkType } from '@airgap/beacon-sdk/dist/cjs/types/beacon/NetworkTyp
 import { TezosToolkit } from '@taquito/taquito';
 import * as tzUtils from '../../utils/tezosToolkit';
 
-export const connect = async (rpc: string) => {
+export const connect = async (
+  rpc: string
+): Promise<[TezosToolkit, BeaconWallet]> => {
   // const available = false;
   //
   // if (!available)
@@ -23,5 +25,5 @@ export const connect = async (rpc: string) => {
   tzToolkit.setWalletProvider(wallet);
   tzUtils.setConfirmationPollingInterval(tzToolkit);
 
-  return tzToolkit;
+  return [tzToolkit, wallet];
 };
