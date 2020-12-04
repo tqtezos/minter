@@ -11,7 +11,7 @@ import React, {
 import { TezosToolkit } from '@taquito/taquito';
 import useSettings from '../common/useSettings';
 import mkContracts, { Contracts } from '../../api/contracts';
-import { useApolloClient } from '@apollo/react-hooks';
+import { useApolloClient } from '@apollo/client';
 
 const TzToolkitContext = createContext<TezosToolkit | undefined>(undefined);
 

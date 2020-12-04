@@ -3,7 +3,7 @@ import { MichelsonMap, WalletContract } from '@taquito/taquito';
 
 import { retrieveStorageField, Address, Nat } from './contractUtil';
 import { waitForConfirmation } from '../utils/waitForConfirmation';
-import { ApolloClient } from '@apollo/react-hooks';
+import { ApolloClient } from '@apollo/client';
 
 interface CreateTokenArgs {
   symbol: string;

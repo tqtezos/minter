@@ -5,7 +5,7 @@ import { Address } from './contractUtil';
 import { NftContract } from './nftContract';
 import mkNftContract from './nftContract';
 import mkNftFactoryContract from './nftFactoryContract';
-import { ApolloClient } from '@apollo/react-hooks';
+import { ApolloClient } from '@apollo/client';
 
 export interface NftContractApi {
   faucetContractAddress: Address;
