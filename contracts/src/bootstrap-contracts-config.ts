@@ -97,7 +97,7 @@ async function createToolkit(
   const rpc = config.get('rpc');
   if (!rpc) throw new Error('cannot read node rpc');
 
-  const toolkit = new TezosToolkit();
+  const toolkit = new TezosToolkit(rpc);
   toolkit.setProvider({
     signer,
     rpc,
