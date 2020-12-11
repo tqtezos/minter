@@ -1,10 +1,11 @@
 {
-  "rpc": "https://testnet-tezos.giganode.io",
-  "admin": {
-    "address": "tz1hWvkWwfHgXh7EP6H7T49m7ZyDJx4YirUx",
-    "secret": "edskRuycScUrc5KqgiWZXWFa4STEAxJSs18ZXLDdfbDGkjLPXf8miygTAYxoR3DDqnczW4KnKkLUnH3h135qp167krTxKwnnbu"
-  },
-  "contracts": {
-    "nftFaucet": "KT1VRQ9UeVNrvq3oMqWHpUHKefuUYLn1W8mX"
-  }
+	"rpc": "https://delphinet-tezos.giganode.io",
+	"admin": {
+		"address": "tz1hs8oA8xjpEfrmqHedJ3Yv7KN355JFL3rW",
+		"secret": "edsk36qzuACZiucKjW3fXifeqSXPveA8ykR95banDK367vimMAC9ZR"
+	},
+	"contracts": {
+		"nftFaucet": "KT1CV1zsMnrnVHHZLKGdZ16bpSKhXfbJ8G8T",
+		"nftFactory": "KT1HDdJAXVxi3scXydzhLZio2KipbyPJSru5"
+	}
 }

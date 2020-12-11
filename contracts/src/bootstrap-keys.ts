@@ -2,4 +2,4 @@ export const sandboxBootstrapKey =
   'edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx';
 
 export const testnetBootstrapKey =
-  'edskRuycScUrc5KqgiWZXWFa4STEAxJSs18ZXLDdfbDGkjLPXf8miygTAYxoR3DDqnczW4KnKkLUnH3h135qp167krTxKwnnbu';
+  'edsk36qzuACZiucKjW3fXifeqSXPveA8ykR95banDK367vimMAC9ZR';
