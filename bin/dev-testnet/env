@@ -3,6 +3,6 @@ TEZOS_RPC_URL=https://rpcalpha.tzbeta.net
 BCD_API_URL=https://api.better-call.dev
 BCD_GUI_URL=https://better-call.dev
 
-BCD_NETWORK="carthagenet"
+BCD_NETWORK="delphinet"
 
 TZ_NETWORK=testnet
