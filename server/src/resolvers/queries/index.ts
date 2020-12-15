@@ -3,17 +3,11 @@ import {
   QueryResolvers,
   OperationStatusType
 } from '../../generated/graphql_schema';
-import PublishedOperation from '../../models/published_operation';
 import { contractNames } from './contractNames';
 import { nfts } from './nfts';
 import { mkBetterCallDev } from './betterCallDev';
 
 const Query: QueryResolvers = {
-  async publishedOperationByHash(_parent, { hash }, { db }) {
-    const publishedOp = await PublishedOperation.byHash(db, hash);
-    return publishedOp || null;
-  },
-
   async nfts(_parent, { ownerAddress, contractAddress }, ctx) {
     return nfts(ownerAddress, contractAddress, ctx);
   },
@@ -22,9 +16,17 @@ const Query: QueryResolvers = {
     return contractNames(contractOwnerAddress, nftOwnerAddress, ctx);
   },
 
-  async contractOperationStatus(_parent, { contractAddress, hash, since }, ctx) {
+  async contractOperationStatus(
+    _parent,
+    { contractAddress, hash, since },
+    ctx
+  ) {
     const bcd = mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork);
-    const op = await bcd.contractOperation(contractAddress, hash, since ? since : undefined);
+    const op = await bcd.contractOperation(
+      contractAddress,
+      hash,
+      since ? since : undefined
+    );
 
     return op
       ? {

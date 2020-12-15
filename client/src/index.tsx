@@ -37,7 +37,19 @@ const link = split(
 );
 
 const cache = new InMemoryCache({
-  possibleTypes: introspectionResult.possibleTypes
+  possibleTypes: introspectionResult.possibleTypes,
+  typePolicies: {
+    Query: {
+      fields: {
+        nftsClient: {
+          async read(_, { variables }) {
+            console.log(variables);
+            return { hello: 'world' };
+          }
+        }
+      }
+    }
+  }
 });
 
 const client = new ApolloClient({

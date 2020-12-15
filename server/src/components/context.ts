@@ -1,33 +1,5 @@
-import { TezosToolkit } from '@taquito/taquito';
-import { InMemorySigner } from '@taquito/signer';
-import { PubSub } from 'apollo-server-express';
-import buildContractStore, { ContractStore } from './contract_store';
-import connect from './db';
-import knex from 'knex';
-import fs from 'fs';
 import Configstore from 'configstore';
 import path from 'path';
-import  Express from 'express-session';
-
-export type DB = knex<any, unknown[]>;
-
-const TZ_NETWORK = getEnv('TZ_NETWORK');
-const CONFIG_NAME = `minter.${TZ_NETWORK}.json`;
-const CONFIG_PATH = path.join(__dirname, '../../config/', CONFIG_NAME);
-
-export const configStore = new Configstore('', {}, { configPath: CONFIG_PATH });
-
-export interface Context {
-  db: DB;
-  contractStore: ContractStore;
-  pubsub: PubSub;
-  bcdApiUrl: string;
-  bcdGuiUrl: string;
-  bcdNetwork: string;
-  tzRpcUrl: string;
-  tzClient: TezosToolkit;
-  configStore: Configstore;
-}
 
 function getEnv(envVar: string) {
   const value = process.env[envVar];
@@ -35,43 +7,27 @@ function getEnv(envVar: string) {
   return value;
 }
 
-function getPrivateKey(): string {
-  const tzPrivateKey = configStore.get('admin.secret');
-  if (tzPrivateKey) return tzPrivateKey;
-  else {
-    const keyPath =
-      process.env.TZ_SECRET_KEY_PATH || '/run/secrets/tz_private_key';
-    const tzPrivateKey = fs.readFileSync(keyPath).toString();
-    return tzPrivateKey;
-  }
+function buildConfigStore() {
+  const tzNetwork = getEnv('TZ_NETWORK');
+  const configName = `minter.${tzNetwork}.json`;
+  const configPath = path.join(__dirname, '../../config/', configName);
+  return new Configstore('', {}, { configPath });
 }
 
-async function buildTzClient(rpc: string) {
-  const tzClient = new TezosToolkit();
-  const tzPrivateKey = getPrivateKey();
-  const signer = await InMemorySigner.fromSecretKey(tzPrivateKey);
-  tzClient.setProvider({ rpc, signer });
-  return tzClient;
+export interface Context {
+  bcdApiUrl: string;
+  bcdGuiUrl: string;
+  bcdNetwork: string;
+  tzRpcUrl: string;
+  configStore: Configstore;
 }
 
 export default async function createContext(): Promise<Context> {
-  const db = await connect();
-  const pubsub = new PubSub();
-  const tzRpcUrl = getEnv('TEZOS_RPC_URL');
-  const tzClient = await buildTzClient(tzRpcUrl);
-  const bcdApiUrl = getEnv('BCD_API_URL');
-  const bcdGuiUrl = getEnv('BCD_GUI_URL');
-  const bcdNetwork = getEnv('BCD_NETWORK');
-  const contractStore = await buildContractStore(tzClient);
   return {
-    db,
-    contractStore,
-    pubsub,
-    bcdApiUrl,
-    bcdGuiUrl,
-    bcdNetwork,
-    tzRpcUrl,
-    tzClient,
-    configStore
+    tzRpcUrl: getEnv('TEZOS_RPC_URL'),
+    bcdApiUrl: getEnv('BCD_API_URL'),
+    bcdGuiUrl: getEnv('BCD_GUI_URL'),
+    bcdNetwork: getEnv('BCD_NETWORK'),
+    configStore: buildConfigStore()
   };
 }
