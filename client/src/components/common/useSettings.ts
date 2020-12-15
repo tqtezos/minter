@@ -15,10 +15,6 @@ const SETTINGS = gql`
         nftFaucet
         nftFactory
       }
-      admin {
-        address
-        secret
-      }
     }
   }
 `;
