@@ -10,4 +10,4 @@
 
 3. `bootstrap-sandbox` bootstrap flextesa sandbox network.
 
-4. `bootstrap-testnet` bootstrap flextesa Carthage test network.
+4. `bootstrap-testnet` bootstrap flextesa test network.

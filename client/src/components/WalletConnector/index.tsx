@@ -7,6 +7,7 @@ import HeaderButton from '../common/HeaderButton';
 import { useTzToolkit, useTzToolkitSetter } from '../App/globalContext';
 import useSettings from '../common/useSettings';
 import * as thanosWallet from './thanosWallet';
+import * as beaconWallet from './beaconWallet';
 
 const WalletConnector: FC = () => {
   const { settings } = useSettings();
@@ -15,11 +16,12 @@ const WalletConnector: FC = () => {
   const [connecting, setConnecting] = useState(false);
 
   const handleConenct = async () => {
-    if (!settings) throw Error('Problem gettings settings from the server!');
+    if (!settings) throw Error('Problem getting settings from the server!');
 
     try {
       setConnecting(true);
-      const tzToolkit = await thanosWallet.connect(settings.rpc);
+      // const tzToolkit = await thanosWallet.connect(settings.rpc);
+      const tzToolkit = await beaconWallet.connect(settings.rpc);
       setTzToolkit(tzToolkit);
     } catch (err) {
       if (err.name === 'NotGrantedThanosWalletError')
@@ -31,6 +33,10 @@ const WalletConnector: FC = () => {
   };
 
   const handleDisconnect = () => {
+    if (tzToolkit) {
+      const [, beaconWallet] = tzToolkit;
+      beaconWallet.disconnect();
+    }
     setTzToolkit(undefined);
   };
 

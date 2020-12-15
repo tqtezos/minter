@@ -12,7 +12,7 @@ BCD_GUI_URL=http://localhost:${BCD_GUI_PORT}
 
 BCD_NETWORK="sandboxnet"
 
-FLEXTESA_DOCKER_IMG=registry.gitlab.com/tezos/flextesa:ce51babe-run
+FLEXTESA_DOCKER_IMG=registry.gitlab.com/tezos/flextesa:00b415f2-run
 
 TZ_INDEX_DB_PATH=$PROJECT_ROOT_DIR/.tzindex
 FLEXTESA_DATA_DIR=$PROJECT_ROOT_DIR/.flextesa

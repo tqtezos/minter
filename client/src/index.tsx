@@ -2,14 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {
   ApolloClient,
+  ApolloProvider,
   InMemoryCache,
   split,
   createHttpLink
 } from '@apollo/client';
-import { WebSocketLink } from '@apollo/link-ws';
-import { getMainDefinition } from 'apollo-utilities';
+import { WebSocketLink } from '@apollo/client/link/ws';
+import { getMainDefinition } from '@apollo/client/utilities';
 import introspectionResult from './generated/fragmentTypes.json';
-import { ApolloProvider } from '@apollo/react-hooks';
 
 import './index.css';
 import App from './components/App';

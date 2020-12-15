@@ -29,11 +29,6 @@ export interface Context {
   configStore: Configstore;
 }
 
-export interface SessionContext extends Context {
-  session: Express.Session;
-  client: TezosToolkit;
-}
-
 function getEnv(envVar: string) {
   const value = process.env[envVar];
   if (!value) throw Error(`${envVar} environment variable is not set`);

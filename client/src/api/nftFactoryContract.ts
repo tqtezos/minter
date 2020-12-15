@@ -6,7 +6,7 @@ import {
 } from '@taquito/rpc';
 import { Address } from './contractUtil';
 import { waitForConfirmation } from '../utils/waitForConfirmation';
-import { ApolloClient } from '@apollo/react-hooks';
+import { ApolloClient } from '@apollo/client';
 
 export interface NftFactoryContract {
   createNftContract(name: string): Promise<string>;
@@ -22,9 +22,9 @@ const mkNftFactoryContract = async (
   return {
     async createNftContract(name: string): Promise<Address> {
       const op = await waitForConfirmation(client, factoryAddress, () =>
-        factory.methods.main(name).send()
+        factory.methods.default(name).send()
       );
-      
+
       return extractOriginatedContractAddress(op);
     }
   };
