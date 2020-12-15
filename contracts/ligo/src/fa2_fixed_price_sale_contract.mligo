@@ -25,6 +25,7 @@ type fixed_sale_contract_entrypoints =
 
 type fixed_sale_contract_storage = sale_contract_params
 
+// LEAVE THIS HERE FOR TESTING THIS CONTRACT IN ISOLATION
 let initiate_sale (param, storage : sale_contract_params * fixed_sale_contract_storage) : (operation list * fixed_sale_contract_storage) =
   let s = {
      sale_asset = param.sale_asset;
