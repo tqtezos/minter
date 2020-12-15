@@ -1,5 +1,3 @@
-import { $log } from '@tsed/logger';
-
 import { compileAndLoadContract, originateContract, defaultEnv } from './ligo';
 import { Contract, address } from './type-aliases';
 import { TezosToolkit } from '@taquito/taquito';
@@ -8,12 +6,6 @@ import { TokenMetadata } from './fa2-interface';
 export interface MintNftParam {
   metadata: TokenMetadata;
   owner: address;
-}
-
-interface AdminStorage {
-  admin: string;
-  pending_admin?: string;
-  paused: boolean;
 }
 
 export async function originateNft(

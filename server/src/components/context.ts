@@ -7,7 +7,7 @@ import knex from 'knex';
 import fs from 'fs';
 import Configstore from 'configstore';
 import path from 'path';
-import  Express from 'express-session';
+import Express from 'express-session';
 
 export type DB = knex<any, unknown[]>;
 
@@ -35,22 +35,9 @@ function getEnv(envVar: string) {
   return value;
 }
 
-function getPrivateKey(): string {
-  const tzPrivateKey = configStore.get('admin.secret');
-  if (tzPrivateKey) return tzPrivateKey;
-  else {
-    const keyPath =
-      process.env.TZ_SECRET_KEY_PATH || '/run/secrets/tz_private_key';
-    const tzPrivateKey = fs.readFileSync(keyPath).toString();
-    return tzPrivateKey;
-  }
-}
-
 async function buildTzClient(rpc: string) {
   const tzClient = new TezosToolkit();
-  const tzPrivateKey = getPrivateKey();
-  const signer = await InMemorySigner.fromSecretKey(tzPrivateKey);
-  tzClient.setProvider({ rpc, signer });
+  tzClient.setProvider({ rpc });
   return tzClient;
 }
 
