@@ -9,7 +9,7 @@ import PublishedOperation from '../../models/published_operation';
 import { TransactionOperation } from '@taquito/taquito/dist/types/operations/transaction-operation';
 import { Context } from '../../components/context';
 import { BigNumber } from 'bignumber.js';
-import CID from 'cids';
+// import CID from 'cids';
 
 async function confirmOperation(
   { db, pubsub, tzClient }: Context,
@@ -23,12 +23,12 @@ async function confirmOperation(
   pubsub.publish('OPERATION_CONFIRMED', { operationConfirmed: publishedOp });
 }
 
-function validateCID(cid: string) {
-  try {
-    new CID(cid);
-  } catch (e) {
-    throw Error('The supplied `ipfs_cid` is invalid');
-  }
+function validateCID(_cid: string) {
+  // try {
+  //   new CID(cid);
+  // } catch (e) {
+  //   throw Error('The supplied `ipfs_cid` is invalid');
+  // }
 }
 
 async function createNonFungibleToken(

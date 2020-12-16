@@ -1,7 +1,6 @@
 import { Express, Response } from 'express';
 import IpfsClient from 'ipfs-http-client';
 import url from 'url';
-import { IpfsContent } from '../../generated/graphql_schema';
 
 // TODO: Move this configuration to a JSON definition
 const ipfsConfig = {
@@ -19,7 +18,7 @@ const ipfsConfig = {
 };
 
 export function ipfsUpload(app: Express) {
-  app.post('/ipfs-upload', async (req, res: Response<IpfsContent>) => {
+  app.post('/ipfs-upload', async (req: any, res: Response) => {
     if (!req.files?.file?.data) {
       throw Error('No file data found');
     }
