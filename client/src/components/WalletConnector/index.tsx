@@ -18,10 +18,11 @@ const WalletConnector: FC = () => {
   const handleConenct = async () => {
     if (!settings) throw Error('Problem getting settings from the server!');
 
+    const { rpc, bcdNetwork } = settings;
+
     try {
       setConnecting(true);
-      // const tzToolkit = await thanosWallet.connect(settings.rpc);
-      const tzToolkit = await beaconWallet.connect(settings.rpc);
+      const tzToolkit = await beaconWallet.connect(rpc, bcdNetwork);
       setTzToolkit(tzToolkit);
     } catch (err) {
       if (err.name === 'NotGrantedThanosWalletError')

@@ -3,23 +3,28 @@ import { NetworkType } from '@airgap/beacon-sdk/dist/cjs/types/beacon/NetworkTyp
 import { TezosToolkit } from '@taquito/taquito';
 import * as tzUtils from '../../utils/tezosToolkit';
 
-export const connect = async (
-  rpc: string
-): Promise<[TezosToolkit, BeaconWallet]> => {
-  // const available = false;
-  //
-  // if (!available)
-  //   throw new Error('Beacon Wallet is not installed!');
+function networkType(network: string) {
+  if (network === 'mainnet') {
+    return NetworkType.MAINNET;
+  }
+  if (network === 'delphinet') {
+    return NetworkType.DELPHINET;
+  }
+  return NetworkType.CUSTOM;
+}
 
+export const connect = async (
+  rpc: string,
+  network: string
+): Promise<[TezosToolkit, BeaconWallet]> => {
   const tzToolkit = new TezosToolkit(rpc);
-  // tzToolkit.setProvider({ rpc });
 
   const wallet = new BeaconWallet({
     name: 'OpenMinter dApp'
   });
 
   await wallet.requestPermissions({
-    network: { type: NetworkType.CUSTOM, rpcUrl: rpc }
+    network: { type: networkType(network), rpcUrl: rpc }
   });
 
   tzToolkit.setWalletProvider(wallet);
