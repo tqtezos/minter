@@ -19,109 +19,161 @@ auctions, voting - DAOs, and games).
 
 [docker]: https://www.docker.com/
 
-> Note: on Ubuntu add your user to `docker` group so that
-> scripts using docker can be executed without sudo:
+> Note: on Ubuntu add your user to the `docker` group so that scripts using
+> docker can be executed without `sudo`:
 >
 > `sudo usermod -a -G docker <username>`
 
 ## Dependencies
 
 - Tezos sandbox: [Flextesa][flextesa]
-- Blockhain indexer: [TZ Index][tz-index]
+- Blockhain indexer: [Better Call Dev Backend][bcdhub]
 - Database: [PostgreSQL][postgres]
 - InterPlanetary File System: [IPFS][ipfs]
 
-[tz-index]: https://github.com/blockwatch-cc/tzindex
+[bcdhub]: https://github.com/baking-bad/bcdhub
 [flextesa]: https://gitlab.com/tezos/flextesa
 [postgres]: https://www.postgresql.org/
 [ipfs]: https://ipfs.io/
 
 ## Usage
 
-### Setup
+### Installation
 
-First install all the packages and build docker images for the development:
+To install and build the dependences required for local development, run:
 
-```sh 
-$ yarn
-```
-or
-```sh 
+```sh
 $ yarn install
 ```
 
-Next, import a Tezos private key. For local development, we can use the default
-`Alice` secret key that's included in the Tezos sandbox node:
+The installation process will fetch toplevel NPM dependences and build
+the `minter-ui-dev` and `minter-api-dev` Docker images. Subsequent runs of
+`yarn install` will rebuild these images without checking for cached versions.
 
-```sh
-$ printf "edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq" | docker secret create tz_private_key -
+### Configuration
+
+The Minter can be configured to run on three different networks: `sandbox`,
+`testnet` (currently set to delphinet), and `mainnet`.
+
+Each network has its own configuration file in the `config` folder under
+`minter.<network>.json`. The schema of these files can be defined as this
+TypeScript type:
+
+```typescript
+type Config = {
+  rpc: string,
+  admin: {
+    address: string,
+    secret: string
+  },
+  contracts?: {
+    nftFaucet?: string,
+    nftFactory?: string
+  }
+}
 ```
 
-This step is not required for the development environment since the secret key is
-stored and picked up from the config file.
+For example, the following `minter.sandbox.json` configuration defines the RPC
+url for the local sandbox node and the default `alice` address as the
+administrator during contract origination:
+
+```json
+{
+	"rpc": "http://localhost:8732",
+	"admin": {
+		"address": "tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU",
+		"secret": "edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx"
+	}
+}
+```
+
+> **Note:** Since sandbox and testnet keys don't represent sensitive accounts, the `config/`
+> folder includes default configurations with `admin` wallets. To configure Minter
+> for the `mainnet` network, update the definitions in
+> `config/minter.mainnet.example.json` and copy it to the proper path for the
+> application to read it:
+>
+> `cp config/minter.mainnet.example.json config/minter.mainnet.json`
+
+If the `contracts` key or its children `nftFaucet` or `nftFactory` keys are not
+specified, these contracts will be originated and their addresses saved in the
+configuration file when starting the Minter devleopment environment.
 
 ### Starting and Stopping
 
-We can start development environment either using sandbox or connecting to Tezos
-test net.
+When starting Minter, it will create or update Docker services for each
+environment and also bootstrap the required contracts if their addresses are not
+specified in the environment's configuration file.
 
-To start our docker swarm services using sandbox run:
+#### Sandbox
 
-```sh
-$ yarn start
-```
-
-or
+To start Minter on a `sandbox` network, run:
 
 ```sh
 $ yarn start:sandbox
 ```
 
-To stop and teardown the services, using sandbox run:
+This command will start the following services:
+- `flextesa` sandbox container
+- Better Call Dev indexer API, GUI, and its required backend services
+- Minter UI
+- Minter API
+- IPFS Node
 
-```sh
-$ yarn stop
-```
-
-or
+To stop and teardown these services, run:
 
 ```sh
 $ yarn stop:sandbox
-
 ```
 
-To start our docker swarm services using testnet run:
+#### Testnet
+
+To start Minter on a `testnet` network, run:
 
 ```sh
 $ yarn start:testnet
 ```
 
-To stop and teardown the services, using testnet run:
+This command will start the following services:
+- Minter UI
+- Minter API
+- IPFS Node
+
+To stop and teardown these services, run:
 
 ```sh
 $ yarn stop:testnet
 ```
 
-### Originating Contracts
+#### Mainnet
 
-Once you've started the docker swarm services with `yarn start-xxx`, it will
-automatically bootstrap a set of initial contracts to interact with.
+To start Minter on a `mainnet` network, run:
+
+```sh
+$ yarn start:mainnet
+```
+
+This command will start the following services:
+- Minter UI
+- Minter API
+- IPFS Node
+
+To stop and teardown these services, run:
+
+```sh
+$ yarn stop:mainnet
+```
+
+### Interacting with Minter
 
 You can now open:
 
 - [http://localhost:9000](http://localhost:9000) to view the application.
 - [http://localhost:9000/graphql](http://localhost:9000/graphql) to open the
   GraphQL playground.
+- [http://localhost:5001/webui](http://localhost:5001/webui) to view the IPFS
+  Web UI
 
-### Using Local IPFS Server
-
-Once your have started the docker swarm services with `yarn start-xxx`, a local
-instance of IPFS server will be automatically configured and started.
-No actions needed to use it for file upload.
-
-However, if you wish to monitor the IPFS server or reconfigure it using its Web
-UI, you can use:
-[http://localhost:5001/webui](http://localhost:5001/webui)
 
 ## Development
 
@@ -142,12 +194,6 @@ it:
 $ yarn log:api
 ```
 
-or
-
-```sh
-$ bin/log api
-```
-
 ...which is a shorter way of doing the following:
 
 ```sh
@@ -160,17 +206,11 @@ To view the UI output, for example, run:
 $ yarn log:ui
 ```
 
-or
-
-```sh
-$ bin/log ui
-```
-
 You may also override the script's default [docker service logs arguments](https://docs-stage.docker.com/engine/reference/commandline/service_logs/)
 (`--follow` and `--raw`) by passing them at the end of the command. For example:
 
 ```sh
-$ bin/log api --since 5m
+$ yarn log:api --since 5m
 ```
 
 ### Editor Environments
@@ -186,38 +226,6 @@ outside of Docker. Make sure you have [Yarn](https://yarnpkg.com)
 $ pushd client; yarn; popd
 $ pushd server; yarn; popd
 ```
-
-### Running on Testnet
-
-By default `bin/start` starts sandbox environment. To run against public tezos
-nodes with public instance of tzstats start with
-
-```sh
-$ bin/start dev-testnet
-```
-
-### Exploring the Database
-
-To explore the database with with `psql`:
-
-```sh
-$ bin/psql
-```
-
-or, if using `dev-testnet` environment:
-
-```sh
-$ bin/psql dev-testnet
-```
-
-To modify database add migration SQL file(s) to `db/` and perform migrations:
-
-```sh
-$ bin/migrate-db
-```
-
-or simply stop and start.
-
 ### Restarting Services
 
 Individual services in docker stack can be restarted like so:
