@@ -5,9 +5,11 @@
     "start": "bin/start dev-sandbox",
     "start:sandbox": "bin/start dev-sandbox",
     "start:testnet": "bin/start dev-testnet",
+    "start:mainnet": "bin/start dev-mainnet",
     "stop": "bin/stop dev-sandbox",
     "stop:sandbox": "bin/stop dev-sandbox",
     "stop:testnet": "bin/stop dev-testnet",
+    "stop:mainnet": "bin/stop dev-mainnet",
     "log": "bin/log",
     "log:api": "bin/log api",
     "log:ui": "bin/log ui"

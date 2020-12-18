@@ -4,6 +4,6 @@ set -e
 
 source ${BASH_SOURCE%/*}/setup-env
 
-docker build -t bashcurl -f $PROJECT_ROOT_DIR/docker/bashcurl.dockerfile $PROJECT_ROOT_DIR/docker/
-docker build -t minter-api-dev -f $PROJECT_ROOT_DIR/docker/api-dev.dockerfile $PROJECT_ROOT_DIR
-docker build -t minter-ui-dev -f $PROJECT_ROOT_DIR/docker/ui-dev.dockerfile $PROJECT_ROOT_DIR
+docker build --no-cache -t bashcurl -f $PROJECT_ROOT_DIR/docker/bashcurl.dockerfile $PROJECT_ROOT_DIR/docker/
+docker build --no-cache -t minter-api-dev -f $PROJECT_ROOT_DIR/docker/api-dev.dockerfile $PROJECT_ROOT_DIR
+docker build --no-cache -t minter-ui-dev -f $PROJECT_ROOT_DIR/docker/ui-dev.dockerfile $PROJECT_ROOT_DIR

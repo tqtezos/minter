@@ -113,16 +113,9 @@ export type QueryPublishedOperationByHashArgs = {
 export type Settings = {
   __typename?: 'Settings';
   rpc: Scalars['String'];
-  admin: SettingsAdmin;
   contracts: SettingsContracts;
   bcdGuiUrl: Scalars['String'];
   bcdNetwork: Scalars['String'];
-};
-
-export type SettingsAdmin = {
-  __typename?: 'SettingsAdmin';
-  address: Scalars['String'];
-  secret: Scalars['String'];
 };
 
 export type SettingsContracts = {

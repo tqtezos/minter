@@ -6,7 +6,6 @@ import { message } from 'antd';
 import HeaderButton from '../common/HeaderButton';
 import { useTzToolkit, useTzToolkitSetter } from '../App/globalContext';
 import useSettings from '../common/useSettings';
-import * as thanosWallet from './thanosWallet';
 import * as beaconWallet from './beaconWallet';
 
 const WalletConnector: FC = () => {
@@ -18,15 +17,14 @@ const WalletConnector: FC = () => {
   const handleConenct = async () => {
     if (!settings) throw Error('Problem getting settings from the server!');
 
+    const { rpc, bcdNetwork } = settings;
+
     try {
       setConnecting(true);
-      // const tzToolkit = await thanosWallet.connect(settings.rpc);
-      const tzToolkit = await beaconWallet.connect(settings.rpc);
+      const tzToolkit = await beaconWallet.connect(rpc, bcdNetwork);
       setTzToolkit(tzToolkit);
     } catch (err) {
-      if (err.name === 'NotGrantedThanosWalletError')
-        message.error('Transaction rejected');
-      else message.error(err.message);
+      message.error(err.message);
     } finally {
       setConnecting(false);
     }

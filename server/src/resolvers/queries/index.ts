@@ -22,9 +22,17 @@ const Query: QueryResolvers = {
     return contractNames(contractOwnerAddress, nftOwnerAddress, ctx);
   },
 
-  async contractOperationStatus(_parent, { contractAddress, hash, since }, ctx) {
+  async contractOperationStatus(
+    _parent,
+    { contractAddress, hash, since },
+    ctx
+  ) {
     const bcd = mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork);
-    const op = await bcd.contractOperation(contractAddress, hash, since ? since : undefined);
+    const op = await bcd.contractOperation(
+      contractAddress,
+      hash,
+      since ? since : undefined
+    );
 
     return op
       ? {
@@ -44,8 +52,7 @@ const Query: QueryResolvers = {
       bcdGuiUrl: bcdGuiUrl,
       bcdNetwork: bcdNetwork,
       rpc: config.rpc,
-      contracts: config.contracts,
-      admin: config.admin
+      contracts: config.contracts
     };
   },
 

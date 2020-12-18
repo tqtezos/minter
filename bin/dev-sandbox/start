@@ -5,8 +5,17 @@ mkdir -p $TZ_INDEX_DB_PATH
 mkdir -p $FLEXTESA_DATA_DIR
 
 docker stack deploy \
+       -c $DOCKER_STACK_DIR/postgres.yml \
+       -c $DOCKER_STACK_DIR/elastic.yml \
+       -c $DOCKER_STACK_DIR/rabbitmq.yml \
+       -c $DOCKER_STACK_DIR/bcdapi.yml \
+       -c $DOCKER_STACK_DIR/bcdgui.yml \
+       -c $DOCKER_STACK_DIR/bcdindexer.yml \
+       -c $DOCKER_STACK_DIR/bcdmetrics.yml \
        -c $DOCKER_STACK_DIR/flextesa.yml \
        $STACK_NAME
+
+$PROJECT_ROOT_DIR/bin/wait-for-postgres $PROJECT_ROOT_DIR/bin/migrate-db
 
 export CHAIN_ID=$(docker run --rm -it --network=${STACK_NAME}_default \
                          -e TEZOS_RPC_URL=${TEZOS_RPC_URL} \
