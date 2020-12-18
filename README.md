@@ -2,7 +2,7 @@
 
 ## Description
 
-OpenMinter is in-development open-source tool to allow anyone
+OpenMinter is an in-development open-source tool to allow anyone
 to create, manage, and use assets on the Tezos blockchain
 via the FA2 standard. The tool enables the user to easily
 create any type of asset (fungible, semi-fungible,
@@ -101,9 +101,9 @@ configuration file when starting the Minter devleopment environment.
 
 ### Starting and Stopping
 
-When starting Minter, it will create or update Docker services for each
-environment and also bootstrap the required contracts if their addresses are not
-specified in the environment's configuration file.
+During its start process, Minter will create or update Docker services for its
+specified environment and also bootstrap the required contracts if their
+addresses are not defined in the environment's configuration file.
 
 #### Sandbox
 
@@ -166,12 +166,12 @@ $ yarn stop:mainnet
 
 ### Interacting with Minter
 
-You can now open:
+After starting Minter, you can now open:
 
-- [http://localhost:9000](http://localhost:9000) to view the application.
+- [http://localhost:9000](http://localhost:9000) to view the Minter application.
 - [http://localhost:9000/graphql](http://localhost:9000/graphql) to open the
   GraphQL playground.
-- [http://localhost:5001/webui](http://localhost:5001/webui) to view the IPFS
+- [http://localhost:5001/webui](http://localhost:5001/webui) to open the IPFS
   Web UI
 
 
