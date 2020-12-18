@@ -18,13 +18,15 @@ export const connect = async (
   network: string
 ): Promise<[TezosToolkit, BeaconWallet]> => {
   const tzToolkit = new TezosToolkit(rpc);
+  const preferredNetwork = networkType(network);
 
   const wallet = new BeaconWallet({
-    name: 'OpenMinter dApp'
+    name: 'OpenMinter dApp',
+    preferredNetwork
   });
 
   await wallet.requestPermissions({
-    network: { type: networkType(network), rpcUrl: rpc }
+    network: { type: preferredNetwork, rpcUrl: rpc }
   });
 
   tzToolkit.setWalletProvider(wallet);
