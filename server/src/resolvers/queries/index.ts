@@ -46,8 +46,7 @@ const Query: QueryResolvers = {
       bcdGuiUrl: bcdGuiUrl,
       bcdNetwork: bcdNetwork,
       rpc: config.rpc,
-      contracts: config.contracts,
-      admin: config.admin
+      contracts: config.contracts
     };
   },
 

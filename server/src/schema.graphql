@@ -27,14 +27,8 @@ type SettingsContracts {
   nftFactory: String!
 }
 
-type SettingsAdmin {
-  address: String!
-  secret: String!
-}
-
 type Settings {
   rpc: String!
-  admin: SettingsAdmin!
   contracts: SettingsContracts!
   bcdGuiUrl: String!
   bcdNetwork: String!
