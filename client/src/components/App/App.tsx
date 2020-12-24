@@ -9,7 +9,6 @@ import SplashPage from '../SplashPage';
 import CreateNonFungiblePage from '../CreateNonFungiblePage';
 import AssetsPage from '../AssetsPage';
 import AssetDetailsPage from '../AssetDetailsPage';
-import { ParametersInvalidBeaconError } from '@airgap/beacon-sdk';
 
 const App: FC = () => {
   const [location] = useLocation();

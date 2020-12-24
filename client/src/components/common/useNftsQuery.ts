@@ -21,7 +21,7 @@ const NFTS = gql`
 export const useNftsQuery = (contractAddress?: string) => {
   const ownerAddress = useWalletAddress();
 
-  return useQuery<Query, QueryNftsArgs>(NFTS, {
+  return useQuery<Pick<Query, 'nfts'>, QueryNftsArgs>(NFTS, {
     variables: { ownerAddress, contractAddress },
     fetchPolicy: 'network-only'
   });
