@@ -1,4 +1,4 @@
-#include "../fa2/fa2_interface.mligo"
+#include "../fa2/fa2_tzip16_interface.mligo"
 
 type global_token_id =
 {
@@ -31,7 +31,7 @@ type market_entry_points =
 
 let transfer_nft(fa2_address, token_id, from, to_: address * token_id * address * address): operation =
   let fa2_transfer : ((transfer list) contract) option =
-      Operation.get_entrypoint_opt "%transfer"  fa2_address in
+      Tezos.get_entrypoint_opt "%transfer"  fa2_address in
   let transfer_op = match fa2_transfer with
   | None -> (failwith "CANNOT_INVOKE_FA2_TRANSFER" : operation)
   | Some c ->
@@ -42,33 +42,33 @@ let transfer_nft(fa2_address, token_id, from, to_: address * token_id * address 
         token_id = token_id;
         amount = 1n;
     }]} in
-    Operation.transaction [tx] 0mutez c in
+    Tezos.transaction [tx] 0mutez c in
   transfer_op
 
 let add_operator_nft(fa2_address, token_id, from, to_: address * token_id * address * address): operation =
   let fa2_update_operator : ((update_operator list) contract) option =
-    Operation.get_entrypoint_opt "%update_operators" fa2_address in
+    Tezos.get_entrypoint_opt "%update_operators" fa2_address in
   let update_operator_op = match fa2_update_operator with
     | None -> (failwith "CANNOT_INVOKE_FA2_UPDATE_OPERATOR" : operation)
     | Some c ->
        let tx = Add_operator ( { owner = to_; operator = from; token_id = token_id; } ) in
-       Operation.transaction [tx] 0mutez c in
+       Tezos.transaction [tx] 0mutez c in
   update_operator_op
 
 
 let remove_operator_nft(fa2_address, token_id, operator, owner: address * token_id * address * address): operation =
   let fa2_update_operator : ((update_operator list) contract) option =
-    Operation.get_entrypoint_opt "%update_operators" fa2_address in
+    Tezos.get_entrypoint_opt "%update_operators" fa2_address in
   let update_operator_op = match fa2_update_operator with
     | None -> (failwith "CANNOT_INVOKE_FA2_UPDATE_OPERATOR" : operation)
     | Some c ->
        let tx = Remove_operator ( { owner = owner; operator = operator; token_id = token_id; } ) in
-       Operation.transaction [tx] 0mutez c in
+       Tezos.transaction [tx] 0mutez c in
   update_operator_op
 
 let transfer_money(fa2_address, token_id, amount_, from, to_: address * token_id * nat * address * address): operation =
   let fa2_transfer : ((transfer list) contract) option =
-      Operation.get_entrypoint_opt "%transfer"  fa2_address in
+      Tezos.get_entrypoint_opt "%transfer"  fa2_address in
   let transfer_op = match fa2_transfer with
   | None -> (failwith "CANNOT_INVOKE_MONEY_FA2" : operation)
   | Some c ->
@@ -79,7 +79,7 @@ let transfer_money(fa2_address, token_id, amount_, from, to_: address * token_id
         token_id = token_id;
         amount = amount_;
     }]} in
-    Operation.transaction [tx] 0mutez c
+    Tezos.transaction [tx] 0mutez c
  in transfer_op
 
 let buy_token(sale, storage: sale * storage) : (operation list * storage) =
