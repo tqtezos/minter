@@ -1,30 +1,14 @@
 /** @jsx jsx */
-import { FC, Fragment } from 'react';
+import { FC } from 'react';
 import { jsx } from '@emotion/core';
-import { Row, Col, Alert } from 'antd';
+import { Row, Col } from 'antd';
 import { useLocation } from 'wouter';
 
 import Page from '../Page';
 import PageTitle from '../common/PageTitle';
 import Form from './Form';
 import { useWalletAddress } from '../App/globalContext';
-import WalletConnector from '../WalletConnector';
-import { AttentionSeeker } from 'react-awesome-reveal';
-
-const NotConnectedAlert: FC = () => (
-  <Fragment>
-    <AttentionSeeker effect="headShake">
-      <Alert
-        css={{ marginTop: '3em', marginBottom: '3em', width: '50em' }}
-        type="error"
-        message="Cannot create tokens!"
-        description="To create tokens please connect to your wallet first."
-        showIcon
-      />
-    </AttentionSeeker>
-    <WalletConnector />
-  </Fragment>
-);
+import NotConnectedAlert from '../common/NotConnectedAlert';
 
 const CreateNonFungiblePage: FC = () => {
   const [, setLocation] = useLocation();
@@ -48,7 +32,10 @@ const CreateNonFungiblePage: FC = () => {
               }}
             />
           ) : (
-            <NotConnectedAlert />
+            <NotConnectedAlert
+              message="Cannot create tokens!"
+              description="To create tokens please connect to your wallet first."
+            />
           )}
         </Col>
       </Row>

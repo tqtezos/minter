@@ -4,7 +4,7 @@ import { jsx } from '@emotion/core';
 import { Row, Col, Spin } from 'antd';
 import { Zoom } from 'react-awesome-reveal';
 
-import { useNftsQuery } from './useNftsQuery';
+import { useNftsQuery } from '../common/useNftsQuery';
 import AssetCard from './AssetCard';
 import ContractsFilter from './ContractsFilter';
 import ContractsTitle from './ContractsTitle';
