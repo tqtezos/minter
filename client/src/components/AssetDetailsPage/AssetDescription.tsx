@@ -1,10 +1,12 @@
 /** @jsx jsx */
+import url from 'url';
 import { FC, Fragment } from 'react';
 import { jsx } from '@emotion/core';
 
 import { Description, ParamName, ParamValue } from './Typography';
 import { NonFungibleToken } from '../../generated/graphql_schema';
 import { Skeleton } from 'antd';
+import config from '../../config';
 
 const AssetDescription: FC<{ nft?: NonFungibleToken }> = ({ nft }) => (
   <Fragment>
@@ -26,7 +28,14 @@ const AssetDescription: FC<{ nft?: NonFungibleToken }> = ({ nft }) => (
 
         <div>
           <ParamName>Owner: </ParamName>
-          <ParamValue>{nft.owner}</ParamValue>
+
+          <ParamValue>
+            <img
+              src={url.resolve(config.tzktAvatarUrl, nft.owner)}
+              css={{ width: '2.5em' }}
+            />
+            {nft.owner}
+          </ParamValue>
         </div>
 
         <div css={{ marginTop: '4em' }}>
