@@ -33,6 +33,7 @@ const AssetDescription: FC<{ nft?: NonFungibleToken }> = ({ nft }) => (
             <img
               src={url.resolve(config.tzktAvatarUrl, nft.owner)}
               css={{ width: '2.5em' }}
+              alt=""
             />
             {nft.owner}
           </ParamValue>
