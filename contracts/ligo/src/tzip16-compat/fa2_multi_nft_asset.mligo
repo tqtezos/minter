@@ -48,7 +48,7 @@ let sample_storage : nft_asset_storage = {
     pending_admin = (None : address option);
     paused = true;
     };
-  metadata = (Big_map.empty : (nat, nat * ((string, bytes) map)) big_map);
+  metadata = (Big_map.empty : (token_id, token_metadata) big_map);
 }
 
 #endif
