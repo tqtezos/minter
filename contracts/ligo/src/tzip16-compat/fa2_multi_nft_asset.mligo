@@ -6,7 +6,7 @@
 type nft_asset_storage = {
   assets : nft_token_storage;
   admin : simple_admin_storage;
-  metadata: nft_meta;
+  metadata: (string, bytes) map; (* contract metadata *)
 }
 
 type nft_asset_entrypoints =
@@ -25,8 +25,8 @@ let nft_asset_main (param, storage : nft_asset_entrypoints * nft_asset_storage)
 
   | Mint mp ->
     let u = fail_if_not_admin storage.admin in
-    let ops, new_assets, new_metadata_big_map = mint_tokens (mp, storage.assets, storage.metadata) in
-    let new_storage = { storage with assets = new_assets; metadata = new_metadata_big_map; } in
+    let ops, new_assets = mint_tokens (mp, storage.assets) in
+    let new_storage = { storage with assets = new_assets;} in
     ops, new_storage
 
   | Admin a ->
@@ -39,7 +39,7 @@ let nft_asset_main (param, storage : nft_asset_entrypoints * nft_asset_storage)
 let sample_storage : nft_asset_storage = {
   assets = {
     ledger = (Big_map.empty : ledger);
-    (* token_metadata = (Big_map.empty : nft_meta); *)
+    token_metadata = (Big_map.empty : nft_meta);
     next_token_id = 0n;
     operators = (Big_map.empty : operator_storage);
   };
@@ -48,7 +48,7 @@ let sample_storage : nft_asset_storage = {
     pending_admin = (None : address option);
     paused = true;
     };
-  metadata = (Big_map.empty : (token_id, token_metadata) big_map);
+  metadata = (Map.empty : (string, bytes) map);
 }
 
 #endif

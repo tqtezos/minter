@@ -8,9 +8,6 @@
 #include "../../fa2/lib/fa2_operator_lib.mligo"
 #include "../../fa2/lib/fa2_owner_hooks_lib.mligo"
 
-
-(* type nft_meta = (token_id, token_metadata) big_map *)
-
 type nft_meta = (token_id, token_metadata) big_map
 
 type ledger = (token_id, address) big_map
@@ -19,7 +16,7 @@ type ledger = (token_id, address) big_map
 
 type nft_token_storage = {
   ledger : ledger;
-  (* token_metadata : nft_meta; *)
+  token_metadata : nft_meta;
   next_token_id : token_id;
   operators : operator_storage;
 }
@@ -32,7 +29,7 @@ let get_owner_hook_ops (tx_descriptors, storage
 
 type nft_token_storage = {
   ledger : ledger;
-  (* token_metadata : nft_meta; *)
+  token_metadata : nft_meta;
   next_token_id : token_id;
   operators : operator_storage;
   permissions_descriptor : permissions_descriptor;
