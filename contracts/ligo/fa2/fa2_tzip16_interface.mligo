@@ -64,7 +64,7 @@ type token_metadata =
 }
  *)
 
-type token_metadata = (string, bytes) map
+type token_metadata = token_id * (string, bytes) map
 
 type token_metadata_param =
 [@layout:comb]
@@ -77,7 +77,7 @@ type fa2_entry_points =
   | Transfer of transfer list
   | Balance_of of balance_of_param
   | Update_operators of update_operator list
-  | Token_metadata_registry of address contract
+  (* | Token_metadata_registry of address contract *)
 
 type fa2_token_metadata =
   | Token_metadata of token_metadata_param
