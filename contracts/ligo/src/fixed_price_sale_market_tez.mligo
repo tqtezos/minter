@@ -113,8 +113,10 @@ let deposit_for_sale(sale, storage: sale * storage) : (operation list * storage)
 let cancel_sale(sale, storage: sale * storage) : (operation list * storage) = match Big_map.find_opt sale storage with
     | None -> (failwith "NO_SALE" : (operation list * storage))
     | Some owner -> if owner = Tezos.sender then
-                      let tx_nft_back_op = (failwith "" : operation) in
-                      let remove_operator_op = (failwith "" : operation) in
+                      let tx_nft_back_op = transfer_nft(sale.token.token_for_sale_address, sale.token.token_for_sale_token_id, Tezos.self_address, Tezos.sender) in
+                      let remove_operator_op =
+                        remove_operator_nft(sale.token.token_for_sale_address,sale.token.token_for_sale_token_id,Tezos.self_address,Tezos.sender)
+                      in
                       (tx_nft_back_op :: remove_operator_op :: []), Big_map.remove sale storage
       else (failwith "NOT_OWNER": (operation list * storage))
 
