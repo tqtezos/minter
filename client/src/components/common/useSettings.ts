@@ -23,18 +23,18 @@ export interface Data {
   settings: Settings;
 }
 
-const NFTS_CLIENT = gql`
-  query HelloWorld {
-    nftsClient @client {
-      hello
-    }
+const settings = {
+  rpc: '',
+  bcdGuiUrl: '',
+  bcdNetwork: '',
+  contracts: {
+    nftFaucet: '',
+    nftFactory: ''
   }
-`;
+};
 
 export default () => {
   const { data, loading, error } = useQuery<Data>(SETTINGS);
-  const { data: data2 } = useQuery(NFTS_CLIENT);
-  console.log(data2);
   const hideLoadingMessage = useRef<MessageType>();
 
   useEffect(() => {

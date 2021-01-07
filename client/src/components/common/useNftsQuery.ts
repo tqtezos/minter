@@ -1,5 +1,9 @@
+import { useWalletAddress } from '../App/globalContext';
 import useAsync from '../../utils/useAsync';
-import { contractNames } from '../../resolvers/contractNames';
+import { nfts } from '../../resolvers/nfts';
+import * as config from '../../config/minter.testnet.json';
+
+console.log(config);
 
 const settings = {
   rpc: 'https://delphinet-tezos.giganode.io',
@@ -12,15 +16,14 @@ const settings = {
   }
 };
 
-export const useContractNamesQuery = (
-  contractOwnerAddress?: string,
-  nftOwnerAddress?: string
-) => {
+export const useNftsQuery = (contractAddress?: string) => {
+  const ownerAddress = useWalletAddress();
+
   return useAsync(
     () =>
-      contractNames(
-        contractOwnerAddress,
-        nftOwnerAddress,
+      nfts(
+        ownerAddress,
+        contractAddress,
         settings.contracts.nftFactory,
         settings.contracts.nftFaucet,
         settings.bcdApiUrl,
