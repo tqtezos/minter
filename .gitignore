@@ -59,6 +59,7 @@ build/Release
 # production
 /client/build
 config/minter.mainnet.json
+client/src/config.json
 
 # misc
 **/.DS_Store

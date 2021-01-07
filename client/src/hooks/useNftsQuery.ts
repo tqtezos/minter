@@ -1,7 +1,7 @@
 import { useWalletAddress } from '../components/App/globalContext';
 import useAsync from '../utils/useAsync';
 import { nfts } from '../resolvers/nfts';
-import config from '../config';
+import config from '../config.json';
 
 export const useNftsQuery = (contractAddress?: string) => {
   const ownerAddress = useWalletAddress();

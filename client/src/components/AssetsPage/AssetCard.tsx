@@ -10,7 +10,7 @@ import { NonFungibleToken } from '../../generated/graphql_schema';
 import { urlFromCid } from '../../api/ipfsUploader';
 import AssetTransfer from './AssetTransfer';
 import { useContracts } from '../App/globalContext';
-import config from '../../config';
+import config from '../../config.json';
 import { useLocation } from 'wouter';
 
 const { Paragraph, Text, Link } = Typography;

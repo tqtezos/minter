@@ -5,7 +5,7 @@ import { message } from 'antd';
 
 import HeaderButton from '../common/HeaderButton';
 import { useTzToolkit, useTzToolkitSetter } from '../App/globalContext';
-import config from '../../config';
+import config from '../../config.json';
 import * as beaconWallet from './beaconWallet';
 
 const WalletConnector: FC = () => {

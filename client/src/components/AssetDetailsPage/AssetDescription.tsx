@@ -6,7 +6,8 @@ import { jsx } from '@emotion/core';
 import { Description, ParamName, ParamValue } from './Typography';
 import { NonFungibleToken } from '../../generated/graphql_schema';
 import { Skeleton } from 'antd';
-import config from '../../config';
+
+const TZKT_AVATAR_URL = 'https://services.tzkt.io/v1/avatars2/';
 
 const AssetDescription: FC<{ nft?: NonFungibleToken }> = ({ nft }) => (
   <Fragment>
@@ -31,7 +32,7 @@ const AssetDescription: FC<{ nft?: NonFungibleToken }> = ({ nft }) => (
 
           <ParamValue>
             <img
-              src={url.resolve(config.tzktAvatarUrl, nft.owner)}
+              src={url.resolve(TZKT_AVATAR_URL, nft.owner)}
               css={{ width: '2.5em' }}
               alt=""
             />

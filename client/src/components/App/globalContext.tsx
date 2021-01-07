@@ -10,10 +10,12 @@ import React, {
 } from 'react';
 
 import { TezosToolkit } from '@taquito/taquito';
-import config from '../../config';
+import config from '../../config.json';
 import mkContracts, { Contracts } from '../../api/contracts';
 import { BeaconWallet } from '@taquito/beacon-wallet';
-import { mkBetterCallDev, BetterCallDev } from '../../resolvers/betterCallDev';
+import { BetterCallDev } from '../../resolvers/betterCallDev';
+
+/* <TODO: Use state reducer with global context to manage actions & application dependencies> */
 
 type GlobalActions =
   | {
@@ -57,6 +59,8 @@ const GlobalContext = createContext<IGlobalContext>({
   state: initialDependencies,
   dispatch: (_action: GlobalActions) => null
 });
+
+/* </END TODO> */
 
 type Toolkit = [TezosToolkit, BeaconWallet] | undefined;
 

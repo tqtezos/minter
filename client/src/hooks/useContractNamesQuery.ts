@@ -1,6 +1,6 @@
 import useAsync from '../utils/useAsync';
 import { contractNames } from '../resolvers/contractNames';
-import config from '../config';
+import config from '../config.json';
 
 export const useContractNamesQuery = (
   contractOwnerAddress?: string,

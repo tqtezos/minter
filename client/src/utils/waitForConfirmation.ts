@@ -3,7 +3,7 @@ import { OperationStatus } from '../generated/graphql_schema';
 import { pollUntilTrue, sleep } from './polling';
 import { contractOperationStatus } from '../resolvers/contractOperationStatus';
 import { indexerStats } from '../resolvers/indexerStats';
-import config from '../config';
+import config from '../config.json';
 
 export const getContractOperationStatus = async (
   contractAddress: string,

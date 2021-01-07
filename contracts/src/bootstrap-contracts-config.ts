@@ -20,11 +20,31 @@ async function main() {
     await bootstrapNftFactory(config, toolkit);
     //add bootstrapping of other contracts here
 
+    genClientConfig(config);
+
     process.exit(0);
   } catch (err) {
     $log.error(`error while bootstrapping environment ${env}`);
     $log.error(err);
     process.exit(1);
+  }
+}
+
+function genClientConfig(mainConfig: Configstore) {
+  const configPath = path.join(__dirname, `../../client/src/config.json`);
+  const clientConfig = new Configstore('client', {}, { configPath });
+
+  const clientConfigKeys = [
+    'rpc',
+    'bcdApiUrl',
+    'bcdGuiUrl',
+    'bcdNetwork',
+    'contracts.nftFaucet',
+    'contracts.nftFactory'
+  ];
+
+  for (let key of clientConfigKeys) {
+    clientConfig.set(key, mainConfig.get(key));
   }
 }
 
