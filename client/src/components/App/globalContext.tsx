@@ -10,9 +10,8 @@ import React, {
 } from 'react';
 
 import { TezosToolkit } from '@taquito/taquito';
-import useSettings from '../common/useSettings';
+import config from '../../config';
 import mkContracts, { Contracts } from '../../api/contracts';
-import { useApolloClient } from '@apollo/client';
 import { BeaconWallet } from '@taquito/beacon-wallet';
 import { mkBetterCallDev, BetterCallDev } from '../../resolvers/betterCallDev';
 
@@ -68,33 +67,25 @@ const TzToolkitSetterContext = createContext<TztSetter>(() => null);
 const ContractsContext = createContext<Contracts | undefined>(undefined);
 
 const GlobalContextProvider: FC = ({ children }) => {
-  const apolloClient = useApolloClient();
   const [state, dispatch] = useReducer(globalReducer, initialDependencies);
   const [tzToolkit, setTzToolkit] = React.useState<Toolkit>();
   const [contracts, setContracts] = React.useState<Contracts | undefined>();
-  const { settings, loading } = useSettings();
 
   useEffect(() => {
-    if (tzToolkit && settings)
-      setContracts(mkContracts(apolloClient, tzToolkit[0], settings.contracts));
+    if (tzToolkit) setContracts(mkContracts(tzToolkit[0], config.contracts));
     else setContracts(undefined);
-  }, [apolloClient, tzToolkit, settings]);
+  }, [tzToolkit]);
 
   return (
-    <>
-      {loading && <div>Loading setting from the server...</div>}
-      {settings && (
-        <GlobalContext.Provider value={{ state, dispatch }}>
-          <TzToolkitContext.Provider value={tzToolkit}>
-            <TzToolkitSetterContext.Provider value={setTzToolkit}>
-              <ContractsContext.Provider value={contracts}>
-                {children}
-              </ContractsContext.Provider>
-            </TzToolkitSetterContext.Provider>
-          </TzToolkitContext.Provider>
-        </GlobalContext.Provider>
-      )}
-    </>
+    <GlobalContext.Provider value={{ state, dispatch }}>
+      <TzToolkitContext.Provider value={tzToolkit}>
+        <TzToolkitSetterContext.Provider value={setTzToolkit}>
+          <ContractsContext.Provider value={contracts}>
+            {children}
+          </ContractsContext.Provider>
+        </TzToolkitSetterContext.Provider>
+      </TzToolkitContext.Provider>
+    </GlobalContext.Provider>
   );
 };
 

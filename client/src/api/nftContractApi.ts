@@ -10,7 +10,6 @@ import { waitForConfirmation } from '../utils/waitForConfirmation';
 import { Address } from './contractUtil';
 import { NftContract } from './nftContract';
 import mkNftContract from './nftContract';
-import { ApolloClient } from '@apollo/client';
 
 export interface NftFactoryContract {
   createNftContract(name: string): Promise<string>;
@@ -41,7 +40,6 @@ export interface NftContractApi {
 }
 
 const mkContractApi = async (
-  client: ApolloClient<object>,
   tzToolkit: TezosToolkit,
   settings: SettingsContracts
 ): Promise<NftContractApi> => {
@@ -50,7 +48,7 @@ const mkContractApi = async (
 
     async createContract(name: string) {
       const factory = await tzToolkit.wallet.at(settings.nftFactory);
-      const op = await waitForConfirmation(client, settings.nftFactory, () =>
+      const op = await waitForConfirmation(settings.nftFactory, () =>
         factory.methods.default(name).send()
       );
 
@@ -60,7 +58,7 @@ const mkContractApi = async (
     async contractByAddress(address: Address) {
       const contract = await tzToolkit.wallet.at(address);
       const ownerAddress = await tzToolkit.wallet.pkh();
-      return mkNftContract(client, contract, ownerAddress);
+      return mkNftContract(contract, ownerAddress);
     }
   };
 };

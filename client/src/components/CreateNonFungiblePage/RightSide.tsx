@@ -7,7 +7,7 @@ import { FormInstance } from 'antd/lib/form/hooks/useForm';
 import ImagePreview from './ImagePreview';
 import { IpfsContent } from '../../api/ipfsUploader';
 import { useContracts, useWalletAddress } from '../App/globalContext';
-import { useContractNamesQuery } from '../common/useContractNamesQuery';
+import { useContractNamesQuery } from '../../hooks/useContractNamesQuery';
 import NewContract from './NewContract';
 
 const { Option } = Select;

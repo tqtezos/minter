@@ -5,19 +5,16 @@ import { message } from 'antd';
 
 import HeaderButton from '../common/HeaderButton';
 import { useTzToolkit, useTzToolkitSetter } from '../App/globalContext';
-import useSettings from '../common/useSettings';
+import config from '../../config';
 import * as beaconWallet from './beaconWallet';
 
 const WalletConnector: FC = () => {
-  const { settings } = useSettings();
   const tzToolkit = useTzToolkit();
   const setTzToolkit = useTzToolkitSetter();
   const [connecting, setConnecting] = useState(false);
 
   const handleConenct = async () => {
-    if (!settings) throw Error('Problem getting settings from the server!');
-
-    const { rpc, bcdNetwork } = settings;
+    const { rpc, bcdNetwork } = config;
 
     try {
       setConnecting(true);

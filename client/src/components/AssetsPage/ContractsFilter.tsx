@@ -4,7 +4,7 @@ import { jsx } from '@emotion/core';
 import { Select, Skeleton, Form } from 'antd';
 
 import { ContractInfo } from '../../generated/graphql_schema';
-import { useContractNamesQuery } from '../common/useContractNamesQuery';
+import { useContractNamesQuery } from '../../hooks/useContractNamesQuery';
 import { useWalletAddress } from '../App/globalContext';
 
 const { Option } = Select;
