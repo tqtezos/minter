@@ -5,7 +5,6 @@
   "dependencies": {
     "@airgap/beacon-sdk": "2.0.0",
     "@ant-design/icons": "4.2.2",
-    "@apollo/client": "3.3.3",
     "@emotion/core": "10.0.28",
     "@emotion/styled": "10.0.27",
     "@taquito/beacon-wallet": "7.1.0-beta.0",
@@ -32,7 +31,6 @@
     "react-awesome-reveal": "3.0.0",
     "react-dom": "16.13.1",
     "react-scripts": "3.4.1",
-    "subscriptions-transport-ws": "0.9.18",
     "typescript": "3.7.2",
     "wouter": "2.5.1"
   },
