@@ -62,9 +62,14 @@ type token_metadata =
   decimals : nat;
   extras : (string, string) map;
 }
- *)
+*)
 
-type token_metadata =  token_id * ((string, bytes) map)
+type token_metadata =
+[@layout:comb]
+  {
+    token_id: token_id;
+    token_metadata_map: ((string, bytes) map);
+  }
 
 type token_metadata_param =
 [@layout:comb]

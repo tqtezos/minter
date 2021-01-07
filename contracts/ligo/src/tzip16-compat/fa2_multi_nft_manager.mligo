@@ -7,7 +7,7 @@
 type mint_token_param =
 [@layout:comb]
 {
-  token_metadata : token_metadata;
+  token_metadata: token_metadata;
   owner : address;
 }
 
@@ -26,7 +26,7 @@ let update_meta_and_create_txs (param, storage
   } in
   List.fold
     (fun (acc, t : minted1 * mint_token_param) ->
-      let new_token_id = t.token_metadata.0 in
+      let new_token_id = t.token_metadata.token_id in
       if new_token_id < acc.storage.next_token_id
       then (failwith "FA2_INVALID_TOKEN_ID" : minted1)
       else
