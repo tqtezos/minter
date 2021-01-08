@@ -1,31 +1,11 @@
 import React from 'react';
-import {
-  Box,
-  Flex,
-  Text,
-  Heading,
-  Image,
-  BoxProps,
-  Link
-} from '@chakra-ui/react';
+import { useLocation } from 'wouter';
+import { Flex, Text, Heading, Image, Link } from '@chakra-ui/react';
+import { MinterButton, MinterLink } from '../common';
 import logo from './logo.svg';
-import { useStyleConfig } from '@chakra-ui/react';
-
-// Common Minter Components - Button & Link referencing branded variants
-
-function MinterButton(props: BoxProps & { size?: string; variant?: string }) {
-  const { size, variant, ...rest } = props;
-  const styles = useStyleConfig('Button', { size, variant });
-  return <Box as="button" sx={styles} {...rest} />;
-}
-
-function MinterLink(props: BoxProps & { size?: string; variant?: string }) {
-  const { size, variant, ...rest } = props;
-  const styles = useStyleConfig('Link', { size, variant });
-  return <Box as="a" sx={styles} {...rest} />;
-}
 
 export default function SplashPage() {
+  const [, setLocation] = useLocation();
   return (
     <Flex bg="brand.background" pos="absolute" w="100%" h="100%">
       <Flex
@@ -53,7 +33,16 @@ export default function SplashPage() {
             <MinterButton variant="secondaryAction">
               Connect your wallet
             </MinterButton>
-            <MinterLink variant="primaryAction" marginLeft={4} flex="1">
+            <MinterLink
+              variant="primaryAction"
+              marginLeft={4}
+              flex="1"
+              href="/create-non-fungible"
+              onClick={e => {
+                e.preventDefault();
+                setLocation('/create-non-fungible');
+              }}
+            >
               Create
             </MinterLink>
           </Flex>

@@ -14,6 +14,10 @@ const Button = {
       borderRadius: '2px',
       color: 'white',
       transition: 'none',
+      _active: {
+        opacity: '0.8',
+        bg: 'brand.blue'
+      },
       _hover: {
         // bg: 'white',
         // color: 'brand.blue',
@@ -21,15 +25,35 @@ const Button = {
       }
     },
     secondaryAction: {
-      bg: 'brand.background',
+      bg: 'none',
       borderColor: 'brand.turquoise',
       borderRadius: '2px',
       borderWidth: '1px',
       color: 'brand.turquoise',
       flex: '1',
+      _active: {
+        opacity: '0.8',
+        bg: 'brand.turquoise'
+      },
       _hover: {
         bg: 'brand.turquoise',
         color: 'brand.background'
+      }
+    },
+    cancelAction: {
+      bg: 'none',
+      borderColor: 'brand.red',
+      borderRadius: '2px',
+      borderWidth: '1px',
+      color: 'brand.red',
+      transition: 'none',
+      _active: {
+        opacity: '0.8',
+        bg: 'brand.red'
+      },
+      _hover: {
+        bg: 'brand.red',
+        color: 'white'
       }
     }
   }
@@ -70,11 +94,15 @@ const theme = extendTheme({
   },
   colors: {
     brand: {
+      black: '#1D2227',
       background: '#1C2228',
       darkGray: '#3B4650',
       lightGray: '#ABBBCB',
+      brightGray: '#F2F4F7',
       blue: '#005DFF',
-      turquoise: '#00FFBE'
+      lightBlue: '#D3DEF5',
+      turquoise: '#00FFBE',
+      red: '#FF4161'
     }
   },
   components: {
