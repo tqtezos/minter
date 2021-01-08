@@ -15,8 +15,6 @@ docker stack deploy \
        -c $DOCKER_STACK_DIR/flextesa.yml \
        $STACK_NAME
 
-$PROJECT_ROOT_DIR/bin/wait-for-postgres $PROJECT_ROOT_DIR/bin/migrate-db
-
 export CHAIN_ID=$(docker run --rm -it --network=${STACK_NAME}_default \
                          -e TEZOS_RPC_URL=${TEZOS_RPC_URL} \
                          -v $PROJECT_ROOT_DIR/bin/chain-id:/bin/chain-id \

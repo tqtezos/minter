@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import { mkBetterCallDev, BetterCallDev } from './betterCallDev';
-import { Context } from '../../components/context';
-import { NonFungibleToken, ContractInfo } from '../../generated/graphql_schema';
+import { NonFungibleToken, ContractInfo } from '../generated/graphql_schema';
 import { contractNames } from './contractNames';
 
 interface Nft {
@@ -28,14 +27,10 @@ const nftsByContractAddress = async (
 
   const { ledger, token_metadata } = contract.bigMaps;
 
-  const tokenBigMap = betterCallDev.bigMapById<NftBigMapValue>(
-    token_metadata
-  );
+  const tokenBigMap = betterCallDev.bigMapById<NftBigMapValue>(token_metadata);
   const tokenItems = await tokenBigMap.values();
 
-  const ledgerBigMap = betterCallDev.bigMapById<LedgerBigMapValue>(
-    ledger
-  );
+  const ledgerBigMap = betterCallDev.bigMapById<LedgerBigMapValue>(ledger);
   const ledgerItems = await ledgerBigMap.values();
 
   const ownerByTokenId = _(ledgerItems)
@@ -59,26 +54,38 @@ const nftsByContractAddress = async (
 
   return _.isNil(ownerAddress)
     ? transformedNfts
-    : transformedNfts.filter(i => i.owner === ownerAddress);
+    : transformedNfts.filter((i: any) => i.owner === ownerAddress);
 };
 
 export const nfts = async (
   ownerAddress: string | null | undefined,
   contractAddress: string | null | undefined,
-  ctx: Context
+  factoryAddress: string,
+  faucetAddress: string,
+  bcdApiUrl: string,
+  bcdNetwork: string
 ): Promise<NonFungibleToken[]> => {
-  const betterCallDev = mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork);
+  const betterCallDev = mkBetterCallDev(bcdApiUrl, bcdNetwork);
 
-  const contracts = await contractNames(null, null, ctx);
+  const contracts = await contractNames(
+    null,
+    null,
+    factoryAddress,
+    faucetAddress,
+    bcdApiUrl,
+    bcdNetwork
+  );
 
   if (!_.isNil(contractAddress)) {
-    const contractInfo = contracts.find(c => c.address === contractAddress);
+    const contractInfo = contracts.find(
+      (c: any) => c.address === contractAddress
+    );
     if (!contractInfo)
       throw Error(`Cannot find contract address: ${contractAddress}`);
     return nftsByContractAddress(betterCallDev, contractInfo, ownerAddress);
   }
 
-  const promises = contracts.map(contractInfo => {
+  const promises = contracts.map((contractInfo: any) => {
     return nftsByContractAddress(betterCallDev, contractInfo, ownerAddress);
   });
   const nftArrays = await Promise.all(promises);

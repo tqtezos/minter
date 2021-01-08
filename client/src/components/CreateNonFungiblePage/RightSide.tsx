@@ -7,7 +7,7 @@ import { FormInstance } from 'antd/lib/form/hooks/useForm';
 import ImagePreview from './ImagePreview';
 import { IpfsContent } from '../../api/ipfsUploader';
 import { useContracts, useWalletAddress } from '../App/globalContext';
-import { useContractNamesQuery } from '../common/useContractNamesQuery';
+import { useContractNamesQuery } from '../../hooks/useContractNamesQuery';
 import NewContract from './NewContract';
 
 const { Option } = Select;
@@ -21,18 +21,17 @@ const RightSide: FC<Props> = ({ ipfsContent, form }) => {
   const ownerAddress = useWalletAddress();
   const [newContractVisible, setNewContractVisible] = useState(false);
   const { data, loading, refetch } = useContractNamesQuery(ownerAddress);
-  const contractNames = data?.contractNames;
 
   useEffect(() => {
-    if (!contractNames) form.setFieldsValue({ contract: undefined });
-    else if (contractNames.length === 1)
-      form.setFieldsValue({ contract: contractNames[0].address });
+    if (!data) form.setFieldsValue({ contract: undefined });
+    else if (data.length === 1)
+      form.setFieldsValue({ contract: data[0].address });
     else {
       const contractAddress = form.getFieldValue('contract');
-      if (!contractNames.find(c => c.address === contractAddress))
+      if (!data.find(c => c.address === contractAddress))
         form.setFieldsValue({ contract: undefined });
     }
-  }, [contractNames, form]);
+  }, [data, form]);
 
   const handleSelectContract = (value: string) => {
     if (value === 'new') setNewContractVisible(true);
@@ -81,7 +80,7 @@ const RightSide: FC<Props> = ({ ipfsContent, form }) => {
           loading={loading}
           placeholder="Select a contract"
         >
-          {data?.contractNames.map(c => (
+          {data?.map(c => (
             <Option key={c.address} value={c.address}>
               {c.name} - {c.address}
             </Option>

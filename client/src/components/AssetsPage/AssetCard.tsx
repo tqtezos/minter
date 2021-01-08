@@ -10,7 +10,7 @@ import { NonFungibleToken } from '../../generated/graphql_schema';
 import { urlFromCid } from '../../api/ipfsUploader';
 import AssetTransfer from './AssetTransfer';
 import { useContracts } from '../App/globalContext';
-import useSettings from '../common/useSettings';
+import config from '../../config.json';
 import { useLocation } from 'wouter';
 
 const { Paragraph, Text, Link } = Typography;
@@ -65,7 +65,6 @@ interface Props {
 const AssetCard: FC<Props> = ({ token, onChange }) => {
   const [transferVisible, setTransferVisible] = useState(false);
   const contracts = useContracts();
-  const { settings } = useSettings();
   const [, setLocation] = useLocation();
 
   const handleTransfer = () => {
@@ -144,7 +143,7 @@ const AssetCard: FC<Props> = ({ token, onChange }) => {
                   Contract:{' '}
                   <Link
                     title={token.contractInfo.address}
-                    href={`${settings?.bcdGuiUrl}/${settings?.bcdNetwork}/${token.contractInfo.address}`}
+                    href={`${config.bcdGuiUrl}/${config.bcdNetwork}/${token.contractInfo.address}`}
                     target="_blank"
                   >
                     {token.contractInfo.name} - {token.contractInfo.address}
@@ -184,7 +183,11 @@ const AssetCard: FC<Props> = ({ token, onChange }) => {
           <Col span={12} css={{ display: 'flex', alignItems: 'center' }}>
             <Link
               css={{ margin: 'auto' }}
-              onClick={() => setLocation(`/asset-details/${token.contractInfo.address}/${token.tokenId}`)}
+              onClick={() =>
+                setLocation(
+                  `/asset-details/${token.contractInfo.address}/${token.tokenId}`
+                )
+              }
             >
               DETAILS
             </Link>

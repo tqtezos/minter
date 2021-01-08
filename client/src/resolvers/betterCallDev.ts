@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 import axiosRetry from 'axios-retry';
 import { isNil } from 'lodash';
 
-import { selectObjectByKeys } from '../../util';
+import selectObjectByKeys from '../utils/selectObjectByKeys';
 
 export type Address = string;
 
@@ -145,7 +145,7 @@ export const mkBetterCallDev = (baseUrl: string, network: string) => ({
     since?: string
   ): Promise<Operation | undefined> {
     try {
-      const from = since ? `?from=${new Date(since).getTime()}` : ''
+      const from = since ? `?from=${new Date(since).getTime()}` : '';
 
       const operations = await axios.get<{ operations: Operation[] }>(
         `${baseUrl}/v1/contract/${network}/${contractAddress}/operations${from}`,
@@ -155,8 +155,8 @@ export const mkBetterCallDev = (baseUrl: string, network: string) => ({
           }
         }
       );
-      
-      return operations.data.operations.find(o => o.hash === hash);
+
+      return operations.data.operations.find((o: any) => o.hash === hash);
     } catch (e) {
       if ((e as AxiosError).response?.status === 500) return undefined;
       else throw e;

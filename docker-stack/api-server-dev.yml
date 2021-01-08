@@ -15,7 +15,6 @@ services:
       TZ_NETWORK: ${TZ_NETWORK}
     volumes:
       - ${PROJECT_ROOT_DIR}/server/src:/usr/src/app/server/src
-      - ${PROJECT_ROOT_DIR}/server/config:/usr/src/app/server/config
     ports:
       - 3300:3300
     secrets:

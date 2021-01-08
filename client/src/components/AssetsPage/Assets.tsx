@@ -4,7 +4,7 @@ import { jsx } from '@emotion/core';
 import { Row, Col, Spin } from 'antd';
 import { Zoom } from 'react-awesome-reveal';
 
-import { useNftsQuery } from '../common/useNftsQuery';
+import { useNftsQuery } from '../../hooks/useNftsQuery';
 import AssetCard from './AssetCard';
 import ContractsFilter from './ContractsFilter';
 import ContractsTitle from './ContractsTitle';
@@ -54,7 +54,7 @@ const Assets: FC = () => {
       <Row css={{ marginTop: '2em' }}>
         <Col offset={3} span={18} css={{ height: '100%' }}>
           {data && !loading ? (
-            <AssetCards data={data.nfts} onChange={refetch} />
+            <AssetCards data={data} onChange={refetch} />
           ) : (
             <Spinner />
           )}

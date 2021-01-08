@@ -1,6 +1,6 @@
 export const anyValue = Symbol('any');
 
-export function selectObjectByKeys(
+export default function selectObjectByKeys(
   object: any,
   ks: Record<string, any>
 ): Record<string, any> | null {

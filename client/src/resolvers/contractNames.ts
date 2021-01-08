@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import { mkBetterCallDev, BetterCallDev, Address } from './betterCallDev';
-import { Context } from '../../components/context';
 
 interface ContractBigMapValue {
   owner: string;
@@ -25,7 +24,7 @@ const contractNftOwners = async (
     contract.bigMaps.ledger
   );
   const values = await ledgerBigMap.values();
-  return values.map(v => v.value);
+  return values.map((v: any) => v.value);
 };
 
 const filterContractsByNftOwner = async (
@@ -50,12 +49,13 @@ const filterContractsByNftOwner = async (
 export const contractNames = async (
   contractOwnerAddress: string | null | undefined,
   nftOwnerAddress: string | null | undefined,
-  ctx: Context
+  factoryAddress: string,
+  faucetAddress: string,
+  bcdApiUrl: string,
+  bcdNetwork: string
 ): Promise<ContractIdentifier[]> => {
-  const factoryAddress = ctx.configStore.get('contracts.nftFactory') as string;
-  const faucetAddress = ctx.configStore.get('contracts.nftFaucet') as string;
   const faucetContract = { address: faucetAddress, name: 'Minter' };
-  const betterCallDev = mkBetterCallDev(ctx.bcdApiUrl, ctx.bcdNetwork);
+  const betterCallDev = mkBetterCallDev(bcdApiUrl, bcdNetwork);
   const contract = await betterCallDev.contractByAddress(factoryAddress);
 
   switch (contract.contractType) {
@@ -69,10 +69,10 @@ export const contractNames = async (
         .values();
 
       const filterContracts = !_.isNil(contractOwnerAddress)
-        ? contracts.filter(i => i.value.owner === contractOwnerAddress)
+        ? contracts.filter((i: any) => i.value.owner === contractOwnerAddress)
         : contracts;
 
-      const result = filterContracts.map(i => ({
+      const result = filterContracts.map((i: any) => ({
         address: i.key,
         name: i.value.name
       }));

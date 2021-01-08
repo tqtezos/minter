@@ -9,7 +9,7 @@ import { BackButtonRow } from '../common/PageTitle';
 import { Name } from './Typography';
 import AssetDescription from './AssetDescription';
 import Actions from './Actions';
-import { useNftsQuery } from '../common/useNftsQuery';
+import { useNftsQuery } from '../../hooks/useNftsQuery';
 import { NonFungibleToken } from '../../generated/graphql_schema';
 import { urlFromCid } from '../../api/ipfsUploader';
 import { useWalletAddress } from '../App/globalContext';
@@ -90,7 +90,7 @@ interface Props {
 export const PageBody: FC<Props> = ({ contractAddress, tokenId }) => {
   const walletAddress = useWalletAddress();
   const { data, error, loading } = useNftsQuery(contractAddress);
-  const nft = data?.nfts.find(t => t.tokenId === tokenId);
+  const nft = data?.find(t => t.tokenId === tokenId);
 
   if (!walletAddress)
     return (
