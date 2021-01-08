@@ -39,7 +39,13 @@ export default function SplashPage() {
           <Heading color="white" size="xl" pb={8}>
             Create NFTs on Tezos
           </Heading>
-          <Heading color="white" size="md" textAlign="center" pb={12}>
+          <Heading
+            color="white"
+            size="md"
+            textAlign="center"
+            pb={12}
+            opacity=".8"
+          >
             Create and mint a new non-fungible token by using our simple
             interface. Just connect your Tezos account.
           </Heading>
@@ -51,7 +57,7 @@ export default function SplashPage() {
               Create
             </MinterLink>
           </Flex>
-          <Text color="brand.lightGray">
+          <Text fontFamily="mono" fontSize="xs" color="brand.lightGray">
             Learn more about <Link textDecor="underline">TZIP-12</Link>
           </Text>
         </Flex>
@@ -59,6 +65,7 @@ export default function SplashPage() {
           width="100%"
           bg="brand.darkGray"
           color="brand.lightGray"
+          fontFamily="mono"
           paddingX={10}
           paddingY={4}
           justifyContent="space-between"

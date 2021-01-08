@@ -6,5 +6,6 @@ services:
     tty: true
     volumes:
       - ${PROJECT_ROOT_DIR}/client/src:/usr/src/app/client/src
+      - ${PROJECT_ROOT_DIR}/client/public:/usr/src/app/client/public
     ports:
       - 3000:3000

@@ -10,12 +10,14 @@ const Button = {
   variants: {
     primaryAction: {
       bg: 'brand.blue',
-      border: '1px',
       borderColor: 'brand.blue',
       borderRadius: '2px',
       color: 'white',
+      transition: 'none',
       _hover: {
-        borderColor: 'white'
+        // bg: 'white',
+        // color: 'brand.blue',
+        // textDecoration: 'none'
       }
     },
     secondaryAction: {
@@ -38,7 +40,6 @@ const Link = {
     primaryAction: {
       alignItems: 'center',
       bg: 'brand.blue',
-      border: '1px',
       borderColor: 'brand.blue',
       borderRadius: '2px',
       color: 'white',
@@ -49,9 +50,11 @@ const Link = {
       lineHeight: '1.2',
       marginLeft: 4,
       paddingX: 4,
+      transition: 'none',
       _hover: {
-        borderColor: 'white',
-        textDecoration: 'none'
+        // bg: 'white',
+        // color: 'brand.blue',
+        // textDecoration: 'none'
       }
     }
   }
@@ -77,6 +80,15 @@ const theme = extendTheme({
   components: {
     Button,
     Link
+  },
+  fonts: {
+    body: "'Roboto', sans-serif",
+    heading: "'Roboto', sans-serif",
+    mono: "'Roboto Mono', monospace"
+  },
+  fontWeights: {
+    normal: 400,
+    bold: 700
   }
 });
 
