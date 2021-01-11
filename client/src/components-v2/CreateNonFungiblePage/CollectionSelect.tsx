@@ -73,9 +73,8 @@ function CollectionRow(props: CollectionRowProps) {
   return (
     <Flex
       align="center"
-      py={2}
-      pl={2}
-      pr={4}
+      py={4}
+      px={4}
       mb={4}
       border="1px solid"
       borderColor={selected ? 'brand.blue' : 'brand.brightGray'}
