@@ -97,6 +97,7 @@ const theme = extendTheme({
       black: '#1D2227',
       background: '#1C2228',
       darkGray: '#3B4650',
+      gray: '#AEBBC9',
       lightGray: '#ABBBCB',
       brightGray: '#F2F4F7',
       blue: '#005DFF',
