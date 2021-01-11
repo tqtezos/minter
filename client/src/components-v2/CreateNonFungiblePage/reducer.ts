@@ -33,7 +33,7 @@ export interface State {
 export type DispatchFn = Dispatch<Action>;
 
 export const initialState: State = {
-  step: 'collection_select',
+  step: 'file_upload',
   fields: {
     name: null,
     description: null,

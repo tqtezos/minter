@@ -1,5 +1,20 @@
 import React from 'react';
-import { Box, Flex, Heading, Text } from '@chakra-ui/react';
+import {
+  Flex,
+  Heading,
+  Text,
+  FormControl,
+  FormLabel,
+  Input,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure
+} from '@chakra-ui/react';
 import { MinterButton } from '../common';
 import { State, DispatchFn } from './reducer';
 
@@ -15,6 +30,42 @@ interface CollectionRowProps {
   address: string;
   dispatch: DispatchFn;
   state: State;
+}
+
+function NewCollectionButton() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const initialRef = React.useRef(null);
+  return (
+    <>
+      <MinterButton variant="primaryAction" onClick={onOpen}>
+        New
+      </MinterButton>
+
+      <Modal isOpen={isOpen} onClose={onClose} initialFocusRef={initialRef}>
+        <ModalOverlay />
+        <ModalContent mt={40}>
+          <ModalHeader>New Collection</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel fontFamily="mono">Collection Name</FormLabel>
+              <Input
+                autoFocus={true}
+                ref={initialRef}
+                placeholder="Input your collection name"
+              />
+            </FormControl>
+          </ModalBody>
+
+          <ModalFooter>
+            <MinterButton variant="primaryAction" onClick={onClose}>
+              Create Collection
+            </MinterButton>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  );
 }
 
 function CollectionRow(props: CollectionRowProps) {
@@ -73,7 +124,7 @@ export default function CollectionSelect(props: {
         borderColor="brand.brightGray"
       >
         <Heading size="lg">Collections</Heading>
-        <MinterButton variant="primaryAction">Create</MinterButton>
+        <NewCollectionButton />
       </Flex>
       {collections.map(({ name, address }) => {
         return (

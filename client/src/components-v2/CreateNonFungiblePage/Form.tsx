@@ -31,6 +31,7 @@ export default function Form({
       <FormControl paddingBottom={6}>
         <FormLabel fontFamily="mono">Asset Name</FormLabel>
         <Input
+          autoFocus={true}
           placeholder="Input your asset name"
           value={name || ''}
           onChange={e =>

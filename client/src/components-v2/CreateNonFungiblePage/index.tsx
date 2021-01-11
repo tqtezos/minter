@@ -111,25 +111,42 @@ export default function () {
                 variant="primaryAction"
                 onClick={() => dispatch({ type: 'increment_step' })}
               >
-                Next
+                {state.step === 'collection_select' ? 'Create' : 'Next'}
               </MinterButton>
             </Flex>
           </Flex>
-          <Flex
-            bg="brand.brightGray"
-            borderLeftWidth="1px"
-            borderLeftColor="brand.lightBlue"
-            w="50%"
-            h="100%"
-            left="50%"
-            position="absolute"
-            flexDir="column"
-            align="center"
-            px={28}
-            pt={16}
-          >
-            <Preview state={state} />
-          </Flex>
+          {state.step === 'file_upload' ? (
+            <Flex
+              bg="brand.darkGray"
+              borderLeftWidth="1px"
+              borderLeftColor="brand.lightBlue"
+              w="50%"
+              h="100%"
+              left="50%"
+              position="absolute"
+              flexDir="column"
+              align="center"
+              justify="center"
+            >
+              <Text color="brand.lightGray">(Artwork TBD)</Text>
+            </Flex>
+          ) : (
+            <Flex
+              bg="brand.brightGray"
+              borderLeftWidth="1px"
+              borderLeftColor="brand.lightBlue"
+              w="50%"
+              h="100%"
+              left="50%"
+              position="absolute"
+              flexDir="column"
+              align="center"
+              px={28}
+              pt={16}
+            >
+              <Preview state={state} />
+            </Flex>
+          )}
         </Flex>
       </Flex>
     </Flex>
