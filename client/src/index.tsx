@@ -137,10 +137,14 @@ const theme = extendTheme({
   }
 });
 
-const isV2 = new URLSearchParams(window.location.search).get('v') === '2';
+const minterVersion = new URLSearchParams(window.location.search).get('v');
+
+if (minterVersion) {
+  localStorage.setItem('minter_version', minterVersion);
+}
 
 function Root() {
-  if (isV2) {
+  if (localStorage.getItem('minter_version') === '2') {
     return (
       <ChakraProvider theme={theme}>
         <AppV2 />
