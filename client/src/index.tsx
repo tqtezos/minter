@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-// import App from './components/App';
-import App from './components-v2/App';
+import AppV1 from './components/App';
+import AppV2 from './components-v2/App';
 import * as serviceWorker from './serviceWorker';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 
@@ -137,12 +137,20 @@ const theme = extendTheme({
   }
 });
 
-ReactDOM.render(
-  <ChakraProvider theme={theme}>
-    <App />
-  </ChakraProvider>,
-  document.getElementById('root')
-);
+const isV2 = new URLSearchParams(window.location.search).get('v') === '2';
+
+function Root() {
+  if (isV2) {
+    return (
+      <ChakraProvider theme={theme}>
+        <AppV2 />
+      </ChakraProvider>
+    );
+  }
+  return <AppV1 />;
+}
+
+ReactDOM.render(<Root />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
