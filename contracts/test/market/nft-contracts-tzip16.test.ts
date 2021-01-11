@@ -71,7 +71,7 @@ describe.each([originateNftFaucet /*, originateNft*/])(
         //   $log.debug(`nft ${nft.address}`);
         // });
 
-        test.only('mint token', async () => {
+        test('mint token', async () => {
             const bobAddress = await tezos.bob.signer.publicKeyHash();
             const empty_metadata_map: MichelsonMap<string, bytes> = new MichelsonMap();
 

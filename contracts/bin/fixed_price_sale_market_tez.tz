@@ -55,42 +55,11 @@
                  PAIR ;
                  CONS ;
                  TRANSFER_TOKENS } } ;
-         LAMBDA
-           (pair (pair address nat) (pair address address))
-           operation
-           { DUP ;
-             CAR ;
-             CAR ;
-             CONTRACT %update_operators
-               (list (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
-                         (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id))))) ;
-             IF_NONE
-               { DROP ; PUSH string "CANNOT_INVOKE_FA2_UPDATE_OPERATOR" ; FAILWITH }
-               { PUSH mutez 0 ;
-                 NIL (or (pair address (pair address nat)) (pair address (pair address nat))) ;
-                 DIG 3 ;
-                 DUP ;
-                 DUG 4 ;
-                 CAR ;
-                 CDR ;
-                 DIG 4 ;
-                 DUP ;
-                 DUG 5 ;
-                 CDR ;
-                 CAR ;
-                 PAIR ;
-                 DIG 4 ;
-                 CDR ;
-                 CDR ;
-                 PAIR ;
-                 RIGHT (pair address (pair address nat)) ;
-                 CONS ;
-                 TRANSFER_TOKENS } } ;
-         DIG 2 ;
+         SWAP ;
          DUP ;
-         DUG 3 ;
+         DUG 2 ;
          CDR ;
-         DIG 3 ;
+         DIG 2 ;
          CAR ;
          IF_LEFT
            { IF_LEFT
@@ -118,28 +87,26 @@
                  CAR ;
                  CDR ;
                  CONTRACT unit ;
-                 IF_NONE { PUSH string "NO_BUYER_ACCOUNT" ; FAILWITH } {} ;
-                 DIG 2 ;
+                 IF_NONE { PUSH string "NO_BUYER_ACCOUNT" ; FAILWITH } { DROP } ;
+                 SWAP ;
                  CDR ;
                  CONTRACT unit ;
                  IF_NONE { PUSH string "NO_SELLER_ACCOUNT" ; FAILWITH } {} ;
                  SWAP ;
-                 DIG 2 ;
                  DUP ;
-                 DUG 3 ;
-                 PUSH mutez 0 ;
-                 SUB ;
+                 DUG 2 ;
+                 AMOUNT ;
+                 COMPARE ;
+                 GT ;
+                 IF { PUSH string "MORE_THAN_ENOUGH_TEZ_TO_BUY" ; FAILWITH } {} ;
+                 SWAP ;
+                 AMOUNT ;
+                 COMPARE ;
+                 LT ;
+                 IF { PUSH string "LESS_THAN_ENOUGH__TEZ_TO_BUY" ; FAILWITH } {} ;
+                 AMOUNT ;
                  PUSH unit Unit ;
                  TRANSFER_TOKENS ;
-                 SWAP ;
-                 DIG 2 ;
-                 PUSH unit Unit ;
-                 TRANSFER_TOKENS ;
-                 NIL operation ;
-                 SWAP ;
-                 CONS ;
-                 SWAP ;
-                 CONS ;
                  SENDER ;
                  SELF ;
                  ADDRESS ;
@@ -156,35 +123,16 @@
                  CAR ;
                  PAIR ;
                  PAIR ;
-                 DIG 5 ;
+                 DIG 4 ;
                  SWAP ;
                  EXEC ;
-                 SENDER ;
-                 SELF ;
-                 ADDRESS ;
-                 PAIR ;
                  DIG 3 ;
-                 DUP ;
-                 DUG 4 ;
-                 CDR ;
-                 CDR ;
-                 DIG 4 ;
-                 DUP ;
-                 DUG 5 ;
-                 CDR ;
-                 CAR ;
-                 PAIR ;
-                 PAIR ;
-                 DIG 5 ;
-                 SWAP ;
-                 EXEC ;
-                 DIG 4 ;
-                 DIG 4 ;
+                 DIG 3 ;
                  NONE address ;
                  SWAP ;
                  UPDATE ;
-                 DIG 3 ;
-                 DIG 3 ;
+                 NIL operation ;
+                 DIG 2 ;
                  CONS ;
                  DIG 2 ;
                  CONS ;
@@ -197,7 +145,7 @@
                  DUG 2 ;
                  GET ;
                  IF_NONE
-                   { DROP 4 ; PUSH string "NO_SALE" ; FAILWITH }
+                   { DROP 3 ; PUSH string "NO_SALE" ; FAILWITH }
                    { SENDER ;
                      SWAP ;
                      COMPARE ;
@@ -218,43 +166,19 @@
                           CAR ;
                           PAIR ;
                           PAIR ;
-                          DIG 4 ;
+                          DIG 3 ;
                           SWAP ;
                           EXEC ;
-                          SENDER ;
-                          SELF ;
-                          ADDRESS ;
-                          PAIR ;
-                          DIG 2 ;
-                          DUP ;
-                          DUG 3 ;
-                          CDR ;
-                          CDR ;
-                          DIG 3 ;
-                          DUP ;
-                          DUG 4 ;
-                          CDR ;
-                          CAR ;
-                          PAIR ;
-                          PAIR ;
-                          DIG 4 ;
-                          SWAP ;
-                          EXEC ;
-                          DIG 3 ;
-                          DIG 3 ;
+                          DUG 2 ;
                           NONE address ;
                           SWAP ;
                           UPDATE ;
                           NIL operation ;
                           DIG 2 ;
                           CONS ;
-                          DIG 2 ;
-                          CONS ;
                           PAIR }
-                        { DROP 4 ; PUSH string "NOT_OWNER" ; FAILWITH } } } }
-           { DIG 2 ;
-             DROP ;
-             PAIR ;
+                        { DROP 3 ; PUSH string "NOT_OWNER" ; FAILWITH } } } }
+           { PAIR ;
              DUP ;
              CAR ;
              SELF ;
@@ -276,61 +200,15 @@
              DIG 3 ;
              SWAP ;
              EXEC ;
-             SENDER ;
-             SELF ;
-             ADDRESS ;
-             PAIR ;
              DIG 2 ;
-             DUP ;
-             DUG 3 ;
-             CDR ;
-             CDR ;
-             DIG 3 ;
-             DUP ;
-             DUG 4 ;
-             CDR ;
-             CAR ;
-             PAIR ;
-             PAIR ;
-             DUP ;
-             CAR ;
-             CAR ;
-             CONTRACT %update_operators
-               (list (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
-                         (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id))))) ;
-             IF_NONE
-               { DROP ; PUSH string "CANNOT_INVOKE_FA2_UPDATE_OPERATOR" ; FAILWITH }
-               { PUSH mutez 0 ;
-                 NIL (or (pair address (pair address nat)) (pair address (pair address nat))) ;
-                 DIG 3 ;
-                 DUP ;
-                 DUG 4 ;
-                 CAR ;
-                 CDR ;
-                 DIG 4 ;
-                 DUP ;
-                 DUG 5 ;
-                 CDR ;
-                 CAR ;
-                 PAIR ;
-                 DIG 4 ;
-                 CDR ;
-                 CDR ;
-                 PAIR ;
-                 LEFT (pair address (pair address nat)) ;
-                 CONS ;
-                 TRANSFER_TOKENS } ;
-             DIG 3 ;
              CDR ;
              SENDER ;
-             DIG 4 ;
+             DIG 3 ;
              SWAP ;
              SOME ;
              SWAP ;
              UPDATE ;
              NIL operation ;
-             DIG 3 ;
-             CONS ;
              DIG 2 ;
              CONS ;
              PAIR } } }
