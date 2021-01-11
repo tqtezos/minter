@@ -24,6 +24,22 @@ const Button = {
         // textDecoration: 'none'
       }
     },
+    primaryActionLined: {
+      bg: 'transparent',
+      borderColor: 'brand.blue',
+      borderRadius: '2px',
+      borderWidth: '1px',
+      color: 'brand.blue',
+      transition: 'none',
+      _active: {
+        opacity: '0.8'
+      },
+      _hover: {
+        // bg: 'white',
+        // color: 'brand.blue',
+        // textDecoration: 'none'
+      }
+    },
     secondaryAction: {
       bg: 'none',
       borderColor: 'brand.turquoise',

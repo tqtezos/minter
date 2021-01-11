@@ -42,27 +42,29 @@ export function Header(props: { action?: React.ReactNode }) {
       alignItems="center"
       justifyContent="space-between"
     >
-      <Flex alignItems="center" color="brand.lightGray">
+      <Flex alignItems="center" color="brand.lightGray" flex="1">
         <Box borderRadius="100%" width={9} height={9} bg="brand.darkGray" />
         <Text fontFamily="mono" marginLeft={4}>
-          tz....
+          {'tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU'.slice(0, 16) + '...'}
         </Text>
       </Flex>
-      <Image maxW="38" src={headerLogo} />
-      {props.action ? (
-        props.action
-      ) : (
-        <MinterLink
-          variant="primaryAction"
-          href="/create-non-fungible"
-          onClick={e => {
-            e.preventDefault();
-            setLocation('/create-non-fungible');
-          }}
-        >
-          Create
-        </MinterLink>
-      )}
+      <Image maxW="38px" src={headerLogo} />
+      <Flex flex="1" justify="end">
+        {props.action ? (
+          props.action
+        ) : (
+          <MinterLink
+            variant="primaryAction"
+            href="/create-non-fungible"
+            onClick={e => {
+              e.preventDefault();
+              setLocation('/create-non-fungible');
+            }}
+          >
+            Create
+          </MinterLink>
+        )}
+      </Flex>
     </Flex>
   );
 }

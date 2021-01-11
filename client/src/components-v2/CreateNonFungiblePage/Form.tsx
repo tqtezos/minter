@@ -81,6 +81,26 @@ export default function Form({
           <Input placeholder="e.g. India" />
         </FormControl>
       </Flex>
+      <Flex align="space-between">
+        <FormControl paddingBottom={6} paddingRight={2}>
+          <FormLabel fontFamily="mono">Name</FormLabel>
+          <Input placeholder="e.g. Country" />
+        </FormControl>
+        <FormControl paddingBottom={6} paddingLeft={2}>
+          <FormLabel fontFamily="mono">Value</FormLabel>
+          <Input placeholder="e.g. India" />
+        </FormControl>
+      </Flex>
+      <Flex align="space-between">
+        <FormControl paddingBottom={6} paddingRight={2}>
+          <FormLabel fontFamily="mono">Name</FormLabel>
+          <Input placeholder="e.g. Country" />
+        </FormControl>
+        <FormControl paddingBottom={6} paddingLeft={2}>
+          <FormLabel fontFamily="mono">Value</FormLabel>
+          <Input placeholder="e.g. India" />
+        </FormControl>
+      </Flex>
     </>
   );
 }
