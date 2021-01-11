@@ -128,6 +128,7 @@ export default function CollectionSelect(props: {
       {collections.map(({ name, address }) => {
         return (
           <CollectionRow
+            key={address}
             name={name}
             address={address}
             dispatch={props.dispatch}
