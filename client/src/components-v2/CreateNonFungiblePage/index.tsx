@@ -11,8 +11,8 @@ import Preview from './Preview';
 function ProgressIndicator({ state }: { state: State }) {
   const stepIdx = steps.indexOf(state.step);
   return (
-    <Flex align="center" flexDir="column" width="100%">
-      <Flex width="200px" justifyContent="stretch" pb={4}>
+    <Flex align="center" flexDir="column" flex="1">
+      <Flex width="200px" justifyContent="stretch" pb={2}>
         {steps.map((step, i) => {
           const color = stepIdx >= i ? 'brand.blue' : 'brand.lightBlue';
           return (
@@ -64,24 +64,31 @@ export default function () {
             </MinterButton>
           }
         />
-        <Flex flex="1" width="100%" position="relative">
-          <Flex
-            w="50%"
-            h="100%"
-            flexDir="column"
-            overflowY="auto"
-            position="absolute"
-          >
-            <Box
-              width="100%"
-              pt={8}
-              pb={4}
-              flex="none"
+        <Flex flex="1" width="100%" minHeight="0">
+          <Flex w="50%" h="100%" flexDir="column" overflowY="scroll">
+            <Flex
+              w="100%"
+              px={8}
+              py={4}
+              justify="space-between"
+              align="end"
               borderBottomWidth="1px"
               borderBottomColor="brand.brightGray"
             >
+              <MinterButton
+                variant="primaryActionLined"
+                onClick={() => dispatch({ type: 'decrement_step' })}
+              >
+                Back
+              </MinterButton>
               <ProgressIndicator state={state} />
-            </Box>
+              <MinterButton
+                variant="primaryAction"
+                onClick={() => dispatch({ type: 'increment_step' })}
+              >
+                {state.step === 'collection_select' ? 'Create' : 'Next'}
+              </MinterButton>
+            </Flex>
             <Box
               width="100%"
               pt={10}
@@ -93,27 +100,6 @@ export default function () {
               <LeftContent state={state} dispatch={dispatch} />
               <Box pb={10} w="100%" />
             </Box>
-            <Flex
-              w="100%"
-              px={8}
-              py={4}
-              justify="space-between"
-              borderTopWidth="1px"
-              borderTopColor="brand.brightGray"
-            >
-              <MinterButton
-                variant="primaryActionLined"
-                onClick={() => dispatch({ type: 'decrement_step' })}
-              >
-                Back
-              </MinterButton>
-              <MinterButton
-                variant="primaryAction"
-                onClick={() => dispatch({ type: 'increment_step' })}
-              >
-                {state.step === 'collection_select' ? 'Create' : 'Next'}
-              </MinterButton>
-            </Flex>
           </Flex>
           {state.step === 'file_upload' ? (
             <Flex
@@ -122,8 +108,6 @@ export default function () {
               borderLeftColor="brand.lightBlue"
               w="50%"
               h="100%"
-              left="50%"
-              position="absolute"
               flexDir="column"
               align="center"
               justify="center"
@@ -137,8 +121,6 @@ export default function () {
               borderLeftColor="brand.lightBlue"
               w="50%"
               h="100%"
-              left="50%"
-              position="absolute"
               flexDir="column"
               align="center"
               px={28}

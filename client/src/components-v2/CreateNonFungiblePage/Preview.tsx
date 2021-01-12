@@ -1,7 +1,7 @@
 import React from 'react';
 import { Divider, Heading, Flex, Image, Text } from '@chakra-ui/react';
 import { State } from './reducer';
-import placeholderPreview from './placeholder_preview.png';
+import placeholderAsset from '../common/placeholder_asset.png';
 
 export default function Preview({ state }: { state: State }) {
   const { name, description } = state.fields;
@@ -16,7 +16,7 @@ export default function Preview({ state }: { state: State }) {
       overflow="hidden"
       boxShadow="0px 0px 0px 4px rgba(211, 222, 245, 0.3)"
     >
-      <Image src={placeholderPreview} width="100%" overflow="hidden" />
+      <Image src={placeholderAsset} width="100%" overflow="hidden" />
       <Heading size="md" color={name ? 'black' : 'gray.200'} px={8} py={6}>
         {name ? name : 'Asset name...'}
       </Heading>

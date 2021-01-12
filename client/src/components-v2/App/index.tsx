@@ -2,6 +2,7 @@ import React from 'react';
 import { Switch, Route } from 'wouter';
 import SplashPage from '../SplashPage';
 import CreateNonFungiblePage from '../CreateNonFungiblePage';
+import AssetsPage from '../AssetsPage';
 
 export default function App() {
   return (
@@ -12,9 +13,9 @@ export default function App() {
       <Route path="/create-non-fungible">
         <CreateNonFungiblePage />
       </Route>
-      {/* <Route path="/assets"> */}
-      {/*   <AssetsPage /> */}
-      {/* </Route> */}
+      <Route path="/assets">
+        <AssetsPage />
+      </Route>
       {/* <Route path="/asset-details/:contractAddress/:tokenId"> */}
       {/*   {({ contractAddress, tokenId }) => ( */}
       {/*     <AssetDetailsPage */}

@@ -144,14 +144,14 @@ if (minterVersion) {
 }
 
 function Root() {
-  if (localStorage.getItem('minter_version') === '2') {
-    return (
-      <ChakraProvider theme={theme}>
-        <AppV2 />
-      </ChakraProvider>
-    );
+  if (localStorage.getItem('minter_version') === '1') {
+    return <AppV1 />;
   }
-  return <AppV1 />;
+  return (
+    <ChakraProvider theme={theme}>
+      <AppV2 />
+    </ChakraProvider>
+  );
 }
 
 ReactDOM.render(<Root />, document.getElementById('root'));
