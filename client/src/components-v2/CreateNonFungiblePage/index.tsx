@@ -1,12 +1,13 @@
 import React, { useReducer } from 'react';
 import { useLocation } from 'wouter';
-import { Box, Flex, Heading, Text } from '@chakra-ui/react';
-import { Header, MinterButton } from '../common';
+import { Box, Flex, Heading, Link, Text } from '@chakra-ui/react';
+import { Header, MinterButton, MinterLink } from '../common';
 import { reducer, steps, initialState, DispatchFn, State } from './reducer';
 import Form from './Form';
 import FileUpload from './FileUpload';
 import CollectionSelect from './CollectionSelect';
 import Preview from './Preview';
+import { ChevronLeft, Plus, X } from 'react-feather';
 
 function ProgressIndicator({ state }: { state: State }) {
   const stepIdx = steps.indexOf(state.step);
@@ -19,10 +20,10 @@ function ProgressIndicator({ state }: { state: State }) {
             <Box
               key={step}
               bg={color}
-              flex="1"
               borderRadius="3px"
               height="5px"
               mx={1}
+              flex="1"
             />
           );
         })}
@@ -56,12 +57,12 @@ export default function () {
       <Flex justifyContent="space-between" width="100%" flexDir="column">
         <Header
           action={
-            <MinterButton
-              variant="cancelAction"
-              onClick={() => setLocation('/')}
-            >
-              Cancel
-            </MinterButton>
+            <MinterLink variant="primaryActionInactive">
+              <Box color="currentcolor">
+                <Plus size={16} strokeWidth="3" />
+              </Box>
+              <Text ml={2}>New Asset</Text>
+            </MinterLink>
           }
         />
         <Flex flex="1" width="100%" minHeight="0">
@@ -75,19 +76,50 @@ export default function () {
               borderBottomWidth="1px"
               borderBottomColor="brand.brightGray"
             >
-              <MinterButton
-                variant="primaryActionLined"
-                onClick={() => dispatch({ type: 'decrement_step' })}
-              >
-                Back
-              </MinterButton>
+              <Flex flex="1">
+                <MinterButton
+                  variant="cancelAction"
+                  onClick={() => setLocation('/assets')}
+                  display="flex"
+                  alignItems="center"
+                  color="brand.red"
+                  border="none"
+                  _hover={{
+                    color: 'white',
+                    textDecoration: 'underline',
+                    borderColor: 'brand.red'
+                  }}
+                >
+                  <Box color="currentcolor">
+                    <X size={16} strokeWidth="3" />
+                  </Box>
+                  <Text fontSize={16} ml={1} fontWeight="600">
+                    Discard
+                  </Text>
+                </MinterButton>
+              </Flex>
               <ProgressIndicator state={state} />
-              <MinterButton
-                variant="primaryAction"
-                onClick={() => dispatch({ type: 'increment_step' })}
-              >
-                {state.step === 'collection_select' ? 'Create' : 'Next'}
-              </MinterButton>
+              <Flex flex="1" justify="end">
+                <MinterButton
+                  visibility={
+                    state.step !== 'file_upload' ? 'visible' : 'hidden'
+                  }
+                  variant="primaryActionInverted"
+                  onClick={() => dispatch({ type: 'decrement_step' })}
+                >
+                  <Box color="currentcolor">
+                    <ChevronLeft size={16} strokeWidth="3" />
+                  </Box>
+                  <Text ml={2}>Back</Text>
+                </MinterButton>
+                <MinterButton
+                  variant="primaryAction"
+                  onClick={() => dispatch({ type: 'increment_step' })}
+                  ml={4}
+                >
+                  {state.step === 'collection_select' ? 'Create' : 'Next'}
+                </MinterButton>
+              </Flex>
             </Flex>
             <Box
               width="100%"

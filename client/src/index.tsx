@@ -15,13 +15,11 @@ const Button = {
       color: 'white',
       transition: 'none',
       _active: {
-        opacity: '0.8',
+        opacity: '0.5',
         bg: 'brand.blue'
       },
       _hover: {
-        // bg: 'white',
-        // color: 'brand.blue',
-        // textDecoration: 'none'
+        opacity: '0.8'
       }
     },
     primaryActionLined: {
@@ -32,21 +30,52 @@ const Button = {
       color: 'brand.blue',
       transition: 'none',
       _active: {
-        opacity: '0.8'
+        opacity: '0.5'
       },
       _hover: {
         // bg: 'white',
         // color: 'brand.blue',
-        // textDecoration: 'none'
+        opacity: '0.8'
+      }
+    },
+    primaryActionInverted: {
+      bg: 'transparent',
+      borderColor: 'brand.blue',
+      borderRadius: '2px',
+      color: 'brand.blue',
+      transition: 'none',
+      _active: {
+        opacity: '0.5'
+      },
+      _hover: {
+        bg: 'brand.blue',
+        color: 'white'
       }
     },
     secondaryAction: {
+      bg: 'brand.turquoise',
+      color: 'brand.background',
+      borderColor: 'brand.turquoise',
+      borderRadius: '2px',
+      borderWidth: '1px',
+      transition: 'none',
+      _active: {
+        opacity: '0.5',
+        bg: 'brand.turquoise'
+      },
+      _hover: {
+        bg: 'brand.turquoise',
+        color: 'brand.background',
+        opacity: '0.8'
+      }
+    },
+    secondaryActionLined: {
       bg: 'none',
       borderColor: 'brand.turquoise',
       borderRadius: '2px',
       borderWidth: '1px',
       color: 'brand.turquoise',
-      flex: '1',
+      transition: 'none',
       _active: {
         opacity: '0.8',
         bg: 'brand.turquoise'
@@ -84,17 +113,35 @@ const Link = {
       borderRadius: '2px',
       color: 'white',
       display: 'inline-flex',
+      fontSize: '1rem',
       fontWeight: '600',
       height: 10,
       justifyContent: 'center',
       lineHeight: '1.2',
-      marginLeft: 4,
       paddingX: 4,
       transition: 'none',
       _hover: {
-        // bg: 'white',
-        // color: 'brand.blue',
-        // textDecoration: 'none'
+        bg: 'white',
+        color: 'brand.blue',
+        textDecoration: 'none'
+      }
+    },
+    primaryActionInactive: {
+      alignItems: 'center',
+      bg: 'gray.600',
+      borderRadius: '2px',
+      color: 'gray.400',
+      display: 'inline-flex',
+      fontSize: '1rem',
+      fontWeight: '600',
+      height: 10,
+      justifyContent: 'center',
+      lineHeight: '1.2',
+      paddingX: 4,
+      transition: 'none',
+      _hover: {
+        color: 'gray.400',
+        textDecoration: 'none'
       }
     }
   }

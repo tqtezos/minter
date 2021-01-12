@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Box,
   Flex,
   Heading,
   Text,
@@ -16,6 +17,7 @@ import {
   useDisclosure
 } from '@chakra-ui/react';
 import { MinterButton } from '../common';
+import { Plus } from 'react-feather';
 import { State, DispatchFn } from './reducer';
 
 // Placeholder data
@@ -37,8 +39,11 @@ function NewCollectionButton() {
   const initialRef = React.useRef(null);
   return (
     <>
-      <MinterButton variant="primaryAction" onClick={onOpen}>
-        New
+      <MinterButton variant="primaryActionLined" onClick={onOpen}>
+        <Box color="currentcolor">
+          <Plus size={16} strokeWidth="3" />
+        </Box>
+        <Text ml={2}>New</Text>
       </MinterButton>
 
       <Modal isOpen={isOpen} onClose={onClose} initialFocusRef={initialRef}>
@@ -98,6 +103,7 @@ function CollectionRow(props: CollectionRowProps) {
         bg={selected ? 'white' : 'brand.blue'}
         color={selected ? 'brand.blue' : 'white'}
         borderRadius="100%"
+        fontWeight="600"
       >
         <Text>{props.name[0]}</Text>
       </Flex>

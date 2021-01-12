@@ -11,6 +11,7 @@ import {
   Text,
   useStyleConfig
 } from '@chakra-ui/react';
+import { ChevronDown, Plus } from 'react-feather';
 import headerLogo from './header-logo.svg';
 
 // Common Minter Components - Button & Link referencing branded variants
@@ -37,7 +38,7 @@ export function Header(props: { action?: React.ReactNode }) {
     <Flex
       width="100%"
       bg="brand.black"
-      paddingX={8}
+      paddingX={4}
       paddingY={3}
       alignItems="center"
       justifyContent="space-between"
@@ -47,8 +48,17 @@ export function Header(props: { action?: React.ReactNode }) {
         <Text fontFamily="mono" marginLeft={4}>
           {'tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU'.slice(0, 16) + '...'}
         </Text>
+        <ChevronDown />
       </Flex>
-      <Image maxW="38px" src={headerLogo} />
+      <Image
+        maxW="38px"
+        src={headerLogo}
+        onClick={e => {
+          e.preventDefault();
+          setLocation('/assets');
+        }}
+        cursor="pointer"
+      />
       <Flex flex="1" justify="end">
         {props.action ? (
           props.action
@@ -61,7 +71,10 @@ export function Header(props: { action?: React.ReactNode }) {
               setLocation('/create-non-fungible');
             }}
           >
-            Create
+            <Box color="currentcolor">
+              <Plus size={16} strokeWidth="3" />
+            </Box>
+            <Text ml={2}>New Asset</Text>
           </MinterLink>
         )}
       </Flex>

@@ -30,7 +30,13 @@ export default function SplashPage() {
             interface. Just connect your Tezos account.
           </Heading>
           <Flex minW="400px" alignItems="stretch" pb={20}>
-            <MinterButton variant="secondaryAction">
+            <MinterButton
+              variant="secondaryActionLined"
+              onClick={e => {
+                e.preventDefault();
+                setLocation('/assets');
+              }}
+            >
               Connect your wallet
             </MinterButton>
             <MinterLink

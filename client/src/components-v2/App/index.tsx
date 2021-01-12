@@ -3,6 +3,7 @@ import { Switch, Route } from 'wouter';
 import SplashPage from '../SplashPage';
 import CreateNonFungiblePage from '../CreateNonFungiblePage';
 import AssetsPage from '../AssetsPage';
+import AssetDetailsPage from '../AssetDetailsPage';
 
 export default function App() {
   return (
@@ -16,14 +17,14 @@ export default function App() {
       <Route path="/assets">
         <AssetsPage />
       </Route>
-      {/* <Route path="/asset-details/:contractAddress/:tokenId"> */}
-      {/*   {({ contractAddress, tokenId }) => ( */}
-      {/*     <AssetDetailsPage */}
-      {/*       contractAddress={contractAddress} */}
-      {/*       tokenId={parseInt(tokenId)} */}
-      {/*     /> */}
-      {/*   )} */}
-      {/* </Route> */}
+      <Route path="/asset-details/:contractAddress/:tokenId">
+        {({ contractAddress, tokenId }) => (
+          <AssetDetailsPage
+            contractAddress={contractAddress}
+            tokenId={parseInt(tokenId)}
+          />
+        )}
+      </Route>
     </Switch>
   );
 }
