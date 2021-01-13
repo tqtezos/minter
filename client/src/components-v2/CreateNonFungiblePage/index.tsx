@@ -55,16 +55,7 @@ export default function () {
   return (
     <Flex pos="absolute" w="100%" h="100%">
       <Flex justifyContent="space-between" width="100%" flexDir="column">
-        <Header
-          action={
-            <MinterLink variant="primaryActionInactive">
-              <Box color="currentcolor">
-                <Plus size={16} strokeWidth="3" />
-              </Box>
-              <Text ml={2}>New Asset</Text>
-            </MinterLink>
-          }
-        />
+        <Header />
         <Flex flex="1" width="100%" minHeight="0">
           <Flex w="50%" h="100%" flexDir="column" overflowY="scroll">
             <Flex
@@ -94,7 +85,7 @@ export default function () {
                     <X size={16} strokeWidth="3" />
                   </Box>
                   <Text fontSize={16} ml={1} fontWeight="600">
-                    Discard
+                    Cancel
                   </Text>
                 </MinterButton>
               </Flex>

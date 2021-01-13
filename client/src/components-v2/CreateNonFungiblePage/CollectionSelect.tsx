@@ -39,11 +39,11 @@ function NewCollectionButton() {
   const initialRef = React.useRef(null);
   return (
     <>
-      <MinterButton variant="primaryActionLined" onClick={onOpen}>
+      <MinterButton variant="primaryActionInverted" onClick={onOpen}>
         <Box color="currentcolor">
           <Plus size={16} strokeWidth="3" />
         </Box>
-        <Text ml={2}>New</Text>
+        <Text ml={2}>New Collection</Text>
       </MinterButton>
 
       <Modal isOpen={isOpen} onClose={onClose} initialFocusRef={initialRef}>

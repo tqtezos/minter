@@ -10,6 +10,8 @@ import {
   Text,
   Textarea
 } from '@chakra-ui/react';
+import { Plus, X } from 'react-feather';
+import { MinterButton } from '../common';
 import { DispatchFn, State } from './reducer';
 
 const DESCRIPTION_PLACEHOLDER =
@@ -101,37 +103,36 @@ export default function Form({
                 }
               />
             </FormControl>
-            <Flex
-              h={6}
-              w={6}
-              color="brand.red"
-              justify="center"
-              align="center"
-              borderRadius="50%"
-              borderWidth="1px"
-              borderColor="brand.red"
-              fontSize="xs"
-              fontWeight="600"
-              ml={3}
+            <Box
+              color="gray.400"
+              ml={4}
               mt={1}
               cursor="pointer"
               onClick={() =>
                 dispatch({ type: 'delete_metadata_row', payload: { key: i } })
               }
+              _hover={{
+                color: 'brand.red'
+              }}
             >
-              X
-            </Flex>
+              <X size={30} />
+            </Box>
           </Flex>
         );
       })}
-      <Text
-        textDecor="underline"
-        color="brand.blue"
-        cursor="pointer"
+      <MinterButton
+        variant="primaryActionInverted"
         onClick={() => dispatch({ type: 'add_metadata_row' })}
+        pl={3}
+        pr={3}
+        pt={2}
+        pb={2}
       >
-        + Add new field
-      </Text>
+        <Box color="currentcolor">
+          <Plus size={16} strokeWidth="3" />
+        </Box>
+        <Text ml={2}>Add field</Text>
+      </MinterButton>
     </>
   );
 }

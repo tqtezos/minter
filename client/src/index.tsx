@@ -171,7 +171,29 @@ const theme = extendTheme({
   },
   components: {
     Button,
-    Link
+    Link,
+    Input: {
+      variants: {
+        outline: {
+          field: {
+            borderRadius: '1px',
+            _focus: {
+              boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.1)'
+            }
+          }
+        }
+      }
+    },
+    Textarea: {
+      variants: {
+        outline: {
+          borderRadius: '1px',
+          _focus: {
+            boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.1)'
+          }
+        }
+      }
+    }
   },
   fonts: {
     body: "'Roboto', sans-serif",
