@@ -78,7 +78,7 @@ export async function removeOperator(
     const op = await fa2WithOwner.methods
         .update_operators([
             {
-                add_operator: {
+                remove_operator: {
                     owner: ownerAddress,
                     operator,
                     token_id

@@ -1,4 +1,4 @@
-import { TezosToolkit, Tezos } from '@taquito/taquito';
+import { TezosToolkit } from '@taquito/taquito';
 import { Signer } from '@taquito/taquito/dist/types/signer/interface';
 import { InMemorySigner } from '@taquito/signer';
 import { $log } from '@tsed/logger';
@@ -40,7 +40,7 @@ export type TestTzMarket = {
 };
 
 function signerToToolkit(signer: Signer, rpc: string): TezosToolkit {
-    const tezos = new TezosToolkit();
+    const tezos = new TezosToolkit(rpc);
     tezos.setProvider({
         signer,
         rpc,
