@@ -25,7 +25,7 @@ const placeholderState: State = {
         id: 0,
         title: 'Cool Token',
         owner: 'tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU',
-        description: '',
+        description: 'This is a description',
         ipfs_hash: '...',
         metadata: {
           // Use CSS filter metadata for placeholder display distinction

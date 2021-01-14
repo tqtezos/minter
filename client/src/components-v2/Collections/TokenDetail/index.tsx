@@ -1,17 +1,61 @@
 import React from 'react';
 import { useLocation } from 'wouter';
 import { AspectRatio, Box, Flex, Heading, Image, Text } from '@chakra-ui/react';
-import { ChevronLeft, MoreHorizontal, Star } from 'react-feather';
+import { ChevronLeft, HelpCircle, MoreHorizontal, Star } from 'react-feather';
 import { MinterButton } from '../../common';
 import placeholderAsset from '../../common/placeholder_asset.png';
+import { State } from '../reducer';
+
+function NotFound() {
+  return (
+    <Flex flex="1" width="100%" justify="center">
+      <Flex w="100%" flex="1" flexDir="column" align="center">
+        <Flex
+          px={32}
+          py={16}
+          bg="gray.100"
+          textAlign="center"
+          align="center"
+          borderRadius="5px"
+          flexDir="column"
+          fontSize="xl"
+          borderColor="gray.200"
+          borderWidth="5px"
+          mt={36}
+          color="gray.300"
+        >
+          <HelpCircle size="100px" />
+          <Heading size="xl" fontWeight="normal" pt={8} color="gray.400">
+            Token not found
+          </Heading>
+        </Flex>
+      </Flex>
+    </Flex>
+  );
+}
 
 interface TokenDetailProps {
   contractAddress: string;
   tokenId: number;
+  state: State;
 }
 
 export default function TokenDetail(props: TokenDetailProps) {
   const [, setLocation] = useLocation();
+
+  const collection = props.state.collections.find(
+    coll => coll.address === props.contractAddress
+  );
+  if (!collection) {
+    return <NotFound />;
+  }
+
+  const tokens = props.state.tokens[collection?.address];
+  const token = tokens?.find(token => token.id === props.tokenId);
+  if (!token) {
+    return <NotFound />;
+  }
+
   return (
     <Flex flex="1" width="100%" minHeight="0">
       <Flex flexDir="column" w="50%" h="100%">
@@ -37,7 +81,11 @@ export default function TokenDetail(props: TokenDetailProps) {
             boxShadow="0 0 5px rgba(0,0,0,.15)"
             overflow="hidden"
           >
-            <Image src={placeholderAsset} objectFit="cover" />
+            <Image
+              src={placeholderAsset}
+              objectFit="cover"
+              filter={token.metadata?.filter}
+            />
           </AspectRatio>
         </Flex>
       </Flex>
@@ -88,9 +136,11 @@ export default function TokenDetail(props: TokenDetailProps) {
               borderColor="brand.lightBlue"
             >
               <Flex flexDir="column">
-                <Text color="brand.blue">Minter</Text>
+                <Text color="brand.blue">
+                  {collection.name || collection.address}
+                </Text>
                 <Heading color="black" size="lg">
-                  Asset Name
+                  {token.title}
                 </Heading>
               </Flex>
               <Box color="gray.300">
@@ -104,7 +154,13 @@ export default function TokenDetail(props: TokenDetailProps) {
               borderBottom="1px solid"
               borderColor="brand.lightBlue"
             >
-              Description
+              {token.description ? (
+                token.description
+              ) : (
+                <Text fontSize="md" color="brand.gray">
+                  No description provided
+                </Text>
+              )}
             </Flex>
             <Flex flexDir="column" px={8} pt={6}>
               <Text pb={2} fontSize="xs" color="brand.gray">

@@ -17,6 +17,7 @@ export default function Collections() {
           <CollectionsTokenDetail
             contractAddress={contractAddress}
             tokenId={parseInt(tokenId)}
+            state={state}
           />
         )}
       </Route>
