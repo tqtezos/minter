@@ -49,111 +49,104 @@ function LeftContent(props: { state: State; dispatch: DispatchFn }) {
   return null;
 }
 
-export default function () {
+export default function CreateNonFungiblePage() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [, setLocation] = useLocation();
   return (
-    <Flex pos="absolute" w="100%" h="100%">
-      <Flex justifyContent="space-between" width="100%" flexDir="column">
-        <Header />
-        <Flex flex="1" width="100%" minHeight="0">
-          <Flex w="50%" h="100%" flexDir="column" overflowY="scroll">
-            <Flex
-              w="100%"
-              px={8}
-              py={4}
-              justify="space-between"
-              align="end"
-              borderBottomWidth="1px"
-              borderBottomColor="brand.brightGray"
+    <Flex flex="1" width="100%" minHeight="0">
+      <Flex w="50%" h="100%" flexDir="column" overflowY="scroll">
+        <Flex
+          w="100%"
+          px={8}
+          py={4}
+          justify="space-between"
+          align="end"
+          borderBottomWidth="1px"
+          borderBottomColor="brand.brightGray"
+        >
+          <Flex flex="1">
+            <MinterButton
+              variant="cancelAction"
+              onClick={() => setLocation('/assets')}
+              display="flex"
+              alignItems="center"
+              color="brand.red"
+              border="none"
+              _hover={{
+                color: 'white',
+                textDecoration: 'underline',
+                borderColor: 'brand.red'
+              }}
             >
-              <Flex flex="1">
-                <MinterButton
-                  variant="cancelAction"
-                  onClick={() => setLocation('/assets')}
-                  display="flex"
-                  alignItems="center"
-                  color="brand.red"
-                  border="none"
-                  _hover={{
-                    color: 'white',
-                    textDecoration: 'underline',
-                    borderColor: 'brand.red'
-                  }}
-                >
-                  <Box color="currentcolor">
-                    <X size={16} strokeWidth="3" />
-                  </Box>
-                  <Text fontSize={16} ml={1} fontWeight="600">
-                    Cancel
-                  </Text>
-                </MinterButton>
-              </Flex>
-              <ProgressIndicator state={state} />
-              <Flex flex="1" justify="end">
-                <MinterButton
-                  visibility={
-                    state.step !== 'file_upload' ? 'visible' : 'hidden'
-                  }
-                  variant="primaryActionInverted"
-                  onClick={() => dispatch({ type: 'decrement_step' })}
-                >
-                  <Box color="currentcolor">
-                    <ChevronLeft size={16} strokeWidth="3" />
-                  </Box>
-                  <Text ml={2}>Back</Text>
-                </MinterButton>
-                <MinterButton
-                  variant="primaryAction"
-                  onClick={() => dispatch({ type: 'increment_step' })}
-                  ml={4}
-                >
-                  {state.step === 'collection_select' ? 'Create' : 'Next'}
-                </MinterButton>
-              </Flex>
-            </Flex>
-            <Box
-              width="100%"
-              pt={10}
-              px={28}
-              overflowY="scroll"
-              minHeight="0px"
-              flex="1"
-            >
-              <LeftContent state={state} dispatch={dispatch} />
-              <Box pb={10} w="100%" />
-            </Box>
+              <Box color="currentcolor">
+                <X size={16} strokeWidth="3" />
+              </Box>
+              <Text fontSize={16} ml={1} fontWeight="600">
+                Cancel
+              </Text>
+            </MinterButton>
           </Flex>
-          {state.step === 'file_upload' ? (
-            <Flex
-              bg="brand.darkGray"
-              borderLeftWidth="1px"
-              borderLeftColor="brand.lightBlue"
-              w="50%"
-              h="100%"
-              flexDir="column"
-              align="center"
-              justify="center"
+          <ProgressIndicator state={state} />
+          <Flex flex="1" justify="end">
+            <MinterButton
+              visibility={state.step !== 'file_upload' ? 'visible' : 'hidden'}
+              variant="primaryActionInverted"
+              onClick={() => dispatch({ type: 'decrement_step' })}
             >
-              <Text color="brand.lightGray">(Artwork TBD)</Text>
-            </Flex>
-          ) : (
-            <Flex
-              bg="brand.brightGray"
-              borderLeftWidth="1px"
-              borderLeftColor="brand.lightBlue"
-              w="50%"
-              h="100%"
-              flexDir="column"
-              align="center"
-              px={28}
-              pt={16}
+              <Box color="currentcolor">
+                <ChevronLeft size={16} strokeWidth="3" />
+              </Box>
+              <Text ml={2}>Back</Text>
+            </MinterButton>
+            <MinterButton
+              variant="primaryAction"
+              onClick={() => dispatch({ type: 'increment_step' })}
+              ml={4}
             >
-              <Preview state={state} />
-            </Flex>
-          )}
+              {state.step === 'collection_select' ? 'Create' : 'Next'}
+            </MinterButton>
+          </Flex>
         </Flex>
+        <Box
+          width="100%"
+          pt={10}
+          px={28}
+          overflowY="scroll"
+          minHeight="0px"
+          flex="1"
+        >
+          <LeftContent state={state} dispatch={dispatch} />
+          <Box pb={10} w="100%" />
+        </Box>
       </Flex>
+      {state.step === 'file_upload' ? (
+        <Flex
+          bg="brand.darkGray"
+          borderLeftWidth="1px"
+          borderLeftColor="brand.lightBlue"
+          w="50%"
+          h="100%"
+          flexDir="column"
+          align="center"
+          justify="center"
+        >
+          <Text color="brand.lightGray">(Artwork TBD)</Text>
+        </Flex>
+      ) : (
+        <Flex
+          bg="brand.brightGray"
+          borderLeftWidth="1px"
+          borderLeftColor="brand.lightBlue"
+          w="50%"
+          h="100%"
+          flexDir="column"
+          align="center"
+          px={28}
+          pt={16}
+        >
+          <Preview state={state} />
+        </Flex>
+      )}
     </Flex>
   );
 }

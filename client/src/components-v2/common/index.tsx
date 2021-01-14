@@ -75,25 +75,24 @@ function HeaderLink(props: HeaderLinkProps) {
 
 function WalletDisplay() {
   return (
-    <Flex alignItems="center" color="brand.lightGray">
+    <>
       <Box borderRadius="100%" width={9} height={9} bg="brand.darkGray" />
       <Text fontFamily="mono" ml={4} mr={2}>
         {/* {'tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU'.slice(0, 16) + '...'} */}
         tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU
       </Text>
-      <ChevronDown />
-    </Flex>
+    </>
   );
 }
 
 function WalletDisplayMenu() {
   const [, setLocation] = useLocation();
   return (
-    <Menu placement="bottom-end">
+    <Menu placement="bottom-start">
       <MenuButton>
-        <WalletDisplay />
+        <ChevronDown />
       </MenuButton>
-      <MenuList>
+      <MenuList color="brand.black">
         <MenuItem onClick={() => setLocation('/')}>Disconnect</MenuItem>
       </MenuList>
     </Menu>
@@ -101,7 +100,11 @@ function WalletDisplayMenu() {
 }
 
 export function Header() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
+  console.log(location);
+  if (location === '/' || location === '') {
+    return null;
+  }
   return (
     <Flex
       width="100%"
@@ -111,7 +114,8 @@ export function Header() {
       alignItems="center"
       justifyContent="space-between"
     >
-      <Flex flex="1">
+      <Flex flex="1" alignItems="center" color="brand.lightGray">
+        <WalletDisplay />
         <WalletDisplayMenu />
       </Flex>
       <Image

@@ -107,7 +107,12 @@ function CollectionRow(props: CollectionRowProps) {
       >
         <Text>{props.name[0]}</Text>
       </Flex>
-      <Text color={selected ? 'white' : 'black'} pl={4}>
+      <Text
+        color={selected ? 'white' : 'black'}
+        pl={4}
+        fontSize="md"
+        fontWeight={selected ? '600' : 'normal'}
+      >
         {props.name}
       </Text>
     </Flex>
