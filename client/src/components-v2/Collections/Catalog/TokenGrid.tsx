@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import { Flex, Grid, Image, Text } from '@chakra-ui/react';
 import { Token, State } from '../reducer';
 import placeholderAsset from '../../common/placeholder_asset.png';
+import { Wind } from 'react-feather';
 
 interface TokenTileProps extends Token {
   selectedCollection: string;
@@ -68,7 +69,27 @@ export default function TokenGrid({ state }: TokenGridProps) {
   );
 
   if (tokens.length === 0) {
-    return <>No tokens to display</>;
+    return (
+      <Flex w="100%" flex="1" flexDir="column" align="center">
+        <Flex
+          px={20}
+          py={10}
+          bg="gray.200"
+          textAlign="center"
+          align="center"
+          borderRadius="5px"
+          flexDir="column"
+          fontSize="xl"
+          color="gray.400"
+          mt={28}
+        >
+          <Wind />
+          <Text fontWeight="600" pt={5}>
+            No owned tokens to display in this collection
+          </Text>
+        </Flex>
+      </Flex>
+    );
   }
 
   return (
