@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Box, Flex, Input, Heading, Text } from '@chakra-ui/react';
+import { Box, Flex, Heading, Text } from '@chakra-ui/react';
 import { DispatchFn, State } from './reducer';
 
 export default function FileUpload({

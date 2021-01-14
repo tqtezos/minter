@@ -1,24 +1,16 @@
 import React from 'react';
 import { useLocation } from 'wouter';
-import {
-  AspectRatio,
-  Box,
-  Flex,
-  Heading,
-  Image,
-  Link,
-  Text
-} from '@chakra-ui/react';
+import { AspectRatio, Box, Flex, Heading, Image, Text } from '@chakra-ui/react';
 import { ChevronLeft, MoreHorizontal, Star } from 'react-feather';
-import { Header, MinterButton } from '../common';
-import placeholderAsset from '../common/placeholder_asset.png';
+import { MinterButton } from '../../common';
+import placeholderAsset from '../../common/placeholder_asset.png';
 
-interface AssetsDetailPageProps {
+interface TokenDetailProps {
   contractAddress: string;
   tokenId: number;
 }
 
-export default function AssetsDetailPage(props: AssetsDetailPageProps) {
+export default function TokenDetail(props: TokenDetailProps) {
   const [, setLocation] = useLocation();
   return (
     <Flex flex="1" width="100%" minHeight="0">

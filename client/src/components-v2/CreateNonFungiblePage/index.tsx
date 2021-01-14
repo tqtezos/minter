@@ -1,13 +1,13 @@
 import React, { useReducer } from 'react';
 import { useLocation } from 'wouter';
-import { Box, Flex, Heading, Link, Text } from '@chakra-ui/react';
-import { Header, MinterButton, MinterLink } from '../common';
+import { Box, Flex, Text } from '@chakra-ui/react';
+import { MinterButton } from '../common';
 import { reducer, steps, initialState, DispatchFn, State } from './reducer';
 import Form from './Form';
 import FileUpload from './FileUpload';
 import CollectionSelect from './CollectionSelect';
 import Preview from './Preview';
-import { ChevronLeft, Plus, X } from 'react-feather';
+import { ChevronLeft, X } from 'react-feather';
 
 function ProgressIndicator({ state }: { state: State }) {
   const stepIdx = steps.indexOf(state.step);

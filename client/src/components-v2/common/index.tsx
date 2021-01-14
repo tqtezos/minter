@@ -101,7 +101,6 @@ function WalletDisplayMenu() {
 
 export function Header() {
   const [location, setLocation] = useLocation();
-  console.log(location);
   if (location === '/' || location === '') {
     return null;
   }
