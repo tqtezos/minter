@@ -1,6 +1,6 @@
 import { $log } from '@tsed/logger';
 import { BigNumber } from 'bignumber.js';
-import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
+import { BigMapAbstraction, TezosToolkit, MichelsonMap } from '@taquito/taquito';
 
 import { bootstrap, TestTz } from '../bootstrap-sandbox';
 import { Contract, nat } from '../../src/type-aliases';
@@ -79,7 +79,7 @@ describe.each([originateNftFaucet /*, originateNft*/])(
         //   $log.debug(`nft ${nft.address}`);
         // });
 
-        test('mint token', async () => {
+        test.only('mint token', async () => {
 
             const bobAddress = await tezos.bob.signer.publicKeyHash();
             const token_metadata_map: MichelsonMap<string, string> = new MichelsonMap();
@@ -103,6 +103,35 @@ describe.each([originateNftFaucet /*, originateNft*/])(
                 { owner: bobAddress, token_id: new BigNumber(0) }
             ]);
             expect(bobHasToken).toBe(true);
+
+            const storage:any = await nft.storage();
+            const ret = await storage.token_metadata.get('0');
+            expect(ret.token_id).toStrictEqual(new BigNumber(0));
+
+            const entriesIterator = ret.token_metadata_map.entries();
+
+            const descriptionIteratee = entriesIterator.next();
+            expect(descriptionIteratee.value[0]).toMatch('description');
+            expect(descriptionIteratee.value[1]).toMatch(toHexString('description'));
+            expect(descriptionIteratee.done).toBe(false);
+
+            const ipfsIteratee = entriesIterator.next();
+            expect(ipfsIteratee.value[0]).toMatch('ipfs_hash_image');
+            expect(ipfsIteratee.value[1]).toMatch(toHexString('ipfs_hash_image'));
+            expect(ipfsIteratee.done).toBe(false);
+
+            const nameIteratee = entriesIterator.next();
+            expect(nameIteratee.value[0]).toMatch('name');
+            expect(nameIteratee.value[1]).toMatch(toHexString('A token'));
+            expect(nameIteratee.done).toBe(false);
+
+            const symbolIteratee = entriesIterator.next();
+            expect(symbolIteratee.value[0]).toMatch('symbol');
+            expect(symbolIteratee.value[1]).toMatch(toHexString('TK1'));
+            expect(symbolIteratee.done).toBe(false);
+
+            expect(entriesIterator.next().done).toBe(true);
+
         });
 
         test('transfer token', async () => {
