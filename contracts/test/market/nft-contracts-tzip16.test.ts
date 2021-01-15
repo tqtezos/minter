@@ -3,7 +3,8 @@ import { BigNumber } from 'bignumber.js';
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 
 import { bootstrap, TestTz } from '../bootstrap-sandbox';
-import { Contract, nat, bytes } from '../../src/type-aliases';
+import { Contract, nat } from '../../src/type-aliases';
+// import { assertMichelsonType, BytesLiteral } from '@taquito/michel-codec';
 
 import {
     originateNftFaucet,
@@ -62,6 +63,13 @@ describe.each([originateNftFaucet /*, originateNft*/])(
             $log.info(`minted tokens. consumed gas: ${op.consumedGas}`);
         }
 
+        function toHexString(input: string): string {
+          const unit8Array: Uint8Array = new TextEncoder().encode(input);
+          return Array.from(unit8Array, (byte: number) => {
+            return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+          }).join('')
+        }
+
         // test.only('update_operators', async () => {
         //   const bobaddress = await tezos.bob.signer.publickeyhash();
         //   await addoperator(nft.address, tezos.alice, bobaddress);
@@ -72,18 +80,20 @@ describe.each([originateNftFaucet /*, originateNft*/])(
         // });
 
         test('mint token', async () => {
+
             const bobAddress = await tezos.bob.signer.publicKeyHash();
-            const empty_metadata_map: MichelsonMap<string, bytes> = new MichelsonMap();
+            const token_metadata_map: MichelsonMap<string, string> = new MichelsonMap();
+
+            token_metadata_map.set('name' , toHexString('A token'));
+            token_metadata_map.set('description', toHexString('description'));
+            token_metadata_map.set('ipfs_hash_image', toHexString('ipfs_hash_image'));
+            token_metadata_map.set('symbol', toHexString('TK1'));
 
             await mintTokens(tezos.bob, [
                 {
                     token_metadata: {
                         token_id: new BigNumber(0),
-                        token_metadata_map: empty_metadata_map,
-                        // symbol: 'TK1',
-                        // name: 'A token',
-                        // decimals: new BigNumber(0),
-                        // extras: new MichelsonMap<string, string>()
+                        token_metadata_map
                     },
                     owner: bobAddress
                 }
@@ -99,16 +109,18 @@ describe.each([originateNftFaucet /*, originateNft*/])(
             const aliceAddress = await tezos.alice.signer.publicKeyHash();
             const bobAddress = await tezos.bob.signer.publicKeyHash();
             const tokenId = new BigNumber(0);
-            const empty_metadata_map: MichelsonMap<string, bytes> = new MichelsonMap();
+            const token_metadata_map: MichelsonMap<string, string> = new MichelsonMap();
+
+            token_metadata_map.set('name' , toHexString('A token'));
+            token_metadata_map.set('description', toHexString('description'));
+            token_metadata_map.set('ipfs_hash_image', toHexString('ipfs_hash_image'));
+            token_metadata_map.set('symbol', toHexString('TK1'));
+
             await mintTokens(tezos.bob, [
                 {
                     token_metadata: {
                         token_id: tokenId,
-                        token_metadata_map: empty_metadata_map,
-                        // symbol: 'TK1',
-                        // name: 'A token',
-                        // decimals: new BigNumber(0),
-                        // extras: new MichelsonMap<string, string>()
+                        token_metadata_map
                     },
                     owner: bobAddress
                 }
@@ -140,17 +152,19 @@ describe.each([originateNftFaucet /*, originateNft*/])(
             const aliceAddress = await tezos.alice.signer.publicKeyHash();
             const bobAddress = await tezos.bob.signer.publicKeyHash();
             const tokenId = new BigNumber(0);
-            const empty_metadata_map: MichelsonMap<string, bytes> = new MichelsonMap();
+            const token_metadata_map: MichelsonMap<string, string> = new MichelsonMap();
+
+            token_metadata_map.set('name' , toHexString('A token'));
+            token_metadata_map.set('description', toHexString('description'));
+            token_metadata_map.set('ipfs_hash_image', toHexString('ipfs_hash_image'));
+            token_metadata_map.set('symbol', toHexString('TK1'));
+
             await mintTokens(tezos.bob, [
                 {
                     owner: bobAddress,
                     token_metadata: {
                         token_id: tokenId,
-                        token_metadata_map: empty_metadata_map,
-                        // symbol: 'TK1',
-                        // name: 'A token',
-                        // decimals: new BigNumber(0),
-                        // extras: new MichelsonMap<string, string>()
+                        token_metadata_map
                     }
                 }
             ]);
@@ -171,28 +185,33 @@ describe.each([originateNftFaucet /*, originateNft*/])(
             const bobAddress = await tezos.bob.signer.publicKeyHash();
             const tokenId1 = new BigNumber(0);
             const tokenId2 = new BigNumber(1);
-            const empty_metadata_map: MichelsonMap<string, bytes> = new MichelsonMap();
+            const token_metadata_map_bob: MichelsonMap<string, string> = new MichelsonMap();
+
+            token_metadata_map_bob.set('name' , toHexString('A token'));
+            token_metadata_map_bob.set('description', toHexString('description'));
+            token_metadata_map_bob.set('ipfs_hash_image', toHexString('ipfs_hash_image'));
+            token_metadata_map_bob.set('symbol', toHexString('TK1'));
+
+            const token_metadata_map_alice: MichelsonMap<string, string> = new MichelsonMap();
+
+            token_metadata_map_alice.set('name' , toHexString('B token'));
+            token_metadata_map_alice.set('description', toHexString('description'));
+            token_metadata_map_alice.set('ipfs_hash_image', toHexString('ipfs_hash_image'));
+            token_metadata_map_alice.set('symbol', toHexString('TK2'));
+
             await mintTokens(tezos.bob, [
                 {
                     owner: bobAddress,
                     token_metadata: {
                         token_id: tokenId1,
-                        token_metadata_map: empty_metadata_map,
-                        // symbol: 'TK1',
-                        // name: 'A token',
-                        // decimals: new BigNumber(0),
-                        // extras: new MichelsonMap<string, string>()
+                        token_metadata_map: token_metadata_map_bob
                     }
                 },
                 {
                     owner: aliceAddress,
                     token_metadata: {
                         token_id: tokenId2,
-                        token_metadata_map: empty_metadata_map,
-                        // symbol: 'TK2',
-                        // name: 'B token',
-                        // decimals: new BigNumber(0),
-                        // extras: new MichelsonMap<string, string>()
+                        token_metadata_map: token_metadata_map_alice
                     }
                 }
             ]);
