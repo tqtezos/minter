@@ -25,15 +25,24 @@ export const initialState: State = {
   tokens: {}
 };
 
-export type Action = {
-  type: 'select_collection';
-  payload: { address: string };
-};
+export type Action =
+  | {
+      type: 'select_collection';
+      payload: { address: string };
+    }
+  | {
+      type: 'populate_collection';
+      payload: { address: string; tokens: Token[] };
+    };
 
 export function reducer(state: State, action: Action) {
   switch (action.type) {
     case 'select_collection': {
       return { ...state, selectedCollection: action.payload.address };
+    }
+    case 'populate_collection': {
+      const { address, tokens } = action.payload;
+      return { ...state, tokens: { ...state.tokens, [address]: tokens } };
     }
     default: {
       return state;

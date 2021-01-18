@@ -17,9 +17,9 @@ export interface Config {
 }
 
 export enum Status {
-  Configured,
-  ToolkitConnected,
-  WalletConnected
+  Configured = 'Configured',
+  ToolkitConnected = 'ToolkitConnected',
+  WalletConnected = 'WalletConnected'
 }
 
 export interface SystemConfigured {
@@ -33,6 +33,7 @@ export interface SystemConfigured {
 export interface SystemWithToolkit {
   status: Status.ToolkitConnected;
   config: Config;
+  betterCallDev: BetterCallDev;
   toolkit: TezosToolkit;
   wallet: null;
 }
@@ -40,6 +41,7 @@ export interface SystemWithToolkit {
 export interface SystemWithWallet {
   status: Status.WalletConnected;
   config: Config;
+  betterCallDev: BetterCallDev;
   toolkit: TezosToolkit;
   wallet: BeaconWallet;
 }
@@ -56,10 +58,10 @@ export function configure(config: Config): SystemConfigured {
   };
 }
 
-export function connectToolkit(minter: SystemConfigured): SystemWithToolkit {
-  const toolkit = new TezosToolkit(minter.config.rpc);
+export function connectToolkit(system: SystemConfigured): SystemWithToolkit {
+  const toolkit = new TezosToolkit(system.config.rpc);
   return {
-    ...minter,
+    ...system,
     status: Status.ToolkitConnected,
     toolkit: toolkit
   };
@@ -76,9 +78,9 @@ function networkType(config: Config) {
 }
 
 export async function connectWallet(
-  minter: SystemWithToolkit
+  system: SystemWithToolkit
 ): Promise<SystemWithWallet> {
-  const network = networkType(minter.config);
+  const network = networkType(system.config);
 
   const wallet = new BeaconWallet({
     name: 'OpenSystem dApp',
@@ -86,16 +88,27 @@ export async function connectWallet(
   });
 
   await wallet.requestPermissions({
-    network: { type: network, rpcUrl: minter.config.rpc }
+    network: { type: network, rpcUrl: system.config.rpc }
   });
 
-  minter.toolkit.setWalletProvider(wallet);
-  tzUtils.setConfirmationPollingInterval(minter.toolkit);
+  system.toolkit.setWalletProvider(wallet);
+  tzUtils.setConfirmationPollingInterval(system.toolkit);
 
   return {
-    ...minter,
+    ...system,
     status: Status.WalletConnected,
     wallet: wallet
+  };
+}
+
+export async function disconnectWallet(
+  system: SystemWithWallet
+): Promise<SystemWithToolkit> {
+  await system.wallet.disconnect();
+  return {
+    ...system,
+    status: Status.ToolkitConnected,
+    wallet: null
   };
 }
 

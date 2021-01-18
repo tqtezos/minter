@@ -7,6 +7,7 @@ import * as serviceWorker from './serviceWorker';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 
 import { Minter } from './lib/system';
+import { getContractNfts } from './lib/nfts/queries';
 
 const Button = {
   variants: {
@@ -210,22 +211,26 @@ const theme = extendTheme({
 
 // <TESTING LIB>
 
-const config = {
-  rpc: 'http://localhost:8732',
-  network: 'sandboxnet',
-  bcd: {
-    api: 'http://localhost:42000',
-    gui: 'http://localhost:8009'
-  },
-  contracts: {
-    nft: 'KT1FMwJjxafePpdG7JuM8Ux93YV27iRkJh6N'
-  }
-};
-
-const configured = Minter.configure(config);
-const minter = Minter.connectToolkit(configured);
-
-console.log(minter);
+// const config = {
+//   rpc: 'http://localhost:8732',
+//   network: 'sandboxnet',
+//   bcd: {
+//     api: 'http://localhost:42000',
+//     gui: 'http://localhost:8009'
+//   },
+//   contracts: {
+//     nft: 'KT1WrTJKykNv4PMpGPQh6KuvWWMMYsk7pnkz'
+//   }
+// };
+//
+// const configured = Minter.configure(config);
+//
+// Minter.connectWallet(Minter.connectToolkit(configured)).then(system => {
+//   getContractNfts(system, system.config.contracts.nft).then((d: any) =>
+//     console.log(d)
+//   );
+//   (window as any).minter = system;
+// });
 
 // </TESTING LIB>
 
