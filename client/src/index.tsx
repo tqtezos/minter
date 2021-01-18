@@ -6,6 +6,8 @@ import AppV2 from './components-v2/App';
 import * as serviceWorker from './serviceWorker';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 
+import { Minter } from './lib/system';
+
 const Button = {
   variants: {
     primaryAction: {
@@ -205,6 +207,27 @@ const theme = extendTheme({
     bold: 700
   }
 });
+
+// <TESTING LIB>
+
+const config = {
+  rpc: 'http://localhost:8732',
+  network: 'sandboxnet',
+  bcd: {
+    api: 'http://localhost:42000',
+    gui: 'http://localhost:8009'
+  },
+  contracts: {
+    nft: 'KT1FMwJjxafePpdG7JuM8Ux93YV27iRkJh6N'
+  }
+};
+
+const configured = Minter.configure(config);
+const minter = Minter.connectToolkit(configured);
+
+console.log(minter);
+
+// </TESTING LIB>
 
 const minterVersion = new URLSearchParams(window.location.search).get('v');
 

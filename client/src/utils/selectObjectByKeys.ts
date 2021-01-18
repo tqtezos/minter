@@ -1,20 +1,31 @@
-export const anyValue = Symbol('any');
+export const $any = Symbol('any');
+export const $some = Symbol('some');
 
 export default function selectObjectByKeys(
   object: any,
   ks: Record<string, any>
 ): Record<string, any> | null {
-  if (object === null) {
+  if (object === null || object === undefined) {
     return null;
   }
 
-  if (
-    Object.keys(ks).every(
-      k =>
-        object.hasOwnProperty(k) &&
-        (ks[k] === anyValue ? true : ks[k] === object[k])
-    )
-  ) {
+  const isMatch = Object.keys(ks).every(k => {
+    if (!object.hasOwnProperty(k)) {
+      return false;
+    }
+    if (ks[k] === $any) {
+      return true;
+    }
+    if (ks[k] === $some && object[k] !== null && object[k] !== undefined) {
+      return true;
+    }
+    if (ks[k] === object[k]) {
+      return true;
+    }
+    return false;
+  });
+
+  if (isMatch) {
     return object;
   }
 
