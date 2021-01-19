@@ -5,17 +5,19 @@ import { Row, Col } from 'antd';
 import BigNumber from 'bignumber.js';
 import { useTzToolkit } from '../App/globalContext';
 
-const Label: FC<{ label: string }> = ({ label }) => 
-  <Col span={6} css={{textAlign: "right", fontWeight: 450}}>
-    {label}: 
+const Label: FC<{ label: string }> = ({ label }) => (
+  <Col span={6} css={{ textAlign: 'right', fontWeight: 450 }}>
+    {label}:
   </Col>
+);
 
-const Value: FC<{ value: string }> = ({ value }) => 
-  <Col span={18} css={{fontWeight: 350}}>
+const Value: FC<{ value: string }> = ({ value }) => (
+  <Col span={18} css={{ fontWeight: 350 }}>
     {value}
   </Col>
+);
 
-const formatBalance = (balance: BigNumber) => 
+const formatBalance = (balance: BigNumber) =>
   `${balance.div(1000000).decimalPlaces(4)} ꜩ`;
 
 const AddressInfo: FC = () => {
@@ -25,33 +27,27 @@ const AddressInfo: FC = () => {
   const timeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (tzToolkit)
-      tzToolkit.wallet.pkh().then(setAddress);
-    else
-      setAddress(undefined);
-  }, 
-  [tzToolkit]);
-  
+    if (tzToolkit) tzToolkit[0].wallet.pkh().then(setAddress);
+    else setAddress(undefined);
+  }, [tzToolkit]);
+
   useEffect(() => {
     if (tzToolkit && address) {
-      const refreshBalance = () => 
-        tzToolkit.tz.getBalance(address)
-        .then(setBalance);
-      
+      const refreshBalance = () =>
+        tzToolkit[0].tz.getBalance(address).then(setBalance);
+
       refreshBalance();
       timeout.current = setInterval(refreshBalance, 10000); // 10 seconds
     } else {
       setBalance(undefined);
-      if(timeout.current) clearInterval(timeout.current);
+      if (timeout.current) clearInterval(timeout.current);
     }
     return () => {
       if (timeout.current) clearInterval(timeout.current);
-    }
-  }, 
-  [address, tzToolkit]);  
+    };
+  }, [address, tzToolkit]);
 
-  if (!address || !balance)
-    return <Fragment />;
+  if (!address || !balance) return <Fragment />;
 
   return (
     <Fragment>
@@ -65,6 +61,6 @@ const AddressInfo: FC = () => {
       </Row>
     </Fragment>
   );
-}
+};
 
 export default AddressInfo;

@@ -27,14 +27,8 @@ type SettingsContracts {
   nftFactory: String!
 }
 
-type SettingsAdmin {
-  address: String!
-  secret: String!
-}
-
 type Settings {
   rpc: String!
-  admin: SettingsAdmin!
   contracts: SettingsContracts!
   bcdGuiUrl: String!
   bcdNetwork: String!
@@ -63,12 +57,23 @@ type OperationStatus {
   error: JSON
 }
 
+type Stats {
+  chainId: String!
+  hash: String!
+  level: Int!
+  network: String!
+  predecessor: String!
+  protocol: String!
+  timestamp: String!
+}
+
 ## Toplevel Types
 
 type Query {
+  indexerStats: Stats!
   nfts(ownerAddress: String, contractAddress: String): [NonFungibleToken!]!
   contractNames(contractOwnerAddress: String, nftOwnerAddress: String): [ContractInfo!]!
-  contractOperationStatus(contractAddress: String!, hash: String!): OperationStatus
+  contractOperationStatus(contractAddress: String!, hash: String!, since: String): OperationStatus
 
   publishedOperationByHash(hash: String!): PublishedOperation
   settings: Settings!

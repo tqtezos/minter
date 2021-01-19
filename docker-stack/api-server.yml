@@ -3,15 +3,5 @@ version: '3.7'
 services:
   api-server:
     image: minter-ui-api
-    environment:
-      BCD_GUI_URL: ${BCD_GUI_URL}
-      BCD_API_URL: ${BCD_API_URL}
-      BCD_NETWORK: ${BCD_NETWORK}
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_PORT: ${POSTGRES_PORT}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      TEZOS_RPC_URL: ${TEZOS_RPC_URL}
-      TZ_NETWORK: ${TZ_NETWORK}
     ports:
       - 3300:3300
