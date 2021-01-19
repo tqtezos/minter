@@ -36,7 +36,7 @@ let create_contract : (key_hash option * tez * nft_asset_storage) -> (operation 
                          (big_map %token_metadata
                             nat
                             (pair (nat %token_id) (map %token_metadata_map string bytes))))))
-          (map %metadata string bytes)) ;
+          (big_map %metadata string bytes)) ;
   code { PUSH string "FA2_INSUFFICIENT_BALANCE" ;
          LAMBDA
            (pair string
@@ -669,7 +669,7 @@ let factory_main (name, storage : string * storage) : operation list * storage =
       pending_admin = (None : address option);
       paused = false;
       };
-    metadata = (Map.empty : (string, bytes) map);
+    metadata = (Big_map.empty : (string, bytes) big_map);
   } in
  let op, fa2_nft = create_contract ((None: key_hash option), 0tez, init_storage) in
  let contract_info = { owner = Tezos.sender; name = name } in

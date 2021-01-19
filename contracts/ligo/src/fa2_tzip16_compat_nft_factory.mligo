@@ -36,7 +36,7 @@ let create_contract : (key_hash option * tez * nft_asset_storage) -> (operation 
                          (big_map %token_metadata
                             nat
                             (pair (nat %token_id) (map %token_metadata_map string bytes))))))
-          (map %metadata string bytes)) ;
+          (big_map %metadata string bytes)) ;
   code { PUSH string "FA2_INSUFFICIENT_BALANCE" ;
          LAMBDA
            (pair string

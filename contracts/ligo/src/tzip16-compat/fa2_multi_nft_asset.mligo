@@ -6,7 +6,7 @@
 type nft_asset_storage = {
   assets : nft_token_storage;
   admin : simple_admin_storage;
-  metadata: (string, bytes) map; (* contract metadata *)
+  metadata: (string, bytes) big_map; (* contract metadata *)
 }
 
 type nft_asset_entrypoints =
@@ -48,7 +48,7 @@ let sample_storage : nft_asset_storage = {
     pending_admin = (None : address option);
     paused = true;
     };
-  metadata = (Map.empty : (string, bytes) map);
+  metadata = (Big_map.empty : (string, bytes) big_map);
 }
 
 #endif
