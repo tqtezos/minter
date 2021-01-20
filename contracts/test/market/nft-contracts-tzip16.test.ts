@@ -83,7 +83,7 @@ describe.each([originateNftFaucet /*, originateNft*/])(
     //   $log.debug(`nft ${nft.address}`);
     // });
 
-    test('mint token', async () => {
+    test.only('mint token', async () => {
       const bobAddress = await tezos.bob.signer.publicKeyHash();
       const token_metadata_map: MichelsonMap<
         string,
@@ -111,7 +111,10 @@ describe.each([originateNftFaucet /*, originateNft*/])(
       expect(bobHasToken).toBe(true);
 
       const storage: any = await nft.storage();
-      const ret = await storage.token_metadata.get('0');
+      const assets = await storage.assets;
+
+      const ret = await assets.token_metadata.get('0');
+
       expect(ret.token_id).toStrictEqual(new BigNumber(0));
 
       const entriesIterator = ret.token_metadata_map.entries();

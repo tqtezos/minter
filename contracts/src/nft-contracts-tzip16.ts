@@ -62,7 +62,7 @@ export async function originateNftFaucet(
         'nft_faucet_main',
         'fa2_multi_nft_faucet_tzip16_compat.tz'
     );
-    const storage = `(Pair (Pair {} 0) (Pair {} {}))`;
+    const storage = `(Pair (Pair (Pair {} 0) (Pair {} {})) {})`;
     return originateContract(tz, code, storage, 'nftFaucet-tzip16-compat');
 }
 
