@@ -144,7 +144,7 @@ describe('test market (test_case_1)', () => {
                                         .methods
                                         .update_operators(
                                             [{remove_operator:
-                                             {owner: tezos.alice.signer.publicKeyHash()
+                                             {owner: aliceAddress
                                               , operator: marketplace.address
                                               , token_id: tokenId
                                              }
@@ -154,12 +154,9 @@ describe('test market (test_case_1)', () => {
                                 .then((op) => {
                                     $log.info(`Waiting for ${op.hash} to be confirmed...`);
                                     return op.confirmation().then(() => op.hash);
-                                })
-                                .then((hash) => {
-                                    $log.info(`Operation injected at hash=${hash}`);
-                                }) ;
+                                }).catch((error) => $log.info(`Error: ${JSON.stringify(error,null,2)}`));
                         })
-                        .catch((error) => $log.info(`Error: wat`));
+                        .catch((error) => $log.info(`Error: ${JSON.stringify(error,null,2)}`));
                 })
                 .catch((error) => $log.info(`Error: ${JSON.stringify(error,null,2)}`));
 
