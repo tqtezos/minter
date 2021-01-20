@@ -1,10 +1,8 @@
 import { System } from '../system';
 import select from '../util/selectObjectByKeys';
 
-export async function getContractNfts(system: System) {
-  const storage = await system.betterCallDev.getContractStorage(
-    system.config.contracts.nft
-  );
+export async function getContractNfts(system: System, address: string) {
+  const storage = await system.betterCallDev.getContractStorage(address);
 
   const ledgerBigMapId = select(storage, {
     type: 'big_map',

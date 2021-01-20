@@ -1,11 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useLocation } from 'wouter';
 import { Flex, Text, Heading, Image, Link } from '@chakra-ui/react';
+import { SystemContext } from '../../systemContext';
 import { MinterButton, MinterLink } from '../common';
 import logo from './logo.svg';
 
 export default function SplashPage() {
   const [, setLocation] = useLocation();
+  const { system, connect } = useContext(SystemContext);
+  if (system.status === 'WalletConnected') {
+    setLocation('/assets');
+  }
+
   return (
     <Flex
       align="center"
@@ -30,28 +36,28 @@ export default function SplashPage() {
           Create and mint a new non-fungible token by using our simple
           interface. Just connect your Tezos account.
         </Heading>
-        <Flex minW="400px" alignItems="stretch" pb={20}>
+        <Flex minW="400px" justify="center" pb={20}>
           <MinterButton
             variant="secondaryActionLined"
             onClick={e => {
               e.preventDefault();
-              setLocation('/assets');
+              connect();
             }}
           >
             Connect your wallet
           </MinterButton>
-          <MinterLink
-            variant="primaryAction"
-            marginLeft={4}
-            flex="1"
-            href="/create-non-fungible"
-            onClick={e => {
-              e.preventDefault();
-              setLocation('/create-non-fungible');
-            }}
-          >
-            Create
-          </MinterLink>
+          {/* <MinterLink */}
+          {/*   variant="primaryAction" */}
+          {/*   marginLeft={4} */}
+          {/*   flex="1" */}
+          {/*   href="/create-non-fungible" */}
+          {/*   onClick={e => { */}
+          {/*     e.preventDefault(); */}
+          {/*     setLocation('/create-non-fungible'); */}
+          {/*   }} */}
+          {/* > */}
+          {/*   Create */}
+          {/* </MinterLink> */}
         </Flex>
         <Text fontFamily="mono" fontSize="xs" color="brand.lightGray">
           Learn more about <Link textDecor="underline">TZIP-12</Link>

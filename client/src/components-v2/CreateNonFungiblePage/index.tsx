@@ -1,6 +1,7 @@
-import React, { useReducer } from 'react';
+import React, { useContext, useReducer } from 'react';
 import { useLocation } from 'wouter';
 import { Box, Flex, Text } from '@chakra-ui/react';
+import { SystemContext } from '../../systemContext';
 import { MinterButton } from '../common';
 import { reducer, steps, initialState, DispatchFn, State } from './reducer';
 import Form from './Form';
@@ -52,6 +53,10 @@ function LeftContent(props: { state: State; dispatch: DispatchFn }) {
 export default function CreateNonFungiblePage() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [, setLocation] = useLocation();
+  const { system } = useContext(SystemContext);
+  if (system.wallet === null) {
+    setLocation('/');
+  }
   return (
     <Flex flex="1" width="100%" minHeight="0">
       <Flex w="50%" h="100%" flexDir="column" overflowY="scroll">

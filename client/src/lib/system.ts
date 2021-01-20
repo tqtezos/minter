@@ -28,6 +28,7 @@ export interface SystemConfigured {
   betterCallDev: BetterCallDev;
   toolkit: null;
   wallet: null;
+  tzPublicKey: null;
 }
 
 export interface SystemWithToolkit {
@@ -36,6 +37,7 @@ export interface SystemWithToolkit {
   betterCallDev: BetterCallDev;
   toolkit: TezosToolkit;
   wallet: null;
+  tzPublicKey: null;
 }
 
 export interface SystemWithWallet {
@@ -44,6 +46,7 @@ export interface SystemWithWallet {
   betterCallDev: BetterCallDev;
   toolkit: TezosToolkit;
   wallet: BeaconWallet;
+  tzPublicKey: string;
 }
 
 export type System = SystemConfigured | SystemWithToolkit | SystemWithWallet;
@@ -54,7 +57,8 @@ export function configure(config: Config): SystemConfigured {
     config: config,
     betterCallDev: new BetterCallDev(config),
     toolkit: null,
-    wallet: null
+    wallet: null,
+    tzPublicKey: null
   };
 }
 
@@ -94,10 +98,13 @@ export async function connectWallet(
   system.toolkit.setWalletProvider(wallet);
   tzUtils.setConfirmationPollingInterval(system.toolkit);
 
+  const tzPublicKey = await wallet.getPKH();
+
   return {
     ...system,
     status: Status.WalletConnected,
-    wallet: wallet
+    wallet: wallet,
+    tzPublicKey: tzPublicKey
   };
 }
 
@@ -105,15 +112,19 @@ export async function disconnectWallet(
   system: SystemWithWallet
 ): Promise<SystemWithToolkit> {
   await system.wallet.disconnect();
+  const toolkit = new TezosToolkit(system.config.rpc);
   return {
     ...system,
     status: Status.ToolkitConnected,
-    wallet: null
+    toolkit: toolkit,
+    wallet: null,
+    tzPublicKey: null
   };
 }
 
 export const Minter = {
   configure,
   connectToolkit,
-  connectWallet
+  connectWallet,
+  disconnectWallet
 };

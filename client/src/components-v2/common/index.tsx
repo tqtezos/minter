@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useLocation } from 'wouter';
 import {
   Box,
@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react';
 import { ChevronDown, Package, Plus } from 'react-feather';
 import headerLogo from './header-logo.svg';
+import { SystemContext } from '../../systemContext';
 
 // Common Minter Components - Button & Link referencing branded variants
 
@@ -73,19 +74,18 @@ function HeaderLink(props: HeaderLinkProps) {
   );
 }
 
-function WalletDisplay() {
+function WalletInfo(props: { tzPublicKey: string }) {
   return (
     <>
       <Box borderRadius="100%" width={9} height={9} bg="brand.darkGray" />
       <Text fontFamily="mono" ml={4} mr={2}>
-        {/* {'tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU'.slice(0, 16) + '...'} */}
-        tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU
+        {props.tzPublicKey}
       </Text>
     </>
   );
 }
 
-function WalletDisplayMenu() {
+function WalletMenu(props: { disconnect: () => Promise<void> }) {
   const [, setLocation] = useLocation();
   return (
     <Menu placement="bottom-start">
@@ -93,9 +93,29 @@ function WalletDisplayMenu() {
         <ChevronDown />
       </MenuButton>
       <MenuList color="brand.black">
-        <MenuItem onClick={() => setLocation('/')}>Disconnect</MenuItem>
+        <MenuItem
+          onClick={async () => {
+            await props.disconnect();
+            setLocation('/');
+          }}
+        >
+          Disconnect
+        </MenuItem>
       </MenuList>
     </Menu>
+  );
+}
+
+function WalletDisplay() {
+  const { system, disconnect } = useContext(SystemContext);
+  if (system.status !== 'WalletConnected') {
+    return null;
+  }
+  return (
+    <>
+      <WalletInfo tzPublicKey={system.tzPublicKey} />
+      <WalletMenu disconnect={disconnect} />
+    </>
   );
 }
 
@@ -115,7 +135,6 @@ export function Header() {
     >
       <Flex flex="1" alignItems="center" color="brand.lightGray">
         <WalletDisplay />
-        <WalletDisplayMenu />
       </Flex>
       <Image
         maxW="38px"

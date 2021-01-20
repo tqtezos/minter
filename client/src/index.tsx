@@ -5,9 +5,7 @@ import AppV1 from './components/App';
 import AppV2 from './components-v2/App';
 import * as serviceWorker from './serviceWorker';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
-
-import { Minter } from './lib/system';
-import { getContractNfts } from './lib/nfts/queries';
+import SystemContextProvider from './systemContext';
 
 const Button = {
   variants: {
@@ -210,7 +208,7 @@ const theme = extendTheme({
 });
 
 // <TESTING LIB>
-
+//
 // const config = {
 //   rpc: 'http://localhost:8732',
 //   network: 'sandboxnet',
@@ -219,18 +217,31 @@ const theme = extendTheme({
 //     gui: 'http://localhost:8009'
 //   },
 //   contracts: {
-//     nft: 'KT1WrTJKykNv4PMpGPQh6KuvWWMMYsk7pnkz'
+//     nft: 'KT1HCmtYdBPUPxsU6MUSEqUAC97G6yPgfNnr'
 //   }
 // };
 //
-// const configured = Minter.configure(config);
+// async function testLib() {
+//   const configured = Minter.configure(config);
+//   const withToolkit = Minter.connectToolkit(configured);
+//   const system = await Minter.connectWallet(withToolkit);
+//   // getContractNfts(system, system.config.contracts.nft).then((d: any) =>
+//   //   console.log(d)
+//   // );
 //
-// Minter.connectWallet(Minter.connectToolkit(configured)).then(system => {
-//   getContractNfts(system, system.config.contracts.nft).then((d: any) =>
-//     console.log(d)
-//   );
-//   (window as any).minter = system;
-// });
+//   // mintToken(system, system.config.contracts.nft, {
+//   //   name: 'Foo token',
+//   //   description: 'My amazing new token'
+//   // });
+//
+//   // createContract(system);
+//   const address = 'KT1NzLiVg9LtkwWwDrS9dSfcPkqAiCv3dxmQ';
+//   const contract = await system.toolkit.wallet.at(address);
+//   const storage = await contract.storage();
+//   console.log(storage);
+// }
+//
+// testLib();
 
 // </TESTING LIB>
 
@@ -246,7 +257,9 @@ function Root() {
   }
   return (
     <ChakraProvider theme={theme}>
-      <AppV2 />
+      <SystemContextProvider>
+        <AppV2 />
+      </SystemContextProvider>
     </ChakraProvider>
   );
 }
