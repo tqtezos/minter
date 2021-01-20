@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Flex, Text, Heading, Image, Link } from '@chakra-ui/react';
 import { SystemContext } from '../../systemContext';
@@ -6,11 +6,13 @@ import { MinterButton, MinterLink } from '../common';
 import logo from './logo.svg';
 
 export default function SplashPage() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { system, connect } = useContext(SystemContext);
-  if (system.status === 'WalletConnected') {
-    setLocation('/assets');
-  }
+  useEffect(() => {
+    if (system.status === 'WalletConnected') {
+      setLocation('/assets');
+    }
+  }, [system.status]);
 
   return (
     <Flex

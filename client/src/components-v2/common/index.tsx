@@ -18,6 +18,8 @@ import {
 import { ChevronDown, Package, Plus } from 'react-feather';
 import headerLogo from './header-logo.svg';
 import { SystemContext } from '../../systemContext';
+import { createAssetContract, mintToken } from '../../lib/nfts/actions';
+import { getContractNfts } from '../../lib/nfts/queries';
 
 // Common Minter Components - Button & Link referencing branded variants
 
@@ -107,8 +109,9 @@ function WalletMenu(props: { disconnect: () => Promise<void> }) {
 }
 
 function WalletDisplay() {
-  const { system, disconnect } = useContext(SystemContext);
+  const { system, connect, disconnect } = useContext(SystemContext);
   if (system.status !== 'WalletConnected') {
+    connect();
     return null;
   }
   return (
