@@ -1,6 +1,8 @@
-import React, { Dispatch } from 'react';
+import React, { Dispatch, useContext, useEffect } from 'react';
 import { Box, Flex, Heading, Text } from '@chakra-ui/react';
+import { useLocation } from 'wouter';
 import { RefreshCw } from 'react-feather';
+import { SystemContext } from '../../../systemContext';
 import { MinterButton } from '../../common';
 import Sidebar from './Sidebar';
 import TokenGrid from './TokenGrid';
@@ -12,6 +14,14 @@ interface CatalogProps {
 }
 
 export default function Catalog({ state, dispatch }: CatalogProps) {
+  const [, setLocation] = useLocation();
+  const { system } = useContext(SystemContext);
+  useEffect(() => {
+    if (system.status !== 'WalletConnected') {
+      setLocation('/');
+    }
+  }, [system.status]);
+
   return (
     <Flex flex="1" w="100%" minHeight="0">
       <Flex w="250px" h="100%" flexDir="column">

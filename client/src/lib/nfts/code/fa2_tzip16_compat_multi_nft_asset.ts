@@ -1,3 +1,6 @@
+export const hash =
+  '83dc6ec84e08bcc33745ad2af94b97416d1292a4e5e55253cf8219de7cc11e9b042e62d0ac2d0641bf8f1a2dd7fba42dd1805a00b4a827b5d9b83b12f8d5c6ae';
+
 const code = `
 { parameter
     (or (or (or %admin (or (unit %confirm_admin) (bool %pause)) (address %set_admin))
@@ -635,7 +638,6 @@ const code = `
              SWAP ;
              CAR ;
              PAIR } } }
-
 `;
 
 export default code;

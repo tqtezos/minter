@@ -15,11 +15,13 @@ const code = `
            (pair (pair %token_metadata (nat %token_id) (map %token_metadata_map string bytes))
                  (address %owner)))) ;
   storage
-    (pair (pair (big_map %ledger nat address) (nat %next_token_id))
-          (pair (big_map %operators (pair address (pair address nat)) unit)
-                (big_map %token_metadata
-                   nat
-                   (pair (nat %token_id) (map %token_metadata_map string bytes))))) ;
+    (pair (pair %assets
+             (pair (big_map %ledger nat address) (nat %next_token_id))
+             (pair (big_map %operators (pair address (pair address nat)) unit)
+                   (big_map %token_metadata
+                      nat
+                      (pair (nat %token_id) (map %token_metadata_map string bytes)))))
+          (big_map %metadata string bytes)) ;
   code { PUSH string "FA2_INSUFFICIENT_BALANCE" ;
          LAMBDA
            (pair string
@@ -199,9 +201,14 @@ const code = `
          DIG 2 ;
          CAR ;
          IF_LEFT
-           { IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SWAP ;
+             IF_LEFT
                { IF_LEFT
-                   { DIG 2 ;
+                   { DIG 3 ;
                      DROP ;
                      SWAP ;
                      DUP ;
@@ -302,8 +309,10 @@ const code = `
                      DIG 2 ;
                      PAIR ;
                      PAIR ;
+                     DIG 2 ;
+                     SWAP ;
                      EXEC } }
-               { DIG 2 ;
+               { DIG 3 ;
                  DROP ;
                  SWAP ;
                  DUP ;
@@ -385,8 +394,23 @@ const code = `
                  CAR ;
                  PAIR ;
                  NIL operation ;
-                 PAIR } }
-           { PAIR ;
+                 PAIR } ;
+             SWAP ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             PAIR ;
+             SWAP ;
+             CAR ;
+             PAIR }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SWAP ;
+             PAIR ;
              DUP ;
              CDR ;
              NIL (pair (option address) (pair nat nat)) ;
@@ -475,8 +499,19 @@ const code = `
              CONS ;
              PAIR ;
              PAIR ;
-             EXEC } } }
-
+             DIG 2 ;
+             SWAP ;
+             EXEC ;
+             SWAP ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             PAIR ;
+             SWAP ;
+             CAR ;
+             PAIR } } }
 `;
 
 export default code;

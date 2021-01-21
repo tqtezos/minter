@@ -1,5 +1,12 @@
-import { System } from '../system';
+import { System, SystemWithWallet } from '../system';
+import { hash as nftAssetHash } from './code/fa2_tzip16_compat_multi_nft_asset';
 import select from '../util/selectObjectByKeys';
+
+function foldBigMapResponseAsObject(bigMapResponse: any) {
+  return bigMapResponse.reduce((acc: {}, next: any) => {
+    return { ...acc, [next.data.key_string]: next.data.value.value };
+  }, {});
+}
 
 export async function getContractNfts(system: System, address: string) {
   const storage = await system.betterCallDev.getContractStorage(address);
@@ -51,4 +58,31 @@ export async function getContractNfts(system: System, address: string) {
   });
 }
 
-export default {};
+export async function getWalletNftAssetContracts(system: SystemWithWallet) {
+  const bcd = system.betterCallDev;
+  const response = await bcd.getWalletContracts(system.tzPublicKey);
+
+  const assetContracts = response.items.filter(
+    (i: any) => i.body.hash === nftAssetHash
+  );
+
+  const results: any[] = [];
+  for (let assetContract of assetContracts) {
+    const storage = await bcd.getContractStorage(assetContract.value);
+
+    const metadataBigMapId = select(storage, {
+      type: 'big_map',
+      name: 'metadata'
+    })?.value;
+
+    const metadataResponse = await bcd.getBigMapKeys(metadataBigMapId);
+    const metadata = foldBigMapResponseAsObject(metadataResponse);
+
+    results.push({
+      address: assetContract.value,
+      metadata: metadata
+    });
+  }
+
+  return results;
+}

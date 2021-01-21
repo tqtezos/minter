@@ -1,7 +1,7 @@
 import { SystemWithWallet } from '../system';
 import { MichelsonMap } from '@taquito/taquito';
-import faucetCode from './fa2_tzip16_compat_multi_nft_faucet';
-import assetCode from './fa2_tzip16_compat_multi_nft_asset';
+import faucetCode from './code/fa2_tzip16_compat_multi_nft_faucet';
+import assetCode from './code/fa2_tzip16_compat_multi_nft_asset';
 
 function toHexString(input: string): string {
   const unit8Array: Uint8Array = new TextEncoder().encode(input);
@@ -20,10 +20,12 @@ export async function createFaucetContract(
     .originate({
       code: faucetCode,
       storage: {
-        ledger: new MichelsonMap(),
-        next_token_id: 0,
-        operators: new MichelsonMap(),
-        token_metadata: new MichelsonMap(),
+        assets: {
+          ledger: new MichelsonMap(),
+          next_token_id: 0,
+          operators: new MichelsonMap(),
+          token_metadata: new MichelsonMap()
+        },
         metadata: metadata
       }
     })
@@ -65,7 +67,7 @@ export async function mintToken(
   const contract = await system.toolkit.wallet.at(address);
   const storage = await contract.storage<any>();
 
-  const token_id = storage.next_token_id || storage.assets.next_token_id;
+  const token_id = storage.assets.next_token_id;
   const token_metadata_map = new MichelsonMap<string, string>();
 
   for (let key in metadata) {
@@ -85,5 +87,3 @@ export async function mintToken(
     ])
     .send();
 }
-
-export default {};

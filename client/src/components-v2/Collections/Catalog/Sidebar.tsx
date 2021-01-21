@@ -1,7 +1,6 @@
 import React from 'react';
-import { Box, Flex, Heading, Text } from '@chakra-ui/react';
-import { Plus } from 'react-feather';
-import { MinterButton } from '../../common';
+import { Flex, Heading, Text } from '@chakra-ui/react';
+import { NewCollectionButton } from '../../common';
 import { State, Action, Collection } from '../reducer';
 
 interface CollectionTabProps extends Collection {
@@ -110,12 +109,7 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
         />
       ))}
       <Flex px={2} pt={2} justify="center">
-        <MinterButton variant="primaryActionInverted">
-          <Box color="currentcolor">
-            <Plus size={16} strokeWidth="3" />
-          </Box>
-          <Text ml={2}>New Collection</Text>
-        </MinterButton>
+        <NewCollectionButton />
       </Flex>
     </>
   );

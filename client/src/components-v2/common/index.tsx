@@ -10,16 +10,30 @@ import {
   LinkProps,
   Text,
   useStyleConfig,
+  FormControl,
+  FormLabel,
+  Input,
   Menu,
   MenuButton,
   MenuList,
-  MenuItem
+  MenuItem,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure
 } from '@chakra-ui/react';
 import { ChevronDown, Package, Plus } from 'react-feather';
 import headerLogo from './header-logo.svg';
 import { SystemContext } from '../../systemContext';
 import { createAssetContract, mintToken } from '../../lib/nfts/actions';
-import { getContractNfts } from '../../lib/nfts/queries';
+import {
+  getContractNfts,
+  getWalletNftAssetContracts
+} from '../../lib/nfts/queries';
 
 // Common Minter Components - Button & Link referencing branded variants
 
@@ -87,37 +101,71 @@ function WalletInfo(props: { tzPublicKey: string }) {
   );
 }
 
-function WalletMenu(props: { disconnect: () => Promise<void> }) {
-  const [, setLocation] = useLocation();
-  return (
-    <Menu placement="bottom-start">
-      <MenuButton>
-        <ChevronDown />
-      </MenuButton>
-      <MenuList color="brand.black">
-        <MenuItem
-          onClick={async () => {
-            await props.disconnect();
-            setLocation('/');
-          }}
-        >
-          Disconnect
-        </MenuItem>
-      </MenuList>
-    </Menu>
-  );
-}
-
 function WalletDisplay() {
-  const { system, connect, disconnect } = useContext(SystemContext);
+  const { system, disconnect } = useContext(SystemContext);
+  const [, setLocation] = useLocation();
   if (system.status !== 'WalletConnected') {
-    connect();
     return null;
   }
   return (
     <>
       <WalletInfo tzPublicKey={system.tzPublicKey} />
-      <WalletMenu disconnect={disconnect} />
+      <Menu placement="bottom-start">
+        <MenuButton>
+          <ChevronDown />
+        </MenuButton>
+        <MenuList color="brand.black">
+          <MenuItem
+            onClick={async () => {
+              await disconnect();
+              setLocation('/');
+            }}
+          >
+            Disconnect
+          </MenuItem>
+          <MenuItem
+            onClick={async () => {
+              const originOp = await createAssetContract(system, 'hello1');
+              const contract = await originOp.contract();
+              console.log(contract.address);
+            }}
+          >
+            Test Contract Create
+          </MenuItem>
+          <MenuItem
+            onClick={async () => {
+              const contracts = await getWalletNftAssetContracts(system);
+              console.log(contracts);
+            }}
+          >
+            Test Get Wallet NFT Asset Contracts
+          </MenuItem>
+          <MenuItem
+            onClick={async () => {
+              const originOp = await mintToken(
+                system,
+                'KT1X8YZ3Xet9EtyEj77KZmS8WrHaNN16FET2',
+                { hello: 'world2' }
+              );
+              await originOp.confirmation();
+              console.log(originOp);
+            }}
+          >
+            Test Mint Token
+          </MenuItem>
+          <MenuItem
+            onClick={async () => {
+              const nfts = await getContractNfts(
+                system,
+                'KT1X8YZ3Xet9EtyEj77KZmS8WrHaNN16FET2'
+              );
+              console.log(nfts);
+            }}
+          >
+            Test Get NFTs
+          </MenuItem>
+        </MenuList>
+      </Menu>
     </>
   );
 }
@@ -163,5 +211,44 @@ export function Header() {
         </HeaderLink>
       </Flex>
     </Flex>
+  );
+}
+
+export function NewCollectionButton() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const initialRef = React.useRef(null);
+  return (
+    <>
+      <MinterButton variant="primaryActionInverted" onClick={onOpen}>
+        <Box color="currentcolor">
+          <Plus size={16} strokeWidth="3" />
+        </Box>
+        <Text ml={2}>New Collection</Text>
+      </MinterButton>
+
+      <Modal isOpen={isOpen} onClose={onClose} initialFocusRef={initialRef}>
+        <ModalOverlay />
+        <ModalContent mt={40}>
+          <ModalHeader>New Collection</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel fontFamily="mono">Collection Name</FormLabel>
+              <Input
+                autoFocus={true}
+                ref={initialRef}
+                placeholder="Input your collection name"
+              />
+            </FormControl>
+          </ModalBody>
+
+          <ModalFooter>
+            <MinterButton variant="primaryAction" onClick={onClose}>
+              Create Collection
+            </MinterButton>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }

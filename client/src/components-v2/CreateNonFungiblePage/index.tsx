@@ -57,6 +57,7 @@ export default function CreateNonFungiblePage() {
   if (system.wallet === null) {
     setLocation('/');
   }
+
   return (
     <Flex flex="1" width="100%" minHeight="0">
       <Flex w="50%" h="100%" flexDir="column" overflowY="scroll">

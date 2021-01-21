@@ -30,6 +30,12 @@ export async function getContractOperations(
   return response.data;
 }
 
+export async function getWalletContracts(config: Config, address: string) {
+  const uri = `${config.bcd.api}/v1/search?q=${address}&i=contract&n=${config.network}&g=0&s=0`;
+  const response = await axios.get(uri);
+  return response.data;
+}
+
 export class BetterCallDev {
   config: Config;
 
@@ -51,5 +57,9 @@ export class BetterCallDev {
 
   getContractOperations(address: string, since?: Date) {
     return getContractOperations(this.config, address, since);
+  }
+
+  getWalletContracts(address: string) {
+    return getWalletContracts(this.config, address);
   }
 }
