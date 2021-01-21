@@ -5,7 +5,7 @@ scalar Upload
 
 type NonFungibleToken {
   contractInfo: ContractInfo!
-  tokenId: String!
+  tokenId: Int!
   symbol: String!
   name: String!
   owner: String!
@@ -27,16 +27,11 @@ type SettingsContracts {
   nftFactory: String!
 }
 
-type SettingsAdmin {
-  address: String!
-  secret: String!
-}
-
 type Settings {
-  tzStatsUrl: String!
   rpc: String!
-  admin: SettingsAdmin!
   contracts: SettingsContracts!
+  bcdGuiUrl: String!
+  bcdNetwork: String!
 }
 
 type ContractInfo {
@@ -51,15 +46,35 @@ type IpfsContent {
   publicGatewayUrl: String!
 }
 
+enum OperationStatusType {
+  APPLIED
+  FAILED
+}
+
+type OperationStatus {
+  status: OperationStatusType!
+  timestamp: String!
+  error: JSON
+}
+
+type Stats {
+  chainId: String!
+  hash: String!
+  level: Int!
+  network: String!
+  predecessor: String!
+  protocol: String!
+  timestamp: String!
+}
+
 ## Toplevel Types
 
 type Query {
+  indexerStats: Stats!
   nfts(ownerAddress: String, contractAddress: String): [NonFungibleToken!]!
   contractNames(contractOwnerAddress: String, nftOwnerAddress: String): [ContractInfo!]!
+  contractOperationStatus(contractAddress: String!, hash: String!, since: String): OperationStatus
 
-  nftByTokenId(token_id: String!): NonFungibleToken
-  nftByOperation(operation_address: String!): NonFungibleToken
-  
   publishedOperationByHash(hash: String!): PublishedOperation
   settings: Settings!
 }

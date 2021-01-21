@@ -1,0 +1,4 @@
+rpc:
+    sandboxnet:
+        uri: http://sandbox:20000
+        timeout: 10

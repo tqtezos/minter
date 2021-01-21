@@ -50,12 +50,24 @@ export type MutationCreateNonFungibleTokenSyncArgs = {
 export type NonFungibleToken = {
   __typename?: 'NonFungibleToken';
   contractInfo: ContractInfo;
-  tokenId: Scalars['String'];
+  tokenId: Scalars['Int'];
   symbol: Scalars['String'];
   name: Scalars['String'];
   owner: Scalars['String'];
   extras: Scalars['JSON'];
 };
+
+export type OperationStatus = {
+  __typename?: 'OperationStatus';
+  status: OperationStatusType;
+  timestamp: Scalars['String'];
+  error?: Maybe<Scalars['JSON']>;
+};
+
+export enum OperationStatusType {
+  Applied = 'APPLIED',
+  Failed = 'FAILED'
+}
 
 export type PublishedOperation = {
   __typename?: 'PublishedOperation';
@@ -70,10 +82,10 @@ export type PublishedOperation = {
 
 export type Query = {
   __typename?: 'Query';
+  indexerStats: Stats;
   nfts: Array<NonFungibleToken>;
   contractNames: Array<ContractInfo>;
-  nftByTokenId?: Maybe<NonFungibleToken>;
-  nftByOperation?: Maybe<NonFungibleToken>;
+  contractOperationStatus?: Maybe<OperationStatus>;
   publishedOperationByHash?: Maybe<PublishedOperation>;
   settings: Settings;
 };
@@ -88,12 +100,10 @@ export type QueryContractNamesArgs = {
   nftOwnerAddress?: Maybe<Scalars['String']>;
 };
 
-export type QueryNftByTokenIdArgs = {
-  token_id: Scalars['String'];
-};
-
-export type QueryNftByOperationArgs = {
-  operation_address: Scalars['String'];
+export type QueryContractOperationStatusArgs = {
+  contractAddress: Scalars['String'];
+  hash: Scalars['String'];
+  since?: Maybe<Scalars['String']>;
 };
 
 export type QueryPublishedOperationByHashArgs = {
@@ -102,22 +112,27 @@ export type QueryPublishedOperationByHashArgs = {
 
 export type Settings = {
   __typename?: 'Settings';
-  tzStatsUrl: Scalars['String'];
   rpc: Scalars['String'];
-  admin: SettingsAdmin;
   contracts: SettingsContracts;
-};
-
-export type SettingsAdmin = {
-  __typename?: 'SettingsAdmin';
-  address: Scalars['String'];
-  secret: Scalars['String'];
+  bcdGuiUrl: Scalars['String'];
+  bcdNetwork: Scalars['String'];
 };
 
 export type SettingsContracts = {
   __typename?: 'SettingsContracts';
   nftFaucet: Scalars['String'];
   nftFactory: Scalars['String'];
+};
+
+export type Stats = {
+  __typename?: 'Stats';
+  chainId: Scalars['String'];
+  hash: Scalars['String'];
+  level: Scalars['Int'];
+  network: Scalars['String'];
+  predecessor: Scalars['String'];
+  protocol: Scalars['String'];
+  timestamp: Scalars['String'];
 };
 
 export type Subscription = {

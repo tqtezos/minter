@@ -5,44 +5,91 @@ import React, {
   SetStateAction,
   useContext,
   useEffect,
-  useState
+  useState,
+  useReducer
 } from 'react';
 
 import { TezosToolkit } from '@taquito/taquito';
-import useSettings from '../common/useSettings';
+import config from '../../config.json';
 import mkContracts, { Contracts } from '../../api/contracts';
+import { BeaconWallet } from '@taquito/beacon-wallet';
+import { BetterCallDev } from '../../resolvers/betterCallDev';
 
-const TzToolkitContext = createContext<TezosToolkit | undefined>(undefined);
+/* <TODO: Use state reducer with global context to manage actions & application dependencies> */
 
-type TztSetter = Dispatch<SetStateAction<TezosToolkit | undefined>>;
-const TzToolkitSetterContext = createContext<TztSetter>(undefined!);
+type GlobalActions =
+  | {
+      type: 'init_tz_toolkit';
+    }
+  | {
+      type: 'create_nft_contract';
+    }
+  | {
+      type: 'create_non_fungible_token';
+    }
+  | {
+      type: 'transfer_non_fungible_token';
+    };
+
+interface GlobalState {
+  tzToolKit?: TezosToolkit;
+  beaconWallet?: BeaconWallet;
+  betterCallDev?: BetterCallDev;
+  contracts?: Contracts;
+}
+
+interface IGlobalContext {
+  state: GlobalState;
+  dispatch: Dispatch<GlobalActions>;
+}
+
+const initialDependencies: GlobalState = {
+  tzToolKit: undefined,
+  beaconWallet: undefined,
+  betterCallDev: undefined,
+  contracts: undefined
+};
+
+function globalReducer(state: GlobalState, action: GlobalActions) {
+  console.log(action);
+  return state;
+}
+
+const GlobalContext = createContext<IGlobalContext>({
+  state: initialDependencies,
+  dispatch: (_action: GlobalActions) => null
+});
+
+/* </END TODO> */
+
+type Toolkit = [TezosToolkit, BeaconWallet] | undefined;
+
+const TzToolkitContext = createContext<Toolkit>(undefined);
+type TztSetter = Dispatch<SetStateAction<Toolkit>>;
+const TzToolkitSetterContext = createContext<TztSetter>(() => null);
 
 const ContractsContext = createContext<Contracts | undefined>(undefined);
 
 const GlobalContextProvider: FC = ({ children }) => {
-  const [tzToolkit, setTzToolkit] = React.useState<TezosToolkit | undefined>();
+  const [state, dispatch] = useReducer(globalReducer, initialDependencies);
+  const [tzToolkit, setTzToolkit] = React.useState<Toolkit>();
   const [contracts, setContracts] = React.useState<Contracts | undefined>();
-  const { settings, loading } = useSettings();
 
   useEffect(() => {
-    if (tzToolkit && settings)
-      setContracts(mkContracts(tzToolkit, settings.contracts));
+    if (tzToolkit) setContracts(mkContracts(tzToolkit[0], config.contracts));
     else setContracts(undefined);
-  }, [tzToolkit, settings]);
+  }, [tzToolkit]);
 
   return (
-    <>
-      {loading && <div>Loading setting from the server...</div>}
-      {settings && (
-        <TzToolkitContext.Provider value={tzToolkit}>
-          <TzToolkitSetterContext.Provider value={setTzToolkit}>
-            <ContractsContext.Provider value={contracts}>
-              {children}
-            </ContractsContext.Provider>
-          </TzToolkitSetterContext.Provider>
-        </TzToolkitContext.Provider>
-      )}
-    </>
+    <GlobalContext.Provider value={{ state, dispatch }}>
+      <TzToolkitContext.Provider value={tzToolkit}>
+        <TzToolkitSetterContext.Provider value={setTzToolkit}>
+          <ContractsContext.Provider value={contracts}>
+            {children}
+          </ContractsContext.Provider>
+        </TzToolkitSetterContext.Provider>
+      </TzToolkitContext.Provider>
+    </GlobalContext.Provider>
   );
 };
 
@@ -55,7 +102,7 @@ const useWalletAddress = (): string | undefined => {
   const [address, setAddress] = useState<string>();
 
   useEffect(() => {
-    if (tzToolkit) tzToolkit.wallet.pkh().then(setAddress);
+    if (tzToolkit) tzToolkit[0].wallet.pkh().then(setAddress);
     else setAddress(undefined);
   }, [tzToolkit]);
 

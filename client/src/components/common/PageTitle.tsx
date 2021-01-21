@@ -5,7 +5,7 @@ import { jsx } from '@emotion/core';
 import styled from '@emotion/styled';
 
 import { Row, Col } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons'
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
 const Title = styled.div({
   fontFamily: 'sans-serif',
@@ -14,7 +14,7 @@ const Title = styled.div({
   letterSpacing: '0.75px',
   color: 'black'
 });
-  
+
 const Text = styled.span({
   fontFamily: 'sans-serif',
   fontWeight: 300,
@@ -23,36 +23,41 @@ const Text = styled.span({
   letterSpacing: '0.75px',
   color: 'black'
 });
-
 interface PageTitleProps {
   title: string;
   description: string;
-  onClick?: () =>  void;
+  onClick?: () => void;
 }
-  
-const PageTitle: FC<PageTitleProps> = ({ title, description, onClick}) => (
+
+export const BackButtonRow: FC<{ onClick?: () => void }> = ({ onClick }) => (
+  <Row align="middle" justify="start">
+    <Col>
+      <Text
+        onClick={onClick}
+        css={{
+          cursor: 'pointer',
+          visibility: onClick ? 'visible' : 'hidden'
+        }}
+      >
+        <ArrowLeftOutlined />
+        &nbsp;Go Back
+      </Text>
+    </Col>
+  </Row>
+);
+
+const PageTitle: FC<PageTitleProps> = ({ title, description, onClick }) => (
   <Fragment>
-    <Row 
-      align="middle" 
-      justify="start" 
-    >
-      <Col>
-        <Text 
-          onClick={onClick}      
-          css={{ 
-            cursor: 'pointer',
-            visibility: onClick ? 'visible' : 'hidden'
-          }} 
-        >
-          <ArrowLeftOutlined />&nbsp;Back
-        </Text>
+    <BackButtonRow onClick={onClick} />
+    <Row css={{ paddingTop: '1em' }}>
+      <Col offset={3}>
+        <Title>{title}</Title>
       </Col>
     </Row>
-    <Row css={{paddingTop: '1em'}}>
-      <Col offset={3}><Title>{title}</Title></Col>
-    </Row>
-    <Row css={{paddingTop: '1em'}}>
-      <Col offset={3}><Text>{description}</Text></Col>
+    <Row css={{ paddingTop: '1em' }}>
+      <Col offset={3}>
+        <Text>{description}</Text>
+      </Col>
     </Row>
   </Fragment>
 );

@@ -5,6 +5,13 @@ mkdir -p $TZ_INDEX_DB_PATH
 mkdir -p $FLEXTESA_DATA_DIR
 
 docker stack deploy \
+       -c $DOCKER_STACK_DIR/postgres.yml \
+       -c $DOCKER_STACK_DIR/elastic.yml \
+       -c $DOCKER_STACK_DIR/rabbitmq.yml \
+       -c $DOCKER_STACK_DIR/bcdapi.yml \
+       -c $DOCKER_STACK_DIR/bcdgui.yml \
+       -c $DOCKER_STACK_DIR/bcdindexer.yml \
+       -c $DOCKER_STACK_DIR/bcdmetrics.yml \
        -c $DOCKER_STACK_DIR/flextesa.yml \
        $STACK_NAME
 
@@ -14,8 +21,3 @@ export CHAIN_ID=$(docker run --rm -it --network=${STACK_NAME}_default \
                          bashcurl bash -c "/bin/chain-id 2> /dev/null")
 
 echo "Chain id: " $CHAIN_ID
-
-docker stack deploy \
-       -c $DOCKER_STACK_DIR/tzindex.yml \
-       -c $DOCKER_STACK_DIR/tzstats.yml \
-       $STACK_NAME

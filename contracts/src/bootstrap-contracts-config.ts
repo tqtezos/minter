@@ -6,27 +6,45 @@ import Configstore from 'configstore';
 import { defaultEnv, originateContract, loadFile } from './ligo';
 import { TezosToolkit } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
-import { sandboxBootstrapKey, testnetBootstrapKey } from './bootstrap-keys';
 
 async function main() {
   const env = getEnv();
-  const bootstrapKey = getBootstrapKey(env);
   try {
     $log.info(`bootstrapping ${env} environment config...`);
 
     const config = getConfig(env);
-    const toolkit = await createToolkit(config, bootstrapKey);
+    const toolkit = await createToolkit(config);
     await awaitForNetwork(toolkit);
 
     await bootstrapNftFaucet(config, toolkit);
     await bootstrapNftFactory(config, toolkit);
     //add bootstrapping of other contracts here
 
+    genClientConfig(config);
+
     process.exit(0);
   } catch (err) {
     $log.error(`error while bootstrapping environment ${env}`);
     $log.error(err);
     process.exit(1);
+  }
+}
+
+function genClientConfig(mainConfig: Configstore) {
+  const configPath = path.join(__dirname, `../../client/src/config.json`);
+  const clientConfig = new Configstore('client', {}, { configPath });
+
+  const clientConfigKeys = [
+    'rpc',
+    'bcdApiUrl',
+    'bcdGuiUrl',
+    'bcdNetwork',
+    'contracts.nftFaucet',
+    'contracts.nftFactory'
+  ];
+
+  for (let key of clientConfigKeys) {
+    clientConfig.set(key, mainConfig.get(key));
   }
 }
 
@@ -46,12 +64,6 @@ function getConfig(env: string): Configstore {
     process.exit(1);
   }
   return new Configstore('minter', {}, { configPath: configFileName });
-}
-
-function getBootstrapKey(env: string): string {
-  if (env === 'sandbox') return sandboxBootstrapKey;
-  if (env === 'testnet') return testnetBootstrapKey;
-  throw new Error(`unsupported env ${env}`);
 }
 
 async function bootstrapNftFaucet(
@@ -89,15 +101,13 @@ async function bootstrapNftFactory(
   $log.info('bootstrapped NFT factory contract');
 }
 
-async function createToolkit(
-  config: Configstore,
-  key: string
-): Promise<TezosToolkit> {
+async function createToolkit(config: Configstore): Promise<TezosToolkit> {
+  const key = config.get('admin.secret');
   const signer = await InMemorySigner.fromSecretKey(key);
   const rpc = config.get('rpc');
   if (!rpc) throw new Error('cannot read node rpc');
 
-  const toolkit = new TezosToolkit();
+  const toolkit = new TezosToolkit(rpc);
   toolkit.setProvider({
     signer,
     rpc,

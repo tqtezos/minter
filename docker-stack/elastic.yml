@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  elastic:
+    image: bakingbad/bcdhub-elastic:3.0
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    environment:
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+    logging:
+      options:
+        max-size: 10m
+        max-file: '5'
+
+volumes:
+  esdata:

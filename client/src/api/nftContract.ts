@@ -1,7 +1,7 @@
 import { BigNumber } from 'bignumber.js';
 import { MichelsonMap, WalletContract } from '@taquito/taquito';
-
 import { retrieveStorageField, Address, Nat } from './contractUtil';
+import { waitForConfirmation } from '../utils/waitForConfirmation';
 
 interface CreateTokenArgs {
   symbol: string;
@@ -40,8 +40,9 @@ const mkNftContract = async (
       }
     ];
 
-    const operation = await contract.methods.mint(params).send();
-    await operation.confirmation();
+    await waitForConfirmation(contract.address, () =>
+      contract.methods.mint(params).send()
+    );
   },
 
   async transferToken({ to, tokenId }) {
@@ -52,8 +53,9 @@ const mkNftContract = async (
       }
     ];
 
-    const operation = await contract.methods.transfer(params).send();
-    await operation.confirmation();
+    await waitForConfirmation(contract.address, () =>
+      contract.methods.transfer(params).send()
+    );
   }
 });
 

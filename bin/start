@@ -18,7 +18,6 @@ echo "Using ${API_SERVER_STACK_FILE}"
 #also default network can't be created with docker network create
 docker stack deploy \
        -c $DOCKER_STACK_DIR/network.yml \
-       -c $DOCKER_STACK_DIR/postgres.yml \
        -c $DOCKER_STACK_DIR/gateway.yml \
        -c $UI_STACK_FILE \
        $STACK_NAME
@@ -27,8 +26,6 @@ ENV_START_SCRIPT=$PROJECT_ROOT_DIR/bin/${ENV_NAME}/start
 [ -f $ENV_START_SCRIPT ] && $ENV_START_SCRIPT
 
 pushd $PROJECT_ROOT_DIR/contracts && yarn run bootstrap ; popd
-
-$PROJECT_ROOT_DIR/bin/wait-for-postgres $PROJECT_ROOT_DIR/bin/migrate-db
 
 #knex does not properly handle no db on startup so
 #have to start dev server after db is up
