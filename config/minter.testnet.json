@@ -10,5 +10,12 @@
 	"contracts": {
 		"nftFaucet": "KT1CV1zsMnrnVHHZLKGdZ16bpSKhXfbJ8G8T",
 		"nftFactory": "KT1HDdJAXVxi3scXydzhLZio2KipbyPJSru5"
-	}
+	},
+	"featuredCollections": [
+		"KT...",
+		{
+			"name": "Hello",
+			"description": "My description"
+		}
+	]
 }
