@@ -1,75 +1,91 @@
-/** @jsx jsx */
-import { FC } from 'react';
-import { jsx } from '@emotion/core';
-import styled from '@emotion/styled';
-import { Row, Col, Button } from 'antd';
+import React, { useContext, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { Slide, Zoom } from 'react-awesome-reveal';
+import { Flex, Text, Heading, Image, Link } from '@chakra-ui/react';
+import { SystemContext } from '../../context/system';
+import { MinterButton, MinterLink } from '../common';
+import logo from './logo.svg';
 
-import Page from '../Page';
-
-const Title = styled.h1({
-  fontFamily: 'sans-serif',
-  fontWeight: 300,
-  fontSize: '60px',
-  lineHeight: '60px',
-  letterSpacing: '0.75px',
-});
-
-const Description = styled.p({
-  fontFamily: 'sans-serif',
-  fontWeight: 300,
-  fontSize: '20px',
-  lineHeight: '30px',
-  letterSpacing: '0.75px',
-  color: 'black'
-});
-
-const MintTokensButton: FC<{ onClick: () => void }> = ({ onClick }) => (
-  <Button
-    size="large"
-    shape="round" 
-    type="primary"
-    onClick={onClick}
-    css={{
-      width: '12em',
-      height: '2.5em !important',
-      fontSize: '1.5em !important'
-    }}
-  >
-    Mint Tokens
-  </Button>
-);
-
-const SplashPage: FC = () => {
-  const [, setLocation] = useLocation();
+export default function SplashPage() {
+  const [location, setLocation] = useLocation();
+  const { system, connect } = useContext(SystemContext);
+  useEffect(() => {
+    if (system.status === 'WalletConnected') {
+      setLocation('/assets');
+    }
+  }, [system.status]);
 
   return (
-    <Page>
-      <Row css={{marginTop: '7em'}}>
-        <Col offset={3} span={18}>
-          <Slide triggerOnce>
-            <Title>Create NFTs on Tezos <br /> with the click of a button</Title>
-          </Slide>
-          <Slide direction="right" triggerOnce>
-            <Description>
-              Create and mint a new non-fungible token by using our simple interface. 
-              Just connect your Tezos account.
-            </Description>
-          </Slide>
-          <Zoom delay={500} direction="down" triggerOnce>
-            <MintTokensButton onClick={
-              () => {setLocation('/create-non-fungible')}} 
-            />
-          </Zoom>
-          <Description css={{marginTop: '7em'}}>
-            Learn more about TZIP-12
-            <a href="https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md"> here</a>
-          </Description>
-        </Col>
-      </Row>
-    </Page>
+    <Flex
+      align="center"
+      justifyContent="space-between"
+      w="100%"
+      flex="1"
+      flexDir="column"
+      bg="brand.background"
+    >
+      <Flex flexDir="column" align="center" maxW="600px" pt={20}>
+        <Image src={logo} maxW="200px" pb={40} />
+        <Heading color="white" size="xl" pb={8}>
+          Create NFTs on Tezos
+        </Heading>
+        <Heading
+          color="white"
+          size="md"
+          textAlign="center"
+          pb={12}
+          opacity=".8"
+        >
+          Create and mint a new non-fungible token by using our simple
+          interface. Just connect your Tezos account.
+        </Heading>
+        <Flex minW="400px" justify="center" pb={20}>
+          <MinterButton
+            variant="secondaryActionLined"
+            onClick={e => {
+              e.preventDefault();
+              connect();
+            }}
+          >
+            Connect your wallet
+          </MinterButton>
+          {/* <MinterLink */}
+          {/*   variant="primaryAction" */}
+          {/*   marginLeft={4} */}
+          {/*   flex="1" */}
+          {/*   href="/create-non-fungible" */}
+          {/*   onClick={e => { */}
+          {/*     e.preventDefault(); */}
+          {/*     setLocation('/create-non-fungible'); */}
+          {/*   }} */}
+          {/* > */}
+          {/*   Create */}
+          {/* </MinterLink> */}
+        </Flex>
+        <Text fontFamily="mono" fontSize="xs" color="brand.lightGray">
+          Learn more about <Link textDecor="underline">TZIP-12</Link>
+        </Text>
+      </Flex>
+      <Flex
+        width="100%"
+        bg="brand.darkGray"
+        color="brand.lightGray"
+        fontFamily="mono"
+        paddingX={10}
+        paddingY={4}
+        justifyContent="space-between"
+      >
+        <Text fontSize="xs">
+          &copy; OpenMinter, Inc. All rights reserved. Currently v1.0.0-beta1.
+        </Text>
+        <Flex>
+          <Link fontSize="xs" textDecor="underline">
+            Terms
+          </Link>
+          <Link fontSize="xs" textDecor="underline" ml={4}>
+            Privacy Policy
+          </Link>
+        </Flex>
+      </Flex>
+    </Flex>
   );
 }
-
-export default SplashPage;

@@ -28,7 +28,7 @@ import {
 } from '@chakra-ui/react';
 import { ChevronDown, Package, Plus } from 'react-feather';
 import headerLogo from './header-logo.svg';
-import { SystemContext } from '../../systemContext';
+import { SystemContext } from '../../context/system';
 import { createAssetContract, mintToken } from '../../lib/nfts/actions';
 import {
   getContractNfts,

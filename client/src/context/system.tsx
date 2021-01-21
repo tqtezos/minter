@@ -1,5 +1,5 @@
 import React, { createContext, useState } from 'react';
-import { Minter, SystemWithToolkit, SystemWithWallet } from './lib/system';
+import { Minter, SystemWithToolkit, SystemWithWallet } from '../lib/system';
 
 // TODO: Import from ./config.json
 const config = {

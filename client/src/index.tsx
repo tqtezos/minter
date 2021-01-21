@@ -1,11 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import AppV1 from './components/App';
-import AppV2 from './components-v2/App';
+import App from './components/App';
 import * as serviceWorker from './serviceWorker';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
-import SystemContextProvider from './systemContext';
+import SystemContextProvider from './context/system';
 
 const Button = {
   variants: {
@@ -207,58 +206,11 @@ const theme = extendTheme({
   }
 });
 
-// <TESTING LIB>
-//
-// const config = {
-//   rpc: 'http://localhost:8732',
-//   network: 'sandboxnet',
-//   bcd: {
-//     api: 'http://localhost:42000',
-//     gui: 'http://localhost:8009'
-//   },
-//   contracts: {
-//     nft: 'KT1HCmtYdBPUPxsU6MUSEqUAC97G6yPgfNnr'
-//   }
-// };
-//
-// async function testLib() {
-//   const configured = Minter.configure(config);
-//   const withToolkit = Minter.connectToolkit(configured);
-//   const system = await Minter.connectWallet(withToolkit);
-//   // getContractNfts(system, system.config.contracts.nft).then((d: any) =>
-//   //   console.log(d)
-//   // );
-//
-//   // mintToken(system, system.config.contracts.nft, {
-//   //   name: 'Foo token',
-//   //   description: 'My amazing new token'
-//   // });
-//
-//   // createContract(system);
-//   const address = 'KT1NzLiVg9LtkwWwDrS9dSfcPkqAiCv3dxmQ';
-//   const contract = await system.toolkit.wallet.at(address);
-//   const storage = await contract.storage();
-//   console.log(storage);
-// }
-//
-// testLib();
-
-// </TESTING LIB>
-
-const minterVersion = new URLSearchParams(window.location.search).get('v');
-
-if (minterVersion) {
-  localStorage.setItem('minter_version', minterVersion);
-}
-
 function Root() {
-  if (localStorage.getItem('minter_version') === '1') {
-    return <AppV1 />;
-  }
   return (
     <ChakraProvider theme={theme}>
       <SystemContextProvider>
-        <AppV2 />
+        <App />
       </SystemContextProvider>
     </ChakraProvider>
   );

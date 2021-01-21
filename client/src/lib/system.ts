@@ -2,7 +2,7 @@ import { TezosToolkit } from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
 import { NetworkType } from '@airgap/beacon-sdk/dist/cjs/types/beacon/NetworkType';
 import { BetterCallDev } from './service/bcd';
-import * as tzUtils from '../utils/tezosToolkit';
+import * as tzUtils from './util/tezosToolkit';
 
 export interface Config {
   rpc: string;

@@ -2,7 +2,7 @@ import React, { Dispatch, useContext, useEffect } from 'react';
 import { Box, Flex, Heading, Text } from '@chakra-ui/react';
 import { useLocation } from 'wouter';
 import { RefreshCw } from 'react-feather';
-import { SystemContext } from '../../../systemContext';
+import { SystemContext } from '../../../context/system';
 import { MinterButton } from '../../common';
 import Sidebar from './Sidebar';
 import TokenGrid from './TokenGrid';
