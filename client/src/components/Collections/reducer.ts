@@ -21,12 +21,14 @@ export interface State {
   collections: Record<string, Collection>;
 }
 
+const globalCollectionAddress = 'KT1WmAwMDCBgB98RuNSbkL6Lj1j6eJMdriZn';
+
 export const initialState: State = {
   selectedCollection: null,
-  globalCollection: 'KT1TuCU1wHQHoWBxFSnXLVk1h1kY7JJ19tKj',
+  globalCollection: globalCollectionAddress,
   collections: {
-    KT1TuCU1wHQHoWBxFSnXLVk1h1kY7JJ19tKj: {
-      address: 'KT1TuCU1wHQHoWBxFSnXLVk1h1kY7JJ19tKj',
+    [globalCollectionAddress]: {
+      address: globalCollectionAddress,
       metadata: {
         name: 'Minter'
       },

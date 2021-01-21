@@ -43,10 +43,10 @@ function CollectionTab({
           bg: selected ? 'brand.blue' : 'gray.200'
         }}
       >
-        <Text>{metadata.name ? metadata.name[0] : '?'}</Text>
+        <Text>{metadata?.name ? metadata.name[0] : '?'}</Text>
       </Flex>
       <Text pl={4} fontWeight={selected ? '600' : '600'}>
-        {metadata.name}
+        {metadata?.name || address}
       </Text>
     </Flex>
   );

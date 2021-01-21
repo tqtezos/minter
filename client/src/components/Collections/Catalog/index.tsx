@@ -21,7 +21,7 @@ function collectionTitle(state: State) {
   if (state.selectedCollection === null) {
     return '';
   }
-  return state.collections[state.selectedCollection].metadata.name;
+  return state.collections[state.selectedCollection]?.metadata?.name;
 }
 
 export default function Catalog({ state, dispatch }: CatalogProps) {
