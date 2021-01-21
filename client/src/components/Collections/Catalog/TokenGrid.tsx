@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation } from 'wouter';
 import { Flex, Grid, Image, Text } from '@chakra-ui/react';
 import { Token, State } from '../reducer';
-import placeholderAsset from '../../common/placeholder_asset.png';
+import placeholderAsset from '../../common/assets/placeholder_asset.png';
 import { Wind } from 'react-feather';
 
 interface TokenTileProps extends Token {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Divider, Heading, Flex, Image, Text } from '@chakra-ui/react';
 import { State } from './reducer';
-import placeholderAsset from '../common/placeholder_asset.png';
+import placeholderAsset from '../common/assets/placeholder_asset.png';
 
 export default function Preview({ state }: { state: State }) {
   const { name, description } = state.fields;

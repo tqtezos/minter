@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import { AspectRatio, Box, Flex, Heading, Image, Text } from '@chakra-ui/react';
 import { ChevronLeft, HelpCircle, MoreHorizontal, Star } from 'react-feather';
 import { MinterButton } from '../../common';
-import placeholderAsset from '../../common/placeholder_asset.png';
+import placeholderAsset from '../../common/assets/placeholder_asset.png';
 import { State } from '../reducer';
 
 function NotFound() {

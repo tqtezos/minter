@@ -1,6 +1,6 @@
 import React from 'react';
 import { Flex, Heading, Text } from '@chakra-ui/react';
-import { NewCollectionButton } from '../common';
+import { CreateCollectionButton } from '../common/CreateCollection';
 import { State, DispatchFn } from './reducer';
 
 // Placeholder data
@@ -78,7 +78,7 @@ export default function CollectionSelect(props: {
         borderColor="brand.brightGray"
       >
         <Heading size="lg">Collections</Heading>
-        <NewCollectionButton />
+        <CreateCollectionButton />
       </Flex>
       {collections.map(({ name, address }) => {
         return (

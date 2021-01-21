@@ -3,7 +3,7 @@ import { Switch, Route } from 'wouter';
 import SplashPage from '../SplashPage';
 import CreateNonFungiblePage from '../CreateNonFungiblePage';
 import Collections from '../Collections';
-import { Header } from '../common';
+import Header from '../common/Header';
 import { Flex } from '@chakra-ui/react';
 
 export default function App() {

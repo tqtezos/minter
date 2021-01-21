@@ -1,6 +1,6 @@
 import React from 'react';
 import { Flex, Heading, Text } from '@chakra-ui/react';
-import { NewCollectionButton } from '../../common';
+import { CreateCollectionButton } from '../../common/CreateCollection';
 import { State, Action, Collection } from '../reducer';
 
 interface CollectionTabProps extends Collection {
@@ -109,7 +109,7 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
         />
       ))}
       <Flex px={2} pt={2} justify="center">
-        <NewCollectionButton />
+        <CreateCollectionButton />
       </Flex>
     </>
   );
