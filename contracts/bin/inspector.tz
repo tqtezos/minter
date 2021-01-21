@@ -17,9 +17,7 @@
                  ADDRESS ;
                  CONTRACT %response
                    (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance))) ;
-                 IF_NONE
-                   { PUSH string "bad address for get_entrypoint (%response)" ; FAILWITH }
-                   {} ;
+                 IF_NONE { PUSH string "bad address for get_entrypoint" ; FAILWITH } {} ;
                  SWAP ;
                  DUP ;
                  DUG 2 ;
@@ -31,9 +29,7 @@
                    (pair (list %requests (pair (address %owner) (nat %token_id)))
                          (contract %callback
                             (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance))))) ;
-                 IF_NONE
-                   { PUSH string "bad address for get_entrypoint (%balance_of)" ; FAILWITH }
-                   {} ;
+                 IF_NONE { PUSH string "bad address for get_entrypoint" ; FAILWITH } {} ;
                  PUSH mutez 0 ;
                  DIG 2 ;
                  TRANSFER_TOKENS ;

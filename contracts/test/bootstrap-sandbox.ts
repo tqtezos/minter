@@ -1,4 +1,4 @@
-import { TezosToolkit, Tezos } from '@taquito/taquito';
+import { TezosToolkit } from '@taquito/taquito';
 import { Signer } from '@taquito/taquito/dist/types/signer/interface';
 import { InMemorySigner } from '@taquito/signer';
 import { $log } from '@tsed/logger';
@@ -33,8 +33,14 @@ export type TestTz = {
   alice: TezosToolkit;
 };
 
+export type TestTzMarket = {
+  bob: TezosToolkit;
+  alice: TezosToolkit;
+  market: TezosToolkit;
+};
+
 function signerToToolkit(signer: Signer, rpc: string): TezosToolkit {
-  const tezos = new TezosToolkit();
+  const tezos = new TezosToolkit(rpc);
   tezos.setProvider({
     signer,
     rpc,
@@ -45,7 +51,7 @@ function signerToToolkit(signer: Signer, rpc: string): TezosToolkit {
 
 export async function bootstrap(): Promise<TestTz> {
   const { bob, alice } = await flextesaKeys();
-  const rpc = 'http://localhost:20000';
+  const rpc = 'http://localhost:8732';
   return {
     bob: signerToToolkit(bob, rpc),
     alice: signerToToolkit(alice, rpc)

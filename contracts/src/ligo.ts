@@ -1,6 +1,7 @@
 import * as child from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as process from 'process';
 import { $log } from '@tsed/logger';
 
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
@@ -73,11 +74,13 @@ async function compileContractImpl(
   main: string,
   dstFilePath: string
 ): Promise<void> {
-  const cmd = `ligo compile-contract ${srcFilePath} ${main} --output=${dstFilePath}`;
+  // const cmd = `ligo compile-contract ${srcFilePath} ${main} --output=${dstFilePath}`;
+  const cmd = `docker run --rm -v $PWD:$PWD -w $PWD ligolang/ligo:0.5.0 compile-contract ${srcFilePath} ${main} --output=${dstFilePath}`;
   await runCmd(cwd, cmd);
 }
 
-async function runCmd(cwd: string, cmd: string): Promise<void> {
+export async function runCmd(cwd: string, cmd: string): Promise<void> {
+  // const shell = "/bin/zsh";
   return new Promise<void>((resolve, reject) =>
     child.exec(cmd, { cwd }, (err, stdout, errout) =>
       err ? reject(err) : resolve()
