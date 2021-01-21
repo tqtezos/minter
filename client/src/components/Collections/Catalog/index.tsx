@@ -7,18 +7,51 @@ import { MinterButton } from '../../common';
 import Sidebar from './Sidebar';
 import TokenGrid from './TokenGrid';
 import { State, Action } from '../reducer';
+import {
+  getContractNfts,
+  getWalletNftAssetContracts
+} from '../../../lib/nfts/queries';
 
 interface CatalogProps {
   state: State;
   dispatch: Dispatch<Action>;
 }
 
+function collectionTitle(state: State) {
+  if (state.selectedCollection === null) {
+    return '';
+  }
+  return state.collections[state.selectedCollection].metadata.name;
+}
+
 export default function Catalog({ state, dispatch }: CatalogProps) {
   const [, setLocation] = useLocation();
   const { system } = useContext(SystemContext);
+
+  useEffect(() => {
+    const selectedCollection = state.selectedCollection;
+    if (selectedCollection === null) {
+      dispatch({
+        type: 'select_collection',
+        payload: { address: state.globalCollection }
+      });
+    } else {
+      getContractNfts(system, selectedCollection).then(tokens => {
+        dispatch({
+          type: 'populate_collection',
+          payload: { address: selectedCollection, tokens }
+        });
+      });
+    }
+  }, [state.selectedCollection]);
+
   useEffect(() => {
     if (system.status !== 'WalletConnected') {
-      setLocation('/');
+      setLocation('/', { replace: true });
+    } else {
+      getWalletNftAssetContracts(system).then(collections => {
+        dispatch({ type: 'update_collections', payload: { collections } });
+      });
     }
   }, [system.status]);
 
@@ -41,13 +74,7 @@ export default function Catalog({ state, dispatch }: CatalogProps) {
         justify="start"
       >
         <Flex w="100%" pb={6} justify="space-between" align="center">
-          <Heading size="lg">
-            {
-              state.collections.find(
-                ({ address }) => address === state.selectedCollection
-              )?.name
-            }
-          </Heading>
+          <Heading size="lg">{collectionTitle(state)}</Heading>
           <MinterButton variant="primaryActionInverted">
             <Box color="currentcolor">
               <RefreshCw size={16} strokeWidth="3" />

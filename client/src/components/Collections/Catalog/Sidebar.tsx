@@ -9,8 +9,8 @@ interface CollectionTabProps extends Collection {
 }
 
 function CollectionTab({
-  name,
   address,
+  metadata,
   selected,
   dispatch
 }: CollectionTabProps) {
@@ -43,10 +43,10 @@ function CollectionTab({
           bg: selected ? 'brand.blue' : 'gray.200'
         }}
       >
-        <Text>{name ? name[0] : '?'}</Text>
+        <Text>{metadata.name ? metadata.name[0] : '?'}</Text>
       </Flex>
       <Text pl={4} fontWeight={selected ? '600' : '600'}>
-        {name}
+        {metadata.name}
       </Text>
     </Flex>
   );
@@ -57,17 +57,7 @@ interface SidebarProps {
   dispatch: React.Dispatch<Action>;
 }
 
-const WALLET_ADDRESS = 'tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU';
-
 export default function Sidebar({ state, dispatch }: SidebarProps) {
-  const featuredCollections = state.collections.filter(coll => {
-    return coll.owner !== WALLET_ADDRESS;
-  });
-
-  const ownedCollections = state.collections.filter(coll => {
-    return coll.owner === WALLET_ADDRESS;
-  });
-
   return (
     <>
       <Heading px={4} pt={6} pb={4} size="md" color="brand.darkGray">
@@ -82,14 +72,12 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
       >
         Featured
       </Heading>
-      {featuredCollections.map(coll => (
-        <CollectionTab
-          key={coll.address}
-          selected={coll.address === state.selectedCollection}
-          dispatch={dispatch}
-          {...coll}
-        />
-      ))}
+      <CollectionTab
+        key={state.globalCollection}
+        selected={state.globalCollection === state.selectedCollection}
+        dispatch={dispatch}
+        {...state.collections[state.globalCollection]}
+      />
       <Heading
         fontFamily="mono"
         px={4}
@@ -100,14 +88,16 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
       >
         Your Collections
       </Heading>
-      {ownedCollections.map(coll => (
-        <CollectionTab
-          key={coll.address}
-          selected={coll.address === state.selectedCollection}
-          dispatch={dispatch}
-          {...coll}
-        />
-      ))}
+      {Object.keys(state.collections)
+        .filter(address => address !== state.globalCollection)
+        .map(address => (
+          <CollectionTab
+            key={address}
+            selected={address === state.selectedCollection}
+            dispatch={dispatch}
+            {...state.collections[address]}
+          />
+        ))}
       <Flex px={2} pt={2} justify="center">
         <CreateCollectionButton />
       </Flex>

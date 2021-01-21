@@ -60,13 +60,19 @@ const WALLET_ADDRESS = 'tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU';
 export default function TokenGrid({ state }: TokenGridProps) {
   const selectedCollection = state.selectedCollection;
 
-  if (!selectedCollection) {
+  if (selectedCollection === null) {
     return <></>;
   }
 
-  const tokens = state.tokens[selectedCollection].filter(
-    ({ owner }) => owner === WALLET_ADDRESS
-  );
+  const collection = state.collections[selectedCollection];
+
+  if (!collection) {
+    return <></>;
+  }
+
+  const selectedTokens = collection.tokens || [];
+
+  const tokens = selectedTokens.filter(({ owner }) => owner === WALLET_ADDRESS);
 
   if (tokens.length === 0) {
     return (

@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { Dispatch, useEffect, useContext } from 'react';
 import { useLocation } from 'wouter';
+import { SystemContext } from '../../../context/system';
 import { AspectRatio, Box, Flex, Heading, Image, Text } from '@chakra-ui/react';
 import { ChevronLeft, HelpCircle, MoreHorizontal, Star } from 'react-feather';
 import { MinterButton } from '../../common';
 import placeholderAsset from '../../common/assets/placeholder_asset.png';
-import { State } from '../reducer';
+import { State, Action } from '../reducer';
+import { getContractNfts } from '../../../lib/nfts/queries';
 
 function NotFound() {
   return (
@@ -38,27 +40,38 @@ interface TokenDetailProps {
   contractAddress: string;
   tokenId: number;
   state: State;
+  dispatch: Dispatch<Action>;
 }
 
 export default function TokenDetail(props: TokenDetailProps) {
   const [, setLocation] = useLocation();
+  const { system } = useContext(SystemContext);
+  const { dispatch, contractAddress, tokenId } = props;
 
-  const collection = props.state.collections.find(
-    coll => coll.address === props.contractAddress
-  );
-  if (!collection) {
-    return <NotFound />;
+  useEffect(() => {
+    getContractNfts(system, contractAddress).then(tokens => {
+      console.log(tokens);
+      dispatch({
+        type: 'populate_collection',
+        payload: { address: contractAddress, tokens }
+      });
+    });
+  }, [contractAddress, tokenId]);
+
+  const collection = props.state.collections[props.contractAddress];
+
+  if (!collection || collection.tokens === null) {
+    return null;
   }
 
-  const tokens = props.state.tokens[collection?.address];
-  const token = tokens?.find(token => token.id === props.tokenId);
+  const token = collection.tokens?.find(token => token.id === props.tokenId);
   if (!token) {
     return <NotFound />;
   }
 
   return (
     <Flex flex="1" width="100%" minHeight="0">
-      <Flex flexDir="column" w="50%" h="100%">
+      <Flex flexDir="column" w="50%" h="100%" overflowY="scroll">
         <Flex py={8} px={8}>
           <MinterButton
             variant="primaryActionInverted"
@@ -137,7 +150,7 @@ export default function TokenDetail(props: TokenDetailProps) {
             >
               <Flex flexDir="column">
                 <Text color="brand.blue">
-                  {collection.name || collection.address}
+                  {collection.metadata.name || collection.address}
                 </Text>
                 <Heading color="black" size="lg">
                   {token.title}
