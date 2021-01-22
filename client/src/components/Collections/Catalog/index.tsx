@@ -50,12 +50,7 @@ export default function Catalog({ state, dispatch }: CatalogProps) {
       setLocation('/', { replace: true });
     } else {
       getWalletNftAssetContracts(system).then(collections => {
-        dispatch({
-          type: 'update_collections',
-          payload: {
-            collections: collections.map(c => ({ ...c, tokens: null }))
-          }
-        });
+        dispatch({ type: 'update_collections', payload: { collections } });
       });
     }
   }, [system.status]);

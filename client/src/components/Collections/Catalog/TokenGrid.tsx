@@ -65,13 +65,13 @@ export default function TokenGrid({ state, walletAddress }: TokenGridProps) {
 
   const collection = state.collections[selectedCollection];
 
-  if (!collection) {
+  if (!collection || collection.tokens === null) {
     return <></>;
   }
 
-  const selectedTokens = collection.tokens || [];
-
-  const tokens = selectedTokens.filter(({ owner }) => owner === walletAddress);
+  const tokens = collection.tokens.filter(
+    ({ owner }) => owner === walletAddress
+  );
 
   if (tokens.length === 0) {
     return (

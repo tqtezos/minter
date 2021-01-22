@@ -56,10 +56,12 @@ export function reducer(state: State, action: Action) {
     case 'update_collections': {
       return produce(state, draftState => {
         for (let collection of action.payload.collections) {
-          draftState.collections[collection.address] = {
-            ...collection,
-            tokens: null
-          };
+          if (!state.collections[collection.address]) {
+            draftState.collections[collection.address] = {
+              ...collection,
+              tokens: null
+            };
+          }
         }
       });
     }
