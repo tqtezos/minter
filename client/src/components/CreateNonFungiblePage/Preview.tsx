@@ -13,7 +13,6 @@ export default function Preview({ state }: { state: State }) {
       borderWidth="1px"
       borderColor="brand.lightBlue"
       borderRadius="2px"
-      overflow="hidden"
       boxShadow="0px 0px 0px 4px rgba(211, 222, 245, 0.3)"
     >
       <Image src={placeholderAsset} width="100%" overflow="hidden" />

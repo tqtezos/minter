@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Flex, Heading, Text } from '@chakra-ui/react';
 import { CreateCollectionButton } from '../common/CreateCollection';
 import { State, DispatchFn } from './reducer';
+import { SystemContext } from '../../context/system';
+import { getWalletNftAssetContracts } from '../../lib/nfts/queries';
 
 // Placeholder data
 const collections: { name: string; address: string }[] = [
@@ -63,10 +65,35 @@ function CollectionRow(props: CollectionRowProps) {
   );
 }
 
+const globalCollectionAddress = 'KT1WsHRaUDRWKNwt2SfVcJwXq6XqEjrzup3L';
+
+const globalCollection = {
+  address: globalCollectionAddress,
+  metadata: {
+    name: 'Minter'
+  }
+};
+
 export default function CollectionSelect(props: {
   state: State;
   dispatch: DispatchFn;
 }) {
+  const { system } = useContext(SystemContext);
+  const [collections, setCollections] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (system.status !== 'WalletConnected') {
+      return;
+    }
+    getWalletNftAssetContracts(system).then(collections => {
+      setCollections([globalCollection, ...collections]);
+    });
+  }, [system.status]);
+
+  if (system.status !== 'WalletConnected') {
+    return null;
+  }
+
   return (
     <Flex flexDir="column" pt={8}>
       <Flex
@@ -80,18 +107,17 @@ export default function CollectionSelect(props: {
         <Heading size="lg">Collections</Heading>
         <CreateCollectionButton />
       </Flex>
-      {collections.map(({ name, address }) => {
+      {collections.map(({ address, metadata }) => {
         return (
           <CollectionRow
             key={address}
-            name={name}
+            name={metadata.name || address}
             address={address}
             dispatch={props.dispatch}
             state={props.state}
           />
         );
       })}
-      ;
     </Flex>
   );
 }

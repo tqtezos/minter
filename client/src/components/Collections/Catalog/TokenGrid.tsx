@@ -53,11 +53,10 @@ function TokenTile(props: TokenTileProps) {
 
 interface TokenGridProps {
   state: State;
+  walletAddress: string;
 }
 
-const WALLET_ADDRESS = 'tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU';
-
-export default function TokenGrid({ state }: TokenGridProps) {
+export default function TokenGrid({ state, walletAddress }: TokenGridProps) {
   const selectedCollection = state.selectedCollection;
 
   if (selectedCollection === null) {
@@ -72,7 +71,7 @@ export default function TokenGrid({ state }: TokenGridProps) {
 
   const selectedTokens = collection.tokens || [];
 
-  const tokens = selectedTokens.filter(({ owner }) => owner === WALLET_ADDRESS);
+  const tokens = selectedTokens.filter(({ owner }) => owner === walletAddress);
 
   if (tokens.length === 0) {
     return (

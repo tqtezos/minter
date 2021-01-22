@@ -50,10 +50,19 @@ export default function Catalog({ state, dispatch }: CatalogProps) {
       setLocation('/', { replace: true });
     } else {
       getWalletNftAssetContracts(system).then(collections => {
-        dispatch({ type: 'update_collections', payload: { collections } });
+        dispatch({
+          type: 'update_collections',
+          payload: {
+            collections: collections.map(c => ({ ...c, tokens: null }))
+          }
+        });
       });
     }
   }, [system.status]);
+
+  if (system.status !== 'WalletConnected') {
+    return null;
+  }
 
   return (
     <Flex flex="1" w="100%" minHeight="0">
@@ -82,7 +91,7 @@ export default function Catalog({ state, dispatch }: CatalogProps) {
             <Text ml={2}>Refresh</Text>
           </MinterButton>
         </Flex>
-        <TokenGrid state={state} />
+        <TokenGrid state={state} walletAddress={system.tzPublicKey} />
       </Flex>
     </Flex>
   );

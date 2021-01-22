@@ -1,4 +1,4 @@
-import React, { useContext, useReducer } from 'react';
+import React, { useContext, useEffect, useReducer } from 'react';
 import { useLocation } from 'wouter';
 import { Box, Flex, Text } from '@chakra-ui/react';
 import { SystemContext } from '../../context/system';
@@ -9,6 +9,7 @@ import FileUpload from './FileUpload';
 import CollectionSelect from './CollectionSelect';
 import Preview from './Preview';
 import { ChevronLeft, X } from 'react-feather';
+import { mintToken } from '../../lib/nfts/actions';
 
 function ProgressIndicator({ state }: { state: State }) {
   const stepIdx = steps.indexOf(state.step);
@@ -54,9 +55,11 @@ export default function CreateNonFungiblePage() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [, setLocation] = useLocation();
   const { system } = useContext(SystemContext);
-  if (system.wallet === null) {
-    setLocation('/');
-  }
+  useEffect(() => {
+    if (system.status !== 'WalletConnected') {
+      setLocation('/');
+    }
+  });
 
   return (
     <Flex flex="1" width="100%" minHeight="0">
@@ -106,7 +109,36 @@ export default function CreateNonFungiblePage() {
             </MinterButton>
             <MinterButton
               variant="primaryAction"
-              onClick={() => dispatch({ type: 'increment_step' })}
+              onClick={() => {
+                if (state.step === 'collection_select') {
+                  if (
+                    system.status === 'WalletConnected' &&
+                    state.collectionAddress !== null &&
+                    state.fields.name !== null
+                  ) {
+                    const metadata: Record<string, string> = {};
+
+                    metadata.name = state.fields.name;
+                    if (state.fields.description) {
+                      metadata.description = state.fields.description;
+                    }
+
+                    for (let row of state.metadataRows) {
+                      if (row.name !== null && row.value !== null) {
+                        metadata[row.name] = row.value;
+                      }
+                    }
+
+                    mintToken(system, state.collectionAddress, metadata).then(
+                      () => {
+                        setLocation('/assets');
+                      }
+                    );
+                  }
+                } else {
+                  dispatch({ type: 'increment_step' });
+                }
+              }}
               ml={4}
             >
               {state.step === 'collection_select' ? 'Create' : 'Next'}
@@ -147,6 +179,7 @@ export default function CreateNonFungiblePage() {
           h="100%"
           flexDir="column"
           align="center"
+          overflowY="scroll"
           px={28}
           pt={16}
         >

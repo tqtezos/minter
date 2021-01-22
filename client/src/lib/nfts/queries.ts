@@ -53,7 +53,7 @@ export async function getContractNfts(system: System, address: string) {
       owner,
       description: metadata.description,
       ipfs_hash: metadata.ipfs_hash,
-      metadata: {}
+      metadata: metadata
     };
   });
 }

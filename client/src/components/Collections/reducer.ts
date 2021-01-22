@@ -21,7 +21,7 @@ export interface State {
   collections: Record<string, Collection>;
 }
 
-const globalCollectionAddress = 'KT1WmAwMDCBgB98RuNSbkL6Lj1j6eJMdriZn';
+const globalCollectionAddress = 'KT1WsHRaUDRWKNwt2SfVcJwXq6XqEjrzup3L';
 
 export const initialState: State = {
   selectedCollection: null,
