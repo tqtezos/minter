@@ -1,7 +1,16 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Box, Flex, Heading, Text } from '@chakra-ui/react';
+import { Box, Flex, Heading, Text, Image } from '@chakra-ui/react';
+
 import { DispatchFn, State } from './reducer';
+
+type IpfsContent = {
+  cid: string;
+  size: number;
+  url: string;
+  publicGatewayUrl: string;
+};
 
 export default function FileUpload({
   state,
@@ -10,7 +19,28 @@ export default function FileUpload({
   state: State;
   dispatch: DispatchFn;
 }) {
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone();
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    const formData = new FormData();
+    formData.append('file', acceptedFiles[0]);
+
+    const response = await axios.post<IpfsContent>('/ipfs-upload', formData);
+
+    dispatch({
+      type: 'update_field',
+      payload: { name: 'ipfs_hash', value: response.data.cid }
+    });
+
+    console.log('Succesfully uploaded image to IPFS Server.');
+    console.log(response.data);
+  }, []);
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    maxFiles: 1,
+    maxSize: 30 * 1024 * 1024,
+    accept: 'image/*'
+  });
+
   return (
     <Flex align="center" flexDir="column" width="100%" flex="1" pt={28}>
       <Heading size="lg" paddingBottom={8} textAlign="center">
@@ -23,7 +53,7 @@ export default function FileUpload({
         textAlign="center"
         pb={4}
       >
-        JPG, PNG, GIF, WEBP, MP4 or MP3
+        JPG, PNG, GIF, WEBP, SVG. Max size 30mb
       </Text>
       <Box
         borderStyle="dashed"
@@ -42,10 +72,20 @@ export default function FileUpload({
           {...getRootProps()}
         >
           <Box as="input" {...getInputProps()} />
-          <Text fontSize={20}>Click or drag file this area to upload</Text>
-          <Text fontSize={18} color="brand.gray">
-            Support for single file
-          </Text>
+          {state.fields.ipfs_hash ? (
+            <Image
+              src={`http://localhost:8080/ipfs/${state.fields.ipfs_hash}`}
+            />
+          ) : (
+            <>
+              <Text fontSize={20}>
+                Click or drag file to this area to upload
+              </Text>
+              <Text fontSize={18} color="brand.gray">
+                Support for single file
+              </Text>
+            </>
+          )}
         </Flex>
       </Box>
     </Flex>
