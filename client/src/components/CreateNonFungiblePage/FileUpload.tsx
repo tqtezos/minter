@@ -61,32 +61,29 @@ export default function FileUpload({
         borderColor="brand.lightBlue"
         borderRadius="3px"
         width="100%"
+        {...getRootProps()}
       >
-        <Flex
-          borderColor="white"
-          borderWidth="1px"
-          flexDir="column"
-          align="center"
-          py={10}
-          bg="brand.brightGray"
-          {...getRootProps()}
-        >
-          <Box as="input" {...getInputProps()} />
-          {state.fields.ipfs_hash ? (
-            <Image
-              src={`http://localhost:8080/ipfs/${state.fields.ipfs_hash}`}
-            />
-          ) : (
-            <>
-              <Text fontSize={20}>
-                Click or drag file to this area to upload
-              </Text>
-              <Text fontSize={18} color="brand.gray">
-                Support for single file
-              </Text>
-            </>
-          )}
-        </Flex>
+        <Box as="input" {...getInputProps()} />
+        {state.fields.ipfs_hash ? (
+          <Image
+            width="100%"
+            src={`http://localhost:8080/ipfs/${state.fields.ipfs_hash}`}
+          />
+        ) : (
+          <Flex
+            borderColor="white"
+            borderWidth="1px"
+            flexDir="column"
+            align="center"
+            py={10}
+            bg="brand.brightGray"
+          >
+            <Text fontSize={20}>Click or drag file to this area to upload</Text>
+            <Text fontSize={18} color="brand.gray">
+              Support for single file
+            </Text>
+          </Flex>
+        )}
       </Box>
     </Flex>
   );
