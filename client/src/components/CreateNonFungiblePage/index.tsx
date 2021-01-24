@@ -157,7 +157,7 @@ export default function CreateNonFungiblePage() {
           <Box pb={10} w="100%" />
         </Box>
       </Flex>
-      {state.step === 'file_upload' ? (
+      {state.step === 'file_upload' && !state.fields.ipfs_hash ? (
         <Flex
           bg="brand.darkGray"
           borderLeftWidth="1px"
