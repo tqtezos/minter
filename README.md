@@ -1,28 +1,21 @@
-# OpenMinter
+![OpenMinter header](/docs/assets/minterhead.png)
 
-## Description
+[![](https://img.shields.io/badge/license-MIT-brightgreen)](license.md) [![](https://img.shields.io/badge/Docker-19.03.x-blue)](https://www.docker.com/) [![](https://img.shields.io/badge/version-v0.1-orange)]()
 
-OpenMinter is an in-development open-source tool to allow anyone
-to create, manage, and use assets on the Tezos blockchain
-via the FA2 standard. The tool enables the user to easily
-create any type of asset (fungible, semi-fungible,
-non-fungible), deploy their own associated contracts for
-those assets, manage them with an administration interface,
-and eventually use them via third-party services (exchanges,
-auctions, voting - DAOs, and games).
+## OpenMinter
 
-## Requirements
+OpenMinter is dApp framework for enabling the creation and collection
+of non-fungible tokens (NFTs) on Tezos. The dApp enables anyone to 
+create an NFT by filling in just a few fields, create new collection
+contracts, see their NFTs across contracts, and enable marketplace 
+capabilities to trade them. 
 
-| Name   | Version   | Download       |
-| ------ | --------- | -------------- |
-| Docker | `19.03.x` | [Link][docker] |
-
-[docker]: https://www.docker.com/
-
-> Note: on Ubuntu add your user to the `docker` group so that scripts using
-> docker can be executed without `sudo`:
->
-> `sudo usermod -a -G docker <username>`
+Current version supports the following:
+🌐 Mainnet and Delphinet
+🎨 Image-based NFTs
+👛 [Beacon](https://www.walletbeacon.io/) support 
+⚙️ The latest [FA2](https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md) spec 
+🚀 [IPFS](https://ipfs.io/) support for data availability
 
 ## Dependencies
 
