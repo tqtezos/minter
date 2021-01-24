@@ -11,11 +11,11 @@ contracts, see their NFTs across contracts, and enable marketplace
 capabilities to trade them. 
 
 Current version supports the following:
-🌐 Mainnet and Delphinet
-🎨 Image-based NFTs
-👛 [Beacon](https://www.walletbeacon.io/) support 
-⚙️ The latest [FA2](https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md) spec 
-🚀 [IPFS](https://ipfs.io/) support for data availability
+#### 🌐 Mainnet and Delphinet
+#### 🎨 Image-based NFTs
+#### 👛 [Beacon](https://www.walletbeacon.io/) support 
+#### ⚙️ The latest [FA2](https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md) spec 
+#### 🚀 [IPFS](https://ipfs.io/) support for data availability
 
 ## Dependencies
 
