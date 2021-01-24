@@ -22,6 +22,17 @@ const Button = {
         opacity: '0.8'
       }
     },
+    primaryActionInactive: {
+      bg: 'brand.blue',
+      borderColor: 'brand.blue',
+      borderRadius: '2px',
+      color: 'white',
+      opacity: '0.3',
+      transition: 'none',
+      _active: {
+        bg: 'brand.blue'
+      }
+    },
     primaryActionLined: {
       bg: 'transparent',
       borderColor: 'brand.blue',

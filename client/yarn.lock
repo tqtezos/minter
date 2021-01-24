@@ -2,7 +2,20 @@
 # yarn lockfile v1
 
 
-"@airgap/beacon-sdk@2.0.0", "@airgap/beacon-sdk@^2.0.0":
+"@airgap/beacon-sdk@2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@airgap/beacon-sdk/-/beacon-sdk-2.1.0.tgz#214e07eb9dee6ad942884e005d23cfecbd0d6b41"
+  integrity sha512-0aAQnzC9xs1ftiCkVRwcVOHKtfo5IxhdEAoob4j32jzVmKMA3OeQkMvC7DudPLYnvUZ54qfMPgrtDCGyO5Q6Pw==
+  dependencies:
+    "@types/chrome" "0.0.115"
+    "@types/libsodium-wrappers" "0.7.7"
+    axios "0.21.1"
+    bignumber.js "9.0.0"
+    bs58check "2.1.2"
+    libsodium-wrappers "0.7.8"
+    qrcode-generator "1.4.4"
+
+"@airgap/beacon-sdk@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@airgap/beacon-sdk/-/beacon-sdk-2.0.0.tgz#b968fffeb1766a4fb6813988d815d122e7cfafd7"
   integrity sha512-RvcuG7WDssKF3Qqks+pNpFDBGHv8Bk2376qMEr2jIQw4nWHtYkt+qYxRjBNj4PkwY9SzBc7JjIRykSX33cUfIA==
@@ -1872,6 +1885,11 @@
   resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-8.5.1.tgz#fde96064ca446dec8c55a8c2f130957b070c6e06"
   integrity sha512-yN7kbciD87WzLGc5539Tn0sApjyiGHAJgKvG9W8C7O+6c7qmoQMfVs0W4bX17eqz6C78QJqqFrtgdK5EWf6Qow==
 
+"@hapi/hoek@^9.0.0":
+  version "9.1.1"
+  resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-9.1.1.tgz#9daf5745156fd84b8e9889a2dc721f0c58e894aa"
+  integrity sha512-CAEbWH7OIur6jEOzaai83jq3FmKmv4PmX1JYfs9IrYcGEVI/lyL1EXJGCj7eFVJ0bg5QR8LMxBlEtA+xKiLpFw==
+
 "@hapi/joi@^15.0.0":
   version "15.1.1"
   resolved "https://registry.yarnpkg.com/@hapi/joi/-/joi-15.1.1.tgz#c675b8a71296f02833f8d6d243b34c57b8ce19d7"
@@ -1888,6 +1906,13 @@
   integrity sha512-tAag0jEcjwH+P2quUfipd7liWCNX2F8NvYjQp2wtInsZxnMlypdw0FtAOLxtvvkO+GSRRbmNi8m/5y42PQJYCQ==
   dependencies:
     "@hapi/hoek" "^8.3.0"
+
+"@hapi/topo@^5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@hapi/topo/-/topo-5.0.0.tgz#c19af8577fa393a06e9c77b60995af959be721e7"
+  integrity sha512-tFJlT47db0kMqVm3H4nQYgn6Pwg10GTZHb1pwmSiv1K4ks6drQOtfEF5ZnPjkvC+y4/bUPHK+bc87QvLcL+WMw==
+  dependencies:
+    "@hapi/hoek" "^9.0.0"
 
 "@jest/console@^24.7.1", "@jest/console@^24.9.0":
   version "24.9.0"
@@ -2136,6 +2161,23 @@
   resolved "https://registry.yarnpkg.com/@sheerun/mutationobserver-shim/-/mutationobserver-shim-0.3.3.tgz#5405ee8e444ed212db44e79351f0c70a582aae25"
   integrity sha512-DetpxZw1fzPD5xUBrIAoplLChO2VB8DlL5Gg+I1IR9b2wPqYIca2WSUxL5g1vLeR4MsQq1NeWriXAVffV+U1Fw==
 
+"@sideway/address@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@sideway/address/-/address-4.1.0.tgz#0b301ada10ac4e0e3fa525c90615e0b61a72b78d"
+  integrity sha512-wAH/JYRXeIFQRsxerIuLjgUu2Xszam+O5xKeatJ4oudShOOirfmsQ1D6LL54XOU2tizpCYku+s1wmU0SYdpoSA==
+  dependencies:
+    "@hapi/hoek" "^9.0.0"
+
+"@sideway/formula@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@sideway/formula/-/formula-3.0.0.tgz#fe158aee32e6bd5de85044be615bc08478a0a13c"
+  integrity sha512-vHe7wZ4NOXVfkoRb8T5otiENVlT7a3IAiw7H5M2+GO+9CDgcVUUsX1zalAztCmwyOr2RUTGJdgB+ZvSVqmdHmg==
+
+"@sideway/pinpoint@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@sideway/pinpoint/-/pinpoint-2.0.0.tgz#cff8ffadc372ad29fd3f78277aeb29e632cc70df"
+  integrity sha512-RNiOoTPkptFtSVzQevY/yWtZwf/RxyVnPy/OcA9HBM3MlGDnBEYL5B41H0MTn0Uec8Hi+2qUtTfG2WWZBmMejQ==
+
 "@svgr/babel-plugin-add-jsx-attribute@^4.2.0":
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/@svgr/babel-plugin-add-jsx-attribute/-/babel-plugin-add-jsx-attribute-4.2.0.tgz#dadcb6218503532d6884b210e7f3c502caaa44b1"
@@ -2239,53 +2281,53 @@
     "@svgr/plugin-svgo" "^4.3.1"
     loader-utils "^1.2.3"
 
-"@taquito/beacon-wallet@7.1.0-beta.0":
-  version "7.1.0-beta.0"
-  resolved "https://registry.yarnpkg.com/@taquito/beacon-wallet/-/beacon-wallet-7.1.0-beta.0.tgz#39accf627de178d151f7f2db64eb02f8333b682a"
-  integrity sha512-Go4AnXcM0armPCvzP1ni10WWDLI8fuEL8EV1WpXKawrNyjecYRIdqD0mBcHmKJTi74EtzqLI/zAcRLb4r3J++g==
+"@taquito/beacon-wallet@7.2.0-beta.2":
+  version "7.2.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@taquito/beacon-wallet/-/beacon-wallet-7.2.0-beta.2.tgz#3eb3d443aae3fd807cf7aa4fa5ba1b43ae69554c"
+  integrity sha512-aMutuIL2mWQYr/LGdfJbrR4c6oUAKRwFh54fIItW1jMxSk83emJA5wP3jglY8cFVw4gjTo1OH4VYUpQytIayag==
   dependencies:
     "@airgap/beacon-sdk" "^2.0.0"
-    "@taquito/taquito" "^7.1.0-beta.0"
-    "@taquito/utils" "^7.1.0-beta.0"
+    "@taquito/taquito" "^7.2.0-beta.2"
+    "@taquito/utils" "^7.2.0-beta.2"
 
-"@taquito/http-utils@^7.1.0-beta.0":
-  version "7.1.0-beta.0"
-  resolved "https://registry.yarnpkg.com/@taquito/http-utils/-/http-utils-7.1.0-beta.0.tgz#2c8586b41f80abc7a255342da0b43f2528e2b030"
-  integrity sha512-froP2kp0R0cxnBFEswbPry18PUDVW6NbbGsSeI00SKEQJp4k6tTAu3ccrqb2bYzcQcLVzB0Vicq2SaYjWa0ULA==
+"@taquito/http-utils@^7.2.0-beta.2":
+  version "7.2.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@taquito/http-utils/-/http-utils-7.2.0-beta.2.tgz#19ac99df11083383102032e54f38835d1103f80f"
+  integrity sha512-COElCghypZt3QQhcsaMnC6oeTA0tJ5IvBnWT5kxZ6f1d6fWS8NZqcW2PPFbFFEsz1j9UaeAq9SAIvaUjsiTXNg==
   dependencies:
     xhr2-cookies "^1.1.0"
 
-"@taquito/michel-codec@^7.1.0-beta.0":
-  version "7.1.0-beta.0"
-  resolved "https://registry.yarnpkg.com/@taquito/michel-codec/-/michel-codec-7.1.0-beta.0.tgz#b97e9b504703958beacc884195f24c5435f9d6aa"
-  integrity sha512-0CeZbUS2TFgm9Pu+inTkyRLf8qUrTD0DxnuZbvJ2Iy6ibMx2REMzWpj6W+MRt6NX4C8EPplpWSYaLfdUF5Ai2w==
+"@taquito/michel-codec@^7.2.0-beta.2":
+  version "7.2.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@taquito/michel-codec/-/michel-codec-7.2.0-beta.2.tgz#d1031c60d09abceb7acc8a1dfcc60124fdb6714e"
+  integrity sha512-3kENFAAJ97StRWxjiTmCIByJh/+OAwNEso7utoU103J3Qe4ZN3TkmVLqWtMYxNYSuwA4VG+b8fPJx1yL351AEQ==
 
-"@taquito/michelson-encoder@^7.1.0-beta.0":
-  version "7.1.0-beta.0"
-  resolved "https://registry.yarnpkg.com/@taquito/michelson-encoder/-/michelson-encoder-7.1.0-beta.0.tgz#b37cb19a2f9c8e4524e7095cbb72b3d8904e176d"
-  integrity sha512-prIbx09cgCnVSKm2sWRMl/9ji7lKYf/E9EuYwF2UJba6ob1OnVD37LB3j4LxRWxidybf/GBVJ6ILVwdVOvN3rw==
+"@taquito/michelson-encoder@^7.2.0-beta.2":
+  version "7.2.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@taquito/michelson-encoder/-/michelson-encoder-7.2.0-beta.2.tgz#2bb3debaf6b62f51225afbe2123453d5f1d5dc50"
+  integrity sha512-bFd6+vgWtOw/6ctNpq1Bk7Io+RAt6HinTQocEcgkyd+v5UUPu7D1zTbcwwiPf2Z8Z+9oFSLMbqqgVvPCZP/t3g==
   dependencies:
-    "@taquito/rpc" "^7.1.0-beta.0"
-    "@taquito/utils" "^7.1.0-beta.0"
+    "@taquito/rpc" "^7.2.0-beta.2"
+    "@taquito/utils" "^7.2.0-beta.2"
     bignumber.js "^9.0.1"
     fast-json-stable-stringify "^2.1.0"
 
-"@taquito/rpc@7.1.0-beta.0", "@taquito/rpc@^7.1.0-beta.0":
-  version "7.1.0-beta.0"
-  resolved "https://registry.yarnpkg.com/@taquito/rpc/-/rpc-7.1.0-beta.0.tgz#b34204cac7a6f83ea48aecdfb27f2d0ad59179ba"
-  integrity sha512-5En7+KDjcVgD1+weSKlTpdjIE3GtODP+Rm0Zz440FvbvFFbzWmS2rqbNL247xf0CI2us9RBCrXcMQFfse5rXhQ==
+"@taquito/rpc@7.2.0-beta.2", "@taquito/rpc@^7.2.0-beta.2":
+  version "7.2.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@taquito/rpc/-/rpc-7.2.0-beta.2.tgz#637f8ca78335da4cbffce326e68ea234b1398f48"
+  integrity sha512-891LKsy3m+J77T5GpswTl3Nh+XAU7FiQ1Vh1/qXaU08sgBd1Bb/uE6DHXZoTcw4FaR4rTpjCWy96XgqySsPWzQ==
   dependencies:
-    "@taquito/http-utils" "^7.1.0-beta.0"
+    "@taquito/http-utils" "^7.2.0-beta.2"
     bignumber.js "^9.0.1"
     lodash "^4.17.20"
 
-"@taquito/signer@7.1.0-beta.0":
-  version "7.1.0-beta.0"
-  resolved "https://registry.yarnpkg.com/@taquito/signer/-/signer-7.1.0-beta.0.tgz#6a671eef2bfa8e3f46c2db05ec12be72d4636e58"
-  integrity sha512-xr5fPQDp/LAlcSWP38REvEFP1kPVfSwW18s0sQXDd7EJsy0r1eXnc1lNVr5e+Qa4gbaFR+rZxmbGzvO6J6uBtA==
+"@taquito/signer@7.2.0-beta.2":
+  version "7.2.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@taquito/signer/-/signer-7.2.0-beta.2.tgz#3940363d16b9a4fad8fd3c1f30c456813eb4811b"
+  integrity sha512-abrBtY0TERzYX1ed6ow/z2Vo7uCjWbB0epvxrYaWSo4jXOl4rPzm+JN4Vvi6I4/Tt7BVBT3dJVR4z+7psJ5cpw==
   dependencies:
-    "@taquito/taquito" "^7.1.0-beta.0"
-    "@taquito/utils" "^7.1.0-beta.0"
+    "@taquito/taquito" "^7.2.0-beta.2"
+    "@taquito/utils" "^7.2.0-beta.2"
     bignumber.js "^9.0.1"
     bip39 "^3.0.2"
     elliptic "^6.5.3"
@@ -2293,24 +2335,24 @@
     pbkdf2 "^3.1.1"
     typedarray-to-buffer "^3.1.5"
 
-"@taquito/taquito@7.1.0-beta.0", "@taquito/taquito@^7.1.0-beta.0":
-  version "7.1.0-beta.0"
-  resolved "https://registry.yarnpkg.com/@taquito/taquito/-/taquito-7.1.0-beta.0.tgz#3d5268029a84dda58da705f095e6d8d3a43383ca"
-  integrity sha512-i2XExHGzTwaiLR1wsAbM3euptRZJqK/mq3ha+BxlYISbxmoVeU7jEUpCO7Qju+7nsb2cnwkP91b7xqR2izozpg==
+"@taquito/taquito@7.2.0-beta.2", "@taquito/taquito@^7.2.0-beta.2":
+  version "7.2.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@taquito/taquito/-/taquito-7.2.0-beta.2.tgz#de7064194052ac16658f15c7bdf9cf0da3d13398"
+  integrity sha512-vRQJ7HRj2UY0yVzfalJn4/j1Suaf60PM5f6NEvjExOiED7g8X/Cqi8lSkHGgKnzM59M6Jbi30Q9yNmunwQayBg==
   dependencies:
-    "@taquito/http-utils" "^7.1.0-beta.0"
-    "@taquito/michel-codec" "^7.1.0-beta.0"
-    "@taquito/michelson-encoder" "^7.1.0-beta.0"
-    "@taquito/rpc" "^7.1.0-beta.0"
-    "@taquito/utils" "^7.1.0-beta.0"
+    "@taquito/http-utils" "^7.2.0-beta.2"
+    "@taquito/michel-codec" "^7.2.0-beta.2"
+    "@taquito/michelson-encoder" "^7.2.0-beta.2"
+    "@taquito/rpc" "^7.2.0-beta.2"
+    "@taquito/utils" "^7.2.0-beta.2"
     bignumber.js "^9.0.1"
     rx-sandbox "^1.0.3"
     rxjs "^6.6.3"
 
-"@taquito/utils@^7.1.0-beta.0":
-  version "7.1.0-beta.0"
-  resolved "https://registry.yarnpkg.com/@taquito/utils/-/utils-7.1.0-beta.0.tgz#998e25f87861a31c64fde87f12d14e49d4dc6d91"
-  integrity sha512-66Wk/UXfjjGiUrsxDPKG/clABgKNOn6DDz9H9rBsJFvi9FvAiPTgiZEmAgKO5zcGlSpcnsJc0YW02/CPox228g==
+"@taquito/utils@^7.2.0-beta.2":
+  version "7.2.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@taquito/utils/-/utils-7.2.0-beta.2.tgz#a89b949c700575f00e15ff4091d6cade65901ec1"
+  integrity sha512-/xAznoXXnOX2RcZFvWbBB+f2sYox+t+PKPwKdWZd1w3kzK02Fui1TaRHTn9CNOdb36TyVKCRbUsdYkBMfd9NQg==
   dependencies:
     blakejs "^1.1.0"
     bs58check "^2.1.2"
@@ -2371,6 +2413,13 @@
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-7.1.2.tgz#3a71bb8a45a1e08b71a54c9efcee9927f3895e80"
   integrity sha512-lDyCVxxgX5lrgCa75ELCfWcdEDyfisjqoDIM3YsghQ+lyViIac/qT67qabQ/HmoVxyikFKovjKwWdn3b/oKhZA==
+
+"@thanos-wallet/dapp@0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@thanos-wallet/dapp/-/dapp-0.7.0.tgz#bbe49b879431e6c79e8271364c1943532c7bb9e4"
+  integrity sha512-eXa8NwHYmlXo1ZWbLfW0tVRAjame92NKJo1I+EsS0ZQyoz9dJTIQSsqwA1cfzIoXV/wFSXmfhTnHniraCtc2fQ==
+  dependencies:
+    nanoid "^3.1.10"
 
 "@types/aria-query@^4.2.0":
   version "4.2.0"
@@ -3301,6 +3350,13 @@ axios@0.19.2:
   integrity sha512-fjgm5MvRHLhx+osE2xoekY70AhARk3a6hkN+3Io1jc00jtquGvxYlKlsFUhmUET0V5te6CcZI7lcv2Ym61mjHA==
   dependencies:
     follow-redirects "1.5.10"
+
+axios@0.21.1:
+  version "0.21.1"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.1.tgz#22563481962f4d6bde9a76d516ef0e5d3c09b2b8"
+  integrity sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==
+  dependencies:
+    follow-redirects "^1.10.0"
 
 axobject-query@^2.0.2:
   version "2.2.0"
@@ -6043,7 +6099,7 @@ follow-redirects@1.5.10:
   dependencies:
     debug "=3.1.0"
 
-follow-redirects@^1.0.0:
+follow-redirects@^1.0.0, follow-redirects@^1.10.0:
   version "1.13.1"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.13.1.tgz#5f69b813376cee4fd0474a3aba835df04ab763b7"
   integrity sha512-SSG5xmZh1mkPGyKzjZP8zLjltIfpW32Y5QpdNJyjcfGxK3qo3NDDkZOZSFiGn1A6SclQxY9GzEwAHQ3dmYRWpg==
@@ -7964,6 +8020,17 @@ jest@24.9.0:
     import-local "^2.0.0"
     jest-cli "^24.9.0"
 
+joi@17.3.0:
+  version "17.3.0"
+  resolved "https://registry.yarnpkg.com/joi/-/joi-17.3.0.tgz#f1be4a6ce29bc1716665819ac361dfa139fff5d2"
+  integrity sha512-Qh5gdU6niuYbUIUV5ejbsMiiFmBdw8Kcp8Buj2JntszCkCfxJ9Cz76OtHxOZMPXrt5810iDIXs+n1nNVoquHgg==
+  dependencies:
+    "@hapi/hoek" "^9.0.0"
+    "@hapi/topo" "^5.0.0"
+    "@sideway/address" "^4.1.0"
+    "@sideway/formula" "^3.0.0"
+    "@sideway/pinpoint" "^2.0.0"
+
 js-sha3@^0.8.0:
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/js-sha3/-/js-sha3-0.8.0.tgz#b9b7a5da73afad7dedd0f8c463954cbde6818840"
@@ -8876,7 +8943,7 @@ nan@^2.12.1:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.2.tgz#f5376400695168f4cc694ac9393d0c9585eeea19"
   integrity sha512-M2ufzIiINKCuDfBSAUr1vWQ+vuVcA9kqx8JJUsbQi6yf1uGRyb7HfpdfUr5qLXf3B/t8dPvcjhKMmlfnP47EzQ==
 
-nanoid@^3.0.2, nanoid@^3.1.3:
+nanoid@^3.0.2, nanoid@^3.1.10, nanoid@^3.1.3:
   version "3.1.20"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.20.tgz#badc263c6b1dcf14b71efaa85f6ab4c1d6cfc788"
   integrity sha512-a1cQNyczgKbLX9jwbS/+d7W8fX/RfgYR7lVWwWOGIPNgK2m0MWvrGF6/m4kk6U3QcFMnZf3RIhL0v2Jgh/0Uxw==

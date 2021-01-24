@@ -1,15 +1,26 @@
 import React, { useContext, useEffect, useReducer } from 'react';
 import { useLocation } from 'wouter';
 import { Box, Flex, Text } from '@chakra-ui/react';
+import Joi from 'joi';
 import { SystemContext } from '../../context/system';
 import { MinterButton } from '../common';
-import { reducer, steps, initialState, DispatchFn, State } from './reducer';
+import {
+  reducer,
+  steps,
+  initialState,
+  DispatchFn,
+  State,
+  fileUploadSchema,
+  assetDetailsSchema,
+  collectionSelectSchema
+} from './reducer';
 import Form from './Form';
 import FileUpload from './FileUpload';
 import CollectionSelect from './CollectionSelect';
 import Preview from './Preview';
 import { ChevronLeft, X } from 'react-feather';
 import { mintToken } from '../../lib/nfts/actions';
+import { SystemWithWallet } from '../../lib/system';
 
 function ProgressIndicator({ state }: { state: State }) {
   const stepIdx = steps.indexOf(state.step);
@@ -51,6 +62,53 @@ function LeftContent(props: { state: State; dispatch: DispatchFn }) {
   return null;
 }
 
+function isValid(schema: Joi.ObjectSchema, state: State) {
+  if (schema.validate(state, { allowUnknown: true }).error) {
+    return false;
+  }
+  return true;
+}
+
+function stepIsValid(state: State) {
+  if (state.step === 'file_upload' && isValid(fileUploadSchema, state)) {
+    return true;
+  }
+  if (state.step === 'asset_details' && isValid(assetDetailsSchema, state)) {
+    return true;
+  }
+  if (
+    state.step === 'collection_select' &&
+    isValid(collectionSelectSchema, state)
+  ) {
+    return true;
+  }
+}
+
+async function handleCreate(
+  system: SystemWithWallet,
+  state: State,
+  cb: () => void
+) {
+  const metadata: Record<string, string> = {};
+  const name = state.fields.name as string;
+  const address = state.collectionAddress as string;
+
+  metadata.name = name;
+  if (state.fields.description) {
+    metadata.description = state.fields.description;
+  }
+
+  for (let row of state.metadataRows) {
+    if (row.name !== null && row.value !== null) {
+      metadata[row.name] = row.value;
+    }
+  }
+
+  const op = await mintToken(system, address, metadata);
+  await op.confirmation();
+  cb();
+}
+
 export default function CreateNonFungiblePage() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [, setLocation] = useLocation();
@@ -60,6 +118,8 @@ export default function CreateNonFungiblePage() {
       setLocation('/');
     }
   });
+
+  const valid = stepIsValid(state);
 
   return (
     <Flex flex="1" width="100%" minHeight="0">
@@ -108,35 +168,25 @@ export default function CreateNonFungiblePage() {
               <Text ml={2}>Back</Text>
             </MinterButton>
             <MinterButton
-              variant="primaryAction"
+              variant={valid ? 'primaryAction' : 'primaryActionInactive'}
               onClick={() => {
-                if (state.step === 'collection_select') {
-                  if (
-                    system.status === 'WalletConnected' &&
-                    state.collectionAddress !== null &&
-                    state.fields.name !== null
-                  ) {
-                    const metadata: Record<string, string> = {};
-
-                    metadata.name = state.fields.name;
-                    if (state.fields.description) {
-                      metadata.description = state.fields.description;
-                    }
-
-                    for (let row of state.metadataRows) {
-                      if (row.name !== null && row.value !== null) {
-                        metadata[row.name] = row.value;
-                      }
-                    }
-
-                    mintToken(system, state.collectionAddress, metadata).then(
-                      () => {
-                        setLocation('/assets');
-                      }
-                    );
+                if (!valid) {
+                  return;
+                }
+                switch (state.step) {
+                  case 'file_upload': {
+                    return dispatch({ type: 'increment_step' });
                   }
-                } else {
-                  dispatch({ type: 'increment_step' });
+                  case 'asset_details': {
+                    return dispatch({ type: 'increment_step' });
+                  }
+                  case 'collection_select': {
+                    if (system.status === 'WalletConnected') {
+                      return handleCreate(system, state, () =>
+                        setLocation('/assets')
+                      );
+                    }
+                  }
                 }
               }}
               ml={4}
