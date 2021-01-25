@@ -1,7 +1,6 @@
 import React from 'react';
 import { Divider, Heading, Flex, Image, Text } from '@chakra-ui/react';
 import { State } from './reducer';
-import placeholderAsset from '../common/assets/placeholder_asset.png';
 
 export default function Preview({ state }: { state: State }) {
   const { name, description } = state.fields;
@@ -15,7 +14,11 @@ export default function Preview({ state }: { state: State }) {
       borderRadius="2px"
       boxShadow="0px 0px 0px 4px rgba(211, 222, 245, 0.3)"
     >
-      <Image src={placeholderAsset} width="100%" overflow="hidden" />
+      <Image
+        src={`http://localhost:8080/ipfs/${state.ipfs_hash}`}
+        width="100%"
+        overflow="hidden"
+      />
       <Heading size="md" color={name ? 'black' : 'gray.200'} px={8} py={6}>
         {name ? name : 'Asset name...'}
       </Heading>
@@ -33,7 +36,7 @@ export default function Preview({ state }: { state: State }) {
         <Text pb={2} fontSize="xs" color="brand.gray">
           IPFS HASH
         </Text>
-        <Text>98u31j2kide...</Text>
+        <Text>{state.ipfs_hash}</Text>
       </Flex>
     </Flex>
   );

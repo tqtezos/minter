@@ -63,6 +63,7 @@ export type Action =
   | { type: 'increment_step' }
   | { type: 'decrement_step' }
   | { type: 'update_field'; payload: { name: keyof Fields; value: string } }
+  | { type: 'update_ipfs_hash'; payload: { value: string } }
   | { type: 'add_metadata_row' }
   | {
       type: 'update_metadata_row_name';
@@ -112,6 +113,12 @@ export function reducer(state: State, action: Action) {
       const { name, value } = action.payload;
       return produce(state, draftState => {
         draftState.fields[name] = value;
+      });
+    }
+    case 'update_ipfs_hash': {
+      const { value } = action.payload;
+      return produce(state, draftState => {
+        draftState.ipfs_hash = value;
       });
     }
     case 'add_metadata_row': {
