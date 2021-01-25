@@ -79,7 +79,20 @@ export default function Catalog({ state, dispatch }: CatalogProps) {
       >
         <Flex w="100%" pb={6} justify="space-between" align="center">
           <Heading size="lg">{collectionTitle(state)}</Heading>
-          <MinterButton variant="primaryActionInverted">
+          <MinterButton
+            variant="primaryActionInverted"
+            onClick={() => {
+              const selectedCollection = state.selectedCollection;
+              if (selectedCollection !== null) {
+                getContractNfts(system, selectedCollection).then(tokens => {
+                  dispatch({
+                    type: 'populate_collection',
+                    payload: { address: selectedCollection, tokens }
+                  });
+                });
+              }
+            }}
+          >
             <Box color="currentcolor">
               <RefreshCw size={16} strokeWidth="3" />
             </Box>
