@@ -90,47 +90,6 @@ function WalletDisplay() {
           >
             Disconnect
           </MenuItem>
-          <MenuItem
-            onClick={async () => {
-              const originOp = await createAssetContract(system, 'hello1');
-              const contract = await originOp.contract();
-              console.log(contract.address);
-            }}
-          >
-            Test Contract Create
-          </MenuItem>
-          <MenuItem
-            onClick={async () => {
-              const contracts = await getWalletNftAssetContracts(system);
-              console.log(contracts);
-            }}
-          >
-            Test Get Wallet NFT Asset Contracts
-          </MenuItem>
-          <MenuItem
-            onClick={async () => {
-              const originOp = await mintToken(
-                system,
-                'KT1X8YZ3Xet9EtyEj77KZmS8WrHaNN16FET2',
-                { hello: 'world2' }
-              );
-              await originOp.confirmation();
-              console.log(originOp);
-            }}
-          >
-            Test Mint Token
-          </MenuItem>
-          <MenuItem
-            onClick={async () => {
-              const nfts = await getContractNfts(
-                system,
-                'KT1X8YZ3Xet9EtyEj77KZmS8WrHaNN16FET2'
-              );
-              console.log(nfts);
-            }}
-          >
-            Test Get NFTs
-          </MenuItem>
         </MenuList>
       </Menu>
     </>

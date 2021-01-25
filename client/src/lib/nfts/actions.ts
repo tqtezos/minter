@@ -87,3 +87,21 @@ export async function mintToken(
     ])
     .send();
 }
+
+export async function transferToken(
+  system: SystemWithWallet,
+  contractAddress: string,
+  tokenId: number,
+  toAddress: string
+) {
+  const contract = await system.toolkit.wallet.at(contractAddress);
+  console.log(toAddress);
+  return contract.methods
+    .transfer([
+      {
+        from_: system.tzPublicKey,
+        txs: [{ to_: toAddress, token_id: tokenId, amount: 1 }]
+      }
+    ])
+    .send();
+}

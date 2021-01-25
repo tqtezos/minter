@@ -7,6 +7,7 @@ import { MinterButton } from '../../common';
 import placeholderAsset from '../../common/assets/placeholder_asset.png';
 import { State, Action } from '../reducer';
 import { getContractNfts } from '../../../lib/nfts/queries';
+import { TransferTokenButton } from '../../common/TransferToken';
 
 function NotFound() {
   return (
@@ -50,7 +51,6 @@ export default function TokenDetail(props: TokenDetailProps) {
 
   useEffect(() => {
     getContractNfts(system, contractAddress).then(tokens => {
-      console.log(tokens);
       dispatch({
         type: 'populate_collection',
         payload: { address: contractAddress, tokens }
@@ -121,6 +121,7 @@ export default function TokenDetail(props: TokenDetailProps) {
             borderColor="brand.lightBlue"
             borderRadius="3px"
             py={6}
+            mb={10}
           >
             <Flex>
               <Flex
@@ -182,6 +183,22 @@ export default function TokenDetail(props: TokenDetailProps) {
               <Text>98u31j2kide...</Text>
             </Flex>
           </Flex>
+          {system.status === 'WalletConnected' ? (
+            <Flex
+              w="100%"
+              bg="white"
+              border="1px solid"
+              borderColor="brand.lightBlue"
+              borderRadius="3px"
+              py={6}
+              px={8}
+            >
+              <TransferTokenButton
+                contractAddress={contractAddress}
+                tokenId={tokenId}
+              />
+            </Flex>
+          ) : null}
         </Flex>
       </Flex>
     </Flex>
