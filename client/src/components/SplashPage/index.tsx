@@ -61,9 +61,9 @@ export default function SplashPage() {
           {/*   Create */}
           {/* </MinterLink> */}
         </Flex>
-        <Text fontFamily="mono" fontSize="xs" color="brand.lightGray">
-          Learn more about <Link textDecor="underline">TZIP-12</Link>
-        </Text>
+        {/* <Text fontFamily="mono" fontSize="xs" color="brand.lightGray"> */}
+        {/*   Learn more about <Link textDecor="underline">TZIP-12</Link> */}
+        {/* </Text> */}
       </Flex>
       <Flex
         width="100%"
@@ -74,15 +74,14 @@ export default function SplashPage() {
         paddingY={4}
         justifyContent="space-between"
       >
-        <Text fontSize="xs">
-          &copy; OpenMinter, Inc. All rights reserved. Currently v1.0.0-beta1.
-        </Text>
+        <Text fontSize="xs">OpenMinter Version v0.1</Text>
         <Flex>
-          <Link fontSize="xs" textDecor="underline">
-            Terms
-          </Link>
-          <Link fontSize="xs" textDecor="underline" ml={4}>
-            Privacy Policy
+          <Link
+            fontSize="xs"
+            textDecor="underline"
+            href="https://github.com/tqtezos/minter"
+          >
+            GitHub
           </Link>
         </Flex>
       </Flex>
