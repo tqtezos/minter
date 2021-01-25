@@ -1,5 +1,6 @@
 import { Dispatch } from 'react';
 import produce from 'immer';
+import Joi from 'joi';
 
 type Step = 'file_upload' | 'asset_details' | 'collection_select';
 
@@ -12,15 +13,51 @@ export const steps: Step[] = [
 interface Fields {
   name: string | null;
   description: string | null;
-  ipfs_hash: string | null;
 }
 
 export interface State {
   step: Step;
+  ipfs_hash: string | null;
   fields: Fields;
   metadataRows: { name: string | null; value: string | null }[];
   collectionAddress: string | null;
 }
+
+export const fileUploadSchema = Joi.object({
+  // TODO: Add more robust CID validation
+  // ipfs_hash: Joi.string().min(1).required()
+});
+
+export const assetDetailsSchema = fileUploadSchema.append({
+  fields: Joi.object({
+    name: Joi.string().min(1).required(),
+    description: Joi.string().allow(null).allow('')
+  }),
+  metadataRows: Joi.array().items(
+    Joi.object({
+      name: Joi.string().min(1).required(),
+      value: Joi.string().min(1).required()
+    })
+  )
+});
+
+export const collectionSelectSchema = assetDetailsSchema.append({
+  collectionAddress: Joi.string().required()
+});
+
+export const submitSchema = Joi.object({
+  fields: Joi.object({
+    name: Joi.string().min(1).required(),
+    description: Joi.string().min(0).allow(null)
+  }),
+  metadataRows: Joi.array().items(
+    Joi.object({
+      name: Joi.string().min(1).required(),
+      value: Joi.string().min(1).required()
+    })
+  ),
+  collectionAddress: Joi.string().required()
+});
 
 export type Action =
   | { type: 'increment_step' }
@@ -42,10 +79,10 @@ export type DispatchFn = Dispatch<Action>;
 
 export const initialState: State = {
   step: 'file_upload',
+  ipfs_hash: null,
   fields: {
     name: null,
-    description: null,
-    ipfs_hash: null
+    description: null
   },
   metadataRows: [],
   collectionAddress: null

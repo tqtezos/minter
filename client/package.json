@@ -26,6 +26,7 @@
     "framer-motion": "3.1.4",
     "immer": "8.0.0",
     "ipfs-http-client": "46.0.1",
+    "joi": "17.3.0",
     "lodash": "4.17.20",
     "prettier": "2.1.1",
     "react": "16.13.1",
@@ -37,9 +38,7 @@
     "typescript": "4.1.3",
     "wouter": "2.5.1"
   },
-  "devDependencies":{
-
-  },
+  "devDependencies": {},
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

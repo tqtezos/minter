@@ -65,7 +65,7 @@ function CollectionRow(props: CollectionRowProps) {
   );
 }
 
-const globalCollectionAddress = 'KT1WsHRaUDRWKNwt2SfVcJwXq6XqEjrzup3L';
+const globalCollectionAddress = 'KT1WVZ8qJBXX2yu9EMixhb32d8KNoWnJ9vAm';
 
 const globalCollection = {
   address: globalCollectionAddress,
