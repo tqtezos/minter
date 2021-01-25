@@ -1,13 +1,11 @@
-import { SystemWithWallet } from '../system';
 import { MichelsonMap } from '@taquito/taquito';
+import { Buffer } from 'buffer';
+import { SystemWithWallet } from '../system';
 import faucetCode from './code/fa2_tzip16_compat_multi_nft_faucet';
 import assetCode from './code/fa2_tzip16_compat_multi_nft_asset';
 
-function toHexString(input: string): string {
-  const unit8Array: Uint8Array = new TextEncoder().encode(input);
-  return Array.from(unit8Array, (byte: number) => {
-    return ('0' + (byte & 0xff).toString(16)).slice(-2);
-  }).join('');
+function toHexString(input: string) {
+  return Buffer.from(input).toString('hex');
 }
 
 export async function createFaucetContract(

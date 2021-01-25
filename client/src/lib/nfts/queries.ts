@@ -1,6 +1,14 @@
+import { Buffer } from 'buffer';
 import { System, SystemWithWallet } from '../system';
 import { hash as nftAssetHash } from './code/fa2_tzip16_compat_multi_nft_asset';
 import select from '../util/selectObjectByKeys';
+
+function fromHexString(input: string) {
+  if (/^([A-Fa-f0-9]{2})*$/.test(input)) {
+    return Buffer.from(input, 'hex').toString();
+  }
+  return input;
+}
 
 function foldBigMapResponseAsObject(bigMapResponse: any) {
   return bigMapResponse.reduce((acc: {}, next: any) => {
@@ -37,7 +45,7 @@ export async function getContractNfts(system: System, address: string) {
     const tokenId = select(token, { name: 'token_id' })?.value;
     const metadataMap = select(token, { name: 'token_metadata_map' })?.children;
     const metadata = metadataMap.reduce((acc: any, next: any) => {
-      return { ...acc, [next.name]: next.value };
+      return { ...acc, [next.name]: fromHexString(next.value) };
     }, {});
 
     const owner = select(
