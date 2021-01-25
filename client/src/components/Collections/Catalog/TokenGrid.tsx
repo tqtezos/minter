@@ -32,7 +32,7 @@ function TokenTile(props: TokenTileProps) {
       }
     >
       <Image
-        src={placeholderAsset}
+        src={`http://localhost:8080/ipfs/${props.ipfs_hash}`}
         objectFit="cover"
         flex="1"
         filter={props.metadata?.filter}

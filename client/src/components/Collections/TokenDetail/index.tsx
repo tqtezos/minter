@@ -95,7 +95,7 @@ export default function TokenDetail(props: TokenDetailProps) {
             overflow="hidden"
           >
             <Image
-              src={placeholderAsset}
+              src={`http://localhost:8080/ipfs/${token.ipfs_hash}`}
               objectFit="cover"
               filter={token.metadata?.filter}
             />
@@ -123,23 +123,25 @@ export default function TokenDetail(props: TokenDetailProps) {
             py={6}
             mb={10}
           >
-            <Flex>
-              <Flex
-                py={1}
-                px={3}
-                mb={3}
-                borderRightRadius="5px"
-                bg="brand.turquoise"
-                color="brand.black"
-                align="center"
-                justify="center"
-              >
-                <Star fill="currentColor" size={16} />
-                <Text fontWeight="600" ml={2} fontSize="sm">
-                  You own this asset
-                </Text>
+            {system.tzPublicKey && system.tzPublicKey === token.owner ? (
+              <Flex>
+                <Flex
+                  py={1}
+                  px={3}
+                  mb={3}
+                  borderRightRadius="5px"
+                  bg="brand.turquoise"
+                  color="brand.black"
+                  align="center"
+                  justify="center"
+                >
+                  <Star fill="currentColor" size={16} />
+                  <Text fontWeight="600" ml={2} fontSize="sm">
+                    You own this asset
+                  </Text>
+                </Flex>
               </Flex>
-            </Flex>
+            ) : null}
             <Flex
               justify="space-between"
               align="center"
@@ -180,7 +182,7 @@ export default function TokenDetail(props: TokenDetailProps) {
               <Text pb={2} fontSize="xs" color="brand.gray">
                 IPFS HASH
               </Text>
-              <Text>98u31j2kide...</Text>
+              <Text>{token.ipfs_hash || 'No IPFS hash'}</Text>
             </Flex>
           </Flex>
           {system.status === 'WalletConnected' ? (

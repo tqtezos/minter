@@ -95,7 +95,6 @@ export async function transferToken(
   toAddress: string
 ) {
   const contract = await system.toolkit.wallet.at(contractAddress);
-  console.log(toAddress);
   return contract.methods
     .transfer([
       {
