@@ -66,6 +66,20 @@ export async function getContractNfts(system: System, address: string) {
   });
 }
 
+export async function getNftAssetContract(system: System, address: string) {
+  const bcd = system.betterCallDev;
+  const storage = await bcd.getContractStorage(address);
+
+  const metadataBigMapId = select(storage, {
+    type: 'big_map',
+    name: 'metadata'
+  })?.value;
+
+  const metadataResponse = await bcd.getBigMapKeys(metadataBigMapId);
+  const metadata = foldBigMapResponseAsObject(metadataResponse);
+  return { address, metadata };
+}
+
 export async function getWalletNftAssetContracts(system: SystemWithWallet) {
   const bcd = system.betterCallDev;
   const response = await bcd.getWalletContracts(system.tzPublicKey);
@@ -76,20 +90,8 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
 
   const results: any[] = [];
   for (let assetContract of assetContracts) {
-    const storage = await bcd.getContractStorage(assetContract.value);
-
-    const metadataBigMapId = select(storage, {
-      type: 'big_map',
-      name: 'metadata'
-    })?.value;
-
-    const metadataResponse = await bcd.getBigMapKeys(metadataBigMapId);
-    const metadata = foldBigMapResponseAsObject(metadataResponse);
-
-    results.push({
-      address: assetContract.value,
-      metadata: metadata
-    });
+    const result = await getNftAssetContract(system, assetContract.value);
+    results.push(result);
   }
 
   return results;

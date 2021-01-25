@@ -4,9 +4,11 @@ import { SystemContext } from '../../../context/system';
 import { AspectRatio, Box, Flex, Heading, Image, Text } from '@chakra-ui/react';
 import { ChevronLeft, HelpCircle, MoreHorizontal, Star } from 'react-feather';
 import { MinterButton } from '../../common';
-import placeholderAsset from '../../common/assets/placeholder_asset.png';
 import { State, Action } from '../reducer';
-import { getContractNfts } from '../../../lib/nfts/queries';
+import {
+  getNftAssetContract,
+  getContractNfts
+} from '../../../lib/nfts/queries';
 import { TransferTokenButton } from '../../common/TransferToken';
 
 function NotFound() {
@@ -48,17 +50,25 @@ export default function TokenDetail(props: TokenDetailProps) {
   const [, setLocation] = useLocation();
   const { system } = useContext(SystemContext);
   const { dispatch, contractAddress, tokenId } = props;
+  const collection = props.state.collections[props.contractAddress];
 
   useEffect(() => {
-    getContractNfts(system, contractAddress).then(tokens => {
-      dispatch({
-        type: 'populate_collection',
-        payload: { address: contractAddress, tokens }
+    if (!collection) {
+      getNftAssetContract(system, contractAddress).then(collection => {
+        dispatch({
+          type: 'update_collection',
+          payload: { collection: { ...collection, tokens: null } }
+        });
       });
-    });
-  }, [contractAddress, tokenId]);
-
-  const collection = props.state.collections[props.contractAddress];
+    } else {
+      getContractNfts(system, contractAddress).then(tokens => {
+        dispatch({
+          type: 'populate_collection',
+          payload: { address: contractAddress, tokens }
+        });
+      });
+    }
+  }, [contractAddress, tokenId, collection === undefined]);
 
   if (!collection || collection.tokens === null) {
     return null;
