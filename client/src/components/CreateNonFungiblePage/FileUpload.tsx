@@ -26,8 +26,8 @@ export default function FileUpload({
     const response = await axios.post<IpfsContent>('/ipfs-upload', formData);
 
     dispatch({
-      type: 'update_field',
-      payload: { name: 'ipfs_hash', value: response.data.cid }
+      type: 'update_ipfs_hash',
+      payload: { value: response.data.cid }
     });
 
     console.log('Succesfully uploaded image to IPFS Server.');
@@ -64,10 +64,10 @@ export default function FileUpload({
         {...getRootProps()}
       >
         <Box as="input" {...getInputProps()} />
-        {state.fields.ipfs_hash ? (
+        {state.ipfs_hash ? (
           <Image
             width="100%"
-            src={`http://localhost:8080/ipfs/${state.fields.ipfs_hash}`}
+            src={`http://localhost:8080/ipfs/${state.ipfs_hash}`}
           />
         ) : (
           <Flex

@@ -68,7 +68,7 @@ export default function Form({
         <Text fontFamily="mono" fontSize="xs" paddingBottom={3}>
           IPFS HASH
         </Text>
-        <Text>{state.fields.ipfs_hash}</Text>
+        <Text>{state.ipfs_hash}</Text>
       </Box>
       <Divider borderColor="brand.lightBlue" opacity="1" marginY={10} />
       <Heading size="md" paddingBottom={6}>

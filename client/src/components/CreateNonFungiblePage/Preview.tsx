@@ -3,7 +3,7 @@ import { Divider, Heading, Flex, Image, Text } from '@chakra-ui/react';
 import { State } from './reducer';
 
 export default function Preview({ state }: { state: State }) {
-  const { name, description, ipfs_hash } = state.fields;
+  const { name, description } = state.fields;
   return (
     <Flex
       flexDir="column"
@@ -14,7 +14,11 @@ export default function Preview({ state }: { state: State }) {
       borderRadius="2px"
       boxShadow="0px 0px 0px 4px rgba(211, 222, 245, 0.3)"
     >
-      <Image src={`http://localhost:8080/ipfs/${ipfs_hash}`} width="100%" overflow="hidden" />
+      <Image
+        src={`http://localhost:8080/ipfs/${state.ipfs_hash}`}
+        width="100%"
+        overflow="hidden"
+      />
       <Heading size="md" color={name ? 'black' : 'gray.200'} px={8} py={6}>
         {name ? name : 'Asset name...'}
       </Heading>
@@ -32,7 +36,7 @@ export default function Preview({ state }: { state: State }) {
         <Text pb={2} fontSize="xs" color="brand.gray">
           IPFS HASH
         </Text>
-        <Text>{ipfs_hash}</Text>
+        <Text>{state.ipfs_hash}</Text>
       </Flex>
     </Flex>
   );
