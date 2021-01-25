@@ -2,15 +2,15 @@ import React, { useContext, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Flex, Text, Heading, Image, Link } from '@chakra-ui/react';
 import { SystemContext } from '../../context/system';
-import { MinterButton, MinterLink } from '../common';
+import { MinterButton /* , MinterLink */ } from '../common';
 import logo from './logo.svg';
 
 export default function SplashPage() {
-  const [location, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   const { system, connect } = useContext(SystemContext);
   useEffect(() => {
     if (system.status === 'WalletConnected') {
-      setLocation('/assets');
+      setLocation('/collections');
     }
   }, [system.status]);
 

@@ -138,7 +138,7 @@ export default function CreateNonFungiblePage() {
           <Flex flex="1">
             <MinterButton
               variant="cancelAction"
-              onClick={() => setLocation('/assets')}
+              onClick={() => setLocation('/collections')}
               display="flex"
               alignItems="center"
               color="brand.red"
@@ -185,7 +185,7 @@ export default function CreateNonFungiblePage() {
                   case 'collection_select': {
                     if (system.status === 'WalletConnected') {
                       return handleCreate(system, state, () =>
-                        setLocation('/assets')
+                        setLocation('/collections')
                       );
                     }
                   }

@@ -77,7 +77,7 @@ export default function TokenDetail(props: TokenDetailProps) {
             variant="primaryActionInverted"
             onClick={e => {
               e.preventDefault();
-              setLocation('/assets');
+              setLocation('/collections', { replace: true });
             }}
           >
             <Box color="currentcolor">

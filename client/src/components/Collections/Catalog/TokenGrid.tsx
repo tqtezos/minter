@@ -28,7 +28,7 @@ function TokenTile(props: TokenTileProps) {
         boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.1)'
       }}
       onClick={() =>
-        setLocation(`/asset-details/${props.selectedCollection}/${props.id}`)
+        setLocation(`/collection/${props.selectedCollection}/token/${props.id}`)
       }
     >
       <Image

@@ -159,18 +159,18 @@ export function Header() {
         src={headerLogo}
         onClick={e => {
           e.preventDefault();
-          setLocation('/assets');
+          setLocation('/collections');
         }}
         cursor="pointer"
       />
       <Flex flex="1" justify="end">
-        <HeaderLink to="/assets">
+        <HeaderLink to="/collections">
           <Box color="brand.turquoise">
             <Package size={16} strokeWidth="3" />
           </Box>
           <Text ml={2}>Collections</Text>
         </HeaderLink>
-        <HeaderLink to="/create-non-fungible">
+        <HeaderLink to="/create">
           <Box color="brand.blue">
             <Plus size={16} strokeWidth="3" />
           </Box>
