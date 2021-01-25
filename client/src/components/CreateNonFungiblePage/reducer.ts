@@ -24,8 +24,7 @@ export interface State {
 }
 
 export const fileUploadSchema = Joi.object({
-  // TODO: Add more robust CID validation
-  // ipfs_hash: Joi.string().min(1).required()
+  ipfs_hash: Joi.string().required()
 });
 
 export const assetDetailsSchema = fileUploadSchema.append({
