@@ -14,11 +14,6 @@ import {
 import { ChevronDown, Package, Plus } from 'react-feather';
 import headerLogo from './assets/header-logo.svg';
 import { SystemContext } from '../../context/system';
-import { createAssetContract, mintToken } from '../../lib/nfts/actions';
-import {
-  getContractNfts,
-  getWalletNftAssetContracts
-} from '../../lib/nfts/queries';
 
 interface HeaderLinkProps {
   to: string;
@@ -60,7 +55,11 @@ function HeaderLink(props: HeaderLinkProps) {
 function WalletInfo(props: { tzPublicKey: string }) {
   return (
     <>
-      <Box borderRadius="100%" width={9} height={9} bg="brand.darkGray" />
+      <Box borderRadius="100%" width={10} height={10} bg="brand.darkGray" p={1}>
+        <Image
+          src={`https://services.tzkt.io/v1/avatars2/${props.tzPublicKey}`}
+        />
+      </Box>
       <Text fontFamily="mono" ml={4} mr={2}>
         {props.tzPublicKey}
       </Text>
