@@ -4,13 +4,7 @@ import { CreateCollectionButton } from '../common/CreateCollection';
 import { State, DispatchFn } from './reducer';
 import { SystemContext } from '../../context/system';
 import { getWalletNftAssetContracts } from '../../lib/nfts/queries';
-
-// Placeholder data
-const collections: { name: string; address: string }[] = [
-  { name: 'Minter', address: '123' },
-  { name: 'Digital Art', address: '456' },
-  { name: 'Misc Stuff', address: '789' }
-];
+import config from '../../config.json';
 
 interface CollectionRowProps {
   name: string;
@@ -65,7 +59,7 @@ function CollectionRow(props: CollectionRowProps) {
   );
 }
 
-const globalCollectionAddress = 'KT1WVZ8qJBXX2yu9EMixhb32d8KNoWnJ9vAm';
+const globalCollectionAddress = config.contracts.nftFaucet;
 
 const globalCollection = {
   address: globalCollectionAddress,

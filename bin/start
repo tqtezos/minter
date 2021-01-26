@@ -6,7 +6,13 @@ STACK_API_SERVER_DEF=${STACK_API_SERVER_DEF:-api-server-dev}
 
 source ${BASH_SOURCE%/*}/setup-env
 docker info | grep "Swarm: active" || docker swarm init
-mkdir -p $PGDATA
+
+# NOTE: UI won't refresh after a 'Module not found' TypeScript error.
+# This file is generated into the client source - set a placeholder before
+# generation so it can be referenced before it's updated
+set -C
+! echo "{}" > "$PROJECT_ROOT_DIR/client/src/config.json"
+set +C
 
 UI_STACK_FILE=$DOCKER_STACK_DIR/${STACK_UI_DEF}.yml
 API_SERVER_STACK_FILE=$DOCKER_STACK_DIR/${STACK_API_SERVER_DEF}.yml
@@ -19,7 +25,6 @@ echo "Using ${API_SERVER_STACK_FILE}"
 docker stack deploy \
        -c $DOCKER_STACK_DIR/network.yml \
        -c $DOCKER_STACK_DIR/gateway.yml \
-       -c $UI_STACK_FILE \
        $STACK_NAME
 
 ENV_START_SCRIPT=$PROJECT_ROOT_DIR/bin/${ENV_NAME}/start
@@ -27,10 +32,7 @@ ENV_START_SCRIPT=$PROJECT_ROOT_DIR/bin/${ENV_NAME}/start
 
 pushd $PROJECT_ROOT_DIR/contracts && yarn run bootstrap ; popd
 
-#knex does not properly handle no db on startup so
-#have to start dev server after db is up
-#see https://stackoverflow.com/questions/33823440/knexerror-pool2-error-connect-econnrefused
-
+docker stack deploy -c $UI_STACK_FILE $STACK_NAME
 docker stack deploy -c $API_SERVER_STACK_FILE $STACK_NAME
 
 $PROJECT_ROOT_DIR/bin/start-ipfs

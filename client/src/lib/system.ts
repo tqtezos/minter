@@ -12,7 +12,7 @@ export interface Config {
     gui: string;
   };
   contracts: {
-    nft: string;
+    nftFaucet: string;
   };
 }
 
