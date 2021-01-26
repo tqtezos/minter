@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, MutableRefObject } from 'react';
 import {
   Box,
   Text,
@@ -12,24 +12,80 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  useDisclosure
+  useDisclosure,
+  Spinner,
+  Flex,
+  Heading
 } from '@chakra-ui/react';
-import { Plus } from 'react-feather';
+import { CheckCircle, Plus } from 'react-feather';
 import { MinterButton } from '../common';
 import { createAssetContract } from '../../lib/nfts/actions';
 import { SystemContext } from '../../context/system';
 
+interface FormProps {
+  initialRef: MutableRefObject<null>;
+  onSubmit: (form: { contractName: string }) => void;
+}
+
+function Form({ initialRef, onSubmit }: FormProps) {
+  const [contractName, setContractName] = useState('');
+  return (
+    <>
+      <ModalHeader>New Collection</ModalHeader>
+      <ModalCloseButton />
+      <ModalBody>
+        <FormControl>
+          <FormLabel fontFamily="mono">Collection Name</FormLabel>
+          <Input
+            autoFocus={true}
+            ref={initialRef}
+            placeholder="Input your collection name"
+            value={contractName}
+            onChange={e => setContractName(e.target.value)}
+          />
+        </FormControl>
+      </ModalBody>
+
+      <ModalFooter>
+        <MinterButton
+          variant="primaryAction"
+          onClick={() => onSubmit({ contractName })}
+        >
+          Create Collection
+        </MinterButton>
+      </ModalFooter>
+    </>
+  );
+}
+
+enum Status {
+  Ready = 'ready',
+  InProgress = 'inProgress',
+  Complete = 'complete'
+}
+
 export function CreateCollectionButton() {
   const { system } = useContext(SystemContext);
-  const [completed, setCompleted] = useState(false);
-  const [originating, setOriginating] = useState(false);
-  const [contractName, setContractName] = useState('');
+  const [status, setStatus] = useState<Status>(Status.Ready);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const initialRef = React.useRef(null);
 
   if (system.status !== 'WalletConnected') {
     return null;
   }
+
+  const onSubmit = async (form: { contractName: string }) => {
+    setStatus(Status.InProgress);
+    const op = await createAssetContract(system, form.contractName);
+    await op.confirmation();
+    setStatus(Status.Complete);
+  };
+
+  const close = () => {
+    if (status !== Status.InProgress) {
+      onClose();
+    }
+  };
 
   return (
     <>
@@ -42,52 +98,39 @@ export function CreateCollectionButton() {
 
       <Modal
         isOpen={isOpen}
-        onClose={() => {
-          if (!originating) onClose();
-        }}
+        onClose={() => close()}
         initialFocusRef={initialRef}
         closeOnEsc={false}
         closeOnOverlayClick={false}
-        onEsc={() => {
-          if (!originating) onClose();
-        }}
-        onOverlayClick={() => {
-          if (!originating) onClose();
-        }}
+        onEsc={() => close()}
+        onOverlayClick={() => close()}
       >
         <ModalOverlay />
         <ModalContent mt={40}>
-          <ModalHeader>New Collection</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel fontFamily="mono">Collection Name</FormLabel>
-              <Input
-                autoFocus={true}
-                ref={initialRef}
-                placeholder="Input your collection name"
-                value={contractName}
-                onChange={e => setContractName(e.target.value)}
-              />
-            </FormControl>
-          </ModalBody>
-
-          <ModalFooter>
-            <MinterButton
-              variant="primaryAction"
-              onClick={() => {
-                if (originating) {
-                  return;
-                }
-                setOriginating(true);
-                createAssetContract(system, contractName).then(() => {
-                  onClose();
-                });
-              }}
-            >
-              Create Collection
-            </MinterButton>
-          </ModalFooter>
+          {status === Status.Ready ? (
+            <Form initialRef={initialRef} onSubmit={onSubmit} />
+          ) : null}
+          {status === Status.InProgress ? (
+            <Flex flexDir="column" align="center" px={4} py={10}>
+              <Spinner size="xl" mb={6} color="gray.300" />
+              <Heading size="lg" textAlign="center" color="gray.500">
+                Creating new collection...
+              </Heading>
+            </Flex>
+          ) : null}
+          {status === Status.Complete ? (
+            <Flex flexDir="column" align="center" px={4} py={10}>
+              <Box color="brand.blue" mb={6}>
+                <CheckCircle size="70px" />
+              </Box>
+              <Heading size="lg" textAlign="center" color="gray.500" mb={6}>
+                Collection created
+              </Heading>
+              <MinterButton variant="primaryAction" onClick={() => close()}>
+                Close
+              </MinterButton>
+            </Flex>
+          ) : null}
         </ModalContent>
       </Modal>
     </>

@@ -15,12 +15,19 @@ interface Fields {
   description: string | null;
 }
 
+export enum CreateStatus {
+  Ready = 'ready',
+  InProgress = 'inProgress',
+  Complete = 'complete'
+}
+
 export interface State {
   step: Step;
   ipfs_hash: string | null;
   fields: Fields;
   metadataRows: { name: string | null; value: string | null }[];
   collectionAddress: string | null;
+  createStatus: CreateStatus;
 }
 
 export const fileUploadSchema = Joi.object({
@@ -73,7 +80,8 @@ export type Action =
       payload: { key: number; value: string };
     }
   | { type: 'delete_metadata_row'; payload: { key: number } }
-  | { type: 'select_collection'; payload: { address: string } };
+  | { type: 'select_collection'; payload: { address: string } }
+  | { type: 'set_create_status'; payload: { status: CreateStatus } };
 
 export type DispatchFn = Dispatch<Action>;
 
@@ -85,7 +93,8 @@ export const initialState: State = {
     description: null
   },
   metadataRows: [],
-  collectionAddress: null
+  collectionAddress: null,
+  createStatus: CreateStatus.Ready
 };
 
 export function reducer(state: State, action: Action) {
@@ -152,6 +161,12 @@ export function reducer(state: State, action: Action) {
       const { address } = action.payload;
       return produce(state, draftState => {
         draftState.collectionAddress = address;
+      });
+    }
+    case 'set_create_status': {
+      const { status } = action.payload;
+      return produce(state, draftState => {
+        draftState.createStatus = status;
       });
     }
     default:

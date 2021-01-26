@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useReducer } from 'react';
+import React, { Dispatch, useContext, useEffect, useReducer } from 'react';
 import { useLocation } from 'wouter';
-import { Box, Flex, Text } from '@chakra-ui/react';
+import { Box, Flex, Text, useDisclosure } from '@chakra-ui/react';
 import Joi from 'joi';
 import { SystemContext } from '../../context/system';
 import { MinterButton } from '../common';
@@ -12,12 +12,15 @@ import {
   State,
   fileUploadSchema,
   assetDetailsSchema,
-  collectionSelectSchema
+  collectionSelectSchema,
+  Action,
+  CreateStatus
 } from './reducer';
 import Form from './Form';
 import FileUpload from './FileUpload';
 import CollectionSelect from './CollectionSelect';
 import Preview from './Preview';
+import StatusModal from './StatusModal';
 import { ChevronLeft, X } from 'react-feather';
 import { mintToken } from '../../lib/nfts/actions';
 import { SystemWithWallet } from '../../lib/system';
@@ -84,11 +87,7 @@ function stepIsValid(state: State) {
   }
 }
 
-async function handleCreate(
-  system: SystemWithWallet,
-  state: State,
-  cb: () => void
-) {
+async function handleCreate(system: SystemWithWallet, state: State) {
   const metadata: Record<string, string> = {};
   const ipfs_hash = state.ipfs_hash as string;
   const name = state.fields.name as string;
@@ -107,13 +106,13 @@ async function handleCreate(
   }
 
   const op = await mintToken(system, address, metadata);
-  await op.confirmation();
-  cb();
+  return await op.confirmation();
 }
 
 export default function CreateNonFungiblePage() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [, setLocation] = useLocation();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { system } = useContext(SystemContext);
   useEffect(() => {
     if (system.status !== 'WalletConnected') {
@@ -171,7 +170,7 @@ export default function CreateNonFungiblePage() {
             </MinterButton>
             <MinterButton
               variant={valid ? 'primaryAction' : 'primaryActionInactive'}
-              onClick={() => {
+              onClick={async () => {
                 if (!valid) {
                   return;
                 }
@@ -184,9 +183,17 @@ export default function CreateNonFungiblePage() {
                   }
                   case 'collection_select': {
                     if (system.status === 'WalletConnected') {
-                      return handleCreate(system, state, () =>
-                        setLocation('/collections')
-                      );
+                      dispatch({
+                        type: 'set_create_status',
+                        payload: { status: CreateStatus.InProgress }
+                      });
+                      onOpen();
+                      await handleCreate(system, state);
+                      dispatch({
+                        type: 'set_create_status',
+                        payload: { status: CreateStatus.Complete }
+                      });
+                      return;
                     }
                   }
                 }
@@ -195,6 +202,14 @@ export default function CreateNonFungiblePage() {
             >
               {state.step === 'collection_select' ? 'Create' : 'Next'}
             </MinterButton>
+            <StatusModal
+              isOpen={isOpen}
+              onClose={() => {
+                onClose();
+                setLocation('/collections');
+              }}
+              createStatus={state.createStatus}
+            />
           </Flex>
         </Flex>
         <Box
