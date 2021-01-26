@@ -72,7 +72,7 @@ export default function Form({
       </Box>
       <Divider borderColor="brand.lightBlue" opacity="1" marginY={10} />
       <Heading size="md" paddingBottom={6}>
-        Create new values for your asset
+        Add attributes to your asset
       </Heading>
       {state.metadataRows.map(({ name, value }, i) => {
         return (
