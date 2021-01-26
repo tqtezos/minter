@@ -51,20 +51,6 @@ export const collectionSelectSchema = assetDetailsSchema.append({
   collectionAddress: Joi.string().required()
 });
 
-export const submitSchema = Joi.object({
-  fields: Joi.object({
-    name: Joi.string().min(1).required(),
-    description: Joi.string().min(0).allow(null)
-  }),
-  metadataRows: Joi.array().items(
-    Joi.object({
-      name: Joi.string().min(1).required(),
-      value: Joi.string().min(1).required()
-    })
-  ),
-  collectionAddress: Joi.string().required()
-});
-
 export type Action =
   | { type: 'increment_step' }
   | { type: 'decrement_step' }
