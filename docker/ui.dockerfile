@@ -1,4 +1,4 @@
-FROM node:12 AS build
+FROM node:14 AS build
 
 WORKDIR /usr/src/app/client
 
