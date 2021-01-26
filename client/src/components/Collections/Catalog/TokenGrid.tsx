@@ -1,12 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'wouter';
-import { Flex, Grid, Image, Text } from '@chakra-ui/react';
+import { Flex, Grid, Image, Text, Heading, Box } from '@chakra-ui/react';
 import { Token, State } from '../reducer';
 import placeholderAsset from '../../common/assets/placeholder_asset.png';
-import { Wind } from 'react-feather';
+import { Wind, HelpCircle } from 'react-feather';
 
 interface TokenTileProps extends Token {
   selectedCollection: string;
+}
+
+function TokenImage(props: { src: string }) {
+  const [errored, setErrored] = useState(false);
+
+  if (errored) {
+    return (
+      <Flex
+        flexDir="column"
+        align="center"
+        justify="center"
+        flex="1"
+        bg="gray.100"
+        color="gray.300"
+      >
+        <HelpCircle size="70px" />
+      </Flex>
+    );
+  }
+
+  return (
+    <Image
+      src={props.src}
+      objectFit="cover"
+      flex="1"
+      onError={() => setErrored(true)}
+    />
+  );
 }
 
 function TokenTile(props: TokenTileProps) {
@@ -31,12 +59,7 @@ function TokenTile(props: TokenTileProps) {
         setLocation(`/collection/${props.selectedCollection}/token/${props.id}`)
       }
     >
-      <Image
-        src={`http://localhost:8080/ipfs/${props.ipfs_hash}`}
-        objectFit="cover"
-        flex="1"
-        filter={props.metadata?.filter}
-      />
+      <TokenImage src={`http://localhost:8080/ipfs/${props.ipfs_hash}`} />
       <Flex
         width="100%"
         px={4}

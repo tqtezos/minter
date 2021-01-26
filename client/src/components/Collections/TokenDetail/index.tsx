@@ -1,4 +1,4 @@
-import React, { Dispatch, useEffect, useContext } from 'react';
+import React, { Dispatch, useEffect, useContext, useState } from 'react';
 import { useLocation } from 'wouter';
 import { SystemContext } from '../../../context/system';
 import { AspectRatio, Box, Flex, Heading, Image, Text } from '@chakra-ui/react';
@@ -44,6 +44,47 @@ interface TokenDetailProps {
   tokenId: number;
   state: State;
   dispatch: Dispatch<Action>;
+}
+
+function TokenImage(props: { src: string }) {
+  const [errored, setErrored] = useState(false);
+
+  if (errored) {
+    return (
+      <AspectRatio
+        ratio={4 / 3}
+        width="100%"
+        borderRadius="3px"
+        bg="gray.100"
+        overflow="hidden"
+      >
+        <Flex flexDir="column" align="center" justify="center">
+          <Box color="gray.300" pb={10}>
+            <HelpCircle size="100px" />
+          </Box>
+          <Heading color="gray.300" size="xl">
+            Image not found
+          </Heading>
+        </Flex>
+      </AspectRatio>
+    );
+  }
+
+  return (
+    <AspectRatio
+      ratio={4 / 3}
+      width="100%"
+      borderRadius="3px"
+      boxShadow="0 0 5px rgba(0,0,0,.15)"
+      overflow="hidden"
+    >
+      <Image
+        src={props.src}
+        objectFit="cover"
+        onError={() => setErrored(true)}
+      />
+    </AspectRatio>
+  );
 }
 
 export default function TokenDetail(props: TokenDetailProps) {
@@ -97,19 +138,7 @@ export default function TokenDetail(props: TokenDetailProps) {
           </MinterButton>
         </Flex>
         <Flex align="center" justify="center" flex="1" px={16}>
-          <AspectRatio
-            ratio={4 / 3}
-            width="100%"
-            borderRadius="3px"
-            boxShadow="0 0 5px rgba(0,0,0,.15)"
-            overflow="hidden"
-          >
-            <Image
-              src={`http://localhost:8080/ipfs/${token.ipfs_hash}`}
-              objectFit="cover"
-              filter={token.metadata?.filter}
-            />
-          </AspectRatio>
+          <TokenImage src={`http://localhost:8080/ipfs/${token.ipfs_hash}`} />
         </Flex>
       </Flex>
       <Flex w="50%" h="100%" flexDir="column">
@@ -169,9 +198,10 @@ export default function TokenDetail(props: TokenDetailProps) {
                   {token.title}
                 </Heading>
               </Flex>
-              <Box color="gray.300">
-                <MoreHorizontal />
-              </Box>
+              {/* TODO: Add dropdown menu that contains transfer/share links */}
+              {/* <Box color="gray.300"> */}
+              {/*   <MoreHorizontal /> */}
+              {/* </Box> */}
             </Flex>
             <Flex
               px={8}
