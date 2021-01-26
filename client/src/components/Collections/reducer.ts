@@ -1,4 +1,5 @@
 import { produce } from 'immer';
+import config from '../../config.json';
 
 export interface Token {
   id: number;
@@ -21,7 +22,7 @@ export interface State {
   collections: Record<string, Collection>;
 }
 
-const globalCollectionAddress = 'KT1WVZ8qJBXX2yu9EMixhb32d8KNoWnJ9vAm';
+const globalCollectionAddress = config.contracts.nftFaucet;
 
 export const initialState: State = {
   selectedCollection: null,

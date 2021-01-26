@@ -1,21 +1,13 @@
 {
 	"rpc": "https://delphinet-tezos.giganode.io",
-	"bcdApiUrl": "https://api.better-call.dev",
-	"bcdGuiUrl": "https://better-call.dev",
-	"bcdNetwork": "delphinet",
+	"network": "delphinet",
+	"bcd": {
+		"api": "https://api.better-call.dev",
+		"gui": "https://better-call.dev"
+	},
 	"admin": {
 		"address": "tz1hs8oA8xjpEfrmqHedJ3Yv7KN355JFL3rW",
 		"secret": "edsk36qzuACZiucKjW3fXifeqSXPveA8ykR95banDK367vimMAC9ZR"
 	},
-	"contracts": {
-		"nftFaucet": "KT1CV1zsMnrnVHHZLKGdZ16bpSKhXfbJ8G8T",
-		"nftFactory": "KT1HDdJAXVxi3scXydzhLZio2KipbyPJSru5"
-	},
-	"featuredCollections": [
-		"KT...",
-		{
-			"name": "Hello",
-			"description": "My description"
-		}
-	]
+	"contracts": {}
 }

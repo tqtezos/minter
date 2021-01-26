@@ -1,18 +1,6 @@
 import React, { createContext, useState } from 'react';
 import { Minter, SystemWithToolkit, SystemWithWallet } from '../lib/system';
-
-// TODO: Import from ./config.json
-const config = {
-  rpc: 'http://localhost:8732',
-  network: 'sandboxnet',
-  bcd: {
-    api: 'http://localhost:42000',
-    gui: 'http://localhost:8009'
-  },
-  contracts: {
-    nft: 'KT1NsRvJCvXymYedx3yxj5mcs6J1xsT5gpMM'
-  }
-};
+import config from '../config.json';
 
 type System = SystemWithToolkit | SystemWithWallet;
 
