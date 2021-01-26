@@ -157,7 +157,7 @@ export default function CreateNonFungiblePage() {
             </MinterButton>
           </Flex>
           <ProgressIndicator state={state} />
-          <Flex flex="1" justify="end">
+          <Flex flex="1" justify="flex-end">
             <MinterButton
               visibility={state.step !== 'file_upload' ? 'visible' : 'hidden'}
               variant="primaryActionInverted"

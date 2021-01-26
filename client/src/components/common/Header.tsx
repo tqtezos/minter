@@ -122,7 +122,7 @@ export function Header() {
         }}
         cursor="pointer"
       />
-      <Flex flex="1" justify="end">
+      <Flex flex="1" justify="flex-end">
         <HeaderLink to="/collections">
           <Box color="brand.turquoise">
             <Package size={16} strokeWidth="3" />
