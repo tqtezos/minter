@@ -14,7 +14,7 @@ set -C
 ! echo "{}" > "$PROJECT_ROOT_DIR/client/src/config.json"
 set +C
 
-mkdir $PGDATA
+mkdir -p $PGDATA
 
 UI_STACK_FILE=$DOCKER_STACK_DIR/${STACK_UI_DEF}.yml
 API_SERVER_STACK_FILE=$DOCKER_STACK_DIR/${STACK_API_SERVER_DEF}.yml
