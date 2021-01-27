@@ -7,14 +7,17 @@ STACK_API_SERVER_DEF=${STACK_API_SERVER_DEF:-api-server-dev}
 source ${BASH_SOURCE%/*}/setup-env
 docker info | grep "Swarm: active" || docker swarm init
 
+# Docker is causing headaches with strange race conditions that require
+# directories to exist as conflictig times.
+# This is an extra measure to try to mitigate....
+mkdir -p $PGDATA
+
 # NOTE: UI won't refresh after a 'Module not found' TypeScript error.
 # This file is generated into the client source - set a placeholder before
 # generation so it can be referenced before it's updated
 set -C
 ! echo "{}" > "$PROJECT_ROOT_DIR/client/src/config.json"
 set +C
-
-mkdir -p $PGDATA
 
 UI_STACK_FILE=$DOCKER_STACK_DIR/${STACK_UI_DEF}.yml
 API_SERVER_STACK_FILE=$DOCKER_STACK_DIR/${STACK_API_SERVER_DEF}.yml

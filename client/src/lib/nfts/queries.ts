@@ -24,14 +24,14 @@ export async function getContractNfts(system: System, address: string) {
     name: 'ledger'
   })?.value;
 
-  if (!ledgerBigMapId) return [];
+  if (ledgerBigMapId === undefined || ledgerBigMapId === null) return [];
 
   const tokensBigMapId = select(storage, {
     type: 'big_map',
     name: 'token_metadata'
   })?.value;
 
-  if (!tokensBigMapId) return [];
+  if (tokensBigMapId === undefined || ledgerBigMapId === null) return [];
 
   const ledger = await system.betterCallDev.getBigMapKeys(ledgerBigMapId);
 
