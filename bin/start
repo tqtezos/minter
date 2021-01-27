@@ -26,7 +26,6 @@ echo "Using ${API_SERVER_STACK_FILE}"
 #also default network can't be created with docker network create
 docker stack deploy \
        -c $DOCKER_STACK_DIR/network.yml \
-       -c $DOCKER_STACK_DIR/postgres.yml \
        -c $DOCKER_STACK_DIR/gateway.yml \
        $STACK_NAME
 
