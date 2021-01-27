@@ -16,7 +16,7 @@ const code = `
                   (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
                       (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id)))))))
         (list %mint
-           (pair (pair %token_metadata (nat %token_id) (map %token_metadata_map string bytes))
+           (pair (pair %token_metadata (nat %token_id) (map %token_info string bytes))
                  (address %owner)))) ;
   storage
     (pair (pair (pair %admin (pair (address %admin) (bool %paused)) (option %pending_admin address))
@@ -25,7 +25,7 @@ const code = `
                    (pair (big_map %operators (pair address (pair address nat)) unit)
                          (big_map %token_metadata
                             nat
-                            (pair (nat %token_id) (map %token_metadata_map string bytes))))))
+                            (pair (nat %token_id) (map %token_info string bytes))))))
           (big_map %metadata string bytes)) ;
   code { PUSH string "FA2_INSUFFICIENT_BALANCE" ;
          LAMBDA

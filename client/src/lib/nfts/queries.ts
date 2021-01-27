@@ -35,7 +35,7 @@ export async function getContractNfts(system: System, address: string) {
 
   return tokens.map((token: any) => {
     const tokenId = select(token, { name: 'token_id' })?.value;
-    const metadataMap = select(token, { name: 'token_metadata_map' })?.children;
+    const metadataMap = select(token, { name: 'token_info' })?.children;
     const metadata = metadataMap.reduce((acc: any, next: any) => {
       return { ...acc, [next.name]: next.value };
     }, {});
