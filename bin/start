@@ -14,6 +14,8 @@ set -C
 ! echo "{}" > "$PROJECT_ROOT_DIR/client/src/config.json"
 set +C
 
+mkdir $PGDATA
+
 UI_STACK_FILE=$DOCKER_STACK_DIR/${STACK_UI_DEF}.yml
 API_SERVER_STACK_FILE=$DOCKER_STACK_DIR/${STACK_API_SERVER_DEF}.yml
 
@@ -24,6 +26,7 @@ echo "Using ${API_SERVER_STACK_FILE}"
 #also default network can't be created with docker network create
 docker stack deploy \
        -c $DOCKER_STACK_DIR/network.yml \
+       -c $DOCKER_STACK_DIR/postgres.yml \
        -c $DOCKER_STACK_DIR/gateway.yml \
        $STACK_NAME
 
