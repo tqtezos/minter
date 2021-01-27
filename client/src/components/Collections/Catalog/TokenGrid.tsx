@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation } from 'wouter';
-import { AspectRatio, Flex, Grid, Image, Text } from '@chakra-ui/react';
+import { AspectRatio, Box, Flex, Grid, Image, Text } from '@chakra-ui/react';
 import { Token, State } from '../reducer';
 import { Wind, HelpCircle } from 'react-feather';
 
@@ -29,7 +29,7 @@ function TokenImage(props: { src: string }) {
   return (
     <Image
       src={props.src}
-      objectFit="cover"
+      objectFit="contain"
       flex="1"
       onError={() => setErrored(true)}
     />
@@ -39,7 +39,8 @@ function TokenImage(props: { src: string }) {
 function TokenTile(props: TokenTileProps) {
   const [, setLocation] = useLocation();
   return (
-    <AspectRatio
+    <Flex
+      flexDir="column"
       ratio={1}
       w="100%"
       bg="white"
@@ -57,22 +58,22 @@ function TokenTile(props: TokenTileProps) {
         setLocation(`/collection/${props.selectedCollection}/token/${props.id}`)
       }
     >
-      <Flex flexDir="column">
-        <TokenImage src={`http://localhost:8080/ipfs/${props.ipfs_hash}`} />
-        <Flex
-          width="100%"
-          px={4}
-          py={4}
-          bg="white"
-          borderTop="1px solid"
-          borderColor="brand.lightBlue"
-          position="absolute"
-          bottom="0"
-        >
-          <Text>{props.title}</Text>
-        </Flex>
+      <AspectRatio ratio={3 / 2}>
+        <Box p={4}>
+          <TokenImage src={`http://localhost:8080/ipfs/${props.ipfs_hash}`} />
+        </Box>
+      </AspectRatio>
+      <Flex
+        width="100%"
+        px={4}
+        py={4}
+        bg="white"
+        borderTop="1px solid"
+        borderColor="brand.lightBlue"
+      >
+        <Text>{props.title}</Text>
       </Flex>
-    </AspectRatio>
+    </Flex>
   );
 }
 

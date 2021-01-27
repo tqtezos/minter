@@ -55,18 +55,22 @@ export default function FileUpload({
       >
         JPG, PNG, GIF, WEBP, SVG. Max size 30mb
       </Text>
-      <Box
+      <Flex
         borderStyle="dashed"
         borderWidth="2px"
         borderColor="brand.lightBlue"
         borderRadius="3px"
         width="100%"
+        justify="center"
+        align="center"
         {...getRootProps()}
       >
         <Box as="input" {...getInputProps()} />
         {state.ipfs_hash ? (
           <Image
-            width="100%"
+            p={4}
+            maxWidth="400px"
+            maxHeight="400px"
             src={`http://localhost:8080/ipfs/${state.ipfs_hash}`}
           />
         ) : (
@@ -77,6 +81,7 @@ export default function FileUpload({
             align="center"
             py={10}
             bg="brand.brightGray"
+            flex="1"
           >
             <Text fontSize={20}>Click or drag file to this area to upload</Text>
             <Text fontSize={18} color="brand.gray">
@@ -84,7 +89,7 @@ export default function FileUpload({
             </Text>
           </Flex>
         )}
-      </Box>
+      </Flex>
     </Flex>
   );
 }

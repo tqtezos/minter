@@ -72,17 +72,19 @@ function TokenImage(props: { src: string }) {
 
   return (
     <AspectRatio
-      ratio={4 / 3}
+      ratio={1}
       width="100%"
       borderRadius="3px"
       boxShadow="0 0 5px rgba(0,0,0,.15)"
       overflow="hidden"
     >
-      <Image
-        src={props.src}
-        objectFit="cover"
-        onError={() => setErrored(true)}
-      />
+      <Box>
+        <Image
+          src={props.src}
+          objectFit="contain"
+          onError={() => setErrored(true)}
+        />
+      </Box>
     </AspectRatio>
   );
 }
