@@ -14,11 +14,20 @@ export default function Preview({ state }: { state: State }) {
       borderRadius="2px"
       boxShadow="0px 0px 0px 4px rgba(211, 222, 245, 0.3)"
     >
-      <Image
-        src={`http://localhost:8080/ipfs/${state.ipfs_hash}`}
-        width="100%"
+      <Flex
+        width="100"
+        justify="center"
+        align="center"
+        height="300px"
         overflow="hidden"
-      />
+      >
+        <Image
+          src={`http://localhost:8080/ipfs/${state.ipfs_hash}`}
+          overflow="hidden"
+          objectFit="contain"
+          objectPosition="center"
+        />
+      </Flex>
       <Heading size="md" color={name ? 'black' : 'gray.200'} px={8} py={6}>
         {name ? name : 'Asset name...'}
       </Heading>

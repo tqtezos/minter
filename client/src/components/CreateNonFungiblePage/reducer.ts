@@ -15,17 +15,23 @@ interface Fields {
   description: string | null;
 }
 
+export enum CreateStatus {
+  Ready = 'ready',
+  InProgress = 'inProgress',
+  Complete = 'complete'
+}
+
 export interface State {
   step: Step;
   ipfs_hash: string | null;
   fields: Fields;
   metadataRows: { name: string | null; value: string | null }[];
   collectionAddress: string | null;
+  createStatus: CreateStatus;
 }
 
 export const fileUploadSchema = Joi.object({
-  // TODO: Add more robust CID validation
-  // ipfs_hash: Joi.string().min(1).required()
+  ipfs_hash: Joi.string().required()
 });
 
 export const assetDetailsSchema = fileUploadSchema.append({
@@ -45,20 +51,6 @@ export const collectionSelectSchema = assetDetailsSchema.append({
   collectionAddress: Joi.string().required()
 });
 
-export const submitSchema = Joi.object({
-  fields: Joi.object({
-    name: Joi.string().min(1).required(),
-    description: Joi.string().min(0).allow(null)
-  }),
-  metadataRows: Joi.array().items(
-    Joi.object({
-      name: Joi.string().min(1).required(),
-      value: Joi.string().min(1).required()
-    })
-  ),
-  collectionAddress: Joi.string().required()
-});
-
 export type Action =
   | { type: 'increment_step' }
   | { type: 'decrement_step' }
@@ -74,7 +66,8 @@ export type Action =
       payload: { key: number; value: string };
     }
   | { type: 'delete_metadata_row'; payload: { key: number } }
-  | { type: 'select_collection'; payload: { address: string } };
+  | { type: 'select_collection'; payload: { address: string } }
+  | { type: 'set_create_status'; payload: { status: CreateStatus } };
 
 export type DispatchFn = Dispatch<Action>;
 
@@ -86,7 +79,8 @@ export const initialState: State = {
     description: null
   },
   metadataRows: [],
-  collectionAddress: null
+  collectionAddress: null,
+  createStatus: CreateStatus.Ready
 };
 
 export function reducer(state: State, action: Action) {
@@ -153,6 +147,12 @@ export function reducer(state: State, action: Action) {
       const { address } = action.payload;
       return produce(state, draftState => {
         draftState.collectionAddress = address;
+      });
+    }
+    case 'set_create_status': {
+      const { status } = action.payload;
+      return produce(state, draftState => {
+        draftState.createStatus = status;
       });
     }
     default:

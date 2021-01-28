@@ -1,12 +1,15 @@
-import React, { Dispatch, useEffect, useContext } from 'react';
+import React, { Dispatch, useEffect, useContext, useState } from 'react';
 import { useLocation } from 'wouter';
 import { SystemContext } from '../../../context/system';
 import { AspectRatio, Box, Flex, Heading, Image, Text } from '@chakra-ui/react';
 import { ChevronLeft, HelpCircle, MoreHorizontal, Star } from 'react-feather';
 import { MinterButton } from '../../common';
-import placeholderAsset from '../../common/assets/placeholder_asset.png';
 import { State, Action } from '../reducer';
-import { getContractNfts } from '../../../lib/nfts/queries';
+import {
+  getNftAssetContract,
+  getContractNfts
+} from '../../../lib/nfts/queries';
+import { TransferTokenButton } from '../../common/TransferToken';
 
 function NotFound() {
   return (
@@ -43,22 +46,72 @@ interface TokenDetailProps {
   dispatch: Dispatch<Action>;
 }
 
+function TokenImage(props: { src: string }) {
+  const [errored, setErrored] = useState(false);
+
+  if (errored) {
+    return (
+      <AspectRatio
+        ratio={4 / 3}
+        width="100%"
+        borderRadius="3px"
+        bg="gray.100"
+        overflow="hidden"
+      >
+        <Flex flexDir="column" align="center" justify="center">
+          <Box color="gray.300" pb={10}>
+            <HelpCircle size="100px" />
+          </Box>
+          <Heading color="gray.300" size="xl">
+            Image not found
+          </Heading>
+        </Flex>
+      </AspectRatio>
+    );
+  }
+
+  return (
+    <AspectRatio
+      ratio={1}
+      width="100%"
+      borderRadius="3px"
+      boxShadow="0 0 5px rgba(0,0,0,.15)"
+      overflow="hidden"
+    >
+      <Box>
+        <Image
+          src={props.src}
+          objectFit="contain"
+          onError={() => setErrored(true)}
+        />
+      </Box>
+    </AspectRatio>
+  );
+}
+
 export default function TokenDetail(props: TokenDetailProps) {
   const [, setLocation] = useLocation();
   const { system } = useContext(SystemContext);
   const { dispatch, contractAddress, tokenId } = props;
+  const collection = props.state.collections[props.contractAddress];
 
   useEffect(() => {
-    getContractNfts(system, contractAddress).then(tokens => {
-      console.log(tokens);
-      dispatch({
-        type: 'populate_collection',
-        payload: { address: contractAddress, tokens }
+    if (!collection) {
+      getNftAssetContract(system, contractAddress).then(collection => {
+        dispatch({
+          type: 'update_collection',
+          payload: { collection: { ...collection, tokens: null } }
+        });
       });
-    });
-  }, [contractAddress, tokenId]);
-
-  const collection = props.state.collections[props.contractAddress];
+    } else {
+      getContractNfts(system, contractAddress).then(tokens => {
+        dispatch({
+          type: 'populate_collection',
+          payload: { address: contractAddress, tokens }
+        });
+      });
+    }
+  }, [contractAddress, tokenId, collection === undefined]);
 
   if (!collection || collection.tokens === null) {
     return null;
@@ -77,7 +130,7 @@ export default function TokenDetail(props: TokenDetailProps) {
             variant="primaryActionInverted"
             onClick={e => {
               e.preventDefault();
-              setLocation('/assets');
+              setLocation('/collections', { replace: true });
             }}
           >
             <Box color="currentcolor">
@@ -87,19 +140,7 @@ export default function TokenDetail(props: TokenDetailProps) {
           </MinterButton>
         </Flex>
         <Flex align="center" justify="center" flex="1" px={16}>
-          <AspectRatio
-            ratio={4 / 3}
-            width="100%"
-            borderRadius="3px"
-            boxShadow="0 0 5px rgba(0,0,0,.15)"
-            overflow="hidden"
-          >
-            <Image
-              src={placeholderAsset}
-              objectFit="cover"
-              filter={token.metadata?.filter}
-            />
-          </AspectRatio>
+          <TokenImage src={`http://localhost:8080/ipfs/${token.ipfs_hash}`} />
         </Flex>
       </Flex>
       <Flex w="50%" h="100%" flexDir="column">
@@ -121,24 +162,27 @@ export default function TokenDetail(props: TokenDetailProps) {
             borderColor="brand.lightBlue"
             borderRadius="3px"
             py={6}
+            mb={10}
           >
-            <Flex>
-              <Flex
-                py={1}
-                px={3}
-                mb={3}
-                borderRightRadius="5px"
-                bg="brand.turquoise"
-                color="brand.black"
-                align="center"
-                justify="center"
-              >
-                <Star fill="currentColor" size={16} />
-                <Text fontWeight="600" ml={2} fontSize="sm">
-                  You own this asset
-                </Text>
+            {system.tzPublicKey && system.tzPublicKey === token.owner ? (
+              <Flex>
+                <Flex
+                  py={1}
+                  px={3}
+                  mb={3}
+                  borderRightRadius="5px"
+                  bg="brand.turquoise"
+                  color="brand.black"
+                  align="center"
+                  justify="center"
+                >
+                  <Star fill="currentColor" size={16} />
+                  <Text fontWeight="600" ml={2} fontSize="sm">
+                    You own this asset
+                  </Text>
+                </Flex>
               </Flex>
-            </Flex>
+            ) : null}
             <Flex
               justify="space-between"
               align="center"
@@ -156,9 +200,10 @@ export default function TokenDetail(props: TokenDetailProps) {
                   {token.title}
                 </Heading>
               </Flex>
-              <Box color="gray.300">
-                <MoreHorizontal />
-              </Box>
+              {/* TODO: Add dropdown menu that contains transfer/share links */}
+              {/* <Box color="gray.300"> */}
+              {/*   <MoreHorizontal /> */}
+              {/* </Box> */}
             </Flex>
             <Flex
               px={8}
@@ -179,9 +224,25 @@ export default function TokenDetail(props: TokenDetailProps) {
               <Text pb={2} fontSize="xs" color="brand.gray">
                 IPFS HASH
               </Text>
-              <Text>98u31j2kide...</Text>
+              <Text>{token.ipfs_hash || 'No IPFS hash'}</Text>
             </Flex>
           </Flex>
+          {system.status === 'WalletConnected' ? (
+            <Flex
+              w="100%"
+              bg="white"
+              border="1px solid"
+              borderColor="brand.lightBlue"
+              borderRadius="3px"
+              py={6}
+              px={8}
+            >
+              <TransferTokenButton
+                contractAddress={contractAddress}
+                tokenId={tokenId}
+              />
+            </Flex>
+          ) : null}
         </Flex>
       </Flex>
     </Flex>

@@ -12,7 +12,7 @@ export interface Config {
     gui: string;
   };
   contracts: {
-    nft: string;
+    nftFaucet: string;
   };
 }
 
@@ -84,7 +84,7 @@ function networkType(config: Config) {
 export async function connectWallet(
   system: SystemWithToolkit
 ): Promise<SystemWithWallet> {
-  const network = networkType(system.config);
+  const network = networkType(system.config) as any;
 
   const wallet = new BeaconWallet({
     name: 'OpenSystem dApp',

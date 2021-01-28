@@ -1,22 +1,49 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'wouter';
-import { Flex, Grid, Image, Text } from '@chakra-ui/react';
+import { AspectRatio, Box, Flex, Grid, Image, Text } from '@chakra-ui/react';
 import { Token, State } from '../reducer';
-import placeholderAsset from '../../common/assets/placeholder_asset.png';
-import { Wind } from 'react-feather';
+import { Wind, HelpCircle } from 'react-feather';
 
 interface TokenTileProps extends Token {
   selectedCollection: string;
+}
+
+function TokenImage(props: { src: string }) {
+  const [errored, setErrored] = useState(false);
+
+  if (errored) {
+    return (
+      <Flex
+        flexDir="column"
+        align="center"
+        justify="center"
+        flex="1"
+        bg="gray.100"
+        color="gray.300"
+      >
+        <HelpCircle size="70px" />
+      </Flex>
+    );
+  }
+
+  return (
+    <Image
+      src={props.src}
+      objectFit="contain"
+      flex="1"
+      onError={() => setErrored(true)}
+    />
+  );
 }
 
 function TokenTile(props: TokenTileProps) {
   const [, setLocation] = useLocation();
   return (
     <Flex
-      w="100%"
-      h="300px"
-      bg="white"
       flexDir="column"
+      ratio={1}
+      w="100%"
+      bg="white"
       border="1px solid"
       borderColor="brand.lightBlue"
       borderRadius="3px"
@@ -28,15 +55,14 @@ function TokenTile(props: TokenTileProps) {
         boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.1)'
       }}
       onClick={() =>
-        setLocation(`/asset-details/${props.selectedCollection}/${props.id}`)
+        setLocation(`/collection/${props.selectedCollection}/token/${props.id}`)
       }
     >
-      <Image
-        src={placeholderAsset}
-        objectFit="cover"
-        flex="1"
-        filter={props.metadata?.filter}
-      />
+      <AspectRatio ratio={3 / 2}>
+        <Box p={4}>
+          <TokenImage src={`http://localhost:8080/ipfs/${props.ipfs_hash}`} />
+        </Box>
+      </AspectRatio>
       <Flex
         width="100%"
         px={4}

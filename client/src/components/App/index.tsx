@@ -15,7 +15,7 @@ export default function App() {
           <Route path="/">
             <SplashPage />
           </Route>
-          <Route path="/create-non-fungible">
+          <Route path="/create">
             <CreateNonFungiblePage />
           </Route>
           <Collections />

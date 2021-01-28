@@ -8,10 +8,10 @@ export default function Collections() {
   const [state, dispatch] = useReducer(reducer, initialState);
   return (
     <>
-      <Route path="/assets">
+      <Route path="/collections">
         <CollectionsCatalog state={state} dispatch={dispatch} />
       </Route>
-      <Route path="/asset-details/:contractAddress/:tokenId">
+      <Route path="/collection/:contractAddress/token/:tokenId">
         {({ contractAddress, tokenId }) => (
           <CollectionsTokenDetail
             contractAddress={contractAddress}

@@ -1,4 +1,5 @@
 import { produce } from 'immer';
+import config from '../../config.json';
 
 export interface Token {
   id: number;
@@ -21,7 +22,7 @@ export interface State {
   collections: Record<string, Collection>;
 }
 
-const globalCollectionAddress = 'KT1WVZ8qJBXX2yu9EMixhb32d8KNoWnJ9vAm';
+const globalCollectionAddress = config.contracts.nftFaucet;
 
 export const initialState: State = {
   selectedCollection: null,
@@ -43,6 +44,10 @@ export type Action =
       payload: { collections: Collection[] };
     }
   | {
+      type: 'update_collection';
+      payload: { collection: Collection };
+    }
+  | {
       type: 'select_collection';
       payload: { address: string };
     }
@@ -62,6 +67,17 @@ export function reducer(state: State, action: Action) {
               tokens: null
             };
           }
+        }
+      });
+    }
+    case 'update_collection': {
+      return produce(state, draftState => {
+        const collection = action.payload.collection;
+        if (!state.collections[collection.address]) {
+          draftState.collections[collection.address] = {
+            ...collection,
+            tokens: null
+          };
         }
       });
     }

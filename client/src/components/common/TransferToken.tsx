@@ -1,6 +1,9 @@
 import React, { useState, useContext, MutableRefObject } from 'react';
 import {
   Box,
+  Flex,
+  Spinner,
+  Heading,
   Text,
   FormControl,
   FormLabel,
@@ -12,36 +15,34 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  useDisclosure,
-  Spinner,
-  Flex,
-  Heading
+  useDisclosure
 } from '@chakra-ui/react';
-import { CheckCircle, Plus } from 'react-feather';
+import { Plus, CheckCircle } from 'react-feather';
 import { MinterButton } from '../common';
-import { createAssetContract } from '../../lib/nfts/actions';
+import { transferToken } from '../../lib/nfts/actions';
 import { SystemContext } from '../../context/system';
+import { SystemWithWallet } from '../../lib/system';
 
 interface FormProps {
   initialRef: MutableRefObject<null>;
-  onSubmit: (form: { contractName: string }) => void;
+  onSubmit: (form: { toAddress: string }) => void;
 }
 
 function Form({ initialRef, onSubmit }: FormProps) {
-  const [contractName, setContractName] = useState('');
+  const [toAddress, setToAddress] = useState('');
   return (
     <>
-      <ModalHeader>New Collection</ModalHeader>
+      <ModalHeader>Transfer Token</ModalHeader>
       <ModalCloseButton />
       <ModalBody>
         <FormControl>
-          <FormLabel fontFamily="mono">Collection Name</FormLabel>
+          <FormLabel fontFamily="mono">To Address</FormLabel>
           <Input
             autoFocus={true}
             ref={initialRef}
-            placeholder="Input your collection name"
-            value={contractName}
-            onChange={e => setContractName(e.target.value)}
+            placeholder="Input token recipient"
+            value={toAddress}
+            onChange={e => setToAddress(e.target.value)}
           />
         </FormControl>
       </ModalBody>
@@ -49,13 +50,18 @@ function Form({ initialRef, onSubmit }: FormProps) {
       <ModalFooter>
         <MinterButton
           variant="primaryAction"
-          onClick={() => onSubmit({ contractName })}
+          onClick={() => onSubmit({ toAddress })}
         >
-          Create Collection
+          Transfer
         </MinterButton>
       </ModalFooter>
     </>
   );
+}
+
+interface TransferTokenButtonProps {
+  contractAddress: string;
+  tokenId: number;
 }
 
 enum Status {
@@ -64,7 +70,7 @@ enum Status {
   Complete = 'complete'
 }
 
-export function CreateCollectionButton() {
+export function TransferTokenButton(props: TransferTokenButtonProps) {
   const { system } = useContext(SystemContext);
   const [status, setStatus] = useState<Status>(Status.Ready);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -74,9 +80,14 @@ export function CreateCollectionButton() {
     return null;
   }
 
-  const onSubmit = async (form: { contractName: string }) => {
+  const onSubmit = async (form: { toAddress: string }) => {
     setStatus(Status.InProgress);
-    const op = await createAssetContract(system, form.contractName);
+    const op = await transferToken(
+      system,
+      props.contractAddress,
+      props.tokenId,
+      form.toAddress
+    );
     await op.confirmation();
     setStatus(Status.Complete);
   };
@@ -89,11 +100,11 @@ export function CreateCollectionButton() {
 
   return (
     <>
-      <MinterButton variant="primaryActionInverted" onClick={onOpen}>
+      <MinterButton variant="primaryAction" onClick={onOpen}>
         <Box color="currentcolor">
           <Plus size={16} strokeWidth="3" />
         </Box>
-        <Text ml={2}>New Collection</Text>
+        <Text ml={2}>Transfer Token</Text>
       </MinterButton>
 
       <Modal
@@ -114,7 +125,7 @@ export function CreateCollectionButton() {
             <Flex flexDir="column" align="center" px={4} py={10}>
               <Spinner size="xl" mb={6} color="gray.300" />
               <Heading size="lg" textAlign="center" color="gray.500">
-                Creating new collection...
+                Transferring token...
               </Heading>
             </Flex>
           ) : null}
@@ -124,7 +135,7 @@ export function CreateCollectionButton() {
                 <CheckCircle size="70px" />
               </Box>
               <Heading size="lg" textAlign="center" color="gray.500" mb={6}>
-                Collection created
+                Transfer complete
               </Heading>
               <MinterButton variant="primaryAction" onClick={() => close()}>
                 Close

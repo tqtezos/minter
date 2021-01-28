@@ -14,11 +14,6 @@ import {
 import { ChevronDown, Package, Plus } from 'react-feather';
 import headerLogo from './assets/header-logo.svg';
 import { SystemContext } from '../../context/system';
-import { createAssetContract, mintToken } from '../../lib/nfts/actions';
-import {
-  getContractNfts,
-  getWalletNftAssetContracts
-} from '../../lib/nfts/queries';
 
 interface HeaderLinkProps {
   to: string;
@@ -60,7 +55,11 @@ function HeaderLink(props: HeaderLinkProps) {
 function WalletInfo(props: { tzPublicKey: string }) {
   return (
     <>
-      <Box borderRadius="100%" width={9} height={9} bg="brand.darkGray" />
+      <Box borderRadius="100%" width={10} height={10} bg="brand.darkGray" p={1}>
+        <Image
+          src={`https://services.tzkt.io/v1/avatars2/${props.tzPublicKey}`}
+        />
+      </Box>
       <Text fontFamily="mono" ml={4} mr={2}>
         {props.tzPublicKey}
       </Text>
@@ -90,47 +89,6 @@ function WalletDisplay() {
           >
             Disconnect
           </MenuItem>
-          <MenuItem
-            onClick={async () => {
-              const originOp = await createAssetContract(system, 'hello1');
-              const contract = await originOp.contract();
-              console.log(contract.address);
-            }}
-          >
-            Test Contract Create
-          </MenuItem>
-          <MenuItem
-            onClick={async () => {
-              const contracts = await getWalletNftAssetContracts(system);
-              console.log(contracts);
-            }}
-          >
-            Test Get Wallet NFT Asset Contracts
-          </MenuItem>
-          <MenuItem
-            onClick={async () => {
-              const originOp = await mintToken(
-                system,
-                'KT1X8YZ3Xet9EtyEj77KZmS8WrHaNN16FET2',
-                { hello: 'world2' }
-              );
-              await originOp.confirmation();
-              console.log(originOp);
-            }}
-          >
-            Test Mint Token
-          </MenuItem>
-          <MenuItem
-            onClick={async () => {
-              const nfts = await getContractNfts(
-                system,
-                'KT1X8YZ3Xet9EtyEj77KZmS8WrHaNN16FET2'
-              );
-              console.log(nfts);
-            }}
-          >
-            Test Get NFTs
-          </MenuItem>
         </MenuList>
       </Menu>
     </>
@@ -159,18 +117,18 @@ export function Header() {
         src={headerLogo}
         onClick={e => {
           e.preventDefault();
-          setLocation('/assets');
+          setLocation('/collections');
         }}
         cursor="pointer"
       />
-      <Flex flex="1" justify="end">
-        <HeaderLink to="/assets">
+      <Flex flex="1" justify="flex-end">
+        <HeaderLink to="/collections">
           <Box color="brand.turquoise">
             <Package size={16} strokeWidth="3" />
           </Box>
           <Text ml={2}>Collections</Text>
         </HeaderLink>
-        <HeaderLink to="/create-non-fungible">
+        <HeaderLink to="/create">
           <Box color="brand.blue">
             <Plus size={16} strokeWidth="3" />
           </Box>
