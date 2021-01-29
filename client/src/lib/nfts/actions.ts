@@ -13,8 +13,14 @@ export async function createFaucetContract(
   name: string
 ) {
   const metadata = new MichelsonMap<string, string>();
+  const contents = {
+    name,
+    description: 'An OpenMinter base collection contract.',
+    interfaces: ['TZIP-012', 'TZIP-016', 'TZIP-020'],
+    tokenCategory: 'collectibles'
+  };
   metadata.set('', toHexString('tezos:storage/contents'));
-  metadata.set('contents', toHexString(JSON.stringify({ name })));
+  metadata.set('contents', toHexString(JSON.stringify(contents)));
   return await system.toolkit.wallet
     .originate({
       code: faucetCode,
@@ -37,7 +43,13 @@ export async function createAssetContract(
 ) {
   const metadata = new MichelsonMap<string, string>();
   metadata.set('', toHexString('tezos:storage/contents'));
-  metadata.set('contents', toHexString(JSON.stringify({ name })));
+  const contents = {
+    name,
+    description: 'An OpenMinter assets contract.',
+    interfaces: ['TZIP-012', 'TZIP-016', 'TZIP-020'],
+    tokenCategory: 'collectibles'
+  };
+  metadata.set('contents', toHexString(JSON.stringify(contents)));
   return await system.toolkit.wallet
     .originate({
       code: assetCode,

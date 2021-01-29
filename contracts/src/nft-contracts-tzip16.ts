@@ -76,8 +76,14 @@ export async function originateNftFaucet2(
 ): Promise<Contract> {
   const name = 'nft_faucet_main';
   const metadata = new MichelsonMap<string, string>();
+  const contents = {
+    name: 'Minter',
+    description: 'An OpenMinter base collection contract.',
+    interfaces: ['TZIP-012', 'TZIP-016', 'TZIP-020'],
+    tokenCategory: 'collectibles'
+  };
   metadata.set('', toHexString('tezos:storage/contents'));
-  metadata.set('contents', toHexString(JSON.stringify({ name })));
+  metadata.set('contents', toHexString(JSON.stringify(contents)));
   try {
     const originationOp = await tz.contract.originate({
       code: code,
