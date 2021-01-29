@@ -23,7 +23,7 @@ export enum CreateStatus {
 
 export interface State {
   step: Step;
-  ipfs_hash: string | null;
+  artifactUri: string | null;
   fields: Fields;
   metadataRows: { name: string | null; value: string | null }[];
   collectionAddress: string | null;
@@ -31,7 +31,7 @@ export interface State {
 }
 
 export const fileUploadSchema = Joi.object({
-  ipfs_hash: Joi.string().required()
+  artifactUri: Joi.string().required()
 });
 
 export const assetDetailsSchema = fileUploadSchema.append({
@@ -55,7 +55,7 @@ export type Action =
   | { type: 'increment_step' }
   | { type: 'decrement_step' }
   | { type: 'update_field'; payload: { name: keyof Fields; value: string } }
-  | { type: 'update_ipfs_hash'; payload: { value: string } }
+  | { type: 'update_artifact_uri'; payload: { value: string } }
   | { type: 'add_metadata_row' }
   | {
       type: 'update_metadata_row_name';
@@ -73,7 +73,7 @@ export type DispatchFn = Dispatch<Action>;
 
 export const initialState: State = {
   step: 'file_upload',
-  ipfs_hash: null,
+  artifactUri: null,
   fields: {
     name: null,
     description: null
@@ -109,10 +109,10 @@ export function reducer(state: State, action: Action) {
         draftState.fields[name] = value;
       });
     }
-    case 'update_ipfs_hash': {
+    case 'update_artifact_uri': {
       const { value } = action.payload;
       return produce(state, draftState => {
-        draftState.ipfs_hash = value;
+        draftState.artifactUri = value;
       });
     }
     case 'add_metadata_row': {

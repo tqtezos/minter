@@ -87,7 +87,7 @@ describe('test market (test_case_1)', () => {
                 {
                     token_metadata: {
                         token_id: tokenId,
-                        token_metadata_map: tokenMetadata,
+                        token_info: tokenMetadata,
                     },
                     owner: bobAddress
                 }

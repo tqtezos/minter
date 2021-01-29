@@ -6,7 +6,7 @@ export interface Token {
   title: string;
   owner: string;
   description: string;
-  ipfs_hash: string;
+  artifactUri: string;
   metadata: Record<string, string>;
 }
 

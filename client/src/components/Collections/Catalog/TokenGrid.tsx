@@ -60,7 +60,7 @@ function TokenTile(props: TokenTileProps) {
     >
       <AspectRatio ratio={3 / 2}>
         <Box p={4}>
-          <TokenImage src={`http://localhost:8080/ipfs/${props.ipfs_hash}`} />
+          <TokenImage src={props.artifactUri} />
         </Box>
       </AspectRatio>
       <Flex

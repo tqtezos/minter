@@ -1,5 +1,5 @@
 export const hash =
-  '83dc6ec84e08bcc33745ad2af94b97416d1292a4e5e55253cf8219de7cc11e9b042e62d0ac2d0641bf8f1a2dd7fba42dd1805a00b4a827b5d9b83b12f8d5c6ae';
+  '10162871bcb0bd01a3c5bb65f32ad72cc8f38b7e616f5e9d7ffea60721a523c95b423356a7f96d46983c788fcb96c0cd9771ebbc933bac58d104b54aacb50d38';
 
 const code = `
 { parameter
@@ -16,16 +16,14 @@ const code = `
                   (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
                       (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id)))))))
         (list %mint
-           (pair (pair %token_metadata (nat %token_id) (map %token_metadata_map string bytes))
+           (pair (pair %token_metadata (nat %token_id) (map %token_info string bytes))
                  (address %owner)))) ;
   storage
     (pair (pair (pair %admin (pair (address %admin) (bool %paused)) (option %pending_admin address))
                 (pair %assets
                    (pair (big_map %ledger nat address) (nat %next_token_id))
                    (pair (big_map %operators (pair address (pair address nat)) unit)
-                         (big_map %token_metadata
-                            nat
-                            (pair (nat %token_id) (map %token_metadata_map string bytes))))))
+                         (big_map %token_metadata nat (pair (nat %token_id) (map %token_info string bytes))))))
           (big_map %metadata string bytes)) ;
   code { PUSH string "FA2_INSUFFICIENT_BALANCE" ;
          LAMBDA
@@ -638,6 +636,7 @@ const code = `
              SWAP ;
              CAR ;
              PAIR } } }
+
 `;
 
 export default code;

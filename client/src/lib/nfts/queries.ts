@@ -16,7 +16,19 @@ function foldBigMapResponseAsObject(bigMapResponse: any) {
   }, {});
 }
 
-export async function getContractNfts(system: System, address: string) {
+interface Nft {
+  id: number;
+  title: string;
+  owner: string;
+  description: string;
+  artifactUri: string;
+  metadata: Record<string, string>;
+}
+
+export async function getContractNfts(
+  system: System,
+  address: string
+): Promise<Nft[]> {
   const storage = await system.betterCallDev.getContractStorage(address);
 
   const ledgerBigMapId = select(storage, {
@@ -41,29 +53,31 @@ export async function getContractNfts(system: System, address: string) {
 
   if (!tokens) return [];
 
-  return tokens.map((token: any) => {
-    const tokenId = select(token, { name: 'token_id' })?.value;
-    const metadataMap = select(token, { name: 'token_metadata_map' })?.children;
-    const metadata = metadataMap.reduce((acc: any, next: any) => {
-      return { ...acc, [next.name]: fromHexString(next.value) };
-    }, {});
+  return tokens.map(
+    (token: any): Nft => {
+      const tokenId = select(token, { name: 'token_id' })?.value;
+      const metadataMap = select(token, { name: 'token_info' })?.children;
+      const metadata = metadataMap.reduce((acc: any, next: any) => {
+        return { ...acc, [next.name]: fromHexString(next.value) };
+      }, {});
 
-    const owner = select(
-      ledger.filter((v: any) => v.data.key.value === tokenId),
-      {
-        type: 'address'
-      }
-    )?.value;
+      const owner = select(
+        ledger.filter((v: any) => v.data.key.value === tokenId),
+        {
+          type: 'address'
+        }
+      )?.value;
 
-    return {
-      id: parseInt(tokenId, 10),
-      title: metadata.name,
-      owner,
-      description: metadata.description,
-      ipfs_hash: metadata.ipfs_hash,
-      metadata: metadata
-    };
-  });
+      return {
+        id: parseInt(tokenId, 10),
+        title: metadata.name,
+        owner,
+        description: metadata.description,
+        artifactUri: metadata.artifactUri,
+        metadata: metadata
+      };
+    }
+  );
 }
 
 export async function getNftAssetContract(system: System, address: string) {
@@ -76,7 +90,14 @@ export async function getNftAssetContract(system: System, address: string) {
   })?.value;
 
   const metadataResponse = await bcd.getBigMapKeys(metadataBigMapId);
-  const metadata = foldBigMapResponseAsObject(metadataResponse);
+
+  // TODO: Resolve and validate metadata to token standard.
+  const metadataContents = select(metadataResponse, {
+    key_string: 'contents'
+  })?.value?.value;
+
+  const metadata = JSON.parse(fromHexString(metadataContents));
+
   return { address, metadata };
 }
 

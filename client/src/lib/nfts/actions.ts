@@ -13,7 +13,8 @@ export async function createFaucetContract(
   name: string
 ) {
   const metadata = new MichelsonMap<string, string>();
-  metadata.set('name', toHexString(name));
+  metadata.set('', toHexString('tesoz:storage/contents'));
+  metadata.set('contents', toHexString(JSON.stringify({ name })));
   return await system.toolkit.wallet
     .originate({
       code: faucetCode,
@@ -35,7 +36,8 @@ export async function createAssetContract(
   name: string
 ) {
   const metadata = new MichelsonMap<string, string>();
-  metadata.set('name', toHexString(name));
+  metadata.set('', toHexString('tesoz:storage/contents'));
+  metadata.set('contents', toHexString(JSON.stringify({ name })));
   return await system.toolkit.wallet
     .originate({
       code: assetCode,
@@ -66,11 +68,13 @@ export async function mintToken(
   const storage = await contract.storage<any>();
 
   const token_id = storage.assets.next_token_id;
-  const token_metadata_map = new MichelsonMap<string, string>();
+  const token_info = new MichelsonMap<string, string>();
+
+  token_info.set('decimals', toHexString('0'));
 
   for (let key in metadata) {
     const value = toHexString(metadata[key]);
-    token_metadata_map.set(key, value);
+    token_info.set(key, value);
   }
 
   return contract.methods
@@ -79,7 +83,7 @@ export async function mintToken(
         owner: system.tzPublicKey,
         token_metadata: {
           token_id,
-          token_metadata_map
+          token_info
         }
       }
     ])

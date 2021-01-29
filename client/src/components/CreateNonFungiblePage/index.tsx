@@ -89,11 +89,11 @@ function stepIsValid(state: State) {
 
 async function handleCreate(system: SystemWithWallet, state: State) {
   const metadata: Record<string, string> = {};
-  const ipfs_hash = state.ipfs_hash as string;
+  const artifactUri = state.artifactUri as string;
   const name = state.fields.name as string;
   const address = state.collectionAddress as string;
 
-  metadata.ipfs_hash = ipfs_hash;
+  metadata.artifactUri = artifactUri;
   metadata.name = name;
   if (state.fields.description) {
     metadata.description = state.fields.description;
@@ -224,7 +224,7 @@ export default function CreateNonFungiblePage() {
           <Box pb={10} w="100%" />
         </Box>
       </Flex>
-      {state.step === 'file_upload' && !state.ipfs_hash ? (
+      {state.step === 'file_upload' && !state.artifactUri ? (
         <Flex
           bg="brand.darkGray"
           borderLeftWidth="1px"
