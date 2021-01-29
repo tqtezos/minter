@@ -17,6 +17,7 @@ mkdir -p $PGDATA
 # generation so it can be referenced before it's updated
 set -C
 ! echo "{}" > "$PROJECT_ROOT_DIR/client/src/config.json"
+! echo "{}" > "$PROJECT_ROOT_DIR/server/src/config.json"
 set +C
 
 UI_STACK_FILE=$DOCKER_STACK_DIR/${STACK_UI_DEF}.yml
