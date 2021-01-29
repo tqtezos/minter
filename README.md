@@ -5,16 +5,16 @@
 ## OpenMinter
 
 OpenMinter is dApp framework for enabling the creation and collection
-of non-fungible tokens (NFTs) on Tezos. The dApp enables anyone to 
+of non-fungible tokens (NFTs) on Tezos. The dApp enables anyone to
 create an NFT by filling in just a few fields, create new collection
-contracts, see their NFTs across contracts, and enable marketplace 
-capabilities to trade them. 
+contracts, see their NFTs across contracts, and enable marketplace
+capabilities to trade them.
 
 Current version supports the following:
 #### 🌐 Mainnet and Delphinet (Edonet soon)
 #### 🎨 Image-based NFTs
-#### 👛 [Beacon](https://www.walletbeacon.io/) support 
-#### ⚙️ The latest [FA2](https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md) spec 
+#### 👛 [Beacon](https://www.walletbeacon.io/) support
+#### ⚙️ The latest [FA2](https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md) spec
 #### 🚀 [IPFS](https://ipfs.io/) support for data availability
 
 ## Dependencies
@@ -55,13 +55,21 @@ TypeScript type:
 ```typescript
 type Config = {
   rpc: string,
+  network: string,
+  bcd: {
+    api: string,
+    gui: string
+  },
   admin: {
     address: string,
     secret: string
   },
+  pinata?: {
+    apiKey: string,
+    secretKey: string
+  },
   contracts?: {
-    nftFaucet?: string,
-    nftFactory?: string
+    nftFaucet?: string
   }
 }
 ```
@@ -80,17 +88,30 @@ administrator during contract origination:
 }
 ```
 
-> **Note:** Since sandbox and testnet keys don't represent sensitive accounts, the `config/`
+> **Note:** Since sandbox keys don't represent sensitive accounts, the `config/`
 > folder includes default configurations with `admin` wallets. To configure Minter
-> for the `mainnet` network, update the definitions in
-> `config/minter.mainnet.example.json` and copy it to the proper path for the
-> application to read it:
+> for the `testnet` or `mainnet` networks, update the definitions in
+> `config/minter.<network>.example.json` and copy it to the proper path for the
+> application to read it. For:
 >
 > `cp config/minter.mainnet.example.json config/minter.mainnet.json`
 
 If the `contracts` key or its children `nftFaucet` or `nftFactory` keys are not
 specified, these contracts will be originated and their addresses saved in the
 configuration file when starting the Minter devleopment environment.
+
+#### Pinata
+
+Testnet and Mainnet instances of OpenMinter can include [Pinata][pinata] API
+keys in order to direct all file uploads through their service. This allows for
+ease of use while working with IPFS as running OpenMinter without Pinata will
+rely on using and maintaining a local IPFS node.
+
+> **Note:** The example `testnet` and `mainnet` configurations in the `config/`
+> folder have placeholder Pinata API keys. If you want to use OpenMinter on
+> these networks without Pinata, remove the `pinata` key from the configuration.
+
+[pinata]: https://pinata.cloud
 
 ### Starting and Stopping
 

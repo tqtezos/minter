@@ -6,8 +6,12 @@
 		"gui": "https://better-call.dev"
 	},
 	"admin": {
-		"address": "tz1hs8oA8xjpEfrmqHedJ3Yv7KN355JFL3rW",
-		"secret": "edsk36qzuACZiucKjW3fXifeqSXPveA8ykR95banDK367vimMAC9ZR"
+		"address": "<YOUR_TZ_PUBLIC_ADDRESS_HERE>",
+		"secret": "<YOUR_TZ_PRIVATE_KEY_HERE>"
+	},
+	"pinata": {
+		"apiKey": "<YOUR_PINATA_API_KEY_HERE>",
+		"apiSecret": "<YOUR_PINATA_API_SECRET_HERE>"
 	},
 	"contracts": {}
 }
