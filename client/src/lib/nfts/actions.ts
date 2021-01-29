@@ -13,7 +13,7 @@ export async function createFaucetContract(
   name: string
 ) {
   const metadata = new MichelsonMap<string, string>();
-  metadata.set('', toHexString('tesoz:storage/contents'));
+  metadata.set('', toHexString('tezos:storage/contents'));
   metadata.set('contents', toHexString(JSON.stringify({ name })));
   return await system.toolkit.wallet
     .originate({
@@ -36,7 +36,7 @@ export async function createAssetContract(
   name: string
 ) {
   const metadata = new MichelsonMap<string, string>();
-  metadata.set('', toHexString('tesoz:storage/contents'));
+  metadata.set('', toHexString('tezos:storage/contents'));
   metadata.set('contents', toHexString(JSON.stringify({ name })));
   return await system.toolkit.wallet
     .originate({
