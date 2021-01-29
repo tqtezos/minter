@@ -91,10 +91,13 @@ export async function getNftAssetContract(system: System, address: string) {
 
   const metadataResponse = await bcd.getBigMapKeys(metadataBigMapId);
 
+  // TODO: Resolve and validate metadata to token standard.
   const metadataContents = select(metadataResponse, {
     key_string: 'contents'
   })?.value?.value;
+
   const metadata = JSON.parse(fromHexString(metadataContents));
+
   return { address, metadata };
 }
 
