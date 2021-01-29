@@ -27,7 +27,7 @@ export default function FileUpload({
 
     dispatch({
       type: 'update_artifact_uri',
-      payload: { value: response.data.url }
+      payload: { value: response.data.publicGatewayUrl }
     });
 
     console.log('Succesfully uploaded image to IPFS Server.');
