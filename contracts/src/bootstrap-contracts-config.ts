@@ -22,6 +22,7 @@ async function main() {
     //add bootstrapping of other contracts here
 
     genClientConfig(config);
+    genServerConfig(config);
 
     process.exit(0);
   } catch (err) {
@@ -36,6 +37,17 @@ function genClientConfig(mainConfig: Configstore) {
   const clientConfig = new Configstore('client', {}, { configPath });
 
   const clientConfigKeys = ['rpc', 'network', 'bcd', 'ipfs', 'contracts'];
+
+  for (let key of clientConfigKeys) {
+    clientConfig.set(key, mainConfig.get(key));
+  }
+}
+
+function genServerConfig(mainConfig: Configstore) {
+  const configPath = path.join(__dirname, `../../server/src/config.json`);
+  const clientConfig = new Configstore('client', {}, { configPath });
+
+  const clientConfigKeys = ['pinata'];
 
   for (let key of clientConfigKeys) {
     clientConfig.set(key, mainConfig.get(key));

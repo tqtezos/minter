@@ -1,50 +1,130 @@
-import express, { Express, Response } from 'express';
+import express, { Express, Request, Response } from 'express';
 import IpfsClient from 'ipfs-http-client';
 import url from 'url';
 import bodyParser from 'body-parser';
-import fileUpload from 'express-fileupload';
+import fileUpload, { UploadedFile } from 'express-fileupload';
 import http from 'http';
+import axios from 'axios';
+import fs from 'fs';
+import FormData from 'form-data';
+import { promisify } from 'util';
+import { Readable } from 'stream';
+
+const readFileAsync = promisify(fs.readFile);
 
 // TODO: Move this configuration to a JSON definition
 const ipfsConfig = {
-  // The URL of our IPFS API server, our Web UI uploads files to.
   apiUrl: 'http://ipfs:5001',
-
-  // The URL of our IPFS gateway server, which can be used for fast file download
-  // It is the same server as the one running IPFS API.
   gatewayUrl: 'http://127.0.0.1:8080/',
-
-  // The URL of a public IPFS read-only gateway server. It may take time to
-  // propagate information from our IPFS server to a public one.
-  // It can be also used for file download but it may be very slow.
-  publicGatewayUrl: 'https://ipfs.io/'
+  pinataGatewayUrl: 'https://gateway.pinata.cloud/',
+  publicGatewayUrl: 'https://cloudflare-ipfs.com/'
 };
 
-function createHttpServer(app: Express) {
+interface PinataConfig {
+  apiKey: string;
+  apiSecret: string;
+}
+
+async function uploadToPinata(
+  pinataConfig: PinataConfig,
+  file: UploadedFile,
+  res: Response
+) {
+  try {
+    const pinataUrl = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
+    const formData = new FormData();
+    formData.append('file', fs.createReadStream(file.tempFilePath));
+
+    const pinataRes = await axios.post(pinataUrl, formData, {
+      maxContentLength: Infinity,
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${
+          (formData as any)._boundary
+        }`,
+        pinata_api_key: pinataConfig.apiKey,
+        pinata_secret_api_key: pinataConfig.apiSecret
+      }
+    });
+
+    const pinataData = pinataRes.data;
+    const cid = pinataData.IpfsHash;
+
+    return res.status(200).send({
+      cid,
+      size: pinataData.PinSize,
+      url: url.resolve(ipfsConfig.pinataGatewayUrl, `ipfs/${cid}`),
+      publicGatewayUrl: url.resolve(ipfsConfig.publicGatewayUrl, `ipfs/${cid}`)
+    });
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+async function uploadToIpfs(file: UploadedFile, res: Response) {
+  const ipfsClient = IpfsClient(ipfsConfig.apiUrl);
+  const ipfsFile = await ipfsClient.add(file.data);
+  const cid = ipfsFile.cid.toString();
+
+  return res.status(200).send({
+    cid,
+    size: ipfsFile.size,
+    url: url.resolve(ipfsConfig.gatewayUrl, `ipfs/${cid}`),
+    publicGatewayUrl: url.resolve(ipfsConfig.publicGatewayUrl, `ipfs/${cid}`)
+  });
+}
+
+async function getPinataConfig(): Promise<PinataConfig | null> {
+  try {
+    const path = `${__dirname}/config.json`;
+    const config = JSON.parse(await readFileAsync(path, { encoding: 'utf8' }));
+    const apiKey = config?.pinata?.apiKey;
+    const apiSecret = config?.pinata?.apiSecret;
+
+    if (!(typeof apiKey === 'string' && typeof apiSecret === 'string')) {
+      return null;
+    }
+
+    return {
+      apiKey,
+      apiSecret
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+async function handleIpfsUpload(
+  pinataConfig: PinataConfig | null,
+  req: Request,
+  res: Response
+) {
+  const file = req.files?.file;
+  if (!file?.data) {
+    throw Error('No file data found');
+  }
+
+  if (pinataConfig) {
+    return await uploadToPinata(pinataConfig, file, res);
+  }
+
+  return await uploadToIpfs(file, res);
+}
+
+async function createHttpServer(app: Express) {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
   app.use(
     fileUpload({
-      limits: { fileSize: 10 * 1024 * 1024 } // 20MB
+      limits: { fileSize: 30 * 1024 * 1024 }, // 30MB
+      useTempFiles: true
     })
   );
 
-  app.post('/ipfs-upload', async (req: any, res: Response) => {
-    if (!req.files?.file?.data) {
-      throw Error('No file data found');
-    }
+  const pinataConfig = await getPinataConfig();
 
-    const ipfsClient = IpfsClient(ipfsConfig.apiUrl);
-    const ipfsFile = await ipfsClient.add(req.files.file.data);
-    const cid = ipfsFile.cid.toString();
-
-    return res.status(200).send({
-      cid,
-      size: ipfsFile.size,
-      url: url.resolve(ipfsConfig.gatewayUrl, `ipfs/${cid}`),
-      publicGatewayUrl: url.resolve(ipfsConfig.publicGatewayUrl, `ipfs/${cid}`)
-    });
-  });
+  app.post('/ipfs-upload', (req, res) =>
+    handleIpfsUpload(pinataConfig, req, res)
+  );
 
   const httpServer = http.createServer(app);
   return httpServer;
@@ -62,7 +142,8 @@ async function run() {
   const envPort = process.env.MINTER_API_PORT;
   const port = envPort ? parseInt(envPort) : 3300;
   const app = express();
-  createHttpServer(app).listen(port, () => {
+  const server = await createHttpServer(app);
+  server.listen(port, () => {
     console.log(`[Server] Serving on port ${port}`);
   });
 }

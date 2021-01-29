@@ -228,11 +228,9 @@ export default function TokenDetail(props: TokenDetailProps) {
                 color="brand.gray"
                 textTransform="uppercase"
               >
-                Artifact URI
+                IPFS Hash
               </Text>
-              <Text>
-                {ipfsCidFromUri(token.artifactUri) || 'No Artifact URI'}
-              </Text>
+              <Text>{ipfsCidFromUri(token.artifactUri) || 'No IPFS Hash'}</Text>
             </Flex>
           </Flex>
           {system.status === 'WalletConnected' ? (
