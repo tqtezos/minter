@@ -17,13 +17,6 @@ interface CatalogProps {
   dispatch: Dispatch<Action>;
 }
 
-function collectionTitle(state: State) {
-  if (state.selectedCollection === null) {
-    return '';
-  }
-  return state.collections[state.selectedCollection]?.metadata?.name;
-}
-
 export default function Catalog({ state, dispatch }: CatalogProps) {
   const [, setLocation] = useLocation();
   const { system } = useContext(SystemContext);
@@ -55,9 +48,12 @@ export default function Catalog({ state, dispatch }: CatalogProps) {
     }
   }, [system.status]);
 
-  if (system.status !== 'WalletConnected') {
+  const selectedCollection = state.selectedCollection;
+  if (system.status !== 'WalletConnected' || !selectedCollection) {
     return null;
   }
+
+  const collection = state.collections[selectedCollection];
 
   return (
     <Flex flex="1" w="100%" minHeight="0">
@@ -78,7 +74,12 @@ export default function Catalog({ state, dispatch }: CatalogProps) {
         justify="start"
       >
         <Flex w="100%" pb={6} justify="space-between" align="center">
-          <Heading size="lg">{collectionTitle(state)}</Heading>
+          <Flex flexDir="column">
+            <Heading size="lg">{collection.metadata.name || ''}</Heading>
+            <Text fontFamily="mono" color="brand.lightGray">
+              {collection.address}
+            </Text>
+          </Flex>
           <MinterButton
             variant="primaryActionInverted"
             onClick={() => {
