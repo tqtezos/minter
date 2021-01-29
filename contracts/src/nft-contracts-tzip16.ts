@@ -82,7 +82,7 @@ export async function originateNftFaucet2(
     interfaces: ['TZIP-012', 'TZIP-016', 'TZIP-020'],
     tokenCategory: 'collectibles'
   };
-  metadata.set('', toHexString('tezos:storage/contents'));
+  metadata.set('', toHexString('tezos-storage:contents'));
   metadata.set('contents', toHexString(JSON.stringify(contents)));
   try {
     const originationOp = await tz.contract.originate({
