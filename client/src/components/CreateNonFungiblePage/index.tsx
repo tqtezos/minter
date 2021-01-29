@@ -94,6 +94,7 @@ async function handleCreate(system: SystemWithWallet, state: State) {
   const address = state.collectionAddress as string;
 
   metadata.artifactUri = artifactUri;
+  metadata.displayUri = artifactUri;
   metadata.name = name;
   if (state.fields.description) {
     metadata.description = state.fields.description;
