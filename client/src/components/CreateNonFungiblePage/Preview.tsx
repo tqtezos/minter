@@ -1,6 +1,7 @@
 import React from 'react';
 import { Divider, Heading, Flex, Image, Text } from '@chakra-ui/react';
 import { State } from './reducer';
+import { ipfsCidFromUri } from '../../util';
 
 export default function Preview({ state }: { state: State }) {
   const { name, description } = state.fields;
@@ -22,7 +23,7 @@ export default function Preview({ state }: { state: State }) {
         overflow="hidden"
       >
         <Image
-          src={`http://localhost:8080/ipfs/${state.ipfs_hash}`}
+          src={state.artifactUri || ''}
           overflow="hidden"
           objectFit="contain"
           objectPosition="center"
@@ -42,10 +43,12 @@ export default function Preview({ state }: { state: State }) {
       </Text>
       <Divider borderColor="brand.lightBlue" opacity="1" />
       <Flex flexDir="column" px={8} py={6}>
-        <Text pb={2} fontSize="xs" color="brand.gray">
-          IPFS HASH
+        <Text pb={2} fontSize="xs" color="brand.gray" textTransform="uppercase">
+          IPFS Hash
         </Text>
-        <Text>{state.ipfs_hash}</Text>
+        <Text>
+          {(state.artifactUri && ipfsCidFromUri(state.artifactUri)) || ''}
+        </Text>
       </Flex>
     </Flex>
   );

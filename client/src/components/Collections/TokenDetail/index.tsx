@@ -10,6 +10,7 @@ import {
   getContractNfts
 } from '../../../lib/nfts/queries';
 import { TransferTokenButton } from '../../common/TransferToken';
+import { ipfsCidFromUri } from '../../../util';
 
 function NotFound() {
   return (
@@ -37,13 +38,6 @@ function NotFound() {
       </Flex>
     </Flex>
   );
-}
-
-interface TokenDetailProps {
-  contractAddress: string;
-  tokenId: number;
-  state: State;
-  dispatch: Dispatch<Action>;
 }
 
 function TokenImage(props: { src: string }) {
@@ -87,6 +81,13 @@ function TokenImage(props: { src: string }) {
       </Box>
     </AspectRatio>
   );
+}
+
+interface TokenDetailProps {
+  contractAddress: string;
+  tokenId: number;
+  state: State;
+  dispatch: Dispatch<Action>;
 }
 
 export default function TokenDetail(props: TokenDetailProps) {
@@ -140,7 +141,7 @@ export default function TokenDetail(props: TokenDetailProps) {
           </MinterButton>
         </Flex>
         <Flex align="center" justify="center" flex="1" px={16}>
-          <TokenImage src={`http://localhost:8080/ipfs/${token.ipfs_hash}`} />
+          <TokenImage src={token.artifactUri} />
         </Flex>
       </Flex>
       <Flex w="50%" h="100%" flexDir="column">
@@ -221,10 +222,17 @@ export default function TokenDetail(props: TokenDetailProps) {
               )}
             </Flex>
             <Flex flexDir="column" px={8} pt={6}>
-              <Text pb={2} fontSize="xs" color="brand.gray">
-                IPFS HASH
+              <Text
+                pb={2}
+                fontSize="xs"
+                color="brand.gray"
+                textTransform="uppercase"
+              >
+                Artifact URI
               </Text>
-              <Text>{token.ipfs_hash || 'No IPFS hash'}</Text>
+              <Text>
+                {ipfsCidFromUri(token.artifactUri) || 'No Artifact URI'}
+              </Text>
             </Flex>
           </Flex>
           {system.status === 'WalletConnected' ? (

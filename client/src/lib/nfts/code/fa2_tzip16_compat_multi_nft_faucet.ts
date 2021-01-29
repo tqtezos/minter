@@ -18,9 +18,7 @@ const code = `
     (pair (pair %assets
              (pair (big_map %ledger nat address) (nat %next_token_id))
              (pair (big_map %operators (pair address (pair address nat)) unit)
-                   (big_map %token_metadata
-                      nat
-                      (pair (nat %token_id) (map %token_info string bytes)))))
+                   (big_map %token_metadata nat (pair (nat %token_id) (map %token_info string bytes)))))
           (big_map %metadata string bytes)) ;
   code { PUSH string "FA2_INSUFFICIENT_BALANCE" ;
          LAMBDA
@@ -512,6 +510,7 @@ const code = `
              SWAP ;
              CAR ;
              PAIR } } }
+
 `;
 
 export default code;
