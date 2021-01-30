@@ -45,7 +45,7 @@ function genClientConfig(mainConfig: Configstore) {
 
 function genServerConfig(mainConfig: Configstore) {
   const configPath = path.join(__dirname, `../../server/src/config.json`);
-  const clientConfig = new Configstore('client', {}, { configPath });
+  const clientConfig = new Configstore('server', {}, { configPath });
 
   const clientConfigKeys = ['pinata'];
 

@@ -62,7 +62,7 @@ async function uploadToPinata(
 
 async function uploadToIpfs(file: UploadedFile, res: Response) {
   const ipfsClient = IpfsClient(ipfsConfig.apiUrl);
-  const ipfsFile = await ipfsClient.add(file.data);
+  const ipfsFile = await ipfsClient.add(fs.readFileSync(file.tempFilePath));
   const cid = ipfsFile.cid.toString();
 
   return res.status(200).send({
