@@ -15,7 +15,7 @@ Current version supports the following:
 #### 🎨 Image-based NFTs
 #### 👛 [Beacon](https://www.walletbeacon.io/) support
 #### ⚙️ The latest [FA2](https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md) spec
-#### 🚀 [IPFS](https://ipfs.io/) support for data availability
+#### 🚀 [IPFS](https://ipfs.io/) support (locally and [Pinata](https://pinata.cloud/))
 
 ## Dependencies
 
