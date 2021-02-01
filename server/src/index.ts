@@ -69,7 +69,7 @@ async function uploadToIpfs(file: UploadedFile, res: Response) {
     cid,
     size: ipfsFile.size,
     url: url.resolve(ipfsConfig.gatewayUrl, `ipfs/${cid}`),
-    publicGatewayUrl: url.resolve(ipfsConfig.publicGatewayUrl, `ipfs/${cid}`)
+    publicGatewayUrl: url.resolve(ipfsConfig.gatewayUrl, `ipfs/${cid}`)
   });
 }
 
