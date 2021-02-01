@@ -6,6 +6,7 @@ import Configstore from 'configstore';
 import { defaultEnv, originateContract, loadFile } from './ligo';
 import { TezosToolkit } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
+import { originateNftFaucet2 } from './nft-contracts-tzip16';
 
 async function main() {
   const env = getEnv();
@@ -16,11 +17,12 @@ async function main() {
     const toolkit = await createToolkit(config);
     await awaitForNetwork(toolkit);
 
-    await bootstrapNftFaucet(config, toolkit);
-    await bootstrapNftFactory(config, toolkit);
+    await bootstrapNftFaucet2(config, toolkit);
+    // await bootstrapNftFactory(config, toolkit);
     //add bootstrapping of other contracts here
 
     genClientConfig(config);
+    genServerConfig(config);
 
     process.exit(0);
   } catch (err) {
@@ -34,14 +36,18 @@ function genClientConfig(mainConfig: Configstore) {
   const configPath = path.join(__dirname, `../../client/src/config.json`);
   const clientConfig = new Configstore('client', {}, { configPath });
 
-  const clientConfigKeys = [
-    'rpc',
-    'bcdApiUrl',
-    'bcdGuiUrl',
-    'bcdNetwork',
-    'contracts.nftFaucet',
-    'contracts.nftFactory'
-  ];
+  const clientConfigKeys = ['rpc', 'network', 'bcd', 'ipfs', 'contracts'];
+
+  for (let key of clientConfigKeys) {
+    clientConfig.set(key, mainConfig.get(key));
+  }
+}
+
+function genServerConfig(mainConfig: Configstore) {
+  const configPath = path.join(__dirname, `../../server/src/config.json`);
+  const clientConfig = new Configstore('server', {}, { configPath });
+
+  const clientConfigKeys = ['pinata'];
 
   for (let key of clientConfigKeys) {
     clientConfig.set(key, mainConfig.get(key));
@@ -82,6 +88,23 @@ async function bootstrapNftFaucet(
   );
 
   $log.info('bootstrapped NFT faucet contract');
+}
+
+async function bootstrapNftFaucet2(
+  config: Configstore,
+  tz: TezosToolkit
+): Promise<void> {
+  const configKey = 'contracts.nftFaucet';
+  const contractFilename = 'fa2_multi_nft_faucet_tzip16_compat.tz';
+  const shouldOrig = await shouldOriginate(config, tz, configKey);
+  if (!shouldOrig) return;
+
+  $log.info('originating...');
+  const codeFilepath = defaultEnv.outFilePath(contractFilename);
+  const code = await loadFile(codeFilepath);
+  const contract = await originateNftFaucet2(tz, code);
+  config.set(configKey, contract.address);
+  $log.info('originated');
 }
 
 async function bootstrapNftFactory(

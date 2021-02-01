@@ -1,14 +1,13 @@
 {
 	"rpc": "http://localhost:8732",
-	"bcdApiUrl": "http://localhost:42000",
-	"bcdGuiUrl": "http://localhost:8009",
-	"bcdNetwork": "sandboxnet",
+	"network": "sandboxnet",
+	"bcd": {
+		"api": "http://localhost:42000",
+		"gui": "http://localhost:8009"
+	},
 	"admin": {
 		"address": "tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU",
 		"secret": "edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx"
 	},
-	"contracts": {
-		"nftFaucet": "KT1JStSHCBtjKjf1qPkdFzLd5RXrGzCr5qdX",
-		"nftFactory": "KT1FdXF9ZuCzuEFCFLXCixXQdLn4wx9N43Na"
-	}
+	"contracts": {}
 }
