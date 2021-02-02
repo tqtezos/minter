@@ -21,11 +21,16 @@ export enum CreateStatus {
   Complete = 'complete'
 }
 
+interface MetadataRow {
+  name: string | null;
+  value: string | null;
+}
+
 export interface State {
   step: Step;
   artifactUri: string | null;
   fields: Fields;
-  metadataRows: { name: string | null; value: string | null }[];
+  metadataRows: MetadataRow[];
   collectionAddress: string | null;
   createStatus: CreateStatus;
 }

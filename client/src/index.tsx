@@ -5,6 +5,7 @@ import App from './components/App';
 import * as serviceWorker from './serviceWorker';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import SystemContextProvider from './context/system';
+import { Provider } from 'react-redux';
 
 const Button = {
   variants: {
