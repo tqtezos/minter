@@ -9,12 +9,16 @@ import {
   getNftAssetContractQuery,
   getWalletAssetContractsQuery
 } from '../async/queries';
+import { ErrorKind, RejectValue } from '../async/errors';
 
 export type StatusKey = 'ready' | 'in_transit' | 'complete';
 
 interface Status {
   status: StatusKey;
-  error: SerializedError | null;
+  error: {
+    rejectValue: RejectValue;
+    serialized: SerializedError;
+  } | null;
 }
 
 export interface StatusState {
@@ -26,7 +30,7 @@ export interface StatusState {
   getWalletAssetContracts: Status;
 }
 
-type Name = keyof StatusState;
+type Method = keyof StatusState;
 
 const defaultStatus: Status = { status: 'ready', error: null };
 
@@ -39,9 +43,12 @@ const initialState: StatusState = {
   getWalletAssetContracts: defaultStatus
 };
 
-type SetStatusAction = PayloadAction<{ method: Name; status: StatusKey }>;
-type SetErrorAction = PayloadAction<{ method: Name; message: string }>;
-type ClearErrorAction = PayloadAction<{ method: Name }>;
+type SetStatusAction = PayloadAction<{ method: Method; status: StatusKey }>;
+type ClearErrorAction = PayloadAction<{ method: Method }>;
+
+function methodMap<A>(method: keyof StatusState, action: A) {
+  return { method, action };
+}
 
 const slice = createSlice({
   name: 'status',
@@ -50,39 +57,44 @@ const slice = createSlice({
     setStatus(state, { payload }: SetStatusAction) {
       state[payload.method].status = payload.status;
     },
-    setError(state, { payload }: SetErrorAction) {
-      state[payload.method].error = { message: payload.message };
-    },
     clearError(state, { payload }: ClearErrorAction) {
       state[payload.method].error = null;
     }
   },
   extraReducers: ({ addCase }) => {
     [
-      { method: 'createAssetContract', action: createAssetContractAction },
-      { method: 'mintToken', action: mintTokenAction },
-      { method: 'transferToken', action: transferTokenAction },
-      { method: 'getContractNfts', action: getContractNftsQuery },
-      { method: 'getNftAssetContract', action: getNftAssetContractQuery },
-      {
-        method: 'getWalletAssetContracts',
-        action: getWalletAssetContractsQuery
-      }
+      methodMap('createAssetContract', createAssetContractAction),
+      methodMap('mintToken', mintTokenAction),
+      methodMap('transferToken', transferTokenAction),
+      methodMap('getContractNfts', getContractNftsQuery),
+      methodMap('getNftAssetContract', getNftAssetContractQuery),
+      methodMap('getWalletAssetContracts', getWalletAssetContractsQuery)
     ].forEach(({ method, action }) => {
-      const name = method as keyof StatusState;
       addCase(action.pending, state => {
-        state[name].status = 'in_transit';
+        state[method].status = 'in_transit';
       });
       addCase(action.fulfilled, state => {
-        state[name].status = 'complete';
+        state[method].status = 'complete';
       });
       addCase(action.rejected, (state, action) => {
-        state[name].error = action.error;
+        if (action.payload) {
+          state[method].error = {
+            rejectValue: action.payload,
+            serialized: action.error
+          };
+        }
+        state[method].error = {
+          rejectValue: {
+            kind: ErrorKind.UknownError,
+            message: 'Unknown error'
+          },
+          serialized: action.error
+        };
       });
     });
   }
 });
 
-export const { setStatus, setError, clearError } = slice.actions;
+export const { setStatus, clearError } = slice.actions;
 
 export default slice;
