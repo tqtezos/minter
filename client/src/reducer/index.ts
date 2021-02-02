@@ -13,7 +13,15 @@ export const reducer = combineReducers({
   system: systemSlice.reducer
 });
 
-export const store = configureStore({ reducer });
+export const store = configureStore({
+  reducer,
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
+      immutableCheck: {
+        ignoredPaths: ['system']
+      }
+    })
+});
 
 export type State = ReturnType<typeof reducer>;
 export type Dispatch = typeof store.dispatch;
