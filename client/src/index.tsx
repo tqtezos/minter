@@ -4,7 +4,6 @@ import './index.css';
 import App from './components/App';
 import * as serviceWorker from './serviceWorker';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
-import SystemContextProvider from './context/system';
 import { Provider } from 'react-redux';
 import { store } from './reducer';
 
@@ -223,9 +222,7 @@ function Root() {
   return (
     <Provider store={store}>
       <ChakraProvider theme={theme}>
-        <SystemContextProvider>
-          <App />
-        </SystemContextProvider>
+        <App />
       </ChakraProvider>
     </Provider>
   );
