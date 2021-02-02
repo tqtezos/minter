@@ -6,6 +6,7 @@ import * as serviceWorker from './serviceWorker';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import SystemContextProvider from './context/system';
 import { Provider } from 'react-redux';
+import { store } from './reducer';
 
 const Button = {
   variants: {
@@ -220,11 +221,13 @@ const theme = extendTheme({
 
 function Root() {
   return (
-    <ChakraProvider theme={theme}>
-      <SystemContextProvider>
-        <App />
-      </SystemContextProvider>
-    </ChakraProvider>
+    <Provider store={store}>
+      <ChakraProvider theme={theme}>
+        <SystemContextProvider>
+          <App />
+        </SystemContextProvider>
+      </ChakraProvider>
+    </Provider>
   );
 }
 
