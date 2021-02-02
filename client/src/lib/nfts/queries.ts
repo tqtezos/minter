@@ -10,13 +10,7 @@ function fromHexString(input: string) {
   return input;
 }
 
-function foldBigMapResponseAsObject(bigMapResponse: any) {
-  return bigMapResponse.reduce((acc: {}, next: any) => {
-    return { ...acc, [next.data.key_string]: next.data.value.value };
-  }, {});
-}
-
-interface Nft {
+export interface Nft {
   id: number;
   title: string;
   owner: string;
@@ -80,7 +74,15 @@ export async function getContractNfts(
   );
 }
 
-export async function getNftAssetContract(system: System, address: string) {
+export interface AssetContract {
+  address: string;
+  metadata: Record<string, string>;
+}
+
+export async function getNftAssetContract(
+  system: System,
+  address: string
+): Promise<AssetContract> {
   const bcd = system.betterCallDev;
   const storage = await bcd.getContractStorage(address);
 
@@ -96,7 +98,9 @@ export async function getNftAssetContract(system: System, address: string) {
     key_string: 'contents'
   })?.value?.value;
 
-  const metadata = JSON.parse(fromHexString(metadataContents));
+  const metadata: Record<string, string> = JSON.parse(
+    fromHexString(metadataContents)
+  );
 
   return { address, metadata };
 }
@@ -109,7 +113,7 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
     (i: any) => i.body.hash === nftAssetHash
   );
 
-  const results: any[] = [];
+  const results = [];
   for (let assetContract of assetContracts) {
     const result = await getNftAssetContract(system, assetContract.value);
     results.push(result);
