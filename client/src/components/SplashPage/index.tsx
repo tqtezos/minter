@@ -64,9 +64,6 @@ export default function SplashPage() {
           {/*   Create */}
           {/* </MinterLink> */}
         </Flex>
-        {/* <Text fontFamily="mono" fontSize="xs" color="brand.lightGray"> */}
-        {/*   Learn more about <Link textDecor="underline">TZIP-12</Link> */}
-        {/* </Text> */}
       </Flex>
       <Flex
         width="100%"
