@@ -11,8 +11,10 @@ import config from '../../config.json';
 
 // Types
 
+export type Token = Nft;
+
 export interface Collection extends AssetContract {
-  tokens: Nft[] | null;
+  tokens: Token[] | null;
 }
 
 export interface CollectionsState {
@@ -43,7 +45,7 @@ export const initialState: CollectionsState = {
 
 //// Reducers & Slice
 
-type PopulateCollection = Reducer<{ address: string; tokens: Nft[] }>;
+type PopulateCollection = Reducer<{ address: string; tokens: Token[] }>;
 
 const populateCollectionR: PopulateCollection = (state, { payload }) => {
   if (state.collections[payload.address]) {
