@@ -1,9 +1,10 @@
 import React from 'react';
 import { Divider, Heading, Flex, Image, Text } from '@chakra-ui/react';
-import { State } from './reducer';
 import { ipfsCidFromUri } from '../../util';
+import { useSelector } from '../../reducer';
 
-export default function Preview({ state }: { state: State }) {
+export default function Preview() {
+  const state = useSelector(s => s.createNft);
   const { name, description } = state.fields;
   return (
     <Flex

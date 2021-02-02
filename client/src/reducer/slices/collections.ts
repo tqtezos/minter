@@ -45,13 +45,13 @@ export const initialState: CollectionsState = {
 
 type PopulateCollection = Reducer<{ address: string; tokens: Nft[] }>;
 
-const populateCollection: PopulateCollection = (state, { payload }) => {
+const populateCollectionR: PopulateCollection = (state, { payload }) => {
   if (state.collections[payload.address]) {
     state.collections[payload.address].tokens = payload.tokens;
   }
 };
 
-const updateCollections: Reducer<AssetContract[]> = (state, action) => {
+const updateCollectionsR: Reducer<AssetContract[]> = (state, action) => {
   for (let coll of action.payload) {
     if (!state.collections[coll.address]) {
       state.collections[coll.address] = { ...coll, tokens: null };
@@ -59,13 +59,13 @@ const updateCollections: Reducer<AssetContract[]> = (state, action) => {
   }
 };
 
-const updateCollection: Reducer<AssetContract> = (state, { payload }) => {
+const updateCollectionR: Reducer<AssetContract> = (state, { payload }) => {
   if (!state.collections[payload.address]) {
     state.collections[payload.address] = { ...payload, tokens: null };
   }
 };
 
-const selectCollection: Reducer<string> = (state, action) => {
+const selectCollectionR: Reducer<string> = (state, action) => {
   state.selectedCollection = action.payload;
 };
 
@@ -73,16 +73,23 @@ const slice = createSlice({
   name: 'collections',
   initialState,
   reducers: {
-    updateCollections,
-    updateCollection,
-    selectCollection,
-    populateCollection
+    updateCollections: updateCollectionsR,
+    updateCollection: updateCollectionR,
+    selectCollection: selectCollectionR,
+    populateCollection: populateCollectionR
   },
   extraReducers: ({ addCase }) => {
-    addCase(getContractNftsQuery.fulfilled, populateCollection);
-    addCase(getNftAssetContractQuery.fulfilled, updateCollection);
-    addCase(getWalletAssetContractsQuery.fulfilled, updateCollections);
+    addCase(getContractNftsQuery.fulfilled, populateCollectionR);
+    addCase(getNftAssetContractQuery.fulfilled, updateCollectionR);
+    addCase(getWalletAssetContractsQuery.fulfilled, updateCollectionsR);
   }
 });
+
+export const {
+  updateCollections,
+  updateCollection,
+  selectCollection,
+  populateCollection
+} = slice.actions;
 
 export default slice;

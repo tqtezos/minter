@@ -10,20 +10,20 @@ import {
 } from '@chakra-ui/react';
 import { CheckCircle } from 'react-feather';
 import { MinterButton } from '../common';
-import { CreateStatus } from './reducer';
+import { StatusKey } from '../../reducer/slices/status';
 
 interface StatusModalProps {
   isOpen: boolean;
   onClose: () => void;
-  createStatus: CreateStatus;
+  status: StatusKey;
 }
 
 export default function StatusModal(props: StatusModalProps) {
-  const { isOpen, onClose, createStatus } = props;
+  const { isOpen, onClose, status } = props;
   const initialRef = React.useRef(null);
 
   const close = () => {
-    if (createStatus === CreateStatus.Complete) {
+    if (status === 'complete') {
       onClose();
     }
   };
@@ -41,7 +41,7 @@ export default function StatusModal(props: StatusModalProps) {
       >
         <ModalOverlay />
         <ModalContent mt={40}>
-          {createStatus === CreateStatus.InProgress ? (
+          {status === 'in_transit' ? (
             <Flex flexDir="column" align="center" px={4} py={10}>
               <Spinner size="xl" mb={6} color="gray.300" />
               <Heading size="lg" textAlign="center" color="gray.500">
@@ -49,7 +49,7 @@ export default function StatusModal(props: StatusModalProps) {
               </Heading>
             </Flex>
           ) : null}
-          {createStatus === CreateStatus.Complete ? (
+          {status === 'complete' ? (
             <Flex flexDir="column" align="center" px={4} py={10}>
               <Box color="brand.blue" mb={6}>
                 <CheckCircle size="70px" />

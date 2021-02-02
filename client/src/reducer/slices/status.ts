@@ -10,7 +10,7 @@ import {
   getWalletAssetContractsQuery
 } from '../async/queries';
 
-type StatusKey = 'ready' | 'in_transit' | 'complete';
+export type StatusKey = 'ready' | 'in_transit' | 'complete';
 
 interface Status {
   status: StatusKey;
@@ -62,9 +62,12 @@ const slice = createSlice({
       { method: 'createAssetContract', action: createAssetContractAction },
       { method: 'mintToken', action: mintTokenAction },
       { method: 'transferToken', action: transferTokenAction },
-      { method: 'getContracts', action: getContractNftsQuery },
+      { method: 'getContractNfts', action: getContractNftsQuery },
       { method: 'getNftAssetContract', action: getNftAssetContractQuery },
-      { name: 'getWalletAssetContracts', action: getWalletAssetContractsQuery }
+      {
+        method: 'getWalletAssetContracts',
+        action: getWalletAssetContractsQuery
+      }
     ].forEach(({ method, action }) => {
       const name = method as keyof StatusState;
       addCase(action.pending, state => {
@@ -79,5 +82,7 @@ const slice = createSlice({
     });
   }
 });
+
+export const { setStatus, setError, clearError } = slice.actions;
 
 export default slice;

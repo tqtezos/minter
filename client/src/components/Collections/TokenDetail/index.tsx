@@ -1,16 +1,15 @@
-import React, { Dispatch, useEffect, useContext, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import { SystemContext } from '../../../context/system';
 import { AspectRatio, Box, Flex, Heading, Image, Text } from '@chakra-ui/react';
 import { ChevronLeft, HelpCircle, MoreHorizontal, Star } from 'react-feather';
 import { MinterButton } from '../../common';
-import { State, Action } from '../reducer';
-import {
-  getNftAssetContract,
-  getContractNfts
-} from '../../../lib/nfts/queries';
 import { TransferTokenButton } from '../../common/TransferToken';
 import { ipfsCidFromUri } from '../../../util';
+import { useSelector, useDispatch } from '../../../reducer';
+import {
+  getContractNftsQuery,
+  getNftAssetContractQuery
+} from '../../../reducer/async/queries';
 
 function NotFound() {
   return (
@@ -86,39 +85,27 @@ function TokenImage(props: { src: string }) {
 interface TokenDetailProps {
   contractAddress: string;
   tokenId: number;
-  state: State;
-  dispatch: Dispatch<Action>;
 }
 
-export default function TokenDetail(props: TokenDetailProps) {
+function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
   const [, setLocation] = useLocation();
-  const { system } = useContext(SystemContext);
-  const { dispatch, contractAddress, tokenId } = props;
-  const collection = props.state.collections[props.contractAddress];
+  const { system, collections: state } = useSelector(s => s);
+  const dispatch = useDispatch();
+  const collection = state.collections[contractAddress];
 
   useEffect(() => {
     if (!collection) {
-      getNftAssetContract(system, contractAddress).then(collection => {
-        dispatch({
-          type: 'update_collection',
-          payload: { collection: { ...collection, tokens: null } }
-        });
-      });
+      dispatch(getNftAssetContractQuery(contractAddress));
     } else {
-      getContractNfts(system, contractAddress).then(tokens => {
-        dispatch({
-          type: 'populate_collection',
-          payload: { address: contractAddress, tokens }
-        });
-      });
+      dispatch(getContractNftsQuery(contractAddress));
     }
   }, [contractAddress, tokenId, collection === undefined]);
 
-  if (!collection || collection.tokens === null) {
+  if (!collection?.tokens) {
     return null;
   }
 
-  const token = collection.tokens?.find(token => token.id === props.tokenId);
+  const token = collection.tokens.find(token => token.id === tokenId);
   if (!token) {
     return <NotFound />;
   }
@@ -254,3 +241,5 @@ export default function TokenDetail(props: TokenDetailProps) {
     </Flex>
   );
 }
+
+export default TokenDetail;

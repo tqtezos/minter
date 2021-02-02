@@ -2,8 +2,8 @@ import axios from 'axios';
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Box, Flex, Heading, Text, Image } from '@chakra-ui/react';
-
-import { DispatchFn, State } from './reducer';
+import { useSelector, useDispatch } from '../../reducer';
+import { updateArtifactUri } from '../../reducer/slices/createNft';
 
 type IpfsContent = {
   cid: string;
@@ -12,26 +12,15 @@ type IpfsContent = {
   publicGatewayUrl: string;
 };
 
-export default function FileUpload({
-  state,
-  dispatch
-}: {
-  state: State;
-  dispatch: DispatchFn;
-}) {
+export default function FileUpload() {
+  const state = useSelector(s => s.createNft);
+  const dispatch = useDispatch();
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const formData = new FormData();
     formData.append('file', acceptedFiles[0]);
 
     const response = await axios.post<IpfsContent>('/ipfs-upload', formData);
-
-    dispatch({
-      type: 'update_artifact_uri',
-      payload: { value: response.data.publicGatewayUrl }
-    });
-
-    console.log('Succesfully uploaded image to IPFS Server.');
-    console.log(response.data);
+    dispatch(updateArtifactUri(response.data.publicGatewayUrl));
   }, []);
 
   const { getRootProps, getInputProps } = useDropzone({

@@ -1,31 +1,27 @@
-import React, { Dispatch, useContext, useEffect, useReducer } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Box, Flex, Text, useDisclosure } from '@chakra-ui/react';
 import Joi from 'joi';
-import { SystemContext } from '../../context/system';
 import { MinterButton } from '../common';
-import {
-  reducer,
-  steps,
-  initialState,
-  DispatchFn,
-  State,
-  fileUploadSchema,
-  assetDetailsSchema,
-  collectionSelectSchema,
-  Action,
-  CreateStatus
-} from './reducer';
 import Form from './Form';
 import FileUpload from './FileUpload';
 import CollectionSelect from './CollectionSelect';
 import Preview from './Preview';
 import StatusModal from './StatusModal';
 import { ChevronLeft, X } from 'react-feather';
-import { mintToken } from '../../lib/nfts/actions';
-import { SystemWithWallet } from '../../lib/system';
 
-function ProgressIndicator({ state }: { state: State }) {
+import { useSelector, useDispatch } from '../../reducer';
+import {
+  CreateNftState,
+  decrementStep,
+  incrementStep,
+  steps
+} from '../../reducer/slices/createNft';
+import { mintTokenAction } from '../../reducer/async/actions';
+import * as validators from '../../reducer/validators';
+import { setStatus } from '../../reducer/slices/status';
+
+function ProgressIndicator({ state }: { state: CreateNftState }) {
   const stepIdx = steps.indexOf(state.step);
   return (
     <Flex align="center" flexDir="column" flex="1">
@@ -51,70 +47,54 @@ function ProgressIndicator({ state }: { state: State }) {
   );
 }
 
-function LeftContent(props: { state: State; dispatch: DispatchFn }) {
-  if (props.state.step === 'file_upload') {
-    return <FileUpload state={props.state} dispatch={props.dispatch} />;
+function LeftContent() {
+  const step = useSelector(s => s.createNft.step);
+  switch (step) {
+    case 'file_upload':
+      return <FileUpload />;
+    case 'asset_details':
+      return <Form />;
+    case 'collection_select':
+      return <CollectionSelect />;
+    default:
+      return null;
   }
-  if (props.state.step === 'asset_details') {
-    return <Form state={props.state} dispatch={props.dispatch} />;
-  }
-  if (props.state.step === 'collection_select') {
-    return <CollectionSelect state={props.state} dispatch={props.dispatch} />;
-  }
-  // TypeScript not checking this properly? The above cases are exhaustive...
-  return null;
 }
 
-function isValid(schema: Joi.ObjectSchema, state: State) {
+function isValid(schema: Joi.ObjectSchema, state: CreateNftState) {
   if (schema.validate(state, { allowUnknown: true }).error) {
     return false;
   }
   return true;
 }
 
-function stepIsValid(state: State) {
-  if (state.step === 'file_upload' && isValid(fileUploadSchema, state)) {
+function stepIsValid(state: CreateNftState) {
+  if (
+    state.step === 'file_upload' &&
+    isValid(validators.fileUploadSchema, state)
+  ) {
     return true;
   }
-  if (state.step === 'asset_details' && isValid(assetDetailsSchema, state)) {
+  if (
+    state.step === 'asset_details' &&
+    isValid(validators.assetDetailsSchema, state)
+  ) {
     return true;
   }
   if (
     state.step === 'collection_select' &&
-    isValid(collectionSelectSchema, state)
+    isValid(validators.collectionSelectSchema, state)
   ) {
     return true;
   }
 }
 
-async function handleCreate(system: SystemWithWallet, state: State) {
-  const metadata: Record<string, string> = {};
-  const artifactUri = state.artifactUri as string;
-  const name = state.fields.name as string;
-  const address = state.collectionAddress as string;
-
-  metadata.artifactUri = artifactUri;
-  metadata.displayUri = artifactUri;
-  metadata.name = name;
-  if (state.fields.description) {
-    metadata.description = state.fields.description;
-  }
-
-  for (let row of state.metadataRows) {
-    if (row.name !== null && row.value !== null) {
-      metadata[row.name] = row.value;
-    }
-  }
-
-  const op = await mintToken(system, address, metadata);
-  return await op.confirmation();
-}
-
 export default function CreateNonFungiblePage() {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const { system, createNft: state } = useSelector(s => s);
+  const status = useSelector(s => s.status.mintToken);
+  const dispatch = useDispatch();
   const [, setLocation] = useLocation();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const { system } = useContext(SystemContext);
+  const { isOpen, onClose, onOpen } = useDisclosure();
   useEffect(() => {
     if (system.status !== 'WalletConnected') {
       setLocation('/');
@@ -162,7 +142,7 @@ export default function CreateNonFungiblePage() {
             <MinterButton
               visibility={state.step !== 'file_upload' ? 'visible' : 'hidden'}
               variant="primaryActionInverted"
-              onClick={() => dispatch({ type: 'decrement_step' })}
+              onClick={() => dispatch(decrementStep())}
             >
               <Box color="currentcolor">
                 <ChevronLeft size={16} strokeWidth="3" />
@@ -177,25 +157,14 @@ export default function CreateNonFungiblePage() {
                 }
                 switch (state.step) {
                   case 'file_upload': {
-                    return dispatch({ type: 'increment_step' });
+                    return dispatch(incrementStep());
                   }
                   case 'asset_details': {
-                    return dispatch({ type: 'increment_step' });
+                    return dispatch(incrementStep());
                   }
                   case 'collection_select': {
-                    if (system.status === 'WalletConnected') {
-                      dispatch({
-                        type: 'set_create_status',
-                        payload: { status: CreateStatus.InProgress }
-                      });
-                      onOpen();
-                      await handleCreate(system, state);
-                      dispatch({
-                        type: 'set_create_status',
-                        payload: { status: CreateStatus.Complete }
-                      });
-                      return;
-                    }
+                    onOpen();
+                    return dispatch(mintTokenAction());
                   }
                 }
               }}
@@ -208,8 +177,9 @@ export default function CreateNonFungiblePage() {
               onClose={() => {
                 onClose();
                 setLocation('/collections');
+                dispatch(setStatus({ method: 'mintToken', status: 'ready' }));
               }}
-              createStatus={state.createStatus}
+              status={status.status}
             />
           </Flex>
         </Flex>
@@ -221,7 +191,7 @@ export default function CreateNonFungiblePage() {
           minHeight="0px"
           flex="1"
         >
-          <LeftContent state={state} dispatch={dispatch} />
+          <LeftContent />
           <Box pb={10} w="100%" />
         </Box>
       </Flex>
@@ -251,7 +221,7 @@ export default function CreateNonFungiblePage() {
           px={28}
           pt={16}
         >
-          <Preview state={state} />
+          <Preview />
         </Flex>
       )}
     </Flex>

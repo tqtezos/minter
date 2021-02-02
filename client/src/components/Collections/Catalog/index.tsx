@@ -1,55 +1,37 @@
-import React, { Dispatch, useContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Box, Flex, Heading, Text } from '@chakra-ui/react';
 import { useLocation } from 'wouter';
 import { RefreshCw } from 'react-feather';
-import { SystemContext } from '../../../context/system';
 import { MinterButton } from '../../common';
 import Sidebar from './Sidebar';
 import TokenGrid from './TokenGrid';
-import { State, Action } from '../reducer';
+
+import { useSelector, useDispatch } from '../../../reducer';
 import {
-  getContractNfts,
-  getWalletNftAssetContracts
-} from '../../../lib/nfts/queries';
+  getContractNftsQuery,
+  getWalletAssetContractsQuery
+} from '../../../reducer/async/queries';
+import { selectCollection } from '../../../reducer/slices/collections';
 
-interface CatalogProps {
-  state: State;
-  dispatch: Dispatch<Action>;
-}
-
-export default function Catalog({ state, dispatch }: CatalogProps) {
+export default function Catalog() {
   const [, setLocation] = useLocation();
-  const { system } = useContext(SystemContext);
+  const { system, collections: state } = useSelector(s => s);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const selectedCollection = state.selectedCollection;
     if (selectedCollection === null) {
-      dispatch({
-        type: 'select_collection',
-        payload: { address: state.globalCollection }
-      });
+      dispatch(selectCollection(state.globalCollection));
     } else {
-      getContractNfts(system, selectedCollection).then(tokens => {
-        dispatch({
-          type: 'populate_collection',
-          payload: { address: selectedCollection, tokens }
-        });
-      });
+      dispatch(getContractNftsQuery(selectedCollection));
     }
-  }, [state.selectedCollection]);
+  }, [system.status, state.selectedCollection]);
 
   useEffect(() => {
     if (system.status !== 'WalletConnected') {
       setLocation('/', { replace: true });
     } else {
-      getWalletNftAssetContracts(system).then(collections => {
-        dispatch({
-          type: 'update_collections',
-          payload: {
-            collections: collections.map(c => ({ ...c, tokens: null }))
-          }
-        });
-      });
+      dispatch(getWalletAssetContractsQuery());
     }
   }, [system.status]);
 
@@ -63,7 +45,7 @@ export default function Catalog({ state, dispatch }: CatalogProps) {
   return (
     <Flex flex="1" w="100%" minHeight="0">
       <Flex w="250px" h="100%" flexDir="column">
-        <Sidebar state={state} dispatch={dispatch} />
+        <Sidebar />
       </Flex>
       <Flex
         flexDir="column"
@@ -90,12 +72,7 @@ export default function Catalog({ state, dispatch }: CatalogProps) {
             onClick={() => {
               const selectedCollection = state.selectedCollection;
               if (selectedCollection !== null) {
-                getContractNfts(system, selectedCollection).then(tokens => {
-                  dispatch({
-                    type: 'populate_collection',
-                    payload: { address: selectedCollection, tokens }
-                  });
-                });
+                dispatch(getContractNftsQuery(selectedCollection));
               }
             }}
           >

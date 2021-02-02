@@ -97,4 +97,17 @@ const slice = createSlice({
   }
 });
 
+export const {
+  incrementStep,
+  decrementStep,
+  updateField,
+  updateArtifactUri,
+  addMetadataRow,
+  updateMetadataRowName,
+  updateMetadataRowValue,
+  deleteMetadataRow,
+  selectCollection,
+  setCreateStatus
+} = slice.actions;
+
 export default slice;
