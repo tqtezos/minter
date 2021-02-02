@@ -15,7 +15,7 @@ export default function SplashPage() {
     if (system.status === 'WalletConnected') {
       setLocation('/collections');
     }
-  }, [system.status]);
+  }, [system.status, setLocation]);
 
   return (
     <Flex

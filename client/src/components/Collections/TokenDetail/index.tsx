@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { AspectRatio, Box, Flex, Heading, Image, Text } from '@chakra-ui/react';
-import { ChevronLeft, HelpCircle, MoreHorizontal, Star } from 'react-feather';
+import {
+  ChevronLeft,
+  HelpCircle,
+  /* MoreHorizontal, */ Star
+} from 'react-feather';
 import { MinterButton } from '../../common';
 import { TransferTokenButton } from '../../common/TransferToken';
 import { ipfsCidFromUri } from '../../../util';
@@ -93,13 +97,15 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
   const dispatch = useDispatch();
   const collection = state.collections[contractAddress];
 
+  const collectionUndefined = collection === undefined;
+
   useEffect(() => {
-    if (!collection) {
+    if (collectionUndefined) {
       dispatch(getNftAssetContractQuery(contractAddress));
     } else {
       dispatch(getContractNftsQuery(contractAddress));
     }
-  }, [contractAddress, tokenId, collection === undefined]);
+  }, [contractAddress, tokenId, collectionUndefined, dispatch]);
 
   if (!collection?.tokens) {
     return null;

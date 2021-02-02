@@ -15,13 +15,16 @@ type IpfsContent = {
 export default function FileUpload() {
   const state = useSelector(s => s.createNft);
   const dispatch = useDispatch();
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    const formData = new FormData();
-    formData.append('file', acceptedFiles[0]);
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      const formData = new FormData();
+      formData.append('file', acceptedFiles[0]);
 
-    const response = await axios.post<IpfsContent>('/ipfs-upload', formData);
-    dispatch(updateArtifactUri(response.data.publicGatewayUrl));
-  }, []);
+      const response = await axios.post<IpfsContent>('/ipfs-upload', formData);
+      dispatch(updateArtifactUri(response.data.publicGatewayUrl));
+    },
+    [dispatch]
+  );
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,

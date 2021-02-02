@@ -63,7 +63,7 @@ export default function CollectionSelect() {
 
   useEffect(() => {
     dispatch(getWalletAssetContractsQuery());
-  }, [collections]);
+  }, [collections, dispatch]);
 
   return (
     <Flex flexDir="column" pt={8}>

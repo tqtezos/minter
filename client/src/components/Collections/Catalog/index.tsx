@@ -25,7 +25,12 @@ export default function Catalog() {
     } else {
       dispatch(getContractNftsQuery(selectedCollection));
     }
-  }, [system.status, state.selectedCollection]);
+  }, [
+    system.status,
+    state.selectedCollection,
+    state.globalCollection,
+    dispatch
+  ]);
 
   useEffect(() => {
     if (system.status !== 'WalletConnected') {
@@ -33,7 +38,7 @@ export default function Catalog() {
     } else {
       dispatch(getWalletAssetContractsQuery());
     }
-  }, [system.status]);
+  }, [system.status, setLocation, dispatch]);
 
   const selectedCollection = state.selectedCollection;
   if (system.status !== 'WalletConnected' || !selectedCollection) {
