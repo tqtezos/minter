@@ -23,7 +23,11 @@ export const store = configureStore({
         ignoredPaths: ['system']
       },
       serializableCheck: {
-        ignoredPaths: ['system']
+        ignoredPaths: ['system'],
+        ignoredActions: [
+          'wallet/connect/fulfilled',
+          'wallet/disconnect/fulfilled'
+        ]
       }
     })
 });
