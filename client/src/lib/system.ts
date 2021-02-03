@@ -2,7 +2,7 @@ import { TezosToolkit } from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
 import { BetterCallDev } from './service/bcd';
 import * as tzUtils from './util/tezosToolkit';
-import { NetworkType } from '@airgap/beacon-sdk';
+import { DAppClientOptions, NetworkType } from '@airgap/beacon-sdk';
 
 export interface Config {
   rpc: string;
@@ -81,15 +81,21 @@ function networkType(config: Config) {
   return NetworkType.CUSTOM;
 }
 
-export async function connectWallet(
-  system: SystemWithToolkit
-): Promise<SystemWithWallet> {
-  const network = networkType(system.config) as any;
+let wallet: BeaconWallet | null = null;
 
-  const wallet = new BeaconWallet({
-    name: 'OpenSystem dApp',
-    preferredNetwork: network
-  });
+export async function connectWallet(
+  system: SystemWithToolkit,
+  eventHandlers?: DAppClientOptions['eventHandlers']
+): Promise<SystemWithWallet> {
+  const network = networkType(system.config);
+
+  if (wallet === null) {
+    wallet = new BeaconWallet({
+      name: 'OpenSystem dApp',
+      preferredNetwork: network,
+      eventHandlers
+    });
+  }
 
   await wallet.requestPermissions({
     network: { type: network, rpcUrl: system.config.rpc }
