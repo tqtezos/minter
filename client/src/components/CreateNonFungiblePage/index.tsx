@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Box, Flex, Text, useDisclosure } from '@chakra-ui/react';
-import Joi from 'joi';
 import { MinterButton } from '../common';
 import Form from './Form';
 import FileUpload from './FileUpload';
@@ -18,7 +17,7 @@ import {
   steps
 } from '../../reducer/slices/createNft';
 import { mintTokenAction } from '../../reducer/async/actions';
-import * as validators from '../../reducer/validators';
+import { validateCreateNftStep } from '../../reducer/validators/createNft';
 import { setStatus } from '../../reducer/slices/status';
 
 function ProgressIndicator({ state }: { state: CreateNftState }) {
@@ -61,34 +60,6 @@ function LeftContent() {
   }
 }
 
-function isValid(schema: Joi.ObjectSchema, state: CreateNftState) {
-  if (schema.validate(state, { allowUnknown: true }).error) {
-    return false;
-  }
-  return true;
-}
-
-function stepIsValid(state: CreateNftState) {
-  if (
-    state.step === 'file_upload' &&
-    isValid(validators.fileUploadSchema, state)
-  ) {
-    return true;
-  }
-  if (
-    state.step === 'asset_details' &&
-    isValid(validators.assetDetailsSchema, state)
-  ) {
-    return true;
-  }
-  if (
-    state.step === 'collection_select' &&
-    isValid(validators.collectionSelectSchema, state)
-  ) {
-    return true;
-  }
-}
-
 export default function CreateNonFungiblePage() {
   const { system, createNft: state } = useSelector(s => s);
   const status = useSelector(s => s.status.mintToken);
@@ -101,7 +72,7 @@ export default function CreateNonFungiblePage() {
     }
   });
 
-  const valid = stepIsValid(state);
+  const stepIsValid = validateCreateNftStep(state);
 
   return (
     <Flex flex="1" width="100%" minHeight="0">
@@ -150,11 +121,9 @@ export default function CreateNonFungiblePage() {
               <Text ml={2}>Back</Text>
             </MinterButton>
             <MinterButton
-              variant={valid ? 'primaryAction' : 'primaryActionInactive'}
+              variant={stepIsValid ? 'primaryAction' : 'primaryActionInactive'}
               onClick={async () => {
-                if (!valid) {
-                  return;
-                }
+                if (!stepIsValid) return;
                 switch (state.step) {
                   case 'file_upload': {
                     return dispatch(incrementStep());

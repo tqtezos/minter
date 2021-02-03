@@ -6,10 +6,49 @@ export const connectWallet = createAsyncThunk<
   SystemWithWallet,
   undefined,
   { state: State }
->('wallet/connect', async (_arg, { getState, rejectWithValue }) => {
+>('wallet/connect', async (_arg, { getState, rejectWithValue, dispatch }) => {
   const { system } = getState();
   if (system.status === 'ToolkitConnected') {
-    return await Minter.connectWallet(system);
+    // NOTE: These event handlers will be passed to the Beacon DAppClient *once*
+    // as the client is cached after its first instantiation
+    const eventHandlers: Parameters<typeof Minter.connectWallet>[1] = {
+      PERMISSION_REQUEST_SENT: {
+        handler(data) {
+          console.log(data);
+        }
+      },
+      PERMISSION_REQUEST_SUCCESS: {
+        handler(data) {
+          console.log(data);
+        }
+      },
+      PERMISSION_REQUEST_ERROR: {
+        handler(data) {
+          console.log(data);
+        }
+      },
+      OPERATION_REQUEST_SENT: {
+        handler(data) {
+          console.log(data);
+        }
+      },
+      OPERATION_REQUEST_SUCCESS: {
+        handler(data) {
+          console.log(data);
+        }
+      },
+      OPERATION_REQUEST_ERROR: {
+        handler(data) {
+          console.log(data);
+        }
+      },
+      ACKNOWLEDGE_RECEIVED: {
+        handler(data) {
+          console.log(data);
+        }
+      }
+    };
+    return await Minter.connectWallet(system /*eventHandlers*/);
   }
   return rejectWithValue({ error: 'Wallet already connected' });
 });
