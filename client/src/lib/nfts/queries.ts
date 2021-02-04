@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer';
-import { System, SystemWithWallet } from '../system';
+import { SystemWithToolkit, SystemWithWallet } from '../system';
 import { hash as nftAssetHash } from './code/fa2_tzip16_compat_multi_nft_asset';
 import select from '../util/selectObjectByKeys';
 
@@ -20,9 +20,15 @@ export interface Nft {
 }
 
 export async function getContractNfts(
-  system: System,
+  system: SystemWithToolkit | SystemWithWallet,
   address: string
 ): Promise<Nft[]> {
+  // TODO: Resolve IPFS metadata as seen in below example
+  // console.log('Resolving metadata...');
+  // const resolvedMetadata = await system.resolveMetadata(
+  //   'ipfs://QmRjVUAuS7V2c8bKbXKN9eXzp2dMXW8jwYLCAFo9nHBSeb'
+  // );
+  // console.log(resolvedMetadata);
   const storage = await system.betterCallDev.getContractStorage(address);
 
   const ledgerBigMapId = select(storage, {
@@ -80,7 +86,7 @@ export interface AssetContract {
 }
 
 export async function getNftAssetContract(
-  system: System,
+  system: SystemWithToolkit | SystemWithWallet,
   address: string
 ): Promise<AssetContract> {
   const bcd = system.betterCallDev;
