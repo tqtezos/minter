@@ -8,6 +8,7 @@ import {
 import { ErrorKind, RejectValue } from './errors';
 import { getContractNftsQuery, getWalletAssetContractsQuery } from './queries';
 import { validateCreateNftForm } from '../validators/createNft';
+import { uploadJSONToIpfs } from '../../lib/util/ipfs';
 
 type Options = {
   state: State;
@@ -83,8 +84,10 @@ export const mintTokenAction = createAsyncThunk<
   }
 
   const { address, metadata } = buildMetadataFromState(state);
+
   try {
-    const op = await mintToken(system, address, metadata);
+    const resp = await uploadJSONToIpfs(metadata);
+    const op = await mintToken(system, address, { '': resp.data.ipfsUri });
     await op.confirmation();
     dispatch(getContractNftsQuery(address));
     return { contract: address };

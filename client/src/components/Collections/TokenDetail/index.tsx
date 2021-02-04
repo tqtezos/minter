@@ -8,7 +8,7 @@ import {
 } from 'react-feather';
 import { MinterButton } from '../../common';
 import { TransferTokenButton } from '../../common/TransferToken';
-import { ipfsUriToGatewayUrl, uriToCid } from '../../../util';
+import { ipfsUriToGatewayUrl, uriToCid } from '../../../lib/util/ipfs';
 import { useSelector, useDispatch } from '../../../reducer';
 import {
   getContractNftsQuery,

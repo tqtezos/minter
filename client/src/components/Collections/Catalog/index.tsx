@@ -49,7 +49,7 @@ export default function Catalog() {
 
   return (
     <Flex flex="1" w="100%" minHeight="0">
-      <Flex w="250px" h="100%" flexDir="column">
+      <Flex w="250px" h="100%" flexDir="column" overflowY="scroll">
         <Sidebar />
       </Flex>
       <Flex

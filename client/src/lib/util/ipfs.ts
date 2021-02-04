@@ -1,3 +1,25 @@
+import axios from 'axios';
+
+export type IpfsContent = {
+  cid: string;
+  size: number;
+  ipfsUri: string;
+  url: string;
+  publicGatewayUrl: string;
+};
+
+export async function uploadJSONToIpfs(data: any) {
+  return axios.post<IpfsContent>('/ipfs-json-upload', data);
+}
+
+export async function uploadFiletoIpfs(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  return axios.post<IpfsContent>('/ipfs-file-upload', formData);
+}
+
+// URI Utils
+
 export function ipfsUriToCid(uri: string) {
   const baseRegex = /^ipfs:\/\//;
   const ipfsRegex = new RegExp(baseRegex.source + '.+');
@@ -22,5 +44,5 @@ export function uriToCid(uri: string) {
   if (httpRegex.test(uri)) {
     return uri.replace(baseRegex, '');
   }
-  return uri;
+  return null;
 }
