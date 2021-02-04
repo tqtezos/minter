@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { mintTokenAction } from '../async/actions';
 
 // State
 
@@ -93,7 +94,13 @@ const slice = createSlice({
     },
     setCreateStatus(state, action: PayloadAction<CreateStatus>) {
       state.createStatus = action.payload;
+    },
+    clearForm() {
+      return initialState;
     }
+  },
+  extraReducers: builder => {
+    builder.addCase(mintTokenAction.fulfilled, () => initialState);
   }
 });
 
@@ -107,7 +114,8 @@ export const {
   updateMetadataRowValue,
   deleteMetadataRow,
   selectCollection,
-  setCreateStatus
+  setCreateStatus,
+  clearForm
 } = slice.actions;
 
 export default slice;

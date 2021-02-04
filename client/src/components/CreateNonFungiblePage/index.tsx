@@ -11,6 +11,7 @@ import { ChevronLeft, X } from 'react-feather';
 
 import { useSelector, useDispatch } from '../../reducer';
 import {
+  clearForm,
   CreateNftState,
   decrementStep,
   incrementStep,
@@ -89,7 +90,10 @@ export default function CreateNonFungiblePage() {
           <Flex flex="1">
             <MinterButton
               variant="cancelAction"
-              onClick={() => setLocation('/collections')}
+              onClick={() => {
+                dispatch(clearForm());
+                setLocation('/collections');
+              }}
               display="flex"
               alignItems="center"
               color="brand.red"
