@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import { AspectRatio, Box, Flex, Grid, Image, Text } from '@chakra-ui/react';
 import { Wind, HelpCircle } from 'react-feather';
 import { Token, CollectionsState } from '../../../reducer/slices/collections';
-import { ipfsUriToGatewayUrl } from '../../../util';
+import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 
 interface TokenTileProps extends Token {
   selectedCollection: string;

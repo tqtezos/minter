@@ -2,7 +2,7 @@ import { Buffer } from 'buffer';
 import { SystemWithToolkit, SystemWithWallet } from '../system';
 import { hash as nftAssetHash } from './code/fa2_tzip16_compat_multi_nft_asset';
 import select from '../util/selectObjectByKeys';
-import { ipfsUriToCid } from '../../util';
+import { ipfsUriToCid } from '../util/ipfs';
 
 function fromHexString(input: string) {
   if (/^([A-Fa-f0-9]{2})*$/.test(input)) {

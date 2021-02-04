@@ -1,6 +1,6 @@
 import React from 'react';
 import { Divider, Heading, Flex, Image, Text } from '@chakra-ui/react';
-import { ipfsUriToGatewayUrl, uriToCid } from '../../util';
+import { ipfsUriToGatewayUrl, uriToCid } from '../../lib/util/ipfs';
 import { useSelector } from '../../reducer';
 
 export default function Preview() {
