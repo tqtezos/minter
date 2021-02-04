@@ -86,7 +86,13 @@ export const mintTokenAction = createAsyncThunk<
   const { address, metadata } = buildMetadataFromState(state);
 
   try {
-    const resp = await uploadJSONToIpfs(metadata);
+    // TODO: Move this into the `mintTokens` library action, with a configured
+    // IPFS endpoint from the toplevel `config/`
+    const resp = await uploadJSONToIpfs({
+      ...metadata,
+      decimals: 0,
+      booleanAmount: true
+    });
     const op = await mintToken(system, address, { '': resp.data.ipfsUri });
     await op.confirmation();
     dispatch(getContractNftsQuery(address));

@@ -82,9 +82,6 @@ export async function mintToken(
   const token_id = storage.assets.next_token_id;
   const token_info = new MichelsonMap<string, string>();
 
-  token_info.set('decimals', toHexString('0'));
-  token_info.set('booleanAmount', toHexString('true'));
-
   for (let key in metadata) {
     const value = toHexString(metadata[key]);
     token_info.set(key, value);
