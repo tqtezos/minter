@@ -1,6 +1,6 @@
 import React from 'react';
 import { Divider, Heading, Flex, Image, Text } from '@chakra-ui/react';
-import { ipfsCidFromUri } from '../../util';
+import { ipfsUriToGatewayUrl, uriToCid } from '../../util';
 import { useSelector } from '../../reducer';
 
 export default function Preview() {
@@ -24,7 +24,9 @@ export default function Preview() {
         overflow="hidden"
       >
         <Image
-          src={state.artifactUri || ''}
+          src={
+            (state.artifactUri && ipfsUriToGatewayUrl(state.artifactUri)) || ''
+          }
           overflow="hidden"
           objectFit="contain"
           objectPosition="center"
@@ -47,9 +49,7 @@ export default function Preview() {
         <Text pb={2} fontSize="xs" color="brand.gray" textTransform="uppercase">
           IPFS Hash
         </Text>
-        <Text>
-          {(state.artifactUri && ipfsCidFromUri(state.artifactUri)) || ''}
-        </Text>
+        <Text>{(state.artifactUri && uriToCid(state.artifactUri)) || ''}</Text>
       </Flex>
     </Flex>
   );

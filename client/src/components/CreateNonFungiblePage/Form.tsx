@@ -21,7 +21,7 @@ import {
   updateMetadataRowName,
   updateMetadataRowValue
 } from '../../reducer/slices/createNft';
-import { ipfsCidFromUri } from '../../util';
+import { uriToCid } from '../../util';
 
 const DESCRIPTION_PLACEHOLDER =
   'e.g. “This is an exclusive japanese comic illustration. Once you purchase it you will be able to get the t-shirt”';
@@ -74,9 +74,7 @@ export default function Form() {
         >
           IPFS Hash
         </Text>
-        <Text>
-          {(state.artifactUri && ipfsCidFromUri(state.artifactUri)) || ''}
-        </Text>
+        <Text>{(state.artifactUri && uriToCid(state.artifactUri)) || ''}</Text>
       </Box>
       <Divider borderColor="brand.lightBlue" opacity="1" marginY={10} />
       <Heading size="md" paddingBottom={6}>

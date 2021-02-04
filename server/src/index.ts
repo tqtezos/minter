@@ -8,7 +8,6 @@ import axios from 'axios';
 import fs from 'fs';
 import FormData from 'form-data';
 import { promisify } from 'util';
-import { Readable } from 'stream';
 
 const readFileAsync = promisify(fs.readFile);
 
@@ -52,6 +51,7 @@ async function uploadToPinata(
     return res.status(200).send({
       cid,
       size: pinataData.PinSize,
+      ipfsUri: `ipfs://${cid}`,
       url: url.resolve(ipfsConfig.pinataGatewayUrl, `ipfs/${cid}`),
       publicGatewayUrl: url.resolve(ipfsConfig.publicGatewayUrl, `ipfs/${cid}`)
     });
@@ -68,6 +68,7 @@ async function uploadToIpfs(file: UploadedFile, res: Response) {
   return res.status(200).send({
     cid,
     size: ipfsFile.size,
+    ipfsUri: `ipfs://${cid}`,
     url: url.resolve(ipfsConfig.gatewayUrl, `ipfs/${cid}`),
     publicGatewayUrl: url.resolve(ipfsConfig.gatewayUrl, `ipfs/${cid}`)
   });

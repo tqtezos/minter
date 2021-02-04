@@ -8,7 +8,7 @@ import {
 } from 'react-feather';
 import { MinterButton } from '../../common';
 import { TransferTokenButton } from '../../common/TransferToken';
-import { ipfsCidFromUri } from '../../../util';
+import { ipfsUriToGatewayUrl, uriToCid } from '../../../util';
 import { useSelector, useDispatch } from '../../../reducer';
 import {
   getContractNftsQuery,
@@ -134,7 +134,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           </MinterButton>
         </Flex>
         <Flex align="center" justify="center" flex="1" px={16}>
-          <TokenImage src={token.artifactUri} />
+          <TokenImage src={ipfsUriToGatewayUrl(token.artifactUri)} />
         </Flex>
       </Flex>
       <Flex w="50%" h="100%" flexDir="column">
@@ -223,7 +223,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               >
                 IPFS Hash
               </Text>
-              <Text>{ipfsCidFromUri(token.artifactUri) || 'No IPFS Hash'}</Text>
+              <Text>{uriToCid(token.artifactUri) || 'No IPFS Hash'}</Text>
             </Flex>
           </Flex>
           {system.status === 'WalletConnected' ? (

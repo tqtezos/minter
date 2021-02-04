@@ -4,10 +4,12 @@ import { useDropzone } from 'react-dropzone';
 import { Box, Flex, Heading, Text, Image } from '@chakra-ui/react';
 import { useSelector, useDispatch } from '../../reducer';
 import { updateArtifactUri } from '../../reducer/slices/createNft';
+import { ipfsUriToGatewayUrl } from '../../util';
 
 type IpfsContent = {
   cid: string;
   size: number;
+  ipfsUri: string;
   url: string;
   publicGatewayUrl: string;
 };
@@ -21,7 +23,7 @@ export default function FileUpload() {
       formData.append('file', acceptedFiles[0]);
 
       const response = await axios.post<IpfsContent>('/ipfs-upload', formData);
-      dispatch(updateArtifactUri(response.data.publicGatewayUrl));
+      dispatch(updateArtifactUri(response.data.ipfsUri));
     },
     [dispatch]
   );
@@ -63,7 +65,7 @@ export default function FileUpload() {
             p={4}
             maxWidth="400px"
             maxHeight="400px"
-            src={state.artifactUri}
+            src={ipfsUriToGatewayUrl(state.artifactUri)}
           />
         ) : (
           <Flex
