@@ -94,14 +94,8 @@ export const mintTokenAction = createAsyncThunk<
   const { address, metadata } = buildMetadataFromState(state);
 
   try {
-    const response = await axios.post<IpfsContent>(
-      '/ipfs-json-upload',
-      metadata
-    );
-
-    const op = await mintToken(system, address, {
-      '': response.data.ipfsUri
-    });
+    const resp = await axios.post<IpfsContent>('/ipfs-json-upload', metadata);
+    const op = await mintToken(system, address, { '': resp.data.ipfsUri });
     await op.confirmation();
     dispatch(getContractNftsQuery(address));
     return { contract: address };

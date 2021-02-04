@@ -24,12 +24,6 @@ export async function getContractNfts(
   system: SystemWithToolkit | SystemWithWallet,
   address: string
 ): Promise<Nft[]> {
-  // TODO: Resolve IPFS metadata as seen in below example
-  // console.log('Resolving metadata...');
-  // const resolvedMetadata = await system.resolveMetadata(
-  //   'ipfs://QmRjVUAuS7V2c8bKbXKN9eXzp2dMXW8jwYLCAFo9nHBSeb'
-  // );
-  // console.log(resolvedMetadata);
   const storage = await system.betterCallDev.getContractStorage(address);
 
   const ledgerBigMapId = select(storage, {
