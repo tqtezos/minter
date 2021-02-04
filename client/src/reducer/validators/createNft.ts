@@ -23,7 +23,7 @@ export const collectionSelectSchema = assetDetailsSchema.append({
 });
 
 function isValid(schema: Joi.ObjectSchema, object: any) {
-  return !!schema.validate(object, { allowUnknown: true }).error;
+  return !schema.validate(object, { allowUnknown: true }).error;
 }
 
 export function validateCreateNftStep(state: State['createNft']) {
