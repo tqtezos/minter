@@ -24,7 +24,7 @@ interface PinataConfig {
   apiSecret: string;
 }
 
-async function uploadToPinata(
+async function uploadFileToPinata(
   pinataConfig: PinataConfig,
   file: UploadedFile,
   res: Response
@@ -60,9 +60,38 @@ async function uploadToPinata(
   }
 }
 
-async function uploadToIpfs(file: UploadedFile, res: Response) {
+async function uploadJSONToPinata(
+  pinataConfig: PinataConfig,
+  req: Request,
+  res: Response
+) {
+  try {
+    const pinataUrl = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
+    const pinataRes = await axios.post(pinataUrl, req.body, {
+      headers: {
+        pinata_api_key: pinataConfig.apiKey,
+        pinata_secret_api_key: pinataConfig.apiSecret
+      }
+    });
+
+    const pinataData = pinataRes.data;
+    const cid = pinataData.IpfsHash;
+
+    return res.status(200).send({
+      cid,
+      size: pinataData.PinSize,
+      ipfsUri: `ipfs://${cid}`,
+      url: url.resolve(ipfsConfig.pinataGatewayUrl, `ipfs/${cid}`),
+      publicGatewayUrl: url.resolve(ipfsConfig.publicGatewayUrl, `ipfs/${cid}`)
+    });
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+async function uploadToIpfs(data: any, res: Response) {
   const ipfsClient = IpfsClient(ipfsConfig.apiUrl);
-  const ipfsFile = await ipfsClient.add(fs.readFileSync(file.tempFilePath));
+  const ipfsFile = await ipfsClient.add(data);
   const cid = ipfsFile.cid.toString();
 
   return res.status(200).send({
@@ -94,7 +123,7 @@ async function getPinataConfig(): Promise<PinataConfig | null> {
   }
 }
 
-async function handleIpfsUpload(
+async function handleIpfsFileUpload(
   pinataConfig: PinataConfig | null,
   req: Request,
   res: Response
@@ -105,10 +134,26 @@ async function handleIpfsUpload(
   }
 
   if (pinataConfig) {
-    return await uploadToPinata(pinataConfig, file, res);
+    return await uploadFileToPinata(pinataConfig, file, res);
+  }
+  const data = fs.readFileSync(file.tempFilePath);
+  return await uploadToIpfs(data, res);
+}
+
+async function handleIpfsJSONUpload(
+  pinataConfig: PinataConfig | null,
+  req: Request,
+  res: Response
+) {
+  if (!req.body) {
+    throw Error('No file data found');
   }
 
-  return await uploadToIpfs(file, res);
+  if (pinataConfig) {
+    return await uploadJSONToPinata(pinataConfig, req, res);
+  }
+
+  return await uploadToIpfs(req.body, res);
 }
 
 async function createHttpServer(app: Express) {
@@ -123,9 +168,13 @@ async function createHttpServer(app: Express) {
 
   const pinataConfig = await getPinataConfig();
 
-  app.post('/ipfs-upload', (req, res) =>
-    handleIpfsUpload(pinataConfig, req, res)
-  );
+  app.post('/ipfs-file-upload', (req, res) => {
+    return handleIpfsFileUpload(pinataConfig, req, res);
+  });
+
+  app.post('/ipfs-json-upload', (req, res) => {
+    return handleIpfsJSONUpload(pinataConfig, req, res);
+  });
 
   const httpServer = http.createServer(app);
   return httpServer;

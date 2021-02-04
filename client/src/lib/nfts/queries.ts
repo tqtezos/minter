@@ -2,6 +2,7 @@ import { Buffer } from 'buffer';
 import { SystemWithToolkit, SystemWithWallet } from '../system';
 import { hash as nftAssetHash } from './code/fa2_tzip16_compat_multi_nft_asset';
 import select from '../util/selectObjectByKeys';
+import { ipfsUriToCid, uriToCid } from '../../util';
 
 function fromHexString(input: string) {
   if (/^([A-Fa-f0-9]{2})*$/.test(input)) {
@@ -53,30 +54,37 @@ export async function getContractNfts(
 
   if (!tokens) return [];
 
-  return tokens.map(
-    (token: any): Nft => {
-      const tokenId = select(token, { name: 'token_id' })?.value;
-      const metadataMap = select(token, { name: 'token_info' })?.children;
-      const metadata = metadataMap.reduce((acc: any, next: any) => {
-        return { ...acc, [next.name]: fromHexString(next.value) };
-      }, {});
+  return Promise.all(
+    tokens.map(
+      async (token: any): Promise<Nft> => {
+        const tokenId = select(token, { name: 'token_id' })?.value;
+        const metadataMap = select(token, { name: 'token_info' })?.children;
+        let metadata = metadataMap.reduce((acc: any, next: any) => {
+          return { ...acc, [next.name]: fromHexString(next.value) };
+        }, {});
 
-      const owner = select(
-        ledger.filter((v: any) => v.data.key.value === tokenId),
-        {
-          type: 'address'
+        if (ipfsUriToCid(metadata[''])) {
+          const resolvedMetadata = await system.resolveMetadata(metadata['']);
+          metadata = { ...metadata, ...resolvedMetadata.metadata };
         }
-      )?.value;
 
-      return {
-        id: parseInt(tokenId, 10),
-        title: metadata.name,
-        owner,
-        description: metadata.description,
-        artifactUri: metadata.artifactUri,
-        metadata: metadata
-      };
-    }
+        const owner = select(
+          ledger.filter((v: any) => v.data.key.value === tokenId),
+          {
+            type: 'address'
+          }
+        )?.value;
+
+        return {
+          id: parseInt(tokenId, 10),
+          title: metadata.name,
+          owner,
+          description: metadata.description,
+          artifactUri: metadata.artifactUri,
+          metadata: metadata
+        };
+      }
+    )
   );
 }
 

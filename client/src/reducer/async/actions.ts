@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { State } from '..';
 import {
@@ -64,6 +65,14 @@ function buildMetadataFromState(state: State['createNft']) {
   return { address, metadata };
 }
 
+type IpfsContent = {
+  cid: string;
+  size: number;
+  ipfsUri: string;
+  url: string;
+  publicGatewayUrl: string;
+};
+
 export const mintTokenAction = createAsyncThunk<
   { contract: string },
   undefined,
@@ -83,8 +92,16 @@ export const mintTokenAction = createAsyncThunk<
   }
 
   const { address, metadata } = buildMetadataFromState(state);
+
   try {
-    const op = await mintToken(system, address, metadata);
+    const response = await axios.post<IpfsContent>(
+      '/ipfs-json-upload',
+      metadata
+    );
+
+    const op = await mintToken(system, address, {
+      '': response.data.ipfsUri
+    });
     await op.confirmation();
     dispatch(getContractNftsQuery(address));
     return { contract: address };

@@ -22,5 +22,5 @@ export function uriToCid(uri: string) {
   if (httpRegex.test(uri)) {
     return uri.replace(baseRegex, '');
   }
-  return uri;
+  return null;
 }
