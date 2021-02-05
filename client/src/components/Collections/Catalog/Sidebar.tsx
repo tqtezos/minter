@@ -1,18 +1,22 @@
 import React from 'react';
 import { Flex, Heading, Text } from '@chakra-ui/react';
 import { CreateCollectionButton } from '../../common/CreateCollection';
-import { State, Action, Collection } from '../reducer';
+import { useSelector, useDispatch } from '../../../reducer';
+import {
+  selectCollection,
+  Collection
+} from '../../../reducer/slices/collections';
 
 interface CollectionTabProps extends Collection {
   selected: boolean;
-  dispatch: React.Dispatch<Action>;
+  onSelect: (address: string) => void;
 }
 
 function CollectionTab({
   address,
   metadata,
   selected,
-  dispatch
+  onSelect
 }: CollectionTabProps) {
   return (
     <Flex
@@ -25,9 +29,7 @@ function CollectionTab({
         cursor: 'pointer',
         color: selected ? 'black' : 'gray.800'
       }}
-      onClick={() =>
-        dispatch({ type: 'select_collection', payload: { address } })
-      }
+      onClick={() => onSelect(address)}
       role="group"
     >
       <Flex
@@ -52,12 +54,9 @@ function CollectionTab({
   );
 }
 
-interface SidebarProps {
-  state: State;
-  dispatch: React.Dispatch<Action>;
-}
-
-export default function Sidebar({ state, dispatch }: SidebarProps) {
+export default function Sidebar() {
+  const state = useSelector(s => s.collections);
+  const dispatch = useDispatch();
   return (
     <>
       <Heading px={4} pt={6} pb={4} size="md" color="brand.darkGray">
@@ -75,7 +74,7 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
       <CollectionTab
         key={state.globalCollection}
         selected={state.globalCollection === state.selectedCollection}
-        dispatch={dispatch}
+        onSelect={address => dispatch(selectCollection(address))}
         {...state.collections[state.globalCollection]}
       />
       <Heading
@@ -94,11 +93,11 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
           <CollectionTab
             key={address}
             selected={address === state.selectedCollection}
-            dispatch={dispatch}
+            onSelect={address => dispatch(selectCollection(address))}
             {...state.collections[address]}
           />
         ))}
-      <Flex px={2} pt={2} justify="center">
+      <Flex px={2} pt={4} justify="center" pb={8}>
         <CreateCollectionButton />
       </Flex>
     </>

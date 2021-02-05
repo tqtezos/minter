@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useLocation } from 'wouter';
 import { AspectRatio, Box, Flex, Grid, Image, Text } from '@chakra-ui/react';
-import { Token, State } from '../reducer';
 import { Wind, HelpCircle } from 'react-feather';
+import { Token, CollectionsState } from '../../../reducer/slices/collections';
+import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 
 interface TokenTileProps extends Token {
   selectedCollection: string;
@@ -60,7 +61,7 @@ function TokenTile(props: TokenTileProps) {
     >
       <AspectRatio ratio={3 / 2}>
         <Box p={4}>
-          <TokenImage src={props.artifactUri} />
+          <TokenImage src={ipfsUriToGatewayUrl(props.artifactUri)} />
         </Box>
       </AspectRatio>
       <Flex
@@ -78,7 +79,7 @@ function TokenTile(props: TokenTileProps) {
 }
 
 interface TokenGridProps {
-  state: State;
+  state: CollectionsState;
   walletAddress: string;
 }
 

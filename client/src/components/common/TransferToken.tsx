@@ -1,4 +1,4 @@
-import React, { useState, useContext, MutableRefObject } from 'react';
+import React, { useState, MutableRefObject } from 'react';
 import {
   Box,
   Flex,
@@ -19,9 +19,9 @@ import {
 } from '@chakra-ui/react';
 import { Plus, CheckCircle } from 'react-feather';
 import { MinterButton } from '../common';
-import { transferToken } from '../../lib/nfts/actions';
-import { SystemContext } from '../../context/system';
-import { SystemWithWallet } from '../../lib/system';
+import { useSelector, useDispatch } from '../../reducer';
+import { transferTokenAction } from '../../reducer/async/actions';
+import { setStatus } from '../../reducer/slices/status';
 
 interface FormProps {
   initialRef: MutableRefObject<null>;
@@ -64,36 +64,26 @@ interface TransferTokenButtonProps {
   tokenId: number;
 }
 
-enum Status {
-  Ready = 'ready',
-  InProgress = 'inProgress',
-  Complete = 'complete'
-}
-
 export function TransferTokenButton(props: TransferTokenButtonProps) {
-  const { system } = useContext(SystemContext);
-  const [status, setStatus] = useState<Status>(Status.Ready);
+  const { status } = useSelector(s => s.status.transferToken);
+  const dispatch = useDispatch();
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const initialRef = React.useRef(null);
 
-  if (system.status !== 'WalletConnected') {
-    return null;
-  }
-
   const onSubmit = async (form: { toAddress: string }) => {
-    setStatus(Status.InProgress);
-    const op = await transferToken(
-      system,
-      props.contractAddress,
-      props.tokenId,
-      form.toAddress
+    dispatch(
+      transferTokenAction({
+        contract: props.contractAddress,
+        tokenId: props.tokenId,
+        to: form.toAddress
+      })
     );
-    await op.confirmation();
-    setStatus(Status.Complete);
   };
 
   const close = () => {
-    if (status !== Status.InProgress) {
+    if (status !== 'in_transit') {
+      dispatch(setStatus({ method: 'transferToken', status: 'ready' }));
       onClose();
     }
   };
@@ -118,10 +108,10 @@ export function TransferTokenButton(props: TransferTokenButtonProps) {
       >
         <ModalOverlay />
         <ModalContent mt={40}>
-          {status === Status.Ready ? (
+          {status === 'ready' ? (
             <Form initialRef={initialRef} onSubmit={onSubmit} />
           ) : null}
-          {status === Status.InProgress ? (
+          {status === 'in_transit' ? (
             <Flex flexDir="column" align="center" px={4} py={10}>
               <Spinner size="xl" mb={6} color="gray.300" />
               <Heading size="lg" textAlign="center" color="gray.500">
@@ -129,7 +119,7 @@ export function TransferTokenButton(props: TransferTokenButtonProps) {
               </Heading>
             </Flex>
           ) : null}
-          {status === Status.Complete ? (
+          {status === 'complete' ? (
             <Flex flexDir="column" align="center" px={4} py={10}>
               <Box color="brand.blue" mb={6}>
                 <CheckCircle size="70px" />

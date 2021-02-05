@@ -1,8 +1,13 @@
-import { TezosToolkit } from '@taquito/taquito';
+import { TezosToolkit, Context } from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
+import {
+  MetadataProvider,
+  DEFAULT_HANDLERS,
+  IpfsHttpHandler
+} from '@taquito/tzip16';
 import { BetterCallDev } from './service/bcd';
 import * as tzUtils from './util/tezosToolkit';
-import { NetworkType } from '@airgap/beacon-sdk';
+import { DAppClientOptions, NetworkType } from '@airgap/beacon-sdk';
 
 export interface Config {
   rpc: string;
@@ -31,11 +36,16 @@ export interface SystemConfigured {
   tzPublicKey: null;
 }
 
+type ResolveMetadata = (
+  uri: string
+) => ReturnType<MetadataProvider['provideMetadata']>;
+
 export interface SystemWithToolkit {
   status: Status.ToolkitConnected;
   config: Config;
   betterCallDev: BetterCallDev;
   toolkit: TezosToolkit;
+  resolveMetadata: ResolveMetadata;
   wallet: null;
   tzPublicKey: null;
 }
@@ -45,6 +55,7 @@ export interface SystemWithWallet {
   config: Config;
   betterCallDev: BetterCallDev;
   toolkit: TezosToolkit;
+  resolveMetadata: ResolveMetadata;
   wallet: BeaconWallet;
   tzPublicKey: string;
 }
@@ -62,12 +73,36 @@ export function configure(config: Config): SystemConfigured {
   };
 }
 
+function createMetadataResolver(
+  toolkit: TezosToolkit,
+  contractAddress: string
+): ResolveMetadata {
+  DEFAULT_HANDLERS.set('ipfs', new IpfsHttpHandler('cloudflare-ipfs.com'));
+  const provider = new MetadataProvider(DEFAULT_HANDLERS);
+  const context = new Context(toolkit.rpc);
+  // This is a performance optimization: We're only resolving off-chain
+  // metadata, however the storage handler requires a ContractAbstraction
+  // instance present - if we fetch a contract on each invokation, the time
+  // to resolution can take several hundred milliseconds.
+  //
+  // TODO: Is it possible to only fetch contracts at the storage resolver level
+  // and make an "off-chain" metadata resolver that excludes the need for a
+  // ContractAbstraction instance?
+  const defaultContract = toolkit.contract.at(contractAddress);
+  return async uri => {
+    const contract = await defaultContract;
+    return provider.provideMetadata(contract, uri, context);
+  };
+}
+
 export function connectToolkit(system: SystemConfigured): SystemWithToolkit {
   const toolkit = new TezosToolkit(system.config.rpc);
+  const faucetAddress = system.config.contracts.nftFaucet;
   return {
     ...system,
     status: Status.ToolkitConnected,
-    toolkit: toolkit
+    toolkit: toolkit,
+    resolveMetadata: createMetadataResolver(toolkit, faucetAddress)
   };
 }
 
@@ -81,15 +116,21 @@ function networkType(config: Config) {
   return NetworkType.CUSTOM;
 }
 
-export async function connectWallet(
-  system: SystemWithToolkit
-): Promise<SystemWithWallet> {
-  const network = networkType(system.config) as any;
+let wallet: BeaconWallet | null = null;
 
-  const wallet = new BeaconWallet({
-    name: 'OpenSystem dApp',
-    preferredNetwork: network
-  });
+export async function connectWallet(
+  system: SystemWithToolkit,
+  eventHandlers?: DAppClientOptions['eventHandlers']
+): Promise<SystemWithWallet> {
+  const network = networkType(system.config);
+
+  if (wallet === null) {
+    wallet = new BeaconWallet({
+      name: 'OpenSystem dApp',
+      preferredNetwork: network,
+      eventHandlers
+    });
+  }
 
   await wallet.requestPermissions({
     network: { type: network, rpcUrl: system.config.rpc }

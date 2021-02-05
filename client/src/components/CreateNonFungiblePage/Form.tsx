@@ -12,19 +12,23 @@ import {
 } from '@chakra-ui/react';
 import { Plus, X } from 'react-feather';
 import { MinterButton } from '../common';
-import { DispatchFn, State } from './reducer';
-import { ipfsCidFromUri } from '../../util';
+
+import { useSelector, useDispatch } from '../../reducer';
+import {
+  addMetadataRow,
+  deleteMetadataRow,
+  updateField,
+  updateMetadataRowName,
+  updateMetadataRowValue
+} from '../../reducer/slices/createNft';
+import { uriToCid } from '../../lib/util/ipfs';
 
 const DESCRIPTION_PLACEHOLDER =
   'e.g. “This is an exclusive japanese comic illustration. Once you purchase it you will be able to get the t-shirt”';
 
-export default function Form({
-  dispatch,
-  state
-}: {
-  dispatch: DispatchFn;
-  state: State;
-}) {
+export default function Form() {
+  const state = useSelector(s => s.createNft);
+  const dispatch = useDispatch();
   const { name, description } = state.fields;
   return (
     <>
@@ -38,10 +42,7 @@ export default function Form({
           placeholder="Input your asset name"
           value={name || ''}
           onChange={e =>
-            dispatch({
-              type: 'update_field',
-              payload: { name: 'name', value: e.target.value }
-            })
+            dispatch(updateField({ name: 'name', value: e.target.value }))
           }
         />
       </FormControl>
@@ -58,10 +59,9 @@ export default function Form({
           placeholder={DESCRIPTION_PLACEHOLDER}
           value={description || ''}
           onChange={e =>
-            dispatch({
-              type: 'update_field',
-              payload: { name: 'description', value: e.target.value }
-            })
+            dispatch(
+              updateField({ name: 'description', value: e.target.value })
+            )
           }
         />
       </FormControl>
@@ -74,27 +74,22 @@ export default function Form({
         >
           IPFS Hash
         </Text>
-        <Text>
-          {(state.artifactUri && ipfsCidFromUri(state.artifactUri)) || ''}
-        </Text>
+        <Text>{(state.artifactUri && uriToCid(state.artifactUri)) || ''}</Text>
       </Box>
       <Divider borderColor="brand.lightBlue" opacity="1" marginY={10} />
       <Heading size="md" paddingBottom={6}>
         Add attributes to your asset
       </Heading>
-      {state.metadataRows.map(({ name, value }, i) => {
+      {state.metadataRows.map(({ name, value }, key) => {
         return (
-          <Flex key={i} align="center" justify="stretch">
+          <Flex key={key} align="center" justify="stretch">
             <FormControl paddingBottom={6} paddingRight={2} flex="1">
               <FormLabel fontFamily="mono">Name</FormLabel>
               <Input
                 placeholder="e.g. Country"
                 value={name || ''}
                 onChange={e =>
-                  dispatch({
-                    type: 'update_metadata_row_name',
-                    payload: { key: i, name: e.target.value }
-                  })
+                  dispatch(updateMetadataRowName({ key, name: e.target.value }))
                 }
               />
             </FormControl>
@@ -104,10 +99,9 @@ export default function Form({
                 placeholder="e.g. India"
                 value={value || ''}
                 onChange={e =>
-                  dispatch({
-                    type: 'update_metadata_row_value',
-                    payload: { key: i, value: e.target.value }
-                  })
+                  dispatch(
+                    updateMetadataRowValue({ key, value: e.target.value })
+                  )
                 }
               />
             </FormControl>
@@ -116,9 +110,7 @@ export default function Form({
               ml={4}
               mt={1}
               cursor="pointer"
-              onClick={() =>
-                dispatch({ type: 'delete_metadata_row', payload: { key: i } })
-              }
+              onClick={() => dispatch(deleteMetadataRow({ key }))}
               _hover={{
                 color: 'brand.red'
               }}
@@ -130,7 +122,7 @@ export default function Form({
       })}
       <MinterButton
         variant="primaryActionInverted"
-        onClick={() => dispatch({ type: 'add_metadata_row' })}
+        onClick={() => dispatch(addMetadataRow())}
         pl={3}
         pr={3}
         pt={2}

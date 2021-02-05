@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useLocation } from 'wouter';
 import {
   Box,
@@ -13,7 +13,8 @@ import {
 } from '@chakra-ui/react';
 import { ChevronDown, Package, Plus } from 'react-feather';
 import headerLogo from './assets/header-logo.svg';
-import { SystemContext } from '../../context/system';
+import { useSelector, useDispatch } from '../../reducer';
+import { disconnectWallet } from '../../reducer/async/wallet';
 
 interface HeaderLinkProps {
   to: string;
@@ -68,8 +69,9 @@ function WalletInfo(props: { tzPublicKey: string }) {
 }
 
 function WalletDisplay() {
-  const { system, disconnect } = useContext(SystemContext);
   const [, setLocation] = useLocation();
+  const system = useSelector(s => s.system);
+  const dispatch = useDispatch();
   if (system.status !== 'WalletConnected') {
     return null;
   }
@@ -83,7 +85,7 @@ function WalletDisplay() {
         <MenuList color="brand.black">
           <MenuItem
             onClick={async () => {
-              await disconnect();
+              await dispatch(disconnectWallet());
               setLocation('/');
             }}
           >

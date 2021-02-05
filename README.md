@@ -40,8 +40,7 @@ $ yarn install
 ```
 
 The installation process will fetch toplevel NPM dependences and build
-the `minter-ui-dev` and `minter-api-dev` Docker images. Subsequent runs of
-`yarn install` will rebuild these images without checking for cached versions.
+the `minter-ui-dev` and `minter-api-dev` Docker images.
 
 ### Configuration
 
@@ -89,16 +88,16 @@ administrator during contract origination:
 ```
 
 > **Note:** Since sandbox keys don't represent sensitive accounts, the `config/`
-> folder includes default configurations with `admin` wallets. To configure Minter
-> for the `testnet` or `mainnet` networks, update the definitions in
+> folder includes default configurations with `admin` wallets. To configure
+> OpenMinter for the `testnet` or `mainnet` networks, update the definitions in
 > `config/minter.<network>.example.json` and copy it to the proper path for the
-> application to read it. For:
+> application to read it. For example:
 >
 > `cp config/minter.mainnet.example.json config/minter.mainnet.json`
 
-If the `contracts` key or its children `nftFaucet` or `nftFactory` keys are not
-specified, these contracts will be originated and their addresses saved in the
-configuration file when starting the Minter devleopment environment.
+If the `contracts` key or its child `nftFaucet` keys is not specified, a new
+contract will be originated and its addresses saved in the configuration file
+when starting the OpenMinter development environment.
 
 #### Pinata
 
@@ -107,21 +106,27 @@ keys in order to direct all file uploads through their service. This allows for
 ease of use while working with IPFS as running OpenMinter without Pinata will
 rely on using and maintaining a local IPFS node.
 
-> **Note:** The example `testnet` and `mainnet` configurations in the `config/`
-> folder have placeholder Pinata API keys. If you want to use OpenMinter on
-> these networks without Pinata, remove the `pinata` key from the configuration.
+> ⚠️ **Note:** The example `testnet` and `mainnet` configurations in the
+`config/` folder have placeholder Pinata API keys as it's the most robust way
+> to easily persist data on IPFS. Using OpenMinter on these networks without
+> Pinata may cause data loss as the NFT metadata and artifacts must be resolved
+> over IPFS. If you want to use OpenMinter on these networks without Pinata,
+> remove the `pinata` key from the configuration, but be aware that this entails
+> running and maintaining your own IPFS gateway in order for your NFT data token
+> remain accessible.
+
 
 [pinata]: https://pinata.cloud
 
 ### Starting and Stopping
 
-During its start process, Minter will create or update Docker services for its
-specified environment and also bootstrap the required contracts if their
+During its start process, OpenMinter will create or update Docker services for
+its specified environment and also bootstrap the required contracts if their
 addresses are not defined in the environment's configuration file.
 
 #### Sandbox
 
-To start Minter on a `sandbox` network, run:
+To start Minter in a `sandbox` network, run:
 
 ```sh
 $ yarn start:sandbox
@@ -142,7 +147,7 @@ $ yarn stop:sandbox
 
 #### Testnet
 
-To start Minter on a `testnet` network, run:
+To start Minter on the `testnet` network, run:
 
 ```sh
 $ yarn start:testnet
@@ -161,7 +166,7 @@ $ yarn stop:testnet
 
 #### Mainnet
 
-To start Minter on a `mainnet` network, run:
+To start Minter on the `mainnet` network, run:
 
 ```sh
 $ yarn start:mainnet
@@ -229,7 +234,7 @@ $ yarn log:api --since 5m
 
 ### Editor Environments
 
-Docker development images are set up to reload server and web ui on source code
+Docker development images are set up to reload server and web UI on source code
 changes.
 
 To setup this project for an IDE, you will want to install NPM dependencies
@@ -263,7 +268,7 @@ $ svc-restart(){docker service scale minter-dev-sandbox_$1=0 && docker service s
 
 ## Release Builds (WIP)
 
-Development ui and api server builds can be swapped out for release builds:
+Development UI and API server builds can be swapped out for release builds:
 
 ```sh
 $ bin/build-release-images

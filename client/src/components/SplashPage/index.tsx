@@ -1,18 +1,21 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Flex, Text, Heading, Image, Link } from '@chakra-ui/react';
-import { SystemContext } from '../../context/system';
 import { MinterButton /* , MinterLink */ } from '../common';
 import logo from './logo.svg';
+import { useSelector, useDispatch } from '../../reducer';
+import { connectWallet } from '../../reducer/async/wallet';
 
 export default function SplashPage() {
   const [, setLocation] = useLocation();
-  const { system, connect } = useContext(SystemContext);
+  const system = useSelector(s => s.system);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     if (system.status === 'WalletConnected') {
       setLocation('/collections');
     }
-  }, [system.status]);
+  }, [system.status, setLocation]);
 
   return (
     <Flex
@@ -43,7 +46,7 @@ export default function SplashPage() {
             variant="secondaryActionLined"
             onClick={e => {
               e.preventDefault();
-              connect();
+              dispatch(connectWallet());
             }}
           >
             Connect your wallet
@@ -61,9 +64,6 @@ export default function SplashPage() {
           {/*   Create */}
           {/* </MinterLink> */}
         </Flex>
-        {/* <Text fontFamily="mono" fontSize="xs" color="brand.lightGray"> */}
-        {/*   Learn more about <Link textDecor="underline">TZIP-12</Link> */}
-        {/* </Text> */}
       </Flex>
       <Flex
         width="100%"

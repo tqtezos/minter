@@ -1,4 +1,4 @@
-import React, { useState, useContext, MutableRefObject } from 'react';
+import React, { useState, MutableRefObject } from 'react';
 import {
   Box,
   Text,
@@ -19,8 +19,10 @@ import {
 } from '@chakra-ui/react';
 import { CheckCircle, Plus } from 'react-feather';
 import { MinterButton } from '../common';
-import { createAssetContract } from '../../lib/nfts/actions';
-import { SystemContext } from '../../context/system';
+
+import { useSelector, useDispatch } from '../../reducer';
+import { createAssetContractAction } from '../../reducer/async/actions';
+import { setStatus } from '../../reducer/slices/status';
 
 interface FormProps {
   initialRef: MutableRefObject<null>;
@@ -58,32 +60,20 @@ function Form({ initialRef, onSubmit }: FormProps) {
   );
 }
 
-enum Status {
-  Ready = 'ready',
-  InProgress = 'inProgress',
-  Complete = 'complete'
-}
-
 export function CreateCollectionButton() {
-  const { system } = useContext(SystemContext);
-  const [status, setStatus] = useState<Status>(Status.Ready);
+  const { status } = useSelector(s => s.status.createAssetContract);
+  const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const initialRef = React.useRef(null);
 
-  if (system.status !== 'WalletConnected') {
-    return null;
-  }
-
   const onSubmit = async (form: { contractName: string }) => {
-    setStatus(Status.InProgress);
-    const op = await createAssetContract(system, form.contractName);
-    await op.confirmation();
-    setStatus(Status.Complete);
+    dispatch(createAssetContractAction(form.contractName));
   };
 
   const close = () => {
-    if (status !== Status.InProgress) {
+    if (status !== 'in_transit') {
       onClose();
+      setStatus({ method: 'createAssetContract', status: 'ready' });
     }
   };
 
@@ -107,10 +97,10 @@ export function CreateCollectionButton() {
       >
         <ModalOverlay />
         <ModalContent mt={40}>
-          {status === Status.Ready ? (
+          {status === 'ready' ? (
             <Form initialRef={initialRef} onSubmit={onSubmit} />
           ) : null}
-          {status === Status.InProgress ? (
+          {status === 'in_transit' ? (
             <Flex flexDir="column" align="center" px={4} py={10}>
               <Spinner size="xl" mb={6} color="gray.300" />
               <Heading size="lg" textAlign="center" color="gray.500">
@@ -118,7 +108,7 @@ export function CreateCollectionButton() {
               </Heading>
             </Flex>
           ) : null}
-          {status === Status.Complete ? (
+          {status === 'complete' ? (
             <Flex flexDir="column" align="center" px={4} py={10}>
               <Box color="brand.blue" mb={6}>
                 <CheckCircle size="70px" />

@@ -1,7 +1,8 @@
 import { Buffer } from 'buffer';
-import { System, SystemWithWallet } from '../system';
+import { SystemWithToolkit, SystemWithWallet } from '../system';
 import { hash as nftAssetHash } from './code/fa2_tzip16_compat_multi_nft_asset';
 import select from '../util/selectObjectByKeys';
+import { ipfsUriToCid } from '../util/ipfs';
 
 function fromHexString(input: string) {
   if (/^([A-Fa-f0-9]{2})*$/.test(input)) {
@@ -10,13 +11,7 @@ function fromHexString(input: string) {
   return input;
 }
 
-function foldBigMapResponseAsObject(bigMapResponse: any) {
-  return bigMapResponse.reduce((acc: {}, next: any) => {
-    return { ...acc, [next.data.key_string]: next.data.value.value };
-  }, {});
-}
-
-interface Nft {
+export interface Nft {
   id: number;
   title: string;
   owner: string;
@@ -26,7 +21,7 @@ interface Nft {
 }
 
 export async function getContractNfts(
-  system: System,
+  system: SystemWithToolkit | SystemWithWallet,
   address: string
 ): Promise<Nft[]> {
   const storage = await system.betterCallDev.getContractStorage(address);
@@ -53,51 +48,47 @@ export async function getContractNfts(
 
   if (!tokens) return [];
 
-  return tokens.map(
-    (token: any): Nft => {
-      const tokenId = select(token, { name: 'token_id' })?.value;
-      const metadataMap = select(token, { name: 'token_info' })?.children;
-      const metadata = metadataMap.reduce((acc: any, next: any) => {
-        return { ...acc, [next.name]: fromHexString(next.value) };
-      }, {});
+  return Promise.all(
+    tokens.map(
+      async (token: any): Promise<Nft> => {
+        const tokenId = select(token, { name: 'token_id' })?.value;
+        const metadataMap = select(token, { name: 'token_info' })?.children;
+        let metadata = metadataMap.reduce((acc: any, next: any) => {
+          return { ...acc, [next.name]: fromHexString(next.value) };
+        }, {});
 
-      const owner = select(
-        ledger.filter((v: any) => v.data.key.value === tokenId),
-        {
-          type: 'address'
+        if (ipfsUriToCid(metadata[''])) {
+          const resolvedMetadata = await system.resolveMetadata(metadata['']);
+          metadata = { ...metadata, ...resolvedMetadata.metadata };
         }
-      )?.value;
 
-      return {
-        id: parseInt(tokenId, 10),
-        title: metadata.name,
-        owner,
-        description: metadata.description,
-        artifactUri: metadata.artifactUri,
-        metadata: metadata
-      };
-    }
+        const entry = ledger.filter((v: any) => v.data.key.value === tokenId);
+        const owner = select(entry, { type: 'address' })?.value;
+
+        return {
+          id: parseInt(tokenId, 10),
+          title: metadata.name,
+          owner,
+          description: metadata.description,
+          artifactUri: metadata.artifactUri,
+          metadata: metadata
+        };
+      }
+    )
   );
 }
 
-export async function getNftAssetContract(system: System, address: string) {
+export interface AssetContract {
+  address: string;
+  metadata: Record<string, string>;
+}
+
+export async function getNftAssetContract(
+  system: SystemWithToolkit | SystemWithWallet,
+  address: string
+): Promise<AssetContract> {
   const bcd = system.betterCallDev;
-  const storage = await bcd.getContractStorage(address);
-
-  const metadataBigMapId = select(storage, {
-    type: 'big_map',
-    name: 'metadata'
-  })?.value;
-
-  const metadataResponse = await bcd.getBigMapKeys(metadataBigMapId);
-
-  // TODO: Resolve and validate metadata to token standard.
-  const metadataContents = select(metadataResponse, {
-    key_string: 'contents'
-  })?.value?.value;
-
-  const metadata = JSON.parse(fromHexString(metadataContents));
-
+  const metadata = await bcd.getAccountMetadata(address);
   return { address, metadata };
 }
 
@@ -109,7 +100,7 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
     (i: any) => i.body.hash === nftAssetHash
   );
 
-  const results: any[] = [];
+  const results = [];
   for (let assetContract of assetContracts) {
     const result = await getNftAssetContract(system, assetContract.value);
     results.push(result);

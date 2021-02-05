@@ -1,20 +1,22 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Flex, Heading, Text } from '@chakra-ui/react';
 import { CreateCollectionButton } from '../common/CreateCollection';
-import { State, DispatchFn } from './reducer';
-import { SystemContext } from '../../context/system';
-import { getWalletNftAssetContracts } from '../../lib/nfts/queries';
-import config from '../../config.json';
+import { useSelector, useDispatch } from '../../reducer';
+import {
+  CreateNftState,
+  selectCollection
+} from '../../reducer/slices/createNft';
+import { getWalletAssetContractsQuery } from '../../reducer/async/queries';
 
 interface CollectionRowProps {
   name: string;
   address: string;
-  dispatch: DispatchFn;
-  state: State;
+  state: CreateNftState;
+  dispatch: ReturnType<typeof useDispatch>;
 }
 
-function CollectionRow(props: CollectionRowProps) {
-  const selected = props.state.collectionAddress === props.address;
+function CollectionRow({ state, dispatch, name, address }: CollectionRowProps) {
+  const selected = state.collectionAddress === address;
   return (
     <Flex
       align="center"
@@ -28,12 +30,7 @@ function CollectionRow(props: CollectionRowProps) {
       _hover={{
         cursor: 'pointer'
       }}
-      onClick={() =>
-        props.dispatch({
-          type: 'select_collection',
-          payload: { address: props.address }
-        })
-      }
+      onClick={() => dispatch(selectCollection(address))}
     >
       <Flex
         align="center"
@@ -45,7 +42,7 @@ function CollectionRow(props: CollectionRowProps) {
         borderRadius="100%"
         fontWeight="600"
       >
-        <Text>{props.name[0]}</Text>
+        <Text>{name[0]}</Text>
       </Flex>
       <Text
         color={selected ? 'white' : 'black'}
@@ -53,40 +50,20 @@ function CollectionRow(props: CollectionRowProps) {
         fontSize="md"
         fontWeight={selected ? '600' : 'normal'}
       >
-        {props.name}
+        {name}
       </Text>
     </Flex>
   );
 }
 
-const globalCollectionAddress = config.contracts.nftFaucet;
-
-const globalCollection = {
-  address: globalCollectionAddress,
-  metadata: {
-    name: 'Minter'
-  }
-};
-
-export default function CollectionSelect(props: {
-  state: State;
-  dispatch: DispatchFn;
-}) {
-  const { system } = useContext(SystemContext);
-  const [collections, setCollections] = useState<any[]>([]);
+export default function CollectionSelect() {
+  const { collections } = useSelector(s => s.collections);
+  const state = useSelector(s => s.createNft);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (system.status !== 'WalletConnected') {
-      return;
-    }
-    getWalletNftAssetContracts(system).then(collections => {
-      setCollections([globalCollection, ...collections]);
-    });
-  }, [system.status]);
-
-  if (system.status !== 'WalletConnected') {
-    return null;
-  }
+    dispatch(getWalletAssetContractsQuery());
+  }, [collections, dispatch]);
 
   return (
     <Flex flexDir="column" pt={8}>
@@ -101,14 +78,15 @@ export default function CollectionSelect(props: {
         <Heading size="lg">Collections</Heading>
         <CreateCollectionButton />
       </Flex>
-      {collections.map(({ address, metadata }) => {
+      {Object.keys(collections).map(key => {
+        const { address, metadata } = collections[key];
         return (
           <CollectionRow
-            key={address}
+            key={collections[key].address}
             name={metadata.name || address}
             address={address}
-            dispatch={props.dispatch}
-            state={props.state}
+            dispatch={dispatch}
+            state={state}
           />
         );
       })}
