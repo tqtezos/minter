@@ -97,7 +97,7 @@ export default function Sidebar() {
             {...state.collections[address]}
           />
         ))}
-      <Flex px={2} pt={2} justify="center" pb={8}>
+      <Flex px={2} pt={4} justify="center" pb={8}>
         <CreateCollectionButton />
       </Flex>
     </>

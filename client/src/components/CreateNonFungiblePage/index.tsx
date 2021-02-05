@@ -151,6 +151,7 @@ export default function CreateNonFungiblePage() {
                 onClose();
                 setLocation('/collections');
                 dispatch(setStatus({ method: 'mintToken', status: 'ready' }));
+                dispatch(clearForm());
               }}
               status={status.status}
             />

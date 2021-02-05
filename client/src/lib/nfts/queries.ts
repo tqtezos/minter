@@ -48,8 +48,18 @@ export async function getContractNfts(
 
   if (!tokens) return [];
 
+  const ownedTokens = tokens.filter((token: any) => {
+    if (system.tzPublicKey === null) {
+      return true;
+    }
+    const tokenId = select(token, { name: 'token_id' })?.value;
+    const ledgerEntry = ledger.filter((v: any) => v.data.key.value === tokenId);
+    const owner = select(ledgerEntry, { type: 'address' })?.value;
+    return owner === system.tzPublicKey;
+  });
+
   return Promise.all(
-    tokens.map(
+    ownedTokens.map(
       async (token: any): Promise<Nft> => {
         const tokenId = select(token, { name: 'token_id' })?.value;
         const metadataMap = select(token, { name: 'token_info' })?.children;
@@ -62,12 +72,15 @@ export async function getContractNfts(
           metadata = { ...metadata, ...resolvedMetadata.metadata };
         }
 
-        const owner = select(
-          ledger.filter((v: any) => v.data.key.value === tokenId),
-          {
-            type: 'address'
-          }
-        )?.value;
+        const owner =
+          system.tzPublicKey === null
+            ? select(
+                ledger.filter((v: any) => v.data.key.value === tokenId),
+                {
+                  type: 'address'
+                }
+              )?.value
+            : system.tzPublicKey;
 
         return {
           id: parseInt(tokenId, 10),
@@ -92,24 +105,7 @@ export async function getNftAssetContract(
   address: string
 ): Promise<AssetContract> {
   const bcd = system.betterCallDev;
-  const storage = await bcd.getContractStorage(address);
-
-  const metadataBigMapId = select(storage, {
-    type: 'big_map',
-    name: 'metadata'
-  })?.value;
-
-  const metadataResponse = await bcd.getBigMapKeys(metadataBigMapId);
-
-  // TODO: Resolve and validate metadata to token standard.
-  const metadataContents = select(metadataResponse, {
-    key_string: 'contents'
-  })?.value?.value;
-
-  const metadata: Record<string, string> = JSON.parse(
-    fromHexString(metadataContents)
-  );
-
+  const metadata = await bcd.getAccountMetadata(address);
   return { address, metadata };
 }
 
