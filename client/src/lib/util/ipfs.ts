@@ -1,21 +1,25 @@
 import axios from 'axios';
 
-export type IpfsContent = {
+export interface IpfsContent {
   cid: string;
   size: number;
   ipfsUri: string;
   url: string;
   publicGatewayUrl: string;
-};
+}
+
+export interface IpfsResponse extends IpfsContent {
+  thumbnail: IpfsContent;
+}
 
 export async function uploadJSONToIpfs(data: any) {
-  return axios.post<IpfsContent>('/ipfs-json-upload', data);
+  return axios.post<IpfsResponse>('/ipfs-json-upload', data);
 }
 
 export async function uploadFiletoIpfs(file: File) {
   const formData = new FormData();
   formData.append('file', file);
-  return axios.post<IpfsContent>('/ipfs-file-upload', formData);
+  return axios.post<IpfsResponse>('/ipfs-file-upload', formData);
 }
 
 // URI Utils

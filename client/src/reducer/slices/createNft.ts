@@ -25,6 +25,7 @@ export enum CreateStatus {
 export interface CreateNftState {
   step: Step;
   artifactUri: string | null;
+  thumbnailUri: string | null;
   fields: Fields;
   metadataRows: { name: string | null; value: string | null }[];
   collectionAddress: string | null;
@@ -34,6 +35,7 @@ export interface CreateNftState {
 export const initialState: CreateNftState = {
   step: 'file_upload',
   artifactUri: null,
+  thumbnailUri: null,
   fields: {
     name: null,
     description: null
@@ -73,6 +75,9 @@ const slice = createSlice({
     updateArtifactUri(state, action: PayloadAction<string>) {
       state.artifactUri = action.payload;
     },
+    updateThumbnailUri(state, action: PayloadAction<string>) {
+      state.thumbnailUri = action.payload;
+    },
     addMetadataRow(state) {
       state.metadataRows.push({ name: null, value: null });
     },
@@ -109,6 +114,7 @@ export const {
   decrementStep,
   updateField,
   updateArtifactUri,
+  updateThumbnailUri,
   addMetadataRow,
   updateMetadataRowName,
   updateMetadataRowValue,

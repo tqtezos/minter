@@ -2,7 +2,8 @@ import Joi from 'joi';
 import { State } from '..';
 
 export const fileUploadSchema = Joi.object({
-  artifactUri: Joi.string().required()
+  artifactUri: Joi.string().required(),
+  thumbnailUri: Joi.string().required()
 });
 
 export const assetDetailsSchema = fileUploadSchema.append({

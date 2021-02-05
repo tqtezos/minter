@@ -2,7 +2,10 @@ import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Box, Flex, Heading, Text, Image } from '@chakra-ui/react';
 import { useSelector, useDispatch } from '../../reducer';
-import { updateArtifactUri } from '../../reducer/slices/createNft';
+import {
+  updateArtifactUri,
+  updateThumbnailUri
+} from '../../reducer/slices/createNft';
 import { ipfsUriToGatewayUrl } from '../../lib/util/ipfs';
 import { uploadFiletoIpfs } from '../../lib/util/ipfs';
 
@@ -14,6 +17,7 @@ export default function FileUpload() {
     async (acceptedFiles: File[]) => {
       const response = await uploadFiletoIpfs(acceptedFiles[0]);
       dispatch(updateArtifactUri(response.data.ipfsUri));
+      dispatch(updateThumbnailUri(response.data.thumbnail.ipfsUri));
     },
     [dispatch]
   );

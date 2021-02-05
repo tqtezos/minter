@@ -50,6 +50,7 @@ function buildMetadataFromState(state: State['createNft']) {
 
   metadata.artifactUri = state.artifactUri as string;
   metadata.displayUri = state.artifactUri as string;
+  metadata.thumbnailUri = state.thumbnailUri as string;
   metadata.name = state.fields.name as string;
 
   if (state.fields.description) {
