@@ -48,18 +48,8 @@ export async function getContractNfts(
 
   if (!tokens) return [];
 
-  const ownedTokens = tokens.filter((token: any) => {
-    if (system.tzPublicKey === null) {
-      return true;
-    }
-    const tokenId = select(token, { name: 'token_id' })?.value;
-    const ledgerEntry = ledger.filter((v: any) => v.data.key.value === tokenId);
-    const owner = select(ledgerEntry, { type: 'address' })?.value;
-    return owner === system.tzPublicKey;
-  });
-
   return Promise.all(
-    ownedTokens.map(
+    tokens.map(
       async (token: any): Promise<Nft> => {
         const tokenId = select(token, { name: 'token_id' })?.value;
         const metadataMap = select(token, { name: 'token_info' })?.children;
@@ -72,15 +62,8 @@ export async function getContractNfts(
           metadata = { ...metadata, ...resolvedMetadata.metadata };
         }
 
-        const owner =
-          system.tzPublicKey === null
-            ? select(
-                ledger.filter((v: any) => v.data.key.value === tokenId),
-                {
-                  type: 'address'
-                }
-              )?.value
-            : system.tzPublicKey;
+        const entry = ledger.filter((v: any) => v.data.key.value === tokenId);
+        const owner = select(entry, { type: 'address' })?.value;
 
         return {
           id: parseInt(tokenId, 10),
