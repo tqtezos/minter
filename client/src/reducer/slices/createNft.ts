@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { mintTokenAction } from '../async/actions';
 
 // State
 
@@ -103,9 +102,6 @@ const slice = createSlice({
     clearForm() {
       return initialState;
     }
-  },
-  extraReducers: builder => {
-    builder.addCase(mintTokenAction.fulfilled, () => initialState);
   }
 });
 
