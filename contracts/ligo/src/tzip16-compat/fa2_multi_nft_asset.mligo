@@ -48,7 +48,11 @@ let sample_storage : nft_asset_storage = {
     pending_admin = (None : address option);
     paused = true;
     };
-  metadata = (Big_map.empty : (string, bytes) big_map);
+  metadata = Big_map.literal
+               [
+                 ("description", Bytes.pack "sample_token");
+                 ("interfaces", Bytes.pack ["TZIP-016"])
+               ];
 }
 
 #endif

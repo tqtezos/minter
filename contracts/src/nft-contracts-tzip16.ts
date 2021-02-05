@@ -37,8 +37,10 @@ export async function originateNft(
         'nft_asset_main',
         'fa2_multi_nft_asset_tzip16_compat.tz'
     );
-    const storage = `(Pair (Pair (Pair "${admin}" False) None)
-  (Pair (Pair {} 0) (Pair {} {})))`;
+    const storage = `(Pair (Pair (Pair (Pair "${admin}" True) None)
+            (Pair (Pair {} 0) (Pair {} {})))
+      { Elt "description" 0x05010000000c73616d706c655f746f6b656e ;
+        Elt "interfaces" 0x05020000000d0100000008545a49502d303136 })`;
     return originateContract(tz, code, storage, 'nft-tzip16-compat');
 }
 
@@ -62,7 +64,9 @@ export async function originateNftFaucet(
         'nft_faucet_main',
         'fa2_multi_nft_faucet_tzip16_compat.tz'
     );
-    const storage = `(Pair (Pair (Pair {} 0) (Pair {} {})) {})`;
+    const storage = `(Pair (Pair (Pair {} 0) (Pair {} {}))
+      { Elt "description" 0x05010000001373616d706c655f6661756365745f746f6b656e ;
+        Elt "interfaces" 0x05020000000d0100000008545a49502d303136 })`;
     return originateContract(tz, code, storage, 'nftFaucet-tzip16-compat');
 }
 

@@ -26,5 +26,9 @@ let sample_storage : nft_faucet_storage = {
     next_token_id = 0n;
     operators = (Big_map.empty : operator_storage);
     };
-  metadata = (Big_map.empty: (string, bytes) big_map);
+  metadata = Big_map.literal
+               [
+                 ("description", Bytes.pack "sample_faucet_token");
+                 ("interfaces", Bytes.pack ["TZIP-016"])
+               ];
   }
