@@ -89,16 +89,14 @@ let buy_token(sale, storage: sale_param * storage) : (operation list * storage) 
   in
   let tx_money_op = transfer_money(sale.tokens.money_token_address, sale.tokens.money_token_token_id, sale.price, Tezos.sender, seller) in
   let tx_nft_op = transfer_nft(sale.tokens.token_for_sale_address, sale.tokens.token_for_sale_token_id, Tezos.self_address, Tezos.sender) in
-  let tx_nft_remove_operator_op = remove_operator_nft(sale.tokens.token_for_sale_address, sale.tokens.token_for_sale_token_id, Tezos.self_address, Tezos.sender) in
   let new_s = Big_map.remove sale storage in
-  (tx_money_op :: tx_nft_remove_operator_op :: tx_nft_op :: []), new_s
+  (tx_money_op :: tx_nft_op :: []), new_s
 
 let deposit_for_sale(sale, storage: sale_param * storage) : (operation list * storage) =
     let transfer_op =
       transfer_nft (sale.tokens.token_for_sale_address, sale.tokens.token_for_sale_token_id, Tezos.sender, Tezos.self_address) in
-    let add_operator_op = add_operator_nft (sale.tokens.token_for_sale_address, sale.tokens.token_for_sale_token_id, Tezos.self_address, Tezos.sender) in
     let new_s = Big_map.add sale Tezos.sender storage in
-    (add_operator_op :: transfer_op :: []), new_s
+    (transfer_op :: []), new_s
 
 let cancel_sale(sale, storage: sale_param * storage) : (operation list * storage) = match Big_map.find_opt sale storage with
     | None -> (failwith "NO_SALE" : (operation list * storage))
