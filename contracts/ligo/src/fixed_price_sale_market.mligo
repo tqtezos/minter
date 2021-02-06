@@ -45,27 +45,6 @@ let transfer_nft(fa2_address, token_id, from, to_: address * token_id * address 
     Tezos.transaction [tx] 0mutez c in
   transfer_op
 
-let add_operator_nft(fa2_address, token_id, from, to_: address * token_id * address * address): operation =
-  let fa2_update_operator : ((update_operator list) contract) option =
-    Tezos.get_entrypoint_opt "%update_operators" fa2_address in
-  let update_operator_op = match fa2_update_operator with
-    | None -> (failwith "CANNOT_INVOKE_FA2_UPDATE_OPERATOR" : operation)
-    | Some c ->
-       let tx = Add_operator ( { owner = to_; operator = from; token_id = token_id; } ) in
-       Tezos.transaction [tx] 0mutez c in
-  update_operator_op
-
-
-let remove_operator_nft(fa2_address, token_id, operator, owner: address * token_id * address * address): operation =
-  let fa2_update_operator : ((update_operator list) contract) option =
-    Tezos.get_entrypoint_opt "%update_operators" fa2_address in
-  let update_operator_op = match fa2_update_operator with
-    | None -> (failwith "CANNOT_INVOKE_FA2_UPDATE_OPERATOR" : operation)
-    | Some c ->
-       let tx = Remove_operator ( { owner = owner; operator = operator; token_id = token_id; } ) in
-       Tezos.transaction [tx] 0mutez c in
-  update_operator_op
-
 let transfer_money(fa2_address, token_id, amount_, from, to_: address * token_id * nat * address * address): operation =
   let fa2_transfer : ((transfer list) contract) option =
       Tezos.get_entrypoint_opt "%transfer"  fa2_address in
@@ -102,8 +81,7 @@ let cancel_sale(sale, storage: sale_param * storage) : (operation list * storage
     | None -> (failwith "NO_SALE" : (operation list * storage))
     | Some owner -> if owner = Tezos.sender then
                       let tx_nft_back_op = transfer_nft(sale.tokens.token_for_sale_address, sale.tokens.token_for_sale_token_id, Tezos.self_address, Tezos.sender) in
-                      let remove_operator_op = remove_operator_nft(sale.tokens.token_for_sale_address,sale.tokens.token_for_sale_token_id,Tezos.self_address,Tezos.sender) in
-                      (tx_nft_back_op :: remove_operator_op :: []), Big_map.remove sale storage
+                      (tx_nft_back_op :: []), Big_map.remove sale storage
       else (failwith "NOT_OWNER": (operation list * storage))
 
 let fixed_price_sale_main (p, storage : market_entry_points * storage) : operation list * storage = match p with
