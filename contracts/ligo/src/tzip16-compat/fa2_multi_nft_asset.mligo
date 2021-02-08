@@ -36,8 +36,12 @@ let nft_asset_main (param, storage : nft_asset_entrypoints * nft_asset_storage)
 
 #if !OWNER_HOOKS
 
-let sample_storage : nft_asset_storage = {
-  assets = {
+let sample_storage : nft_asset_storage =
+  let contents_name = "\"name\":\"example_name\"" in
+  let contents_description = "\"description\":\"sample_token\"" in
+  let contents_interfaces = "\"interfaces\":[\"TZIP-012\", \"TZIP-016\"]" in
+  let contents = Bytes.pack("{" ^ contents_name ^ "," ^ contents_description ^ "," ^ contents_interfaces ^ "}") in
+  { assets = {
     ledger = (Big_map.empty : ledger);
     token_metadata = (Big_map.empty : nft_meta);
     next_token_id = 0n;
@@ -50,8 +54,8 @@ let sample_storage : nft_asset_storage = {
     };
   metadata = Big_map.literal
                [
-                 ("description", Bytes.pack "sample_token");
-                 ("interfaces", Bytes.pack ["TZIP-016"])
+                 ("", Bytes.pack "tezos-storage:contents");
+                 ("contents", contents)
                ];
 }
 
