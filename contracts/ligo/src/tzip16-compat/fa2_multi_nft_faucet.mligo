@@ -21,9 +21,9 @@ let nft_faucet_main (param, storage : nft_faucet_entrypoints * nft_faucet_storag
      ops, { storage with assets = new_assets; }
 
 let sample_storage : nft_faucet_storage =
-  let contents_name = "" in
-  let contents_description = "" in
-  let contents_interfaces = "" in
+  let contents_name = "\"name\":\"example_name\"" in
+  let contents_description = "\"description\":\"sample_token\"" in
+  let contents_interfaces = "\"interfaces\":[\"TZIP-012\", \"TZIP-016\"]" in
   let contents = Bytes.pack("{" ^ contents_name ^ "," ^ contents_description ^ "," ^ contents_interfaces ^ "}") in
   { assets = { ledger = (Big_map.empty : ledger);
     token_metadata = (Big_map.empty : nft_meta);
