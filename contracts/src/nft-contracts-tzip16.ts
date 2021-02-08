@@ -67,7 +67,8 @@ export async function originateNftFaucet(
     );
     const storage = `(Pair (Pair (Pair {} 0) (Pair {} {}))
       { Elt "" 0x05010000001674657a6f732d73746f726167653a636f6e74656e7473 ;
-        Elt "contents" 0x0501000000047b2c2c7d })`;
+        Elt "contents"
+            0x0501000000687b5c226e616d655c223a5c226578616d706c655f6e616d655c222c5c226465736372697074696f6e5c223a5c2273616d706c655f746f6b656e5c222c5c22696e74657266616365735c223a5b5c22545a49502d3031325c222c205c22545a49502d3031365c225d7d })`;
     return originateContract(tz, code, storage, 'nftFaucet-tzip16-compat');
 }
 
