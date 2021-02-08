@@ -19,12 +19,3 @@ let nft_faucet_main (param, storage : nft_faucet_entrypoints * nft_faucet_storag
   | Mint mp ->
      let ops, new_assets = mint_tokens (mp, storage.assets) in
      ops, { storage with assets = new_assets; }
-
-let sample_storage : nft_faucet_storage = {
-  assets = { ledger = (Big_map.empty : ledger);
-    token_metadata = (Big_map.empty : nft_meta);
-    next_token_id = 0n;
-    operators = (Big_map.empty : operator_storage);
-    };
-  metadata = (Big_map.empty: (string, bytes) big_map);
-  }
