@@ -18,12 +18,12 @@ type auction =
   {
     owner : address;
     current_bid : tez;
-    in_progress : bool;
     start_time : timestamp;
+    last_bid_time : timestamp;
     round_time : int;
     asset : (tokens list);
     min_raise : tez;
-    end_time : timestamp;
+    auction_time : int;
     highest_bidder : address;
   }
 
@@ -32,10 +32,10 @@ type configure_param =
   {
     opening_price : tez;
     min_raise : tez;
-    start_time : timestamp;
     round_time : nat; 
     asset : (tokens list);
-    end_time : timestamp 
+    auction_time : nat;
+    start_time : timestamp;
   }
 
 type auction_entrypoints = 
@@ -49,6 +49,7 @@ type storage =
   {
     current_id : nat;
     max_auction_time : nat;
+    max_config_to_start_time : nat;
     auctions : (nat, auction) big_map
   }
 
@@ -89,20 +90,30 @@ let resolve_contract (add : address) : unit contract =
       None -> (failwith "" : unit contract) 
     | Some c -> c  
 
+let auction_in_progress (auction : auction) : bool = 
+  ((Tezos.now <= auction.start_time + auction.auction_time) &&
+  (Tezos.now <= auction.last_bid_time + auction.round_time || 
+  Tezos.now <= auction.start_time )) 
+
+
 let configure_auction(configure_param, storage : configure_param * storage) : return = begin
+    let now = Tezos.now in 
     assert (Tezos.sender = Tezos.source);
-    assert(configure_param.end_time <= Tezos.now + int(storage.max_auction_time));
+    assert(configure_param.auction_time <= storage.max_auction_time);
+    assert(configure_param.start_time <= now + int(storage.max_config_to_start_time));
     assert(Tezos.amount = 0mutez);
+    assert(configure_param.round_time > 0n);
+
     let auction_data : auction = {
       owner = Tezos.sender;
       current_bid = 0mutez;
-      in_progress = true;
       start_time = configure_param.start_time;
       round_time = int(configure_param.round_time);
       asset = configure_param.asset;
       min_raise = configure_param.min_raise;
-      end_time = configure_param.end_time;
-      highest_bidder = Tezos.sender
+      auction_time = int(configure_param.auction_time);
+      highest_bidder = Tezos.sender;
+      last_bid_time = now; (*Just a default value*)
     } in
     let updated_auctions : (nat, auction) big_map = Big_map.update storage.current_id (Some auction_data) storage.auctions in
     let fa2_transfers : operation list = tokens_to_transfer_list(configure_param.asset, Tezos.sender, Tezos.self_address) in 
@@ -112,54 +123,39 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
 let resolve_auction(asset_id, storage : nat * storage) : return = begin
     assert(Tezos.sender = Tezos.source);
     let auction : auction = get_auction_data(asset_id, storage) in
-    assert(auction.in_progress);
-    assert(Tezos.now >= auction.end_time || Tezos.now > auction.start_time + auction.round_time);
+    assert(not auction_in_progress(auction));
     assert(Tezos.amount = 0mutez);
-
-    let updated_auction_data = {auction with in_progress = false} in 
-    let updated_auctions = Big_map.update asset_id (Some updated_auction_data) storage.auctions in
     
     let owner_contract : unit contract = resolve_contract(auction.owner) in
-
     let fa2_transfers : operation list = tokens_to_transfer_list(auction.asset, Tezos.self_address, auction.highest_bidder) in 
-     
     let send_fee = Tezos.transaction unit auction.current_bid owner_contract in
-
+    let updated_auctions = Big_map.update asset_id (None : auction option) storage.auctions in
     (send_fee :: fa2_transfers, {storage with auctions = updated_auctions})
   end
+
 let cancel_auction(asset_id, storage : nat * storage) : return = begin 
     assert(Tezos.sender = Tezos.source);
     let auction : auction = get_auction_data(asset_id, storage) in
     assert(Tezos.sender = auction.owner);
-    assert(auction.in_progress);
-    assert(Tezos.now < auction.end_time);
-    assert(Tezos.now <= auction.start_time + auction.round_time);
+    assert(auction_in_progress(auction));
     assert(Tezos.amount = 0mutez);
 
-    let updated_auction_data = {auction with in_progress = false} in 
-    let updated_auctions = Big_map.update asset_id (Some updated_auction_data) storage.auctions in
-    
     let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
     let return_bid = Tezos.transaction unit auction.current_bid highest_bidder_contract in
-
     let fa2_transfers : operation list = tokens_to_transfer_list(auction.asset, Tezos.self_address, auction.owner) in 
-
+    let updated_auctions = Big_map.update asset_id (None : auction option) storage.auctions in
     (return_bid :: fa2_transfers, {storage with auctions = updated_auctions})
   end
 
 let place_bid(asset_id, storage : nat * storage) : return = begin
     assert(Tezos.sender = Tezos.source);
     let auction : auction = get_auction_data(asset_id, storage) in
-    assert(auction.in_progress);
-    assert(Tezos.now < auction.end_time);
-    assert(Tezos.now <= auction.start_time + auction.round_time);
-    
+    assert(auction_in_progress(auction));
+
     let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
     let return_bid = Tezos.transaction unit auction.current_bid highest_bidder_contract in
-
-    let updated_auction_data = {auction with current_bid = Tezos.amount; highest_bidder = Tezos.sender} in 
+    let updated_auction_data = {auction with current_bid = Tezos.amount; highest_bidder = Tezos.sender; last_bid_time = Tezos.now} in 
     let updated_auctions = Big_map.update asset_id (Some updated_auction_data) storage.auctions in
-
     ([return_bid] , {storage with auctions = updated_auctions})
   end 
 
