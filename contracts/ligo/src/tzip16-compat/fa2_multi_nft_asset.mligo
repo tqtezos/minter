@@ -33,30 +33,3 @@ let nft_asset_main (param, storage : nft_asset_entrypoints * nft_asset_storage)
     let ops, admin = simple_admin (a, storage.admin) in
     let new_storage = { storage with admin = admin; } in
     ops, new_storage
-
-#if !OWNER_HOOKS
-
-let sample_storage : nft_asset_storage =
-  let contents_name = "\"name\":\"example_name\"" in
-  let contents_description = "\"description\":\"sample_token\"" in
-  let contents_interfaces = "\"interfaces\":[\"TZIP-012\", \"TZIP-016\"]" in
-  let contents = Bytes.pack("{" ^ contents_name ^ "," ^ contents_description ^ "," ^ contents_interfaces ^ "}") in
-  { assets = {
-    ledger = (Big_map.empty : ledger);
-    token_metadata = (Big_map.empty : nft_meta);
-    next_token_id = 0n;
-    operators = (Big_map.empty : operator_storage);
-  };
-  admin = {
-    admin = ("tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU" : address);
-    pending_admin = (None : address option);
-    paused = true;
-    };
-  metadata = Big_map.literal
-               [
-                 ("", Bytes.pack "tezos-storage:contents");
-                 ("contents", contents)
-               ];
-}
-
-#endif
