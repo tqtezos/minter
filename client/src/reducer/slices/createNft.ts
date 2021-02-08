@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { uploadTokenArtifactAction } from '../async/actions';
 
 // State
 
@@ -102,6 +103,12 @@ const slice = createSlice({
     clearForm() {
       return initialState;
     }
+  },
+  extraReducers: ({ addCase }) => {
+    addCase(uploadTokenArtifactAction.fulfilled, (state, action) => {
+      state.artifactUri = action.payload.ipfsUri;
+      state.thumbnailUri = action.payload.thumbnail.ipfsUri;
+    });
   }
 });
 

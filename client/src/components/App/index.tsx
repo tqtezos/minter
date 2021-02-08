@@ -6,13 +6,13 @@ import CollectionsCatalog from '../Collections/Catalog';
 import CollectionsTokenDetail from '../Collections/TokenDetail';
 import Header from '../common/Header';
 import { Flex } from '@chakra-ui/react';
+import Notifications from '../common/Notifications';
 
 export default function App() {
   return (
     <Flex pos="absolute" w="100%" h="100%">
       <Flex justifyContent="space-between" width="100%" flexDir="column">
         <Header />
-
         <Switch>
           <Route path="/">
             <SplashPage />
@@ -32,6 +32,7 @@ export default function App() {
             )}
           </Route>
         </Switch>
+        <Notifications />
       </Flex>
     </Flex>
   );

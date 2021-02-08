@@ -7,7 +7,10 @@ export enum ErrorKind {
   TransferTokenFailed,
   GetNftAssetContractFailed,
   GetContractNftsFailed,
-  GetWalletNftAssetContractsFailed
+  GetWalletNftAssetContractsFailed,
+  IPFSUploadFailed,
+  WalletAlreadyConnected,
+  WalletPermissionRequestDenied
 }
 
 export interface RejectValue {

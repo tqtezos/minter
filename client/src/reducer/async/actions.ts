@@ -8,6 +8,7 @@ import {
 import { ErrorKind, RejectValue } from './errors';
 import { getContractNftsQuery, getWalletAssetContractsQuery } from './queries';
 import { validateCreateNftForm } from '../validators/createNft';
+import { uploadIPFSFile, IpfsResponse } from '../../lib/util/ipfs';
 
 type Options = {
   state: State;
@@ -15,7 +16,7 @@ type Options = {
 };
 
 export const createAssetContractAction = createAsyncThunk<
-  { address: string },
+  { name: string; address: string },
   string,
   Options
 >(
@@ -42,6 +43,29 @@ export const createAssetContractAction = createAsyncThunk<
     }
   }
 );
+
+export const uploadTokenArtifactAction = createAsyncThunk<
+  IpfsResponse,
+  File,
+  Options
+>('action/uploadTokenArtifact', async (file, { getState, rejectWithValue }) => {
+  const { system } = getState();
+  if (system.status !== 'WalletConnected') {
+    return rejectWithValue({
+      kind: ErrorKind.WalletNotConnected,
+      message: 'Cannot upload token artifact: Wallet not connected'
+    });
+  }
+  try {
+    const response = await uploadIPFSFile(file);
+    return response.data;
+  } catch (e) {
+    return rejectWithValue({
+      kind: ErrorKind.IPFSUploadFailed,
+      message: 'IPFS upload failed'
+    });
+  }
+});
 
 function buildMetadataFromState(state: State['createNft']) {
   const address = state.collectionAddress as string;

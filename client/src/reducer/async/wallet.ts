@@ -1,11 +1,17 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { State } from '..';
 import { Minter, SystemWithToolkit, SystemWithWallet } from '../../lib/system';
+import { ErrorKind, RejectValue } from './errors';
+
+type Options = {
+  state: State;
+  rejectValue: RejectValue;
+};
 
 export const connectWallet = createAsyncThunk<
   SystemWithWallet,
   undefined,
-  { state: State }
+  Options
 >(
   'wallet/connect',
   async (_arg, { getState, rejectWithValue /* , dispatch */ }) => {
@@ -52,20 +58,33 @@ export const connectWallet = createAsyncThunk<
           }
         }
       };
-      return await Minter.connectWallet(system /*eventHandlers*/);
+      try {
+        return await Minter.connectWallet(system /*eventHandlers*/);
+      } catch (e) {
+        return rejectWithValue({
+          kind: ErrorKind.WalletPermissionRequestDenied,
+          message: 'Wallet permission request denied'
+        });
+      }
     }
-    return rejectWithValue({ error: 'Wallet already connected' });
+    return rejectWithValue({
+      kind: ErrorKind.WalletNotConnected,
+      message: 'Wallet already connected'
+    });
   }
 );
 
 export const disconnectWallet = createAsyncThunk<
   SystemWithToolkit,
   undefined,
-  { state: State }
+  Options
 >('wallet/disconnect', async (_arg, { getState, rejectWithValue }) => {
   const { system } = getState();
   if (system.status === 'WalletConnected') {
     return await Minter.disconnectWallet(system);
   }
-  return rejectWithValue({ error: 'No wallet connected' });
+  return rejectWithValue({
+    kind: ErrorKind.WalletNotConnected,
+    message: 'No wallet to disconnect from '
+  });
 });
