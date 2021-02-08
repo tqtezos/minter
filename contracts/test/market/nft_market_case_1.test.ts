@@ -112,53 +112,28 @@ describe('test market (test_case_1)', () => {
 
         test('bob makes sale, and alice buys nft', async () => {
 
-            $log.info('starting sale...');
-            tezos.bob.contract
-                .at(marketplace.address)
-                .then((contract) => {
-                    return contract.methods.sell(salePrice,nft.address,tokenId).send({source: bobAddress, amount: 0 });
-                })
-                .then((op) => {
-                    $log.info(`Waiting for ${op.hash} to be confirmed...`);
-                    return op.confirmation(1).then(() =>  op.hash);
-                })
-                .then((hash) => {
-                    $log.info(`Operation injected at hash=${hash}`);
-                    $log.info('alice buys nft...');
-                    tezos.alice.contract
-                        .at(marketplace.address)
-                        .then((contract) => {
-                            return contract.methods.buy(salePrice,nft.address,tokenId).send({source: aliceAddress, amount: 1});
-                        })
-                        .then((op) => {
-                            $log.info(`Waiting for ${op.hash} to be confirmed...`);
-                            return op.confirmation().then(() =>  op.hash);
-                        })
-                        .then((hash) => {
-                            $log.info(`Operation injected at hash=${hash}`);
-                            $log.info('remove marketplace as an operator of alice\'s token');
-                            tezos.alice.contract
-                                .at(nft.address)
-                                .then((contract) => {
-                                    return contract
-                                        .methods
-                                        .update_operators(
-                                            [{remove_operator:
-                                             {owner: aliceAddress
-                                              , operator: marketplace.address
-                                              , token_id: tokenId
-                                             }
-                                             }
-                                            ]).send()
-                                })
-                                .then((op) => {
-                                    $log.info(`Waiting for ${op.hash} to be confirmed...`);
-                                    return op.confirmation().then(() => op.hash);
-                                }).catch((error) => $log.info(`Error: ${JSON.stringify(error,null,2)}`));
-                        })
-                        .catch((error) => $log.info(`Error: ${JSON.stringify(error,null,2)}`));
-                })
-                .catch((error) => $log.info(`Error: ${JSON.stringify(error,null,2)}`));
+            try {
+              $log.info('starting sale...');
+              const bobSaleContract = await tezos.bob.contract.at(marketplace.address);
+              const sellOp = await bobSaleContract.methods.sell(salePrice,nft.address,tokenId).send({source: bobAddress, amount: 0});
+              $log.info(`Waiting for ${sellOp.hash} to be confirmed...`);
+              const sellOpHash = await sellOp.confirmation(1).then(() => sellOp.hash);
+              $log.info(`Operation injected at hash=${sellOpHash}`);
+              $log.info('alice buys nft...');
+
+              try {
+                const aliceSaleContract = await tezos.alice.contract.at(marketplace.address);
+                const buyOp = await aliceSaleContract.methods.buy(salePrice, nft.address, tokenId).send({source: aliceAddress, amount: 1});
+                $log.info(`Waiting for ${buyOp.hash} to be confirmed...`);
+                const buyOpHash = await buyOp.confirmation().then(() =>  buyOp.hash);
+                $log.info(`Operation injected at hash=${buyOpHash}`);
+              } catch (error) {
+                  $log.info(`Error: ${JSON.stringify(error,null,2)}`);
+              }
+            } catch (error) {
+                $log.info(`Error: ${JSON.stringify(error,null,2)}`);
+            }
+
 
         });
 
