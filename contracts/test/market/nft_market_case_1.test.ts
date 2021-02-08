@@ -121,15 +121,13 @@ describe('test market (test_case_1)', () => {
               $log.info(`Operation injected at hash=${sellOpHash}`);
               $log.info('alice buys nft...');
 
-              try {
-                const aliceSaleContract = await tezos.alice.contract.at(marketplace.address);
-                const buyOp = await aliceSaleContract.methods.buy(salePrice, nft.address, tokenId).send({source: aliceAddress, amount: 1});
-                $log.info(`Waiting for ${buyOp.hash} to be confirmed...`);
-                const buyOpHash = await buyOp.confirmation().then(() =>  buyOp.hash);
-                $log.info(`Operation injected at hash=${buyOpHash}`);
-              } catch (error) {
-                  $log.info(`Error: ${JSON.stringify(error,null,2)}`);
-              }
+
+             const aliceSaleContract = await tezos.alice.contract.at(marketplace.address);
+             const buyOp = await aliceSaleContract.methods.buy(salePrice, nft.address, tokenId).send({source: aliceAddress, amount: 1});
+             $log.info(`Waiting for ${buyOp.hash} to be confirmed...`);
+             const buyOpHash = await buyOp.confirmation().then(() =>  buyOp.hash);
+             $log.info(`Operation injected at hash=${buyOpHash}`);
+
             } catch (error) {
                 $log.info(`Error: ${JSON.stringify(error,null,2)}`);
             }
