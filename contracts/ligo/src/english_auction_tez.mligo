@@ -150,11 +150,13 @@ let cancel_auction(asset_id, storage : nat * storage) : return = begin
 let place_bid(asset_id, storage : nat * storage) : return = begin
     assert(Tezos.sender = Tezos.source);
     let auction : auction = get_auction_data(asset_id, storage) in
+    let amt = Tezos.amount in 
     assert(auction_in_progress(auction));
+    assert(amount >= auction.current_bid + auction.min_raise);
 
     let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
     let return_bid = Tezos.transaction unit auction.current_bid highest_bidder_contract in
-    let updated_auction_data = {auction with current_bid = Tezos.amount; highest_bidder = Tezos.sender; last_bid_time = Tezos.now} in 
+    let updated_auction_data = {auction with current_bid = amt; highest_bidder = Tezos.sender; last_bid_time = Tezos.now} in 
     let updated_auctions = Big_map.update asset_id (Some updated_auction_data) storage.auctions in
     ([return_bid] , {storage with auctions = updated_auctions})
   end 
