@@ -129,7 +129,7 @@ let resolve_auction(asset_id, storage : nat * storage) : return = begin
     let owner_contract : unit contract = resolve_contract(auction.owner) in
     let fa2_transfers : operation list = tokens_to_transfer_list(auction.asset, Tezos.self_address, auction.highest_bidder) in 
     let send_fee = Tezos.transaction unit auction.current_bid owner_contract in
-    let updated_auctions = Big_map.update asset_id (None : auction option) storage.auctions in
+    let updated_auctions = Big_map.remove asset_id storage.auctions in
     (send_fee :: fa2_transfers, {storage with auctions = updated_auctions})
   end
 
@@ -143,7 +143,7 @@ let cancel_auction(asset_id, storage : nat * storage) : return = begin
     let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
     let return_bid = Tezos.transaction unit auction.current_bid highest_bidder_contract in
     let fa2_transfers : operation list = tokens_to_transfer_list(auction.asset, Tezos.self_address, auction.owner) in 
-    let updated_auctions = Big_map.update asset_id (None : auction option) storage.auctions in
+    let updated_auctions = Big_map.remove asset_id storage.auctions in
     (return_bid :: fa2_transfers, {storage with auctions = updated_auctions})
   end
 

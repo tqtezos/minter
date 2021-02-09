@@ -402,12 +402,13 @@
                  CDR ;
                  CDR ;
                  CDR ;
+                 DIG 3 ;
                  NONE (pair address
                             (pair mutez
                                   (pair timestamp
                                         (pair timestamp
                                               (pair int (pair (list (pair address (list (pair nat nat)))) (pair mutez (pair int address)))))))) ;
-                 DIG 4 ;
+                 SWAP ;
                  UPDATE ;
                  DIG 3 ;
                  DUP ;
@@ -659,12 +660,13 @@
                  CDR ;
                  CDR ;
                  CDR ;
+                 DIG 3 ;
                  NONE (pair address
                             (pair mutez
                                   (pair timestamp
                                         (pair timestamp
                                               (pair int (pair (list (pair address (list (pair nat nat)))) (pair mutez (pair int address)))))))) ;
-                 DIG 4 ;
+                 SWAP ;
                  UPDATE ;
                  DIG 3 ;
                  DUP ;
