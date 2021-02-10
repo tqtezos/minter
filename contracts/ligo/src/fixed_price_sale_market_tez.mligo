@@ -54,17 +54,17 @@ let transfer_tez (price, seller : tez * address) : operation =
   let seller_account = match (Tezos.get_contract_opt seller : unit contract option) with
     | None -> (failwith "NO_SELLER_ACCOUNT" : unit contract)
     | Some acc -> acc
-     in let amountError = if Tezos.amount <> price then failwith "NOT_ENOUGH_TEZ_TO_BUY" else () in
+     in let amountError = if Tezos.amount <> price then failwith "WRONG_TEZ_PRICE" else () in
         Tezos.transaction () Tezos.amount seller_account
 
 let buy_token(sale, storage: sale_param_tez * storage) : (operation list * storage) =
   let sale_price = match Big_map.find_opt sale storage with
   | None -> (failwith "NO_SALE": tez)
   | Some s -> s
-  in let tx_money_ops = transfer_tez(sale_price, sale.sale_seller) in
+  in let tx_ops = transfer_tez(sale_price, sale.sale_seller) in
   let tx_nft_op = transfer_nft(sale.sale_token.token_for_sale_address, sale.sale_token.token_for_sale_token_id, Tezos.self_address, Tezos.sender) in
   let new_s = Big_map.remove sale storage in
-  (tx_money_ops :: tx_nft_op :: []), new_s
+  (tx_ops :: tx_nft_op :: []), new_s
 
 let deposit_for_sale(sale_token, price, storage: sale_token_param_tez * tez * storage) : (operation list * storage) =
     let transfer_op =

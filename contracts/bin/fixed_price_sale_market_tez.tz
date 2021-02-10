@@ -86,7 +86,7 @@
                  AMOUNT ;
                  COMPARE ;
                  NEQ ;
-                 IF { PUSH string "NOT_ENOUGH_TEZ_TO_BUY" ; FAILWITH } {} ;
+                 IF { PUSH string "WRONG_TEZ_PRICE" ; FAILWITH } {} ;
                  AMOUNT ;
                  PUSH unit Unit ;
                  TRANSFER_TOKENS ;
