@@ -2,8 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   createAssetContractAction,
   mintTokenAction,
-  transferTokenAction,
-  uploadTokenArtifactAction
+  transferTokenAction
 } from '../async/actions';
 import { connectWallet, disconnectWallet } from '../async/wallet';
 import {
@@ -53,7 +52,6 @@ const slice = createSlice({
       createAssetContractAction,
       mintTokenAction,
       transferTokenAction,
-      uploadTokenArtifactAction,
       getContractNftsQuery,
       getNftAssetContractQuery,
       getWalletAssetContractsQuery,

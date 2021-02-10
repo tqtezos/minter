@@ -2,16 +2,19 @@ import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Box, Flex, Heading, Text, Image } from '@chakra-ui/react';
 import { useSelector, useDispatch } from '../../reducer';
-import { uploadTokenArtifactAction } from '../../reducer/async/actions';
 import { ipfsUriToGatewayUrl } from '../../lib/util/ipfs';
+import { readFileAsDataUrlAction } from '../../reducer/async/actions';
 
 export default function FileUpload() {
   const state = useSelector(s => s.createNft);
   const dispatch = useDispatch();
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    dispatch(uploadTokenArtifactAction(acceptedFiles[0]));
-  }, []);
+  const onDrop = useCallback(
+    (files: File[]) => {
+      dispatch(readFileAsDataUrlAction({ ns: 'createNft', file: files[0] }));
+    },
+    [dispatch]
+  );
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
@@ -45,12 +48,12 @@ export default function FileUpload() {
         {...getRootProps()}
       >
         <Box as="input" {...getInputProps()} />
-        {state.artifactUri ? (
+        {state.selectedFile?.objectUrl ? (
           <Image
             p={4}
             maxWidth="400px"
             maxHeight="400px"
-            src={ipfsUriToGatewayUrl(state.artifactUri)}
+            src={ipfsUriToGatewayUrl(state.selectedFile.objectUrl)}
           />
         ) : (
           <Flex

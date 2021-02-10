@@ -23,7 +23,7 @@ export default function Notifications() {
         }
       });
     }
-  }, [notifications]);
+  }, [notifications, dispatch, toast]);
 
   return <></>;
 }
