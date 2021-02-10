@@ -22,8 +22,15 @@ type sale_param_tez =
 
 type storage = (sale_param_tez, tez) big_map
 
+type init_sale_param_tez =
+[@layout:comb]
+{
+  sale_price: tez;
+  sale_token_param_tez: sale_token_param_tez;
+}
+
 type market_entry_points =
-  | Sell of (sale_token_param_tez * tez)
+  | Sell of init_sale_param_tez
   | Buy of sale_param_tez
   | Cancel of sale_param_tez
 
@@ -74,6 +81,6 @@ let cancel_sale(sale, storage: sale_param_tez * storage) : (operation list * sto
       else (failwith "NOT_OWNER": (operation list * storage))
 
 let fixed_price_sale_tez_main (p, storage : market_entry_points * storage) : operation list * storage = match p with
-  | Sell sale -> deposit_for_sale(sale.0, sale.1, storage)
+  | Sell sale -> deposit_for_sale(sale.sale_token_param_tez, sale.sale_price, storage)
   | Buy sale -> buy_token(sale, storage)
   | Cancel sale -> cancel_sale(sale,storage)

@@ -126,7 +126,7 @@ describe('test market (test_case_2)', () => {
             $log.info(`Operation injected at hash=${removeSaleOpHash}`);
             $log.info(`alice tries to buy`);
             const aliceSaleContract = await tezos.alice.contract.at(marketplace.address);
-            const buyOp = await aliceSaleContract.methods.buy(salePrice, nft.address, tokenId).send({ source: aliceAddress, amount: 1 });
+            const buyOp = await aliceSaleContract.methods.buy(bobAddress, nft.address, tokenId).send({ source: aliceAddress, amount: 1 });
         } catch (error) {
             $log.info(`alice couldn't buy`);
         }
