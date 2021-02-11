@@ -27,6 +27,14 @@ interface AdminStorage {
     paused: boolean;
 }
 
+function toHexString(input: string): string {
+  const unit8Array: Uint8Array = new TextEncoder().encode(input);
+  return Array.from(unit8Array, (byte: number) => {
+    return ('0' + (byte & 0xff).toString(16)).slice(-2);
+  }).join('');
+}
+
+
 export async function originateNft(
     tz: TezosToolkit,
     admin: address
@@ -37,8 +45,18 @@ export async function originateNft(
         'nft_asset_main',
         'fa2_multi_nft_asset_tzip16_compat.tz'
     );
-    const storage = `(Pair (Pair (Pair "${admin}" False) None)
-  (Pair (Pair {} 0) (Pair {} {})))`;
+    const meta_uri = toHexString('tezos-storage:content');
+    const meta = {
+        name: 'example_name',
+        description: 'sample_token',
+        interfaces: ['TZIP-012','TZIP-016']
+    };
+
+    const meta_content = toHexString(JSON.stringify(meta,null,2));
+
+    const storage = `(Pair (Pair (Pair (Pair "tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU" True) None)
+            (Pair (Pair {} 0) (Pair {} {})))
+      { Elt "" 0x${meta_uri} ; Elt "contents" 0x${meta_content} })`;
     return originateContract(tz, code, storage, 'nft-tzip16-compat');
 }
 
@@ -62,7 +80,18 @@ export async function originateNftFaucet(
         'nft_faucet_main',
         'fa2_multi_nft_faucet_tzip16_compat.tz'
     );
-    const storage = `(Pair (Pair (Pair {} 0) (Pair {} {})) {})`;
+
+    const meta_uri = toHexString('tezos-storage:content');
+    const meta = {
+        name: 'example_name',
+        description: 'sample_token',
+        interfaces: ['TZIP-012','TZIP-016']
+    };
+
+    const meta_content = toHexString(JSON.stringify(meta,null,2));
+
+    const storage = `(Pair (Pair (Pair {} 0) (Pair {} {}))
+      { Elt "" 0x${meta_uri} ; Elt "contents" 0x${meta_content} })`;
     return originateContract(tz, code, storage, 'nftFaucet-tzip16-compat');
 }
 
