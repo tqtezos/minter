@@ -5,7 +5,7 @@ import retry from 'async-retry';
 import Configstore from 'configstore';
 import { defaultEnv, originateContract, loadFile } from './ligo';
 import { TezosToolkit } from '@taquito/taquito';
-import { InMemorySigner } from '@taquito/signer';
+import { InMemorySigner, importKey } from '@taquito/signer';
 import { originateNftFaucet2 } from './nft-contracts-tzip16';
 
 async function main() {
@@ -125,17 +125,25 @@ async function bootstrapNftFactory(
 }
 
 async function createToolkit(config: Configstore): Promise<TezosToolkit> {
+  const FAUCET_KEY = JSON.parse(fs.readFileSync("./config/wallet.json", { encoding: "utf-8" }));
   const key = config.get('admin.secret');
-  const signer = await InMemorySigner.fromSecretKey(key);
+  // const signer = await InMemorySigner.fromSecretKey(key);
   const rpc = config.get('rpc');
   if (!rpc) throw new Error('cannot read node rpc');
 
   const toolkit = new TezosToolkit(rpc);
   toolkit.setProvider({
-    signer,
+    // signer,
     rpc,
     config: { confirmationPollingIntervalSecond: 5 }
   });
+  await importKey(
+    toolkit as any,
+    FAUCET_KEY.email,
+    FAUCET_KEY.password,
+    FAUCET_KEY.mnemonic.join(' '),
+    FAUCET_KEY.secret
+  );
   return toolkit;
 }
 
