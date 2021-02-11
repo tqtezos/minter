@@ -1,4 +1,4 @@
-#include "../fa2/fa2_tzip16_interface.mligo"
+#include "../fa2/fa2_interface.mligo"
 
 type global_token_id =
 {

@@ -3,8 +3,8 @@ import { BigNumber } from 'bignumber.js';
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
 
-import { bootstrap, TestTz } from '../bootstrap-sandbox';
-import { Contract, nat, address, bytes } from '../../src/type-aliases';
+import { bootstrap, TestTz } from './bootstrap-sandbox';
+import { Contract, nat, address, bytes } from '../src/type-aliases';
 
 import {
     originateNftFaucet,
@@ -12,20 +12,20 @@ import {
     MintNftParam,
     SaleParamTez,
     originateFixedPriceTezSale
-} from '../../src/nft-contracts-tzip16';
+} from '../src/nft-contracts';
 import {
     BalanceOfRequest,
     transfer,
     addOperator,
     removeOperator
-} from '../../src/fa2-tzip16-compat-interface';
-import { originateInspector, queryBalances } from '../fa2-balance-inspector';
+} from '../src/fa2-interface';
+import { originateInspector, queryBalances } from './fa2-balance-inspector';
 
 jest.setTimeout(180000); // 3 minutes
 
 const nat1 = new BigNumber(1);
 
-describe('test market (test_case_2)', () => {
+describe('test market (test_case_1)', () => {
     let tezos: TestTz;
     let nft: Contract;
     let inspector: Contract;
@@ -46,7 +46,7 @@ describe('test market (test_case_2)', () => {
         marketAddress = marketplace.address;
         aliceAddress = await tezos.alice.signer.publicKeyHash();
         bobAddress = await tezos.bob.signer.publicKeyHash();
-        tokenId = new BigNumber(1);
+        tokenId = new BigNumber(0);
         tokenMetadata = new MichelsonMap();
         salePrice = new BigNumber(1000000);
     });
@@ -110,7 +110,7 @@ describe('test market (test_case_2)', () => {
 
     });
 
-    test('bob makes sale, cancels it, then alice unsuccessfully tries to buy', async () => {
+    test('bob makes sale, and alice buys nft', async () => {
 
         try {
             $log.info('starting sale...');
@@ -119,17 +119,19 @@ describe('test market (test_case_2)', () => {
             $log.info(`Waiting for ${sellOp.hash} to be confirmed...`);
             const sellOpHash = await sellOp.confirmation(1).then(() => sellOp.hash);
             $log.info(`Operation injected at hash=${sellOpHash}`);
-            $log.info('bob cancels sale');
-            const removeSaleOp = await bobSaleContract.methods.cancel(salePrice, nft.address, tokenId).send({ source: bobAddress, amount: 0 });
-            $log.info(`Waiting for ${removeSaleOp.hash} to be confirmed...`);
-            const removeSaleOpHash = await removeSaleOp.confirmation(1).then(() => removeSaleOp.hash);
-            $log.info(`Operation injected at hash=${removeSaleOpHash}`);
-            $log.info(`alice tries to buy`);
+            $log.info('alice buys nft...');
+
+
             const aliceSaleContract = await tezos.alice.contract.at(marketplace.address);
             const buyOp = await aliceSaleContract.methods.buy(bobAddress, nft.address, tokenId).send({ source: aliceAddress, amount: 1 });
+            $log.info(`Waiting for ${buyOp.hash} to be confirmed...`);
+            const buyOpHash = await buyOp.confirmation().then(() => buyOp.hash);
+            $log.info(`Operation injected at hash=${buyOpHash}`);
+
         } catch (error) {
-            $log.info(`alice couldn't buy`);
+            $log.info(`Error: ${JSON.stringify(error, null, 2)}`);
         }
+
 
     });
 
