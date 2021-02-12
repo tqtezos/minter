@@ -109,7 +109,7 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
     assert(configure_param.start_time <= now + int(storage.max_config_to_start_time));
     assert(Tezos.amount = 0mutez);
     assert(configure_param.round_time > 0n);
-    assert(configure_param.start_time > now);
+    (*assert(configure_param.start_time > now);*)
 
     let auction_data : auction = {
       seller = Tezos.sender;

@@ -579,18 +579,6 @@
                  COMPARE ;
                  GT ;
                  IF {} { PUSH string "failed assertion" ; FAILWITH } ;
-                 DUP ;
-                 DIG 2 ;
-                 DUP ;
-                 DUG 3 ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 COMPARE ;
-                 GT ;
-                 IF {} { PUSH string "failed assertion" ; FAILWITH } ;
                  SENDER ;
                  DIG 2 ;
                  DUP ;
