@@ -4,11 +4,11 @@ services:
   api:
     image: bakingbad/bcdhub-api:3.4
     # command: -f config.yml -f config.box.yml -f config.bbbox.yml
-    # volumes:
-    #   - ${PROJECT_ROOT_DIR}/bbbox/config.yml:/app/api/config.bbbox.yml
+    volumes:
+      - ${PROJECT_ROOT_DIR}/bcd/sandbox.yml:/app/api/sandbox.yml
     environment:
       - BCD_ENV=sandbox
-      - GIN_MODE=release
+      - GIN_MODE=debug
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=bcd
