@@ -14,7 +14,7 @@
                 (pair (nat %max_config_to_start_time)
                       (big_map %auctions
                          nat
-                         (pair (address %owner)
+                         (pair (address %seller)
                                (pair (mutez %current_bid)
                                      (pair (timestamp %start_time)
                                            (pair (timestamp %last_bid_time)
@@ -149,15 +149,35 @@
              COMPARE ;
              LE ;
              AND } ;
-         DIG 4 ;
-         DUP ;
-         DUG 5 ;
-         CDR ;
+         LAMBDA
+           (pair address
+                 (pair mutez
+                       (pair timestamp
+                             (pair timestamp
+                                   (pair int (pair (list (pair address (list (pair nat nat)))) (pair mutez (pair int address))))))))
+           bool
+           { DUP ;
+             CAR ;
+             SWAP ;
+             CDR ;
+             CDR ;
+             CDR ;
+             CDR ;
+             CDR ;
+             CDR ;
+             CDR ;
+             CDR ;
+             COMPARE ;
+             EQ } ;
          DIG 5 ;
+         DUP ;
+         DUG 6 ;
+         CDR ;
+         DIG 6 ;
          CAR ;
          IF_LEFT
            { IF_LEFT
-               { DIG 5 ;
+               { DIG 6 ;
                  DROP ;
                  SOURCE ;
                  SENDER ;
@@ -171,11 +191,11 @@
                  DUP ;
                  DUG 2 ;
                  PAIR ;
-                 DIG 5 ;
+                 DIG 6 ;
                  SWAP ;
                  EXEC ;
                  DUP ;
-                 DIG 4 ;
+                 DIG 5 ;
                  SWAP ;
                  EXEC ;
                  IF {} { PUSH string "failed assertion" ; FAILWITH } ;
@@ -223,24 +243,38 @@
                  OR ;
                  IF {} { PUSH string "failed assertion" ; FAILWITH } ;
                  DUP ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF {} { PUSH string "failed assertion" ; FAILWITH } ;
+                 DUP ;
                  DIG 4 ;
                  SWAP ;
                  EXEC ;
-                 SWAP ;
-                 DUP ;
-                 DUG 2 ;
-                 CDR ;
-                 CAR ;
-                 UNIT ;
-                 TRANSFER_TOKENS ;
+                 IF { DUP ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      DIG 4 ;
+                      SWAP ;
+                      EXEC ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      CDR ;
+                      CAR ;
+                      UNIT ;
+                      TRANSFER_TOKENS ;
+                      NIL operation ;
+                      SWAP ;
+                      CONS }
+                    { DIG 3 ; DROP ; NIL operation } ;
                  SWAP ;
                  DUP ;
                  DUG 2 ;
@@ -367,9 +401,7 @@
                  DIG 2 ;
                  CAR ;
                  PAIR ;
-                 NIL operation ;
-                 DIG 2 ;
-                 CONS ;
+                 SWAP ;
                  PAIR }
                { SOURCE ;
                  SENDER ;
@@ -383,7 +415,7 @@
                  DUP ;
                  DUG 2 ;
                  PAIR ;
-                 DIG 5 ;
+                 DIG 6 ;
                  SWAP ;
                  EXEC ;
                  DUP ;
@@ -393,7 +425,7 @@
                  EQ ;
                  IF {} { PUSH string "failed assertion" ; FAILWITH } ;
                  DUP ;
-                 DIG 4 ;
+                 DIG 5 ;
                  SWAP ;
                  EXEC ;
                  IF {} { PUSH string "failed assertion" ; FAILWITH } ;
@@ -403,31 +435,12 @@
                  EQ ;
                  IF {} { PUSH string "failed assertion" ; FAILWITH } ;
                  DUP ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 DIG 4 ;
-                 SWAP ;
-                 EXEC ;
-                 SWAP ;
-                 DUP ;
-                 DUG 2 ;
-                 CDR ;
-                 CAR ;
-                 UNIT ;
-                 TRANSFER_TOKENS ;
-                 SWAP ;
-                 DUP ;
-                 DUG 2 ;
                  CAR ;
                  SELF ;
                  ADDRESS ;
-                 DIG 3 ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
                  CDR ;
                  CDR ;
                  CDR ;
@@ -436,16 +449,43 @@
                  CAR ;
                  PAIR ;
                  PAIR ;
-                 DIG 4 ;
+                 DIG 6 ;
                  SWAP ;
                  EXEC ;
-                 DIG 3 ;
+                 SWAP ;
                  DUP ;
-                 DUG 4 ;
+                 DUG 2 ;
+                 DIG 5 ;
+                 SWAP ;
+                 EXEC ;
+                 IF { SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      DIG 5 ;
+                      SWAP ;
+                      EXEC ;
+                      DIG 2 ;
+                      CDR ;
+                      CAR ;
+                      UNIT ;
+                      TRANSFER_TOKENS ;
+                      CONS }
+                    { SWAP ; DROP ; DIG 3 ; DROP } ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
                  CDR ;
                  CDR ;
                  CDR ;
-                 DIG 3 ;
+                 DIG 2 ;
                  NONE (pair address
                             (pair mutez
                                   (pair timestamp
@@ -453,28 +493,28 @@
                                               (pair int (pair (list (pair address (list (pair nat nat)))) (pair mutez (pair int address)))))))) ;
                  SWAP ;
                  UPDATE ;
-                 DIG 3 ;
+                 DIG 2 ;
                  DUP ;
-                 DUG 4 ;
+                 DUG 3 ;
                  CDR ;
                  CDR ;
                  CAR ;
                  PAIR ;
-                 DIG 3 ;
+                 DIG 2 ;
                  DUP ;
-                 DUG 4 ;
+                 DUG 3 ;
                  CDR ;
                  CAR ;
                  PAIR ;
-                 DIG 3 ;
+                 DIG 2 ;
                  CAR ;
                  PAIR ;
                  SWAP ;
-                 DIG 2 ;
-                 CONS ;
                  PAIR } }
            { IF_LEFT
                { DIG 2 ;
+                 DROP ;
+                 DIG 2 ;
                  DROP ;
                  DIG 2 ;
                  DROP ;
@@ -657,11 +697,11 @@
                  DUP ;
                  DUG 2 ;
                  PAIR ;
-                 DIG 5 ;
+                 DIG 6 ;
                  SWAP ;
                  EXEC ;
                  DUP ;
-                 DIG 4 ;
+                 DIG 5 ;
                  SWAP ;
                  EXEC ;
                  NOT ;
@@ -672,13 +712,6 @@
                  EQ ;
                  IF {} { PUSH string "failed assertion" ; FAILWITH } ;
                  DUP ;
-                 CAR ;
-                 DIG 4 ;
-                 SWAP ;
-                 EXEC ;
-                 SWAP ;
-                 DUP ;
-                 DUG 2 ;
                  CDR ;
                  CDR ;
                  CDR ;
@@ -689,9 +722,9 @@
                  CDR ;
                  SELF ;
                  ADDRESS ;
-                 DIG 3 ;
+                 DIG 2 ;
                  DUP ;
-                 DUG 4 ;
+                 DUG 3 ;
                  CDR ;
                  CDR ;
                  CDR ;
@@ -700,22 +733,36 @@
                  CAR ;
                  PAIR ;
                  PAIR ;
-                 DIG 5 ;
+                 DIG 6 ;
                  SWAP ;
                  EXEC ;
                  SWAP ;
-                 DIG 2 ;
-                 CDR ;
-                 CAR ;
-                 UNIT ;
-                 TRANSFER_TOKENS ;
-                 DIG 3 ;
                  DUP ;
-                 DUG 4 ;
+                 DUG 2 ;
+                 DIG 5 ;
+                 SWAP ;
+                 EXEC ;
+                 IF { SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      CAR ;
+                      DIG 5 ;
+                      SWAP ;
+                      EXEC ;
+                      DIG 2 ;
+                      CDR ;
+                      CAR ;
+                      UNIT ;
+                      TRANSFER_TOKENS ;
+                      CONS }
+                    { SWAP ; DROP ; DIG 3 ; DROP } ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
                  CDR ;
                  CDR ;
                  CDR ;
-                 DIG 3 ;
+                 DIG 2 ;
                  NONE (pair address
                             (pair mutez
                                   (pair timestamp
@@ -723,23 +770,22 @@
                                               (pair int (pair (list (pair address (list (pair nat nat)))) (pair mutez (pair int address)))))))) ;
                  SWAP ;
                  UPDATE ;
-                 DIG 3 ;
+                 DIG 2 ;
                  DUP ;
-                 DUG 4 ;
+                 DUG 3 ;
                  CDR ;
                  CDR ;
                  CAR ;
                  PAIR ;
-                 DIG 3 ;
+                 DIG 2 ;
                  DUP ;
-                 DUG 4 ;
+                 DUG 3 ;
                  CDR ;
                  CAR ;
                  PAIR ;
-                 DIG 3 ;
+                 DIG 2 ;
                  CAR ;
                  PAIR ;
-                 DUG 2 ;
-                 CONS ;
+                 SWAP ;
                  PAIR } } } }
 
