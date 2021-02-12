@@ -1,11 +1,11 @@
 version: '3.7'
 
 services:
-  bcdapi:
-    image: bakingbad/bcdhub-api:3.0
-    command: -f config.yml -f config.box.yml -f config.bbbox.yml
-    volumes:
-      - ${PROJECT_ROOT_DIR}/bbbox/config.yml:/app/api/config.bbbox.yml
+  api:
+    image: bakingbad/bcdhub-api:3.4
+    # command: -f config.yml -f config.box.yml -f config.bbbox.yml
+    # volumes:
+    #   - ${PROJECT_ROOT_DIR}/bbbox/config.yml:/app/api/config.bbbox.yml
     environment:
       - BCD_ENV=sandbox
       - GIN_MODE=release
@@ -14,6 +14,7 @@ services:
       - POSTGRES_DB=bcd
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
+      - SANDBOX_NODE_URI=http://sandbox:20000
     depends_on:
       - elastic
       - db
