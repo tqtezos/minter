@@ -113,7 +113,7 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
 
     let auction_data : auction = {
       seller = Tezos.sender;
-      current_bid = 0mutez;
+      current_bid = configure_param.opening_price;
       start_time = configure_param.start_time;
       round_time = int(configure_param.round_time);
       asset = configure_param.asset;

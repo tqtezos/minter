@@ -635,7 +635,10 @@
                  CDR ;
                  CDR ;
                  PAIR ;
-                 PUSH mutez 0 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
                  PAIR ;
                  SENDER ;
                  PAIR ;
