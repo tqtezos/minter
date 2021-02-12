@@ -121,3 +121,16 @@ export async function originateFixedPriceTezSale(
     const storage = `{}`;
     return originateContract(tz, code, storage, 'fixed-price-sale-market-tez');
 }
+
+export async function originateEnglishAuctionTez(
+    tz: TezosToolkit,
+): Promise<Contract> {
+    const code = await compileAndLoadContract(
+        defaultEnv,
+        'english_auction_tez.mligo',
+        'english_auction_tez_main',
+        'english_auction_tez.tz',
+    );
+    const storage = `(Pair 0 (Pair 86400 (Pair 86400 {})))`;
+    return originateContract(tz, code, storage, 'english_auction_tez');
+}

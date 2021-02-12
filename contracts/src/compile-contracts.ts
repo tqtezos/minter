@@ -16,6 +16,7 @@ async function main(): Promise<void> {
     await compileTzip16NftFactoryContract(env);
     await compileTzip16FixedPriceSaleMarketPlaceContract(env);
     await compileTzip16FixedPriceSaleTezMarketPlaceContract(env);
+    await compileEnglishAuctionTezContract(env);
     // add other contracts here
 
     process.exit(0);
@@ -120,6 +121,18 @@ async function compileTzip16FixedPriceSaleTezMarketPlaceContract(env: LigoEnv): 
         'fixed_price_sale_market_tez.tz'
     );
     $log.info('compiled tzip compatible fixed price sale (sold in tez) marketplace contract');
+}
+
+async function compileEnglishAuctionTezContract(env: LigoEnv): Promise<void> {
+  $log.info('compiling english auction tez contract');
+
+  await compileContract(
+      env,
+      'english_auction_tez.mligo',
+      'english_auction_tez_main',
+      'english_auction_tez.tz'
+  );
+  $log.info('compiled english auction tez contract');
 }
 
 

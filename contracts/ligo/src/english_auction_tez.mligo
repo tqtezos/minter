@@ -160,7 +160,7 @@ let place_bid(asset_id, storage : nat * storage) : return = begin
     ([return_bid] , {storage with auctions = updated_auctions})
   end 
 
-let main (p,storage : auction_entrypoints * storage) : return = match p with
+let english_auction_tez_main (p,storage : auction_entrypoints * storage) : return = match p with
   | Configure config -> configure_auction(config, storage)
   | Bid asset_id -> place_bid(asset_id, storage) 
   | Cancel asset_id -> cancel_auction(asset_id, storage)
