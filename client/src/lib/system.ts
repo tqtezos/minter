@@ -74,10 +74,15 @@ export function configure(config: Config): SystemConfigured {
 }
 
 function createMetadataResolver(
+  system: SystemConfigured,
   toolkit: TezosToolkit,
   contractAddress: string
 ): ResolveMetadata {
-  DEFAULT_HANDLERS.set('ipfs', new IpfsHttpHandler('cloudflare-ipfs.com'));
+  const ipfsGateway =
+    system.config.network === 'sandbox'
+      ? 'localhost:5001'
+      : 'cloudflare-ipfs.com';
+  DEFAULT_HANDLERS.set('ipfs', new IpfsHttpHandler(ipfsGateway));
   const provider = new MetadataProvider(DEFAULT_HANDLERS);
   const context = new Context(toolkit.rpc);
   // This is a performance optimization: We're only resolving off-chain
@@ -102,7 +107,7 @@ export function connectToolkit(system: SystemConfigured): SystemWithToolkit {
     ...system,
     status: Status.ToolkitConnected,
     toolkit: toolkit,
-    resolveMetadata: createMetadataResolver(toolkit, faucetAddress)
+    resolveMetadata: createMetadataResolver(system, toolkit, faucetAddress)
   };
 }
 
