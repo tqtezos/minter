@@ -212,7 +212,7 @@
                  CAR ;
                  AMOUNT ;
                  COMPARE ;
-                 EQ ;
+                 GE ;
                  AND ;
                  SWAP ;
                  DUP ;
