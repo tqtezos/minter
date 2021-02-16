@@ -72,11 +72,10 @@ describe('test NFT auction', () => {
         fa2_address : nftAddress,
         fa2_batch : [fa2_tokens]
     }
-    
-    const opAuction = await nftAuction.methods.configure(new BigNumber(10), new BigNumber(1), new BigNumber(360), [tokens], new BigNumber(3600), "2020-02-12T10:10:10Z" ).send({amount : 0,  });
+  
+    const opAuction = await nftAuction.methods.configure(new BigNumber(10000000), new BigNumber(1), new BigNumber(360), [tokens], new BigNumber(3600), "2020-02-12T10:10:10Z" ).send({amount : 10});
     await opAuction.confirmation();
     $log.info(`Auction configured. Consumed gas: ${opAuction.consumedGas}`);
-
   });
 
 

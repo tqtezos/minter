@@ -113,7 +113,7 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
     assert_msg (Tezos.sender = Tezos.source, "Sender must be an implicit account");
     assert_msg (configure_param.auction_time <= storage.max_auction_time, "Auction time must be less than max_auction_time");
     assert_msg (configure_param.start_time <= now + int(storage.max_config_to_start_time), "start_time must be greater less than the sum of current_time and max_config_to_start_time");
-    assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez");
+    assert_msg (Tezos.amount = configure_param.opening_price, "Amount must be equal to opening_price");
     assert_msg (configure_param.round_time > 0n, "Round_time must be greater than 0 seconds");
     (*assert_msg (configure_param.start_time > now), "Start time must be in the future";*)
 
@@ -140,12 +140,10 @@ let resolve_auction(asset_id, storage : nat * storage) : return = begin
     assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez");
 
     let fa2_transfers : operation list = tokens_to_operation_list(auction.asset, Tezos.self_address, auction.highest_bidder) in
-    let ops : operation list = if (not first_bid(auction)) then
-      let seller_contract : unit contract = resolve_contract(auction.seller) in
-      let send_fee = Tezos.transaction unit auction.current_bid seller_contract in
-      (send_fee :: fa2_transfers) else fa2_transfers in
+    let seller_contract : unit contract = resolve_contract(auction.seller) in
+    let send_fee = Tezos.transaction unit auction.current_bid seller_contract in
     let updated_auctions = Big_map.remove asset_id storage.auctions in
-    (ops, {storage with auctions = updated_auctions})
+    (send_fee :: fa2_transfers, {storage with auctions = updated_auctions})
   end
 
 let cancel_auction(asset_id, storage : nat * storage) : return = begin
@@ -156,12 +154,10 @@ let cancel_auction(asset_id, storage : nat * storage) : return = begin
     assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez");
 
     let fa2_transfers : operation list = tokens_to_operation_list(auction.asset, Tezos.self_address, auction.seller) in
-    let ops : operation list = if (not first_bid(auction)) then
-      let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
-      let return_bid = Tezos.transaction unit auction.current_bid highest_bidder_contract in
-      (return_bid :: fa2_transfers) else fa2_transfers in
+    let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
+    let return_bid = Tezos.transaction unit auction.current_bid highest_bidder_contract in
     let updated_auctions = Big_map.remove asset_id storage.auctions in
-    (ops, {storage with auctions = updated_auctions})
+    (return_bid :: fa2_transfers, {storage with auctions = updated_auctions})
   end
 
 let place_bid(asset_id, storage : nat * storage) : return = begin
@@ -171,13 +167,11 @@ let place_bid(asset_id, storage : nat * storage) : return = begin
     assert_msg (valid_bid_amount(auction), "Bid must be greater than previous bid + min_raise or greater than opening price if it is the first bid");
     assert_msg(Tezos.sender <> auction.seller, "Seller cannot place a bid");
 
-    let ops : operation list = if (not first_bid(auction)) then
-      let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
-      let return_bid = Tezos.transaction unit auction.current_bid highest_bidder_contract in
-      [return_bid] else ([] : operation list) in
+    let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
+    let return_bid = Tezos.transaction unit auction.current_bid highest_bidder_contract in
     let updated_auction_data = {auction with current_bid = Tezos.amount; highest_bidder = Tezos.sender; last_bid_time = Tezos.now} in
     let updated_auctions = Big_map.update asset_id (Some updated_auction_data) storage.auctions in
-    (ops , {storage with auctions = updated_auctions})
+    ([return_bid] , {storage with auctions = updated_auctions})
   end
 
 let english_auction_tez_main (p,storage : auction_entrypoints * storage) : return = match p with
