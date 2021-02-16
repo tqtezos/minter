@@ -164,6 +164,7 @@ let place_bid(asset_id, storage : nat * storage) : return = begin
     assert_msg (Tezos.sender = Tezos.source, "Sender must be an implicit account");
     let auction : auction = get_auction_data(asset_id, storage) in
     assert_msg (auction_in_progress(auction), "Auction must be in progress");
+    assert_msg (Tezos.now >= auction.start_time, "Start_time must have already passed");
     assert_msg (valid_bid_amount(auction), "Bid must be greater than previous bid + min_raise or greater than opening price if it is the first bid");
     assert_msg(Tezos.sender <> auction.seller, "Seller cannot place a bid");
 

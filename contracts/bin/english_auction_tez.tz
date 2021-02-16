@@ -199,6 +199,23 @@
                  SWAP ;
                  EXEC ;
                  DROP ;
+                 PUSH string "Start_time must have already passed" ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CDR ;
+                 CAR ;
+                 NOW ;
+                 COMPARE ;
+                 GE ;
+                 PAIR ;
+                 DIG 5 ;
+                 DUP ;
+                 DUG 6 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
                  PUSH string
                       "Bid must be greater than previous bid + min_raise or greater than opening price if it is the first bid" ;
                  SWAP ;
