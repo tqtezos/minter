@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer';
+import Joi from 'joi';
 import { SystemWithToolkit, SystemWithWallet } from '../system';
 import { hash as nftAssetHash } from './code/fa2_tzip16_compat_multi_nft_asset';
 import select from '../util/selectObjectByKeys';
@@ -80,30 +81,51 @@ export async function getContractNfts(
 
 export interface AssetContract {
   address: string;
-  metadata: Record<string, string>;
+  metadata: Record<string, any>;
 }
+
+const metadataSchema = Joi.object({
+  name: Joi.string().required().disallow(null)
+});
 
 export async function getNftAssetContract(
   system: SystemWithToolkit | SystemWithWallet,
   address: string
 ): Promise<AssetContract> {
   const bcd = system.betterCallDev;
-  const metadata = await bcd.getAccountMetadata(address);
+  const storage = await bcd.getContractStorage(address);
+
+  const metadataBigMapId = select(storage, {
+    type: 'big_map',
+    name: 'metadata'
+  })?.value;
+
+  const metaBigMap = await system.betterCallDev.getBigMapKeys(metadataBigMapId);
+  const metaUri = select(metaBigMap, { key_string: '' })?.value.value;
+  const { metadata } = await system.resolveMetadata(metaUri);
+
+  const { error } = metadataSchema.validate(metadata, { allowUnknown: true });
+  if (error) {
+    throw Error('Metadata validation failed');
+  }
   return { address, metadata };
 }
 
 export async function getWalletNftAssetContracts(system: SystemWithWallet) {
   const bcd = system.betterCallDev;
   const response = await bcd.getWalletContracts(system.tzPublicKey);
-
   const assetContracts = response.items.filter(
     (i: any) => i.body.hash === nftAssetHash
   );
 
   const results = [];
   for (let assetContract of assetContracts) {
-    const result = await getNftAssetContract(system, assetContract.value);
-    results.push(result);
+    try {
+      const result = await getNftAssetContract(system, assetContract.value);
+      results.push(result);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   return results;

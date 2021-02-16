@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-set -e
-
-source ${BASH_SOURCE%/*}/setup-env
-
-docker build -t bashcurl -f $PROJECT_ROOT_DIR/docker/bashcurl.dockerfile $PROJECT_ROOT_DIR/docker/
-docker build -t minter-api -f $PROJECT_ROOT_DIR/docker/api.dockerfile $PROJECT_ROOT_DIR/
-docker build -t minter-ui -f $PROJECT_ROOT_DIR/docker/ui.dockerfile $PROJECT_ROOT_DIR/

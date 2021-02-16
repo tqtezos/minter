@@ -5,6 +5,7 @@ import {
   mintToken,
   transferToken
 } from '../../lib/nfts/actions';
+// import {getNftAssetContract} from '../../lib/nfts/queries'
 import { ErrorKind, RejectValue } from './errors';
 import { getContractNftsQuery, getWalletAssetContractsQuery } from './queries';
 import { validateCreateNftForm } from '../validators/createNft';
@@ -32,6 +33,7 @@ export const createAssetContractAction = createAsyncThunk<
       const op = await createAssetContract(system, { name });
       await op.confirmation();
       const { address } = await op.contract();
+      // TODO: Poll for contract availability on indexer
       dispatch(getWalletAssetContractsQuery());
       return { name, address };
     } catch (e) {
