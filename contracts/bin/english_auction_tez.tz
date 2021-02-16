@@ -200,18 +200,11 @@
                  EXEC ;
                  IF {} { PUSH string "failed assertion" ; FAILWITH } ;
                  DUP ;
-                 CDR ;
-                 CDR ;
-                 CAR ;
-                 SWAP ;
+                 DIG 4 ;
                  DUP ;
-                 DUG 2 ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CAR ;
-                 COMPARE ;
-                 LT ;
+                 DUG 5 ;
+                 SWAP ;
+                 EXEC ;
                  SWAP ;
                  DUP ;
                  DUG 2 ;
@@ -252,6 +245,7 @@
                  DIG 4 ;
                  SWAP ;
                  EXEC ;
+                 NOT ;
                  IF { DUP ;
                       CDR ;
                       CDR ;
@@ -458,6 +452,7 @@
                  DIG 5 ;
                  SWAP ;
                  EXEC ;
+                 NOT ;
                  IF { SWAP ;
                       DUP ;
                       DUG 2 ;
@@ -733,6 +728,7 @@
                  DIG 5 ;
                  SWAP ;
                  EXEC ;
+                 NOT ;
                  IF { SWAP ;
                       DUP ;
                       DUG 2 ;
