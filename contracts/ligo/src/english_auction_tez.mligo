@@ -61,7 +61,7 @@ let address_to_contract_transfer_entrypoint(add : address) : ((transfer list) co
     None -> (failwith "Invalid FA2 Address" : (transfer list) contract)
   | Some c ->  c
 
-let fa2_batch_to_transfer_list(fa2_batch, from_, to_ : fa2_tokens list * address * address) : (transfer list) =
+let fa2_batch_to_transfer_param(fa2_batch, from_, to_ : fa2_tokens list * address * address) : (transfer list) =
   let to_tx (fa2_tokens : fa2_tokens) : transfer_destination = {
       to_ = to_;
       token_id = fa2_tokens.token_id;
@@ -71,12 +71,14 @@ let fa2_batch_to_transfer_list(fa2_batch, from_, to_ : fa2_tokens list * address
   let transfer_param = {from_ = from_; txs = txs} in
   [transfer_param]
 
+(*Transfers tokens in batch from a single FA2 contract*)
 let tokens_to_operation(from_ : address) (to_ : address) (tokens : tokens): operation =
-  let param = fa2_batch_to_transfer_list(tokens.fa2_batch, from_, to_) in
+  let param = fa2_batch_to_transfer_param(tokens.fa2_batch, from_, to_) in
   let c = address_to_contract_transfer_entrypoint(tokens.fa2_address) in
   (Tezos.transaction param 0mutez c)
 
-let tokens_to_transfer_list((tokens_list, from_, to_) : tokens list * address * address) : (operation list) =
+(*Handles transfers of tokens across FA2 Contracts*)
+let tokens_to_operation_list((tokens_list, from_, to_) : tokens list * address * address) : (operation list) =
    (List.map (tokens_to_operation from_ to_) tokens_list)
 
 let get_auction_data ((asset_id, storage) : nat * storage) : auction =
@@ -84,7 +86,7 @@ let get_auction_data ((asset_id, storage) : nat * storage) : auction =
       None -> (failwith "ASSET DOES NOT EXIST" : auction)
     | Some auction -> auction
 
-(* We only return bids to past SENDERs so this should never fail *)
+(* We only return bids to past SENDERs so resolve_contract should never fail *)
 let resolve_contract (add : address) : unit contract =
   match ((Tezos.get_contract_opt add) : (unit contract) option) with
       None -> (failwith "" : unit contract)
@@ -95,6 +97,7 @@ let auction_in_progress (auction : auction) : bool =
   (Tezos.now <= auction.last_bid_time + auction.round_time ||
   Tezos.now <= auction.start_time ))
 
+(*This condition is met iff no bid has been placed before the function executes*)
 let first_bid (auction : auction) : bool =
   auction.highest_bidder = auction.seller
 
@@ -123,7 +126,7 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
       last_bid_time = now; (*Just a default value*)
     } in
     let updated_auctions : (nat, auction) big_map = Big_map.update storage.current_id (Some auction_data) storage.auctions in
-    let fa2_transfers : operation list = tokens_to_transfer_list(configure_param.asset, Tezos.sender, Tezos.self_address) in
+    let fa2_transfers : operation list = tokens_to_operation_list(configure_param.asset, Tezos.sender, Tezos.self_address) in
     (fa2_transfers, {storage with auctions = updated_auctions; current_id = storage.current_id + 1n})
   end
 
@@ -133,7 +136,7 @@ let resolve_auction(asset_id, storage : nat * storage) : return = begin
     assert(not auction_in_progress(auction));
     assert(Tezos.amount = 0mutez);
 
-    let fa2_transfers : operation list = tokens_to_transfer_list(auction.asset, Tezos.self_address, auction.highest_bidder) in
+    let fa2_transfers : operation list = tokens_to_operation_list(auction.asset, Tezos.self_address, auction.highest_bidder) in
     let ops : operation list = if (not first_bid(auction)) then
       let seller_contract : unit contract = resolve_contract(auction.seller) in
       let send_fee = Tezos.transaction unit auction.current_bid seller_contract in
@@ -149,7 +152,7 @@ let cancel_auction(asset_id, storage : nat * storage) : return = begin
     assert(auction_in_progress(auction));
     assert(Tezos.amount = 0mutez);
 
-    let fa2_transfers : operation list = tokens_to_transfer_list(auction.asset, Tezos.self_address, auction.seller) in
+    let fa2_transfers : operation list = tokens_to_operation_list(auction.asset, Tezos.self_address, auction.seller) in
     let ops : operation list = if (not first_bid(auction)) then
       let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
       let return_bid = Tezos.transaction unit auction.current_bid highest_bidder_contract in
