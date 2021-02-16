@@ -4,6 +4,7 @@ import { ipfsUriToGatewayUrl, uriToCid } from '../../lib/util/ipfs';
 import { useSelector } from '../../reducer';
 
 export default function Preview() {
+  const network = useSelector(s => s.system.config.network);
   const state = useSelector(s => s.createNft);
   const { name, description } = state.fields;
   return (
@@ -25,7 +26,9 @@ export default function Preview() {
       >
         <Image
           src={
-            (state.artifactUri && ipfsUriToGatewayUrl(state.artifactUri)) || ''
+            (state.artifactUri &&
+              ipfsUriToGatewayUrl(network, state.artifactUri)) ||
+            ''
           }
           overflow="hidden"
           objectFit="contain"

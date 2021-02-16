@@ -134,7 +134,9 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           </MinterButton>
         </Flex>
         <Flex align="center" justify="center" flex="1" px={16}>
-          <TokenImage src={ipfsUriToGatewayUrl(token.artifactUri)} />
+          <TokenImage
+            src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
+          />
         </Flex>
       </Flex>
       <Flex w="50%" h="100%" flexDir="column">

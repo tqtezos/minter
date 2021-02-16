@@ -11,6 +11,7 @@ import { uploadFiletoIpfs } from '../../lib/util/ipfs';
 
 export default function FileUpload() {
   const state = useSelector(s => s.createNft);
+  const network = useSelector(s => s.system.config.network);
   const dispatch = useDispatch();
 
   const onDrop = useCallback(
@@ -59,7 +60,7 @@ export default function FileUpload() {
             p={4}
             maxWidth="400px"
             maxHeight="400px"
-            src={ipfsUriToGatewayUrl(state.artifactUri)}
+            src={ipfsUriToGatewayUrl(network, state.artifactUri)}
           />
         ) : (
           <Flex
