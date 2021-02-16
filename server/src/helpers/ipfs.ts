@@ -1,4 +1,6 @@
+import fs from 'fs';
 import url from 'url';
+import sharp from 'sharp';
 import IpfsClient from 'ipfs-http-client';
 
 // TODO: Move this configuration to a JSON definition
@@ -20,5 +22,20 @@ export async function uploadDataToIpfs(data: any) {
     ipfsUri: `ipfs://${cid}`,
     url: url.resolve(ipfsConfig.gatewayUrl, `ipfs/${cid}`),
     publicGatewayUrl: url.resolve(ipfsConfig.gatewayUrl, `ipfs/${cid}`)
+  };
+}
+
+export async function uploadImageWithThumbnailToIpfs(path: string) {
+  const thumbnailPath = `${path}-thumbnail`;
+  await sharp(path).resize(200, 200).toFile(thumbnailPath);
+
+  const origFile = await uploadDataToIpfs(fs.createReadStream(path));
+  const thumbnailFile = await uploadDataToIpfs(
+    fs.createReadStream(thumbnailPath)
+  );
+  fs.unlink(thumbnailPath, () => null);
+  return {
+    ...origFile,
+    thumbnail: thumbnailFile
   };
 }

@@ -4,8 +4,10 @@ import {
   uploadImageWithThumbnailToPinata,
   uploadJSONToPinata
 } from './helpers/pinata';
-import { uploadDataToIpfs } from './helpers/ipfs';
-import fs from 'fs';
+import {
+  uploadImageWithThumbnailToIpfs,
+  uploadDataToIpfs
+} from './helpers/ipfs';
 
 export async function handleIpfsFileUpload(
   pinataConfig: PinataConfig | null,
@@ -27,8 +29,7 @@ export async function handleIpfsFileUpload(
       );
       return res.status(200).json(content);
     }
-    const data = fs.readFileSync(file.tempFilePath);
-    const content = await uploadDataToIpfs(data);
+    const content = await uploadImageWithThumbnailToIpfs(file.tempFilePath);
     return res.status(200).json(content);
   } catch (e) {
     return res.status(500).json({
@@ -54,7 +55,7 @@ export async function handleIpfsJSONUpload(
       return res.status(200).json(content);
     }
 
-    const content = await uploadDataToIpfs(req.body);
+    const content = await uploadDataToIpfs(JSON.stringify(req.body));
     return res.status(200).json(content);
   } catch (e) {
     return res.status(500).json({
