@@ -55,6 +55,9 @@ type storage =
 
 type return = operation list * storage
 
+let assert_msg (condition, msg : bool * string ) : unit = 
+  if (not condition) then failwith(msg) else unit
+
 let address_to_contract_transfer_entrypoint(add : address) : ((transfer list) contract) =
   let c : (transfer list) contract option = Tezos.get_entrypoint_opt "%transfer" add in
   match c with
@@ -107,12 +110,12 @@ let valid_bid_amount (auction : auction) : bool =
 
 let configure_auction(configure_param, storage : configure_param * storage) : return = begin
     let now = Tezos.now in
-    assert (Tezos.sender = Tezos.source);
-    assert(configure_param.auction_time <= storage.max_auction_time);
-    assert(configure_param.start_time <= now + int(storage.max_config_to_start_time));
-    assert(Tezos.amount = 0mutez);
-    assert(configure_param.round_time > 0n);
-    (*assert(configure_param.start_time > now);*)
+    assert_msg (Tezos.sender = Tezos.source, "Sender must be an implicit account");
+    assert_msg (configure_param.auction_time <= storage.max_auction_time, "Auction time must be less than max_auction_time");
+    assert_msg (configure_param.start_time <= now + int(storage.max_config_to_start_time), "start_time must be greater less than the sum of current_time and max_config_to_start_time");
+    assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez");
+    assert_msg (configure_param.round_time > 0n, "Round_time must be greater than 0 seconds");
+    (*assert_msg (configure_param.start_time > now), "Start time must be in the future";*)
 
     let auction_data : auction = {
       seller = Tezos.sender;
@@ -131,10 +134,10 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
   end
 
 let resolve_auction(asset_id, storage : nat * storage) : return = begin
-    assert(Tezos.sender = Tezos.source);
+    assert_msg (Tezos.sender = Tezos.source, "Sender must be an implicit account");
     let auction : auction = get_auction_data(asset_id, storage) in
-    assert(not auction_in_progress(auction));
-    assert(Tezos.amount = 0mutez);
+    assert_msg (not auction_in_progress(auction), "Auction must NOT be in progress");
+    assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez");
 
     let fa2_transfers : operation list = tokens_to_operation_list(auction.asset, Tezos.self_address, auction.highest_bidder) in
     let ops : operation list = if (not first_bid(auction)) then
@@ -146,11 +149,11 @@ let resolve_auction(asset_id, storage : nat * storage) : return = begin
   end
 
 let cancel_auction(asset_id, storage : nat * storage) : return = begin
-    assert(Tezos.sender = Tezos.source);
+    assert_msg (Tezos.sender = Tezos.source, "Sender must be an implicit account");
     let auction : auction = get_auction_data(asset_id, storage) in
-    assert(Tezos.sender = auction.seller);
-    assert(auction_in_progress(auction));
-    assert(Tezos.amount = 0mutez);
+    assert_msg (Tezos.sender = auction.seller, "Only seller can cancel the auction");
+    assert_msg (auction_in_progress(auction), "Auction must be in progress");
+    assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez");
 
     let fa2_transfers : operation list = tokens_to_operation_list(auction.asset, Tezos.self_address, auction.seller) in
     let ops : operation list = if (not first_bid(auction)) then
@@ -162,11 +165,11 @@ let cancel_auction(asset_id, storage : nat * storage) : return = begin
   end
 
 let place_bid(asset_id, storage : nat * storage) : return = begin
-    assert(Tezos.sender = Tezos.source);
+    assert_msg (Tezos.sender = Tezos.source, "Sender must be an implicit account");
     let auction : auction = get_auction_data(asset_id, storage) in
-    assert(auction_in_progress(auction));
-    assert(valid_bid_amount(auction));
-    assert(Tezos.sender <> auction.seller);
+    assert_msg (auction_in_progress(auction), "Auction must be in progress");
+    assert_msg (valid_bid_amount(auction), "Bid must be greater than previous bid + min_raise or greater than opening price if it is the first bid");
+    assert_msg(Tezos.sender <> auction.seller, "Seller cannot place a bid");
 
     let ops : operation list = if (not first_bid(auction)) then
       let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
