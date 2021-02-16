@@ -1,13 +1,11 @@
 version: '3.7'
 
 services:
-  bcdgui:
+  gui:
     image: bakingbad/bcdhub-gui:3.4
-    environment:
-      - BCD_ENV=sandbox
     entrypoint: /bin/bash
     depends_on:
-      - bcdapi
+      - api
     ports:
       - 8009:80
     logging:
