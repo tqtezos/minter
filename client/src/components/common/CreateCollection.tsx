@@ -72,8 +72,8 @@ export function CreateCollectionButton() {
 
   const close = () => {
     if (status !== 'in_transit') {
+      dispatch(setStatus({ method: 'createAssetContract', status: 'ready' }));
       onClose();
-      setStatus({ method: 'createAssetContract', status: 'ready' });
     }
   };
 
