@@ -94,11 +94,14 @@
              SWAP ;
              CAR ;
              GET ;
-             IF_NONE { PUSH string "ASSET DOES NOT EXIST" ; FAILWITH } {} } ;
+             IF_NONE
+               { PUSH string "Auction does not exist for given asset_id" ; FAILWITH }
+               {} } ;
          LAMBDA
            address
            (contract unit)
-           { CONTRACT unit ; IF_NONE { PUSH string "" ; FAILWITH } {} } ;
+           { CONTRACT unit ;
+             IF_NONE { PUSH string "Address does not resolve to contract" ; FAILWITH } {} } ;
          LAMBDA
            (pair address
                  (pair mutez
@@ -217,7 +220,7 @@
                  EXEC ;
                  DROP ;
                  PUSH string
-                      "Bid must be greater than previous bid + min_raise or greater than opening price if it is the first bid" ;
+                      "Bid must be at least previous bid + min_raise or at least opening price if it is the first bid" ;
                  SWAP ;
                  DUP ;
                  DUG 2 ;
@@ -608,7 +611,7 @@
                  EXEC ;
                  DROP ;
                  PUSH string
-                      "start_time must be greater less than the sum of current_time and max_config_to_start_time" ;
+                      "start_time must be not greater than the sum of current_time and max_config_to_start_time" ;
                  DIG 3 ;
                  DUP ;
                  DUG 4 ;

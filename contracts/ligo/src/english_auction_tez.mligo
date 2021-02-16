@@ -86,13 +86,13 @@ let tokens_to_operation_list((tokens_list, from_, to_) : tokens list * address *
 
 let get_auction_data ((asset_id, storage) : nat * storage) : auction =
   match (Big_map.find_opt asset_id storage.auctions) with
-      None -> (failwith "ASSET DOES NOT EXIST" : auction)
+      None -> (failwith "Auction does not exist for given asset_id" : auction)
     | Some auction -> auction
 
 (* We only return bids to past SENDERs so resolve_contract should never fail *)
 let resolve_contract (add : address) : unit contract =
   match ((Tezos.get_contract_opt add) : (unit contract) option) with
-      None -> (failwith "" : unit contract)
+      None -> (failwith "Address does not resolve to contract" : unit contract)
     | Some c -> c
 
 let auction_in_progress (auction : auction) : bool =
@@ -112,7 +112,7 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
     let now = Tezos.now in
     assert_msg (Tezos.sender = Tezos.source, "Sender must be an implicit account");
     assert_msg (configure_param.auction_time <= storage.max_auction_time, "Auction time must be less than max_auction_time");
-    assert_msg (configure_param.start_time <= now + int(storage.max_config_to_start_time), "start_time must be greater less than the sum of current_time and max_config_to_start_time");
+    assert_msg (configure_param.start_time <= now + int(storage.max_config_to_start_time), "start_time must be not greater than the sum of current_time and max_config_to_start_time");
     assert_msg (Tezos.amount = configure_param.opening_price, "Amount must be equal to opening_price");
     assert_msg (configure_param.round_time > 0n, "Round_time must be greater than 0 seconds");
     (*assert_msg (configure_param.start_time > now), "Start time must be in the future";*)
@@ -126,7 +126,7 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
       min_raise = configure_param.min_raise;
       auction_time = int(configure_param.auction_time);
       highest_bidder = Tezos.sender;
-      last_bid_time = now; (*Just a default value*)
+      last_bid_time = now; 
     } in
     let updated_auctions : (nat, auction) big_map = Big_map.update storage.current_id (Some auction_data) storage.auctions in
     let fa2_transfers : operation list = tokens_to_operation_list(configure_param.asset, Tezos.sender, Tezos.self_address) in
@@ -165,7 +165,7 @@ let place_bid(asset_id, storage : nat * storage) : return = begin
     let auction : auction = get_auction_data(asset_id, storage) in
     assert_msg (auction_in_progress(auction), "Auction must be in progress");
     assert_msg (Tezos.now >= auction.start_time, "Start_time must have already passed");
-    assert_msg (valid_bid_amount(auction), "Bid must be greater than previous bid + min_raise or greater than opening price if it is the first bid");
+    assert_msg (valid_bid_amount(auction), "Bid must be at least previous bid + min_raise or at least opening price if it is the first bid");
     assert_msg(Tezos.sender <> auction.seller, "Seller cannot place a bid");
 
     let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
