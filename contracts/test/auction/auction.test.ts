@@ -1,7 +1,7 @@
 import { $log } from '@tsed/logger';
 import { BigNumber } from 'bignumber.js';
 import { bootstrap, TestTz } from '../bootstrap-sandbox';
-import { Contract, nat, bytes } from '../../src/type-aliases';
+import { Contract, nat, bytes, address } from '../../src/type-aliases';
 import {
   originateEnglishAuctionTez,
   originateNftFactory,
@@ -24,6 +24,10 @@ describe('test NFT auction', () => {
   let tezos: TestTz;
   let nftAuction: Contract;
   let nftFactory: Contract;
+  let bobAddress : address;
+  let aliceAddress : address;
+  let startTime : Date;
+  let endTime : Date;
 
   beforeAll(async () => {
     tezos = await bootstrap();
@@ -43,7 +47,8 @@ describe('test NFT auction', () => {
     $log.info('minting token')
     const nftContract = await tezos.bob.contract.at(nftAddress);
 
-    const bobAddress = await tezos.bob.signer.publicKeyHash();
+    bobAddress = await tezos.bob.signer.publicKeyHash();
+    aliceAddress = await tezos.alice.signer.publicKeyHash();
     const empty_metadata_map: MichelsonMap<string, bytes> = new MichelsonMap();
 
     const tokenId = new BigNumber(0);
@@ -72,13 +77,15 @@ describe('test NFT auction', () => {
         fa2_address : nftAddress,
         fa2_batch : [fa2_tokens]
     }
-  
-    const opAuction = await nftAuction.methods.configure(new BigNumber(10000000), new BigNumber(1), new BigNumber(360), [tokens], new BigNumber(3600), "2020-02-12T10:10:10Z" ).send({amount : 10});
+    
+    startTime = new Date()
+    startTime.setSeconds(startTime.getSeconds() + 7)
+    endTime = new Date(startTime.valueOf())
+    endTime.setHours(endTime.getHours() + 1)
+    const opAuction = await nftAuction.methods.configure(new BigNumber(10000000), new BigNumber(10), new BigNumber(360), [tokens], startTime, endTime).send({amount : 10, source : bobAddress});
     await opAuction.confirmation();
     $log.info(`Auction configured. Consumed gas: ${opAuction.consumedGas}`);
   });
-
-
 });
 
 
