@@ -35,8 +35,8 @@ export function ipfsUriToCid(uri: string) {
 
 export function ipfsUriToGatewayUrl(network: string, uri: string) {
   const ipfsHost =
-    network === 'sandbox'
-      ? 'http://localhost:5001'
+    network === 'sandboxnet'
+      ? 'http://localhost:8080'
       : 'https://cloudflare-ipfs.com';
   const cid = ipfsUriToCid(uri);
   return cid ? `${ipfsHost}/ipfs/${cid}` : uri;
