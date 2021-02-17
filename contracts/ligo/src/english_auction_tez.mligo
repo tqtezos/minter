@@ -95,10 +95,16 @@ let resolve_contract (add : address) : unit contract =
       None -> (failwith "Address does not resolve to contract" : unit contract)
     | Some c -> c
 
-let auction_in_progress (auction : auction) : bool =
-  ((Tezos.now <= auction.start_time + auction.auction_time) &&
-  (Tezos.now <= auction.last_bid_time + auction.round_time ||
-  Tezos.now <= auction.start_time ))
+let auction_ended (auction : auction) : bool =
+  ((Tezos.now > auction.start_time + auction.auction_time) || (* auction has passed auction time*)
+  (Tezos.now > auction.last_bid_time + auction.round_time && (*round time has passed after bid has been placed*)
+  Tezos.now > auction.start_time + auction.round_time)) (*round time has passed from start time*)
+
+let auction_started (auction : auction) : bool = 
+  Tezos.now >= auction.start_time
+
+let auction_in_progress (auction : auction) : bool = 
+  auction_started(auction) && (not auction_ended(auction))
 
 (*This condition is met iff no bid has been placed before the function executes*)
 let first_bid (auction : auction) : bool =
@@ -109,13 +115,12 @@ let valid_bid_amount (auction : auction) : bool =
   ((Tezos.amount >= auction.current_bid) && first_bid(auction)))
 
 let configure_auction(configure_param, storage : configure_param * storage) : return = begin
-    let now = Tezos.now in
-    assert_msg (Tezos.sender = Tezos.source, "Sender must be an implicit account");
     assert_msg (configure_param.auction_time <= storage.max_auction_time, "Auction time must be less than max_auction_time");
-    assert_msg (configure_param.start_time <= now + int(storage.max_config_to_start_time), "start_time must be not greater than the sum of current_time and max_config_to_start_time");
+    assert_msg (configure_param.start_time <= Tezos.now + int(storage.max_config_to_start_time), "start_time must be not greater than the sum of current_time and max_config_to_start_time");
     assert_msg (Tezos.amount = configure_param.opening_price, "Amount must be equal to opening_price");
     assert_msg (configure_param.round_time > 0n, "Round_time must be greater than 0 seconds");
-    (*assert_msg (configure_param.start_time > now), "Start time must be in the future";*)
+    assert_msg (configure_param.auction_time > 0n, "Auction_time must be greater than 0 seconds");
+    (*assert_msg (configure_param.start_time > Tezos.now, "Start time must be in the future");*)
 
     let auction_data : auction = {
       seller = Tezos.sender;
@@ -126,7 +131,7 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
       min_raise = configure_param.min_raise;
       auction_time = int(configure_param.auction_time);
       highest_bidder = Tezos.sender;
-      last_bid_time = now; 
+      last_bid_time = Tezos.now; 
     } in
     let updated_auctions : (nat, auction) big_map = Big_map.update storage.current_id (Some auction_data) storage.auctions in
     let fa2_transfers : operation list = tokens_to_operation_list(configure_param.asset, Tezos.sender, Tezos.self_address) in
@@ -134,9 +139,8 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
   end
 
 let resolve_auction(asset_id, storage : nat * storage) : return = begin
-    assert_msg (Tezos.sender = Tezos.source, "Sender must be an implicit account");
     let auction : auction = get_auction_data(asset_id, storage) in
-    assert_msg (not auction_in_progress(auction), "Auction must NOT be in progress");
+    assert_msg (auction_ended(auction) , "Auction must have ended");
     assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez");
 
     let fa2_transfers : operation list = tokens_to_operation_list(auction.asset, Tezos.self_address, auction.highest_bidder) in
@@ -147,10 +151,9 @@ let resolve_auction(asset_id, storage : nat * storage) : return = begin
   end
 
 let cancel_auction(asset_id, storage : nat * storage) : return = begin
-    assert_msg (Tezos.sender = Tezos.source, "Sender must be an implicit account");
     let auction : auction = get_auction_data(asset_id, storage) in
     assert_msg (Tezos.sender = auction.seller, "Only seller can cancel the auction");
-    assert_msg (auction_in_progress(auction), "Auction must be in progress");
+    assert_msg (not auction_ended(auction), "Auction must not have ended");
     assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez");
 
     let fa2_transfers : operation list = tokens_to_operation_list(auction.asset, Tezos.self_address, auction.seller) in
@@ -161,10 +164,8 @@ let cancel_auction(asset_id, storage : nat * storage) : return = begin
   end
 
 let place_bid(asset_id, storage : nat * storage) : return = begin
-    assert_msg (Tezos.sender = Tezos.source, "Sender must be an implicit account");
     let auction : auction = get_auction_data(asset_id, storage) in
     assert_msg (auction_in_progress(auction), "Auction must be in progress");
-    assert_msg (Tezos.now >= auction.start_time, "Start_time must have already passed");
     assert_msg (valid_bid_amount(auction), "Bid must be at least previous bid + min_raise or at least opening price if it is the first bid");
     assert_msg(Tezos.sender <> auction.seller, "Seller cannot place a bid");
 
@@ -175,8 +176,10 @@ let place_bid(asset_id, storage : nat * storage) : return = begin
     ([return_bid] , {storage with auctions = updated_auctions})
   end
 
-let english_auction_tez_main (p,storage : auction_entrypoints * storage) : return = match p with
-  | Configure config -> configure_auction(config, storage)
-  | Bid asset_id -> place_bid(asset_id, storage)
-  | Cancel asset_id -> cancel_auction(asset_id, storage)
-  | Resolve asset_id -> resolve_auction(asset_id, storage)
+let english_auction_tez_main (p,storage : auction_entrypoints * storage) : return = 
+  let u : unit = assert_msg (Tezos.sender = Tezos.source, "Sender must be an implicit account") in
+  match p with
+    | Configure config -> configure_auction(config, storage)
+    | Bid asset_id -> place_bid(asset_id, storage)
+    | Cancel asset_id -> cancel_auction(asset_id, storage)
+    | Resolve asset_id -> resolve_auction(asset_id, storage)
