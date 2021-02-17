@@ -22,7 +22,7 @@ type auction =
     last_bid_time : timestamp;
     round_time : int;
     asset : (tokens list);
-    min_raise : tez;
+    min_raise_percent : nat;
     auction_time : int;
     highest_bidder : address;
   }
@@ -31,7 +31,7 @@ type configure_param =
   [@layout:comb]
   {
     opening_price : tez;
-    min_raise : tez;
+    min_raise_percent : nat;
     round_time : nat;
     asset : (tokens list);
     auction_time : nat;
@@ -111,8 +111,8 @@ let first_bid (auction : auction) : bool =
   auction.highest_bidder = auction.seller
 
 let valid_bid_amount (auction : auction) : bool =
-  (Tezos.amount >= auction.current_bid + auction.min_raise ||
-  ((Tezos.amount >= auction.current_bid) && first_bid(auction)))
+  (Tezos.amount >= (auction.current_bid + ( (auction.min_raise_percent / 100n) *  auction.current_bid))) ||
+  ((Tezos.amount >= auction.current_bid) && first_bid(auction))
 
 let configure_auction(configure_param, storage : configure_param * storage) : return = begin
     assert_msg (configure_param.auction_time <= storage.max_auction_time, "Auction time must be less than max_auction_time");
@@ -128,7 +128,7 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
       start_time = configure_param.start_time;
       round_time = int(configure_param.round_time);
       asset = configure_param.asset;
-      min_raise = configure_param.min_raise;
+      min_raise_percent = configure_param.min_raise_percent;
       auction_time = int(configure_param.auction_time);
       highest_bidder = Tezos.sender;
       last_bid_time = Tezos.now; 
@@ -166,7 +166,7 @@ let cancel_auction(asset_id, storage : nat * storage) : return = begin
 let place_bid(asset_id, storage : nat * storage) : return = begin
     let auction : auction = get_auction_data(asset_id, storage) in
     assert_msg (auction_in_progress(auction), "Auction must be in progress");
-    assert_msg (valid_bid_amount(auction), "Bid must be at least previous bid + min_raise or at least opening price if it is the first bid");
+    assert_msg (valid_bid_amount(auction), "Bid must raised by at least min_raise_percent of the previous bid or at least opening price if it is the first bid");
     assert_msg(Tezos.sender <> auction.seller, "Seller cannot place a bid");
 
     let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in

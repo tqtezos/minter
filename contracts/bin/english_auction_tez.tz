@@ -2,7 +2,7 @@
     (or (or (nat %bid) (nat %cancel))
         (or (pair %configure
                (mutez %opening_price)
-               (pair (mutez %min_raise)
+               (pair (nat %min_raise_percent)
                      (pair (nat %round_time)
                            (pair (list %asset
                                     (pair (address %fa2_address) (list %fa2_batch (pair (nat %token_id) (nat %amount)))))
@@ -21,7 +21,7 @@
                                                  (pair (int %round_time)
                                                        (pair (list %asset
                                                                 (pair (address %fa2_address) (list %fa2_batch (pair (nat %token_id) (nat %amount)))))
-                                                             (pair (mutez %min_raise) (pair (int %auction_time) (address %highest_bidder))))))))))))) ;
+                                                             (pair (nat %min_raise_percent) (pair (int %auction_time) (address %highest_bidder))))))))))))) ;
   code { LAMBDA
            (pair bool string)
            unit
@@ -80,12 +80,12 @@
                                             (pair mutez
                                                   (pair timestamp
                                                         (pair timestamp
-                                                              (pair int (pair (list (pair address (list (pair nat nat)))) (pair mutez (pair int address)))))))))))))
+                                                              (pair int (pair (list (pair address (list (pair nat nat)))) (pair nat (pair int address)))))))))))))
            (pair address
                  (pair mutez
                        (pair timestamp
                              (pair timestamp
-                                   (pair int (pair (list (pair address (list (pair nat nat)))) (pair mutez (pair int address))))))))
+                                   (pair int (pair (list (pair address (list (pair nat nat)))) (pair nat (pair int address))))))))
            { DUP ;
              CDR ;
              CDR ;
@@ -107,7 +107,7 @@
                  (pair mutez
                        (pair timestamp
                              (pair timestamp
-                                   (pair int (pair (list (pair address (list (pair nat nat)))) (pair mutez (pair int address))))))))
+                                   (pair int (pair (list (pair address (list (pair nat nat)))) (pair nat (pair int address))))))))
            bool
            { DUP ;
              CDR ;
@@ -223,7 +223,7 @@
                  EXEC ;
                  DROP ;
                  PUSH string
-                      "Bid must be at least previous bid + min_raise or at least opening price if it is the first bid" ;
+                      "Bid must raised by at least min_raise_percent of the previous bid or at least opening price if it is the first bid" ;
                  SWAP ;
                  DUP ;
                  DUG 2 ;
@@ -254,12 +254,22 @@
                  DUP ;
                  DUG 3 ;
                  CDR ;
+                 CAR ;
+                 PUSH nat 100 ;
+                 DIG 4 ;
+                 DUP ;
+                 DUG 5 ;
+                 CDR ;
                  CDR ;
                  CDR ;
                  CDR ;
                  CDR ;
                  CDR ;
                  CAR ;
+                 EDIV ;
+                 IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                 CAR ;
+                 MUL ;
                  DIG 3 ;
                  DUP ;
                  DUG 4 ;
@@ -537,7 +547,7 @@
                             (pair mutez
                                   (pair timestamp
                                         (pair timestamp
-                                              (pair int (pair (list (pair address (list (pair nat nat)))) (pair mutez (pair int address)))))))) ;
+                                              (pair int (pair (list (pair address (list (pair nat nat)))) (pair nat (pair int address)))))))) ;
                  SWAP ;
                  UPDATE ;
                  DIG 3 ;
@@ -845,7 +855,7 @@
                             (pair mutez
                                   (pair timestamp
                                         (pair timestamp
-                                              (pair int (pair (list (pair address (list (pair nat nat)))) (pair mutez (pair int address)))))))) ;
+                                              (pair int (pair (list (pair address (list (pair nat nat)))) (pair nat (pair int address)))))))) ;
                  SWAP ;
                  UPDATE ;
                  DIG 3 ;
