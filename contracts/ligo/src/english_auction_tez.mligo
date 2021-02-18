@@ -47,6 +47,7 @@ type auction_entrypoints =
 type storage =
   [@layout:comb]
   {
+    admin : address;
     current_id : nat;
     max_auction_time : nat;
     max_config_to_start_time : nat;
@@ -106,14 +107,16 @@ let auction_in_progress (auction : auction) : bool =
   auction_started(auction) && (not auction_ended(auction))
 
 (*This condition is met iff no bid has been placed before the function executes*)
-let first_bid (auction : auction) : bool =
-  auction.highest_bidder = auction.seller
+let first_bid (auction, storage : auction * storage) : bool =
+  auction.highest_bidder = storage.admin
 
-let valid_bid_amount (auction : auction) : bool =
+let valid_bid_amount (auction, storage : auction * storage) : bool =
   (Tezos.amount >= (auction.current_bid + ( (auction.min_raise_percent / 100n) *  auction.current_bid))) ||
-  ((Tezos.amount >= auction.current_bid) && first_bid(auction))
+  ((Tezos.amount >= auction.current_bid) && first_bid(auction, storage))
 
 let configure_auction(configure_param, storage : configure_param * storage) : return = begin
+    assert_msg (Tezos.sender = storage.admin, "Only admin can configure auction");
+
     assert_msg (configure_param.end_time > configure_param.start_time, "end_time must be after start_time");
     assert_msg (abs(configure_param.end_time - configure_param.start_time) <= storage.max_auction_time, "Auction time must be less than max_auction_time");
     
@@ -145,7 +148,7 @@ let resolve_auction(asset_id, storage : nat * storage) : return = begin
     assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez");
 
     let fa2_transfers : operation list = tokens_to_operation_list(auction.asset, Tezos.self_address, auction.highest_bidder) in
-    let seller_contract : unit contract = resolve_contract(auction.seller) in
+    let seller_contract : unit contract = resolve_contract(storage.admin) in
     let send_fee = Tezos.transaction unit auction.current_bid seller_contract in
     let updated_auctions = Big_map.remove asset_id storage.auctions in
     (send_fee :: fa2_transfers, {storage with auctions = updated_auctions})
@@ -153,11 +156,11 @@ let resolve_auction(asset_id, storage : nat * storage) : return = begin
 
 let cancel_auction(asset_id, storage : nat * storage) : return = begin
     let auction : auction = get_auction_data(asset_id, storage) in
-    assert_msg (Tezos.sender = auction.seller, "Only seller can cancel the auction");
+    assert_msg (Tezos.sender = storage.admin, "Only seller can cancel the auction");
     assert_msg (not auction_ended(auction), "Auction must not have ended");
     assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez");
 
-    let fa2_transfers : operation list = tokens_to_operation_list(auction.asset, Tezos.self_address, auction.seller) in
+    let fa2_transfers : operation list = tokens_to_operation_list(auction.asset, Tezos.self_address, storage.admin) in
     let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
     let return_bid = Tezos.transaction unit auction.current_bid highest_bidder_contract in
     let updated_auctions = Big_map.remove asset_id storage.auctions in
@@ -167,8 +170,8 @@ let cancel_auction(asset_id, storage : nat * storage) : return = begin
 let place_bid(asset_id, storage : nat * storage) : return = begin
     let auction : auction = get_auction_data(asset_id, storage) in
     assert_msg (auction_in_progress(auction), "Auction must be in progress");
-    assert_msg (valid_bid_amount(auction), "Bid must raised by at least min_raise_percent of the previous bid or at least opening price if it is the first bid");
-    assert_msg(Tezos.sender <> auction.seller, "Seller cannot place a bid");
+    assert_msg (valid_bid_amount(auction, storage), "Bid must raised by at least min_raise_percent of the previous bid or at least opening price if it is the first bid");
+    assert_msg(Tezos.sender <> storage.admin, "Seller cannot place a bid");
 
     let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
     let return_bid = Tezos.transaction unit auction.current_bid highest_bidder_contract in
