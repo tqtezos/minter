@@ -186,7 +186,8 @@ let place_bid(asset_id, storage : nat * storage) : return = begin
   end
 
 let change_admin(new_admin, storage : address * storage) : return = 
-  let u : unit = assert_msg (Tezos.sender = storage.admin, "Only admin can change admin") in
+  let u : unit = assert_msg (Tezos.sender = storage.admin, "Only admin can change admin") in 
+  let u = assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez") in
   ([] : operation list), {storage with admin = new_admin}
 
 let english_auction_tez_main (p,storage : auction_entrypoints * storage) : return = match p with

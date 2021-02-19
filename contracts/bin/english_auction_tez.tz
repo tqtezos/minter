@@ -670,6 +670,18 @@
                      EQ ;
                      PAIR ;
                      DIG 3 ;
+                     DUP ;
+                     DUG 4 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     PUSH string "Amount must be 0mutez" ;
+                     PUSH mutez 0 ;
+                     AMOUNT ;
+                     COMPARE ;
+                     EQ ;
+                     PAIR ;
+                     DIG 3 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
