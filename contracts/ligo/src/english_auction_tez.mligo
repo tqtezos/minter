@@ -44,6 +44,7 @@ type auction_entrypoints =
   | Bid of nat
   | Cancel of nat
   | Resolve of nat
+  | Change_admin of address
 
 type storage =
   [@layout:comb]
@@ -91,10 +92,9 @@ let get_auction_data ((asset_id, storage) : nat * storage) : auction =
       None -> (failwith "Auction does not exist for given asset_id" : auction)
     | Some auction -> auction
 
-(* We only return bids to past SENDERs so resolve_contract should never fail *)
 let resolve_contract (add : address) : unit contract =
   match ((Tezos.get_contract_opt add) : (unit contract) option) with
-      None -> (failwith "Address does not resolve to contract" : unit contract)
+      None -> (failwith "Return address does not resolve to contract" : unit contract)
     | Some c -> c
 
 let auction_ended (auction : auction) : bool =
@@ -171,6 +171,7 @@ let cancel_auction(asset_id, storage : nat * storage) : return = begin
 
 let place_bid(asset_id, storage : nat * storage) : return = begin
     let auction : auction = get_auction_data(asset_id, storage) in
+    assert_msg (Tezos.sender = Tezos.source, "Bidder must be an implicit account");
     assert_msg (auction_in_progress(auction), "Auction must be in progress");
     assert_msg (valid_bid_amount(auction, storage), "Bid must raised by at least min_raise_percent of the previous bid or at least opening price if it is the first bid");
     assert_msg(Tezos.sender <> storage.admin, "Seller cannot place a bid");
@@ -184,10 +185,13 @@ let place_bid(asset_id, storage : nat * storage) : return = begin
     ([return_bid] , {storage with auctions = updated_auctions})
   end
 
-let english_auction_tez_main (p,storage : auction_entrypoints * storage) : return = 
-  let u : unit = assert_msg (Tezos.sender = Tezos.source, "Sender must be an implicit account") in
-  match p with
+let change_admin(new_admin, storage : address * storage) : return = 
+  let u : unit = assert_msg (Tezos.sender = storage.admin, "Only admin can change admin") in
+  ([] : operation list), {storage with admin = new_admin}
+
+let english_auction_tez_main (p,storage : auction_entrypoints * storage) : return = match p with
     | Configure config -> configure_auction(config, storage)
     | Bid asset_id -> place_bid(asset_id, storage)
     | Cancel asset_id -> cancel_auction(asset_id, storage)
     | Resolve asset_id -> resolve_auction(asset_id, storage)
+    | Change_admin new_admin -> change_admin(new_admin, storage)
