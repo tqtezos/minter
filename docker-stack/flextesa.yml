@@ -6,7 +6,7 @@ services:
     environment:
       block_time: 5
       flextesa_node_cors_origin: "*"
-    command: "delphibox start --keep-root --genesis-block-hash random"
+    command: "edobox start --keep-root --genesis-block-hash random"
     volumes:
       - ${FLEXTESA_DATA_DIR}:/tmp/mini-box
     ports:

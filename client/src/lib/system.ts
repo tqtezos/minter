@@ -118,6 +118,9 @@ function networkType(config: Config) {
   if (config.network === 'delphinet') {
     return NetworkType.DELPHINET;
   }
+  if (config.network === 'edonet') {
+    return NetworkType.EDONET;
+  }
   return NetworkType.CUSTOM;
 }
 

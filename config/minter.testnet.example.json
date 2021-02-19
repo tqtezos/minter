@@ -1,6 +1,6 @@
 {
-	"rpc": "https://delphinet-tezos.giganode.io",
-	"network": "delphinet",
+	"rpc": "https://edonet-tezos.giganode.io",
+	"network": "edonet",
 	"bcd": {
 		"api": "https://api.better-call.dev",
 		"gui": "https://better-call.dev"

@@ -1,8 +1,8 @@
-TEZOS_RPC_URL=https://delphinet-tezos.giganode.io
+TEZOS_RPC_URL=https://edonet-tezos.giganode.io
 
 BCD_API_URL=https://api.better-call.dev
 BCD_GUI_URL=https://better-call.dev
 
-BCD_NETWORK="delphinet"
+BCD_NETWORK="edonet"
 
 TZ_NETWORK=testnet
