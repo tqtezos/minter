@@ -141,7 +141,10 @@ export async function connectWallet(
   }
 
   await wallet.requestPermissions({
-    network: { type: network, rpcUrl: system.config.rpc }
+    network: {
+      type: 'edo2net' as NetworkType,
+      rpcUrl: system.config.rpc
+    }
   });
 
   system.toolkit.setWalletProvider(wallet);
