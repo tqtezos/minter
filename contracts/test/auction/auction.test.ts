@@ -82,7 +82,8 @@ describe('test NFT auction', () => {
     startTime.setSeconds(startTime.getSeconds() + 7)
     endTime = new Date(startTime.valueOf())
     endTime.setHours(endTime.getHours() + 1)
-    const opAuction = await nftAuction.methods.configure(new BigNumber(10000000), new BigNumber(10), new BigNumber(360), [tokens], startTime, endTime).send({amount : 10, source : bobAddress});
+    //opening price = 10 tz, percent raise = 10, round_time = 1 hr, extend_time = 5 mins, end_time = start_time + 1hr, 
+    const opAuction = await nftAuction.methods.configure(new BigNumber(10000000), new BigNumber(10), new BigNumber(3600), new BigNumber(300), [tokens], startTime, endTime).send({amount : 10, source : bobAddress});
     await opAuction.confirmation();
     $log.info(`Auction configured. Consumed gas: ${opAuction.consumedGas}`);
   });
