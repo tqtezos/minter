@@ -15,14 +15,13 @@
                       (pair (nat %max_config_to_start_time)
                             (big_map %auctions
                                nat
-                               (pair (address %seller)
-                                     (pair (mutez %current_bid)
-                                           (pair (timestamp %start_time)
-                                                 (pair (timestamp %last_bid_time)
-                                                       (pair (int %round_time)
-                                                             (pair (list %asset
-                                                                      (pair (address %fa2_address) (list %fa2_batch (pair (nat %token_id) (nat %amount)))))
-                                                                   (pair (nat %min_raise_percent) (pair (timestamp %end_time) (address %highest_bidder)))))))))))))) ;
+                               (pair (mutez %current_bid)
+                                     (pair (timestamp %start_time)
+                                           (pair (timestamp %last_bid_time)
+                                                 (pair (int %round_time)
+                                                       (pair (list %asset
+                                                                (pair (address %fa2_address) (list %fa2_batch (pair (nat %token_id) (nat %amount)))))
+                                                             (pair (nat %min_raise_percent) (pair (timestamp %end_time) (address %highest_bidder))))))))))))) ;
   code { LAMBDA
            (pair bool string)
            unit
@@ -78,18 +77,16 @@
                                    (pair nat
                                          (big_map
                                             nat
-                                            (pair address
-                                                  (pair mutez
+                                            (pair mutez
+                                                  (pair timestamp
                                                         (pair timestamp
-                                                              (pair timestamp
-                                                                    (pair int
-                                                                          (pair (list (pair address (list (pair nat nat)))) (pair nat (pair timestamp address))))))))))))))
-           (pair address
-                 (pair mutez
+                                                              (pair int
+                                                                    (pair (list (pair address (list (pair nat nat)))) (pair nat (pair timestamp address)))))))))))))
+           (pair mutez
+                 (pair timestamp
                        (pair timestamp
-                             (pair timestamp
-                                   (pair int
-                                         (pair (list (pair address (list (pair nat nat)))) (pair nat (pair timestamp address))))))))
+                             (pair int
+                                   (pair (list (pair address (list (pair nat nat)))) (pair nat (pair timestamp address)))))))
            { DUP ;
              CDR ;
              CDR ;
@@ -108,15 +105,13 @@
            { CONTRACT unit ;
              IF_NONE { PUSH string "Address does not resolve to contract" ; FAILWITH } {} } ;
          LAMBDA
-           (pair address
-                 (pair mutez
+           (pair mutez
+                 (pair timestamp
                        (pair timestamp
-                             (pair timestamp
-                                   (pair int
-                                         (pair (list (pair address (list (pair nat nat)))) (pair nat (pair timestamp address))))))))
+                             (pair int
+                                   (pair (list (pair address (list (pair nat nat)))) (pair nat (pair timestamp address)))))))
            bool
            { DUP ;
-             CDR ;
              CDR ;
              CDR ;
              CDR ;
@@ -126,14 +121,12 @@
              DUG 2 ;
              CDR ;
              CDR ;
-             CDR ;
              CAR ;
              ADD ;
              NOW ;
              COMPARE ;
              GT ;
              SWAP ;
-             CDR ;
              CDR ;
              CDR ;
              CDR ;
@@ -189,7 +182,6 @@
                  DUP ;
                  DUG 3 ;
                  CDR ;
-                 CDR ;
                  CAR ;
                  NOW ;
                  COMPARE ;
@@ -225,13 +217,11 @@
                  CDR ;
                  CDR ;
                  CDR ;
-                 CDR ;
                  COMPARE ;
                  EQ ;
                  SWAP ;
                  DUP ;
                  DUG 2 ;
-                 CDR ;
                  CAR ;
                  AMOUNT ;
                  COMPARE ;
@@ -240,13 +230,11 @@
                  SWAP ;
                  DUP ;
                  DUG 2 ;
-                 CDR ;
                  CAR ;
                  PUSH nat 100 ;
                  DIG 3 ;
                  DUP ;
                  DUG 4 ;
-                 CDR ;
                  CDR ;
                  CDR ;
                  CDR ;
@@ -258,7 +246,6 @@
                  CAR ;
                  MUL ;
                  DIG 2 ;
-                 CDR ;
                  CAR ;
                  ADD ;
                  AMOUNT ;
@@ -293,26 +280,18 @@
                  CDR ;
                  CDR ;
                  CDR ;
-                 CDR ;
                  DIG 4 ;
                  SWAP ;
                  EXEC ;
                  SWAP ;
                  DUP ;
                  DUG 2 ;
-                 CDR ;
                  CAR ;
                  UNIT ;
                  TRANSFER_TOKENS ;
                  SWAP ;
-                 DUP ;
-                 DUG 2 ;
-                 CDR ;
                  CDR ;
                  AMOUNT ;
-                 PAIR ;
-                 DIG 2 ;
-                 CAR ;
                  PAIR ;
                  SENDER ;
                  SWAP ;
@@ -324,18 +303,6 @@
                  CDR ;
                  CDR ;
                  CDR ;
-                 CDR ;
-                 CAR ;
-                 PAIR ;
-                 SWAP ;
-                 DUP ;
-                 DUG 2 ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
-                 CDR ;
                  CAR ;
                  PAIR ;
                  SWAP ;
@@ -382,18 +349,10 @@
                  CAR ;
                  PAIR ;
                  DUP ;
-                 CDR ;
                  CDR ;
                  CDR ;
                  CDR ;
                  NOW ;
-                 PAIR ;
-                 SWAP ;
-                 DUP ;
-                 DUG 2 ;
-                 CDR ;
-                 CDR ;
-                 CAR ;
                  PAIR ;
                  SWAP ;
                  DUP ;
@@ -506,7 +465,6 @@
                  CDR ;
                  CDR ;
                  CDR ;
-                 CDR ;
                  CAR ;
                  PAIR ;
                  PAIR ;
@@ -523,12 +481,10 @@
                  CDR ;
                  CDR ;
                  CDR ;
-                 CDR ;
                  DIG 5 ;
                  SWAP ;
                  EXEC ;
                  DIG 2 ;
-                 CDR ;
                  CAR ;
                  UNIT ;
                  TRANSFER_TOKENS ;
@@ -540,12 +496,11 @@
                  CDR ;
                  CDR ;
                  DIG 3 ;
-                 NONE (pair address
-                            (pair mutez
+                 NONE (pair mutez
+                            (pair timestamp
                                   (pair timestamp
-                                        (pair timestamp
-                                              (pair int
-                                                    (pair (list (pair address (list (pair nat nat)))) (pair nat (pair timestamp address)))))))) ;
+                                        (pair int
+                                              (pair (list (pair address (list (pair nat nat)))) (pair nat (pair timestamp address))))))) ;
                  SWAP ;
                  UPDATE ;
                  DIG 3 ;
@@ -790,8 +745,6 @@
                  DUG 2 ;
                  CAR ;
                  PAIR ;
-                 SENDER ;
-                 PAIR ;
                  SELF ;
                  ADDRESS ;
                  SENDER ;
@@ -902,13 +855,11 @@
                  CDR ;
                  CDR ;
                  CDR ;
-                 CDR ;
                  SELF ;
                  ADDRESS ;
                  DIG 2 ;
                  DUP ;
                  DUG 3 ;
-                 CDR ;
                  CDR ;
                  CDR ;
                  CDR ;
@@ -927,7 +878,6 @@
                  SWAP ;
                  EXEC ;
                  DIG 2 ;
-                 CDR ;
                  CAR ;
                  UNIT ;
                  TRANSFER_TOKENS ;
@@ -939,12 +889,11 @@
                  CDR ;
                  CDR ;
                  DIG 3 ;
-                 NONE (pair address
-                            (pair mutez
+                 NONE (pair mutez
+                            (pair timestamp
                                   (pair timestamp
-                                        (pair timestamp
-                                              (pair int
-                                                    (pair (list (pair address (list (pair nat nat)))) (pair nat (pair timestamp address)))))))) ;
+                                        (pair int
+                                              (pair (list (pair address (list (pair nat nat)))) (pair nat (pair timestamp address))))))) ;
                  SWAP ;
                  UPDATE ;
                  DIG 3 ;

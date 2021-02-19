@@ -16,7 +16,6 @@ type tokens =
 type auction =
   [@layout:comb]
   {
-    seller : address;
     current_bid : tez;
     start_time : timestamp;
     last_bid_time : timestamp;
@@ -127,7 +126,6 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
     assert_msg (configure_param.round_time > 0n, "Round_time must be greater than 0 seconds");
 
     let auction_data : auction = {
-      seller = Tezos.sender;
       current_bid = configure_param.opening_price;
       start_time = configure_param.start_time;
       round_time = int(configure_param.round_time);
