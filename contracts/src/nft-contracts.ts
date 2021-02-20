@@ -111,6 +111,7 @@ export async function originateFixedPriceSale(
 
 export async function originateFixedPriceTezSale(
     tz: TezosToolkit,
+    adminAddress: address
 ): Promise<Contract> {
     const code = await compileAndLoadContract(
         defaultEnv,
@@ -118,6 +119,6 @@ export async function originateFixedPriceTezSale(
         'fixed_price_sale_tez_main',
         'fixed_price_sale_market_tez.tz',
     );
-    const storage = `{}`;
+    const storage = `(Pair (Pair (Pair \"${adminAddress}\" False) None) {})`;
     return originateContract(tz, code, storage, 'fixed-price-sale-market-tez');
 }

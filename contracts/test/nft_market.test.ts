@@ -2,8 +2,9 @@ import { $log } from '@tsed/logger';
 import { BigNumber } from 'bignumber.js';
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 
-import { bootstrap, TestTz } from './bootstrap-sandbox';
+import { adminBootstrap, bootstrap, TestTz } from './bootstrap-sandbox';
 import { Contract, address, bytes } from '../src/type-aliases';
+import { Signer } from '@taquito/taquito/dist/types/signer/interface';
 
 import {
     originateNftFaucet,
@@ -30,16 +31,19 @@ describe.each([originateFixedPriceTezSale])
         let tokenId: BigNumber;
         let tokenMetadata: MichelsonMap<string, bytes>;
         let salePrice: BigNumber;
+        let adminAddress: address;
+        let adminToolkit: TezosToolkit;
 
         beforeAll(async () => {
             tezos = await bootstrap();
             inspector = await originateInspector(tezos.bob);
+            adminToolkit = await adminBootstrap();
+            adminAddress = await adminToolkit.signer.publicKeyHash();
         });
 
         beforeEach(async () => {
-            const admin = await tezos.bob.signer.publicKeyHash();
-            nft = await originateNftFaucet(tezos.bob, admin);
-            marketplace = await originateMarketplace(tezos.bob);
+            nft = await originateNftFaucet(adminToolkit, adminAddress);
+            marketplace = await originateMarketplace(tezos.bob, adminAddress);
             marketAddress = marketplace.address;
             aliceAddress = await tezos.alice.signer.publicKeyHash();
             bobAddress = await tezos.bob.signer.publicKeyHash();
@@ -93,6 +97,25 @@ describe.each([originateFixedPriceTezSale])
             try {
                 $log.info('starting sale...');
                 const bobSaleContract = await tezos.bob.contract.at(marketplace.address);
+
+                $log.info('pause marketplace');
+                const pauseOp = await bobSaleContract.methods.pause(true).send({ source: adminAddress, amount: 0 });
+                $log.info(`Waiting for ${pauseOp.hash} to be confirmed...`);
+                const pauseOpHash = await pauseOp.confirmation(1).then(() => pauseOp.hash);
+                $log.info(`Operation injected at hash=${pauseOpHash}`);
+
+                try
+                {
+                    $log.info(`Attempting to create sale while contract is paused`);
+                    const sellOp = await bobSaleContract.methods.sell(salePrice, nft.address, tokenId).send({ source: bobAddress, amount: 0 });
+                } catch (error) {$log.info(`Confirmation: Cannot create sale while contract is paused`);}
+
+                $log.info('unpause marketplace');
+                const unpauseOp = await bobSaleContract.methods.pause(false).send({ source: adminAddress, amount: 0 });
+                $log.info(`Waiting for ${unpauseOp.hash} to be confirmed...`);
+                const unpauseOpHash = await unpauseOp.confirmation(1).then(() => unpauseOp.hash);
+                $log.info(`Operation injected at hash=${unpauseOpHash}`);
+
                 const sellOp = await bobSaleContract.methods.sell(salePrice, nft.address, tokenId).send({ source: bobAddress, amount: 0 });
                 $log.info(`Waiting for ${sellOp.hash} to be confirmed...`);
                 const sellOpHash = await sellOp.confirmation(1).then(() => sellOp.hash);
@@ -137,13 +160,36 @@ describe.each([originateFixedPriceTezSale])
 
             try {
                 $log.info('starting sale...');
-                const bobSaleContract = await tezos.bob.contract.at(marketplace.address);
-                const sellOp = await bobSaleContract.methods.sell(salePrice, nft.address, tokenId).send({ source: bobAddress, amount: 0 });
+                const saleContract = await tezos.bob.contract.at(marketplace.address);
+                const sellOp = await saleContract.methods.sell(salePrice, nft.address, tokenId).send({ source: bobAddress, amount: 0 });
                 $log.info(`Waiting for ${sellOp.hash} to be confirmed...`);
                 const sellOpHash = await sellOp.confirmation(1).then(() => sellOp.hash);
                 $log.info(`Operation injected at hash=${sellOpHash}`);
-                $log.info('bob cancels sale');
-                const removeSaleOp = await bobSaleContract.methods.cancel(salePrice, nft.address, tokenId).send({ source: bobAddress, amount: 0 });
+
+                try
+                {
+                    $log.info('bob cancels sale (not admin)');
+                    const removeSaleOp = await saleContract.methods.cancel(salePrice, nft.address, tokenId).send({ source: bobAddress, amount: 0 });
+                } catch (error) {
+                    $log.info(`Bob cannot cancel sale, since he is not an admin`);
+                }
+
+                $log.info('change admin workflow');
+
+                $log.info('set admin');
+                const setAdminOp = await (await adminToolkit.contract.at(marketplace.address)).methods.set_admin(bobAddress).send({source: adminAddress, amount: 0 });
+                $log.info(`Waiting for ${setAdminOp.hash} to be confirmed...`);
+                const setAdminOpHash = await setAdminOp.confirmation(1).then(() => setAdminOp.hash);
+                $log.info(`Operation injected at hash=${setAdminOpHash}`);
+
+                $log.info('confirm admin');
+                const confirmAdminOp = await (await adminToolkit.contract.at(marketplace.address)).methods.confirm_admin({}).send({amount: 0});
+                $log.info(`Waiting for ${confirmAdminOp.hash} to be confirmed...`);
+                const confirmAdminOpHash = await confirmAdminOp.confirmation(1).then(() => confirmAdminOp.hash);
+                $log.info(`Operation injected at hash=${confirmAdminOpHash}`);
+
+                $log.info('bob cancels sale (now admin)');
+                const removeSaleOp = await saleContract.methods.cancel(salePrice, nft.address, tokenId).send({ source: bobAddress, amount: 0 });
                 $log.info(`Waiting for ${removeSaleOp.hash} to be confirmed...`);
                 const removeSaleOpHash = await removeSaleOp.confirmation(1).then(() => removeSaleOp.hash);
                 $log.info(`Operation injected at hash=${removeSaleOpHash}`);
