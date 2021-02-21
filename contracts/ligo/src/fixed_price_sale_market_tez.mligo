@@ -95,7 +95,9 @@ let fixed_price_sale_tez_main (p, storage : market_entry_points * storage) : ope
      let u = fail_if_paused(storage.admin) in
      buy_token(sale, storage)
   | Cancel sale ->
-     let u = fail_if_not_admin storage.admin in
+     let is_seller = Tezos.sender = sale.sale_seller in
+     let u = if is_seller then ()
+             else fail_if_not_admin storage.admin (Some " OR A SELLER") in
      let v = fail_if_paused(storage.admin) in
      cancel_sale(sale,storage)
   | Admin a ->
