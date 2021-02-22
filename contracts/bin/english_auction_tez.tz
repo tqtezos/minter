@@ -227,11 +227,11 @@
                  COMPARE ;
                  GE ;
                  AND ;
-                 SWAP ;
-                 DUP ;
-                 DUG 2 ;
-                 CAR ;
                  PUSH nat 100 ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
                  DIG 3 ;
                  DUP ;
                  DUG 4 ;
@@ -241,10 +241,10 @@
                  CDR ;
                  CDR ;
                  CAR ;
+                 MUL ;
                  EDIV ;
                  IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
                  CAR ;
-                 MUL ;
                  DIG 2 ;
                  CAR ;
                  ADD ;
