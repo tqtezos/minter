@@ -69,7 +69,7 @@ let buy_token(sale, storage: sale_param_tez * storage) : (operation list * stora
   let new_s = Big_map.remove sale storage in
   (tx_ops :: tx_nft_op :: []), new_s
 
-let tez_stuck_guard(entrypoint: string) : string = "DON'T TRANSFER TEZ TO THIS ENTRYPOINT " ^ entrypoint
+let tez_stuck_guard(entrypoint: string) : string = "DON'T TRANSFER TEZ TO THIS ENTRYPOINT (" ^ entrypoint ^ ")"
 
 let deposit_for_sale(sale_token, price, storage: sale_token_param_tez * tez * storage) : (operation list * storage) =
     let u = if Tezos.amount <> 0tez then failwith (tez_stuck_guard "SELL") else () in
