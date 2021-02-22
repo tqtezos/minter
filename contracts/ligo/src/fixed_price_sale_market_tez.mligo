@@ -54,7 +54,10 @@ let transfer_tez (price, seller : tez * address) : operation =
   let seller_account = match (Tezos.get_contract_opt seller : unit contract option) with
     | None -> (failwith "NO_SELLER_ACCOUNT" : unit contract)
     | Some acc -> acc
-     in let amountError = if Tezos.amount <> price then failwith "WRONG_TEZ_PRICE" else () in
+  in let amountError =
+       if Tezos.amount <> price
+       then ([%Michelson ({| { FAILWITH } |} : string * tez * tez -> unit)] ("WRONG_TEZ_PRICE", price, Tezos.amount) : unit)
+       else () in
         Tezos.transaction () Tezos.amount seller_account
 
 let buy_token(sale, storage: sale_param_tez * storage) : (operation list * storage) =
