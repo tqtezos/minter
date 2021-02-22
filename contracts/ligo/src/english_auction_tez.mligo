@@ -112,7 +112,7 @@ let first_bid (auction : auction) : bool =
   auction.highest_bidder = auction.seller
 
 let valid_bid_amount (auction : auction) : bool =
-  (Tezos.amount >= (auction.current_bid + ( (auction.min_raise_percent / 100n) *  auction.current_bid))) ||
+  (Tezos.amount >= (auction.current_bid + ((auction.min_raise_percent *  auction.current_bid)/ 100n))) ||
   ((Tezos.amount >= auction.current_bid) && first_bid(auction))
 
 let configure_auction(configure_param, storage : configure_param * storage) : return = begin
