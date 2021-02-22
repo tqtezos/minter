@@ -23,11 +23,15 @@ Current version supports the following:
 - Blockhain indexer: [Better Call Dev Backend][bcdhub]
 - Database: [PostgreSQL][postgres]
 - InterPlanetary File System: [IPFS][ipfs]
+- [Docker][docker]
+- [Yarn][yarn]
 
 [bcdhub]: https://github.com/baking-bad/bcdhub
 [flextesa]: https://gitlab.com/tezos/flextesa
 [postgres]: https://www.postgresql.org/
 [ipfs]: https://ipfs.io/
+[docker]: https://www.docker.com/get-started
+[yarn]: https://classic.yarnpkg.com/en/docs/install
 
 ## Usage
 
