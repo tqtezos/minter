@@ -122,6 +122,7 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
     assert_msg (configure_param.start_time >= Tezos.now, "Start_time must not have already passed");
     assert_msg (abs(configure_param.start_time - Tezos.now) <= storage.max_config_to_start_time, "start_time must not be greater than the sum of current time and max_config_to_start_time");
     
+    assert_msg (configure_param.opening_price > 0mutez, "Opening price must be greater than 0mutez");
     assert_msg (Tezos.amount = configure_param.opening_price, "Amount must be equal to opening_price");
     assert_msg (configure_param.round_time > 0n, "Round_time must be greater than 0 seconds");
 
