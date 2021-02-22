@@ -83,7 +83,9 @@ let transfer (txs, validate_op, ops_storage, ledger
         if dst.amount > 1n
         then (failwith fa2_insufficient_balance : ledger)
         else if dst.amount = 0n
-        then ll (* zero transfer, don't change the ledger *)
+        then match Big_map.find_opt dst.token_id ll with
+               | None -> (failwith fa2_token_undefined : ledger)
+               | Some cur_o -> ll (* zero transfer, don't change the ledger *)
         else
           let lll = dec_balance (tx.from_, dst.token_id, ll) in
           inc_balance(dst.to_, dst.token_id, lll)
