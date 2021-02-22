@@ -51,7 +51,7 @@ let dec_balance(owner, token_id, ledger : address option * token_id * ledger) : 
   | Some o -> (
     let current_owner = Big_map.find_opt token_id ledger in
     match current_owner with
-    | None -> (failwith fa2_insufficient_balance : ledger)
+    | None -> (failwith fa2_token_undefined : ledger)
     | Some cur_o ->
       if cur_o = o
       then Big_map.remove token_id ledger
