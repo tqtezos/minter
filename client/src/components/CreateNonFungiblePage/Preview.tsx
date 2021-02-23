@@ -1,8 +1,10 @@
 import React from 'react';
 import { Divider, Heading, Flex, Image, Text } from '@chakra-ui/react';
 import { useSelector } from '../../reducer';
+import { ipfsUriToGatewayUrl } from '../../lib/util/ipfs';
 
 export default function Preview() {
+  const network = useSelector(s => s.system.config.network);
   const state = useSelector(s => s.createNft);
   const { name, description } = state.fields;
   return (
@@ -23,7 +25,11 @@ export default function Preview() {
         overflow="hidden"
       >
         <Image
-          src={state.selectedFile?.objectUrl || ''}
+          src={
+            (state.selectedFile?.objectUrl &&
+              ipfsUriToGatewayUrl(network, state.selectedFile?.objectUrl)) ||
+            ''
+          }
           overflow="hidden"
           objectFit="contain"
           objectPosition="center"

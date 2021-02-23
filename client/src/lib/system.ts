@@ -1,10 +1,7 @@
 import { TezosToolkit, Context } from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
-import {
-  MetadataProvider,
-  DEFAULT_HANDLERS,
-  IpfsHttpHandler
-} from '@taquito/tzip16';
+import { MetadataProvider, DEFAULT_HANDLERS } from '@taquito/tzip16';
+import CustomIpfsHttpHandler from './util/taquito-custom-ipfs-http-handler';
 import { BetterCallDev } from './service/bcd';
 import * as tzUtils from './util/tezosToolkit';
 import { DAppClientOptions, NetworkType } from '@airgap/beacon-sdk';
@@ -79,10 +76,13 @@ function createMetadataResolver(
   contractAddress: string
 ): ResolveMetadata {
   const ipfsGateway =
-    system.config.network === 'sandbox'
-      ? 'localhost:5001'
+    system.config.network === 'sandboxnet'
+      ? 'localhost:8080'
       : 'cloudflare-ipfs.com';
-  DEFAULT_HANDLERS.set('ipfs', new IpfsHttpHandler(ipfsGateway));
+  const gatewayProtocol =
+    system.config.network === 'sandboxnet' ? 'http' : 'https';
+  const ipfsHandler = new CustomIpfsHttpHandler(ipfsGateway, gatewayProtocol);
+  DEFAULT_HANDLERS.set('ipfs', ipfsHandler);
   const provider = new MetadataProvider(DEFAULT_HANDLERS);
   const context = new Context(toolkit.rpc);
   // This is a performance optimization: We're only resolving off-chain

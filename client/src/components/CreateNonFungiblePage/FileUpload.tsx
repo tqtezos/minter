@@ -7,6 +7,7 @@ import { readFileAsDataUrlAction } from '../../reducer/async/actions';
 
 export default function FileUpload() {
   const state = useSelector(s => s.createNft);
+  const network = useSelector(s => s.system.config.network);
   const dispatch = useDispatch();
 
   const onDrop = useCallback(
@@ -53,7 +54,7 @@ export default function FileUpload() {
             p={4}
             maxWidth="400px"
             maxHeight="400px"
-            src={ipfsUriToGatewayUrl(state.selectedFile.objectUrl)}
+            src={ipfsUriToGatewayUrl(network, state.selectedFile.objectUrl)}
           />
         ) : (
           <Flex

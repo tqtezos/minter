@@ -33,9 +33,13 @@ export function ipfsUriToCid(uri: string) {
   return null;
 }
 
-export function ipfsUriToGatewayUrl(uri: string) {
+export function ipfsUriToGatewayUrl(network: string, uri: string) {
+  const ipfsHost =
+    network === 'sandboxnet'
+      ? 'http://localhost:8080'
+      : 'https://cloudflare-ipfs.com';
   const cid = ipfsUriToCid(uri);
-  return cid ? `https://cloudflare-ipfs.com/ipfs/${cid}` : uri;
+  return cid ? `${ipfsHost}/ipfs/${cid}` : uri;
 }
 
 export function uriToCid(uri: string) {
