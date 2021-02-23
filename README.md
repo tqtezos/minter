@@ -2,6 +2,12 @@
 
 [![](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE) [![](https://img.shields.io/badge/Docker-19.03.x-blue)](https://www.docker.com/) [![](https://img.shields.io/badge/version-v0.1-orange)](https://github.com/tqtezos/minter)
 
+## Notice
+
+This software is in beta. At the moment, the smart contracts 
+that OpenMinter uses have **not** been formally audited. Please
+use this software at your own risk. 
+
 ## OpenMinter
 
 OpenMinter is dApp framework for enabling the creation and collection
