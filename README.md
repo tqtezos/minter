@@ -16,21 +16,23 @@ create an NFT by filling in just a few fields, create new collection
 contracts, see their NFTs across contracts, and enable marketplace
 capabilities to trade them.
 
-Current version supports the following:
-#### 🌐 Mainnet and Delphinet (Edonet soon)
-#### 🎨 Image-based NFTs
-#### 👛 [Beacon](https://www.walletbeacon.io/) support
-#### ⚙️ The latest [FA2](https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md) spec
-#### 🚀 [IPFS](https://ipfs.io/) support (locally and [Pinata](https://pinata.cloud/))
+OpenMinter supports the following networks and software components:
+#### 🌐 Mainnet and Delphinet networks (Edonet soon)
+#### 📦 Sandboxed development via [Flextesa][flextesa]
+#### 🎨 Creating multimedia NFTs
+#### 👛 Various wallets via [Beacon](https://www.walletbeacon.io/)
+#### 📖 Reading blockchain data via [Better Call Dev][bcdhub]
+#### ⚙️ The latest [FA2](https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md) specification
+#### 🚀 [IPFS](https://ipfs.io/) via a local node or [Pinata](https://pinata.cloud/)
 
 ## Dependencies
 
-- Tezos sandbox: [Flextesa][flextesa]
-- Blockhain indexer: [Better Call Dev Backend][bcdhub]
-- Database: [PostgreSQL][postgres]
-- InterPlanetary File System: [IPFS][ipfs]
-- [Docker][docker]
-- [Yarn][yarn]
+The following dependencies are required to run OpenMinter.
+
+| Dependency | Version|
+|-|-|
+| [Docker][docker] | `v20.10.*` or above |
+| [Yarn][yarn] | `v1.22.*` or above |
 
 [bcdhub]: https://github.com/baking-bad/bcdhub
 [flextesa]: https://gitlab.com/tezos/flextesa
