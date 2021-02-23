@@ -20,6 +20,7 @@ type auction =
     start_time : timestamp;
     last_bid_time : timestamp;
     round_time : int;
+    extend_time : int;
     asset : (tokens list);
     min_raise_percent : nat;
     end_time : timestamp;
@@ -32,6 +33,7 @@ type configure_param =
     opening_price : tez;
     min_raise_percent : nat;
     round_time : nat;
+    extend_time : nat;
     asset : (tokens list);
     start_time : timestamp;
     end_time : timestamp;
@@ -96,7 +98,7 @@ let resolve_contract (add : address) : unit contract =
     | Some c -> c
 
 let auction_ended (auction : auction) : bool =
-  ((Tezos.now > auction.end_time) || (* auction has passed auction time*)
+  ((Tezos.now >= auction.end_time) || (* auction has passed auction time*)
    (Tezos.now > auction.last_bid_time + auction.round_time)) (*round time has passed after bid has been placed*)
 
 let auction_started (auction : auction) : bool = 
@@ -130,6 +132,7 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
       current_bid = configure_param.opening_price;
       start_time = configure_param.start_time;
       round_time = int(configure_param.round_time);
+      extend_time = int(configure_param.extend_time);
       asset = configure_param.asset;
       min_raise_percent = configure_param.min_raise_percent;
       end_time = configure_param.end_time;
@@ -174,7 +177,9 @@ let place_bid(asset_id, storage : nat * storage) : return = begin
 
     let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
     let return_bid = Tezos.transaction unit auction.current_bid highest_bidder_contract in
-    let updated_auction_data = {auction with current_bid = Tezos.amount; highest_bidder = Tezos.sender; last_bid_time = Tezos.now} in
+    let new_end_time = if auction.end_time - Tezos.now <= auction.extend_time then 
+      Tezos.now + auction.extend_time else auction.end_time in
+    let updated_auction_data = {auction with current_bid = Tezos.amount; highest_bidder = Tezos.sender; last_bid_time = Tezos.now; end_time = new_end_time;} in
     let updated_auctions = Big_map.update asset_id (Some updated_auction_data) storage.auctions in
     ([return_bid] , {storage with auctions = updated_auctions})
   end
