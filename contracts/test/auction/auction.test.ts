@@ -23,6 +23,8 @@ jest.setTimeout(180000); // 3 minutes
 describe('test NFT auction', () => {
   let tezos: TestTz;
   let nftAuction: Contract;
+  let nftAuctionBob : Contract;
+  let nftAuctionAlice : Contract;
   let nftFactory: Contract;
   let bobAddress : address;
   let aliceAddress : address;
@@ -82,10 +84,31 @@ describe('test NFT auction', () => {
     startTime.setSeconds(startTime.getSeconds() + 7)
     endTime = new Date(startTime.valueOf())
     endTime.setHours(endTime.getHours() + 1)
+
+    nftAuctionBob = await tezos.bob.contract.at(nftAuction.address);
+
     //opening price = 10 tz, percent raise = 10, round_time = 1 hr, extend_time = 5 mins, end_time = start_time + 1hr, 
-    const opAuction = await nftAuction.methods.configure(new BigNumber(10000000), new BigNumber(10), new BigNumber(3600), new BigNumber(300), [tokens], startTime, endTime).send({amount : 10, source : bobAddress});
+    const opAuction = await nftAuctionBob.methods.configure(new BigNumber(10000000), new BigNumber(10), new BigNumber(3600), new BigNumber(300), [tokens], startTime, endTime).send({amount : 10});
     await opAuction.confirmation();
     $log.info(`Auction configured. Consumed gas: ${opAuction.consumedGas}`);
+  });
+  test('bid of less than asking price should fail', async() => {
+    nftAuctionAlice = await tezos.alice.contract.at(nftAuction.address);
+    const failedOpeningBid = nftAuctionAlice.methods.bid(0).send({amount : 9});
+    return expect(failedOpeningBid).rejects.toHaveProperty('message', 'Bid must raised by at least min_raise_percent of the previous bid or at least opening price if it is the first bid');
+  });
+  test('place bid meeting opening price and then raise it by exactly 10%', async () => {
+    nftAuctionAlice = await tezos.alice.contract.at(nftAuction.address);
+    const opBid = await nftAuctionAlice.methods.bid(0).send({amount : 10});
+    await opBid.confirmation();
+    $log.info(`Bid placed. Amount sent: ${opBid.amount}`);
+    const opBid2 = await nftAuctionAlice.methods.bid(0).send({amount : 11});
+    await opBid2.confirmation();
+    $log.info(`Bid placed. Amount sent: ${opBid2.amount}`);
+  });
+  test('bid of same amount as previous bid should fail', async () => {
+    const failedBidPromise = nftAuctionAlice.methods.bid(0).send({amount : 11});
+    return expect(failedBidPromise).rejects.toHaveProperty('message', 'Bid must raised by at least min_raise_percent of the previous bid or at least opening price if it is the first bid');
   });
 });
 
