@@ -55,15 +55,25 @@
                  PAIR ;
                  CONS ;
                  TRANSFER_TOKENS } } ;
-         SWAP ;
-         DUP ;
-         DUG 2 ;
-         CDR ;
+         LAMBDA
+           string
+           string
+           { PUSH string ")" ;
+             SWAP ;
+             CONCAT ;
+             PUSH string "DON'T TRANSFER TEZ TO THIS ENTRYPOINT (" ;
+             CONCAT } ;
          DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CDR ;
+         DIG 3 ;
          CAR ;
          IF_LEFT
            { IF_LEFT
-               { SWAP ;
+               { DIG 2 ;
+                 DROP ;
+                 SWAP ;
                  DUP ;
                  DUG 2 ;
                  SWAP ;
@@ -75,18 +85,16 @@
                  DUP ;
                  DUG 2 ;
                  CAR ;
-                 SWAP ;
-                 PAIR ;
-                 DUP ;
-                 CDR ;
                  CONTRACT unit ;
                  IF_NONE { PUSH string "NO_SELLER_ACCOUNT" ; FAILWITH } {} ;
                  SWAP ;
-                 CAR ;
+                 DUP ;
+                 DUG 2 ;
                  AMOUNT ;
                  COMPARE ;
                  NEQ ;
-                 IF { PUSH string "WRONG_TEZ_PRICE" ; FAILWITH } {} ;
+                 IF { AMOUNT ; DIG 2 ; PUSH string "WRONG_TEZ_PRICE" ; PAIR ; PAIR ; FAILWITH }
+                    { SWAP ; DROP } ;
                  AMOUNT ;
                  PUSH unit Unit ;
                  TRANSFER_TOKENS ;
@@ -120,7 +128,13 @@
                  DIG 2 ;
                  CONS ;
                  PAIR }
-               { SWAP ;
+               { PUSH mutez 0 ;
+                 AMOUNT ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string "CANCEL" ; DIG 3 ; SWAP ; EXEC ; FAILWITH }
+                    { DIG 2 ; DROP } ;
+                 SWAP ;
                  DUP ;
                  DUG 2 ;
                  SWAP ;
@@ -175,6 +189,11 @@
              DUP ;
              CAR ;
              CAR ;
+             PUSH mutez 0 ;
+             AMOUNT ;
+             COMPARE ;
+             NEQ ;
+             IF { PUSH string "SELL" ; DIG 3 ; SWAP ; EXEC ; FAILWITH } { DIG 2 ; DROP } ;
              SELF ;
              ADDRESS ;
              SENDER ;
