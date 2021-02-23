@@ -9,6 +9,7 @@ import {
   uploadImageWithThumbnailToIpfs,
   uploadDataToIpfs
 } from './helpers/ipfs';
+import fs from 'fs';
 
 export async function handleIpfsFileUpload(
   pinataConfig: PinataConfig | null,
@@ -27,7 +28,9 @@ export async function handleIpfsFileUpload(
       const content = await uploadFileToPinata(pinataConfig, file.tempFilePath);
       return res.status(200).json(content);
     }
-    const content = await uploadDataToIpfs(file.tempFilePath);
+    const content = await uploadDataToIpfs(
+      fs.createReadStream(file.tempFilePath)
+    );
     return res.status(200).json(content);
   } catch (e) {
     console.log(e);
