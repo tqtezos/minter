@@ -64,7 +64,12 @@ function TokenImage(props: { src: string }) {
 
   if (/^video\/.*/.test(obj.type)) {
     return (
-      <video controls>
+      <video
+        loop
+        onClick={e => e.preventDefault()}
+        onMouseEnter={e => e.currentTarget.play()}
+        onMouseLeave={e => e.currentTarget.pause()}
+      >
         <source src={obj.url} type={obj.type} />
       </video>
     );
