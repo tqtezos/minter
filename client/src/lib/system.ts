@@ -155,7 +155,10 @@ export async function connectWallet(
 
   await wallet.requestPermissions({
     network: {
-      type: system.config.network as NetworkType,
+      type:
+        system.config.network === 'edo2net'
+          ? (system.config.network as NetworkType)
+          : network,
       rpcUrl: system.config.rpc
     }
   });
