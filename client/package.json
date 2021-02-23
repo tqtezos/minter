@@ -1,38 +1,41 @@
 {
   "name": "client",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
-    "@airgap/beacon-sdk": "2.0.0",
-    "@ant-design/icons": "4.2.2",
+    "@chakra-ui/react": "1.1.2",
     "@emotion/core": "10.0.28",
-    "@emotion/styled": "10.0.27",
-    "@taquito/beacon-wallet": "7.1.0-beta.0",
-    "@taquito/rpc": "7.1.0-beta.0",
-    "@taquito/signer": "7.1.0-beta.0",
-    "@taquito/taquito": "7.1.0-beta.0",
+    "@emotion/react": "11.1.4",
+    "@emotion/styled": "11.0.0",
+    "@reduxjs/toolkit": "1.5.0",
+    "@taquito/beacon-wallet": "8.0.3-beta.0",
+    "@taquito/tzip16": "8.0.3-beta.0",
+    "@taquito/taquito": "8.0.3-beta.0",
+    "@types/lodash": "4.14.165",
+    "@types/react": "16.9.12",
+    "@types/react-dom": "16.9.0",
+    "@types/react-dropzone": "5.1.0",
+    "@types/react-redux": "7.1.16",
+    "axios-retry": "3.1.9",
+    "buffer": "6.0.3",
+    "framer-motion": "3.1.4",
+    "immer": "8.0.0",
+    "joi": "17.3.0",
+    "prettier": "2.1.1",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-dropzone": "11.2.4",
+    "react-feather": "2.0.9",
+    "react-redux": "7.2.2",
+    "typescript": "4.1.3",
+    "wouter": "2.5.1"
+  },
+  "devDependencies": {
+    "@types/jest": "24.0.0",
     "@testing-library/jest-dom": "4.2.4",
     "@testing-library/react": "9.3.2",
     "@testing-library/user-event": "7.1.2",
-    "@thanos-wallet/dapp": "0.7.0",
-    "@types/jest": "24.0.0",
-    "@types/lodash": "4.14.165",
-    "@types/node": "12.0.0",
-    "@types/react": "16.9.12",
-    "@types/react-dom": "16.9.0",
-    "antd": "4.5.2",
-    "axios-retry": "3.1.9",
-    "graphql": "15.3.0",
-    "graphql-tag": "2.11.0",
-    "ipfs-http-client": "46.0.1",
-    "lodash": "4.17.20",
-    "prettier": "2.1.1",
-    "react": "16.13.1",
-    "react-awesome-reveal": "3.0.0",
-    "react-dom": "16.13.1",
-    "react-scripts": "3.4.1",
-    "typescript": "3.7.2",
-    "wouter": "2.5.1"
+    "react-scripts": "3.4.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -54,5 +57,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "resolutions": {
+    "**/@typescript-eslint/eslint-plugin": "^4.1.1",
+    "**/@typescript-eslint/parser": "^4.1.1"
   }
 }

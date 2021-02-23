@@ -1,103 +1,137 @@
-/** @jsx jsx */
-import { FC, useEffect, useState } from 'react';
-import { jsx } from '@emotion/core';
-import { Form, Button, message, Row, Col } from 'antd';
+import React from 'react';
+import {
+  Box,
+  Divider,
+  Flex,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  Text,
+  Textarea
+} from '@chakra-ui/react';
+import { Plus, X } from 'react-feather';
+import { MinterButton } from '../common';
 
-import { IpfsContent } from '../../api/ipfsUploader';
-import { useContracts } from '../App/globalContext';
-import LeftSide from './LeftSide';
-import RightSide from './RightSide';
+import { useSelector, useDispatch } from '../../reducer';
+import {
+  addMetadataRow,
+  deleteMetadataRow,
+  updateField,
+  updateMetadataRowName,
+  updateMetadataRowValue
+} from '../../reducer/slices/createNft';
 
-interface InputFormProps {
-  onFinish: () => void;
-}
+const DESCRIPTION_PLACEHOLDER =
+  'e.g. “This is an exclusive japanese comic illustration. Once you purchase it you will be able to get the t-shirt”';
 
-const InputForm: FC<InputFormProps> = ({ onFinish }) => {
-  const [ipfsContent, setIpfsContent] = useState<IpfsContent>();
-  const [creatingToken, setCreatingToken] = useState(false);
-  const [form] = Form.useForm();
-  const contracts = useContracts();
-
-  const handleCreateToken = async () => {
-    try {
-      await form.validateFields([
-        'name',
-        'description',
-        'symbol',
-        'ipfsCid',
-        'contract'
-      ]);
-    } catch (error) {
-      message.error('Please fix the errors and try to submit again');
-      return;
-    }
-
-    // This should never happen as 'Create' button is disabled until
-    // the settings are received
-    if (!contracts) return;
-
-    const values = form.getFieldsValue() as any;
-    console.log('Submitted values: ', values);
-
-    setCreatingToken(true);
-    const hideMessage = message.loading(
-      'Creating a new non-fungible token...',
-      0
-    );
-
-    try {
-      const nft = await contracts.nft();
-      const contract = await nft.contractByAddress(values.contract);
-
-      await contract.createToken({
-        ...values,
-        description: values.description || ''
-      });
-
-      setTimeout(onFinish, 0);
-    } catch (error) {
-      message.error(error.message, 10); // Keep for 10 seconds
-    } finally {
-      setCreatingToken(false);
-      hideMessage();
-    }
-  };
-
-  useEffect(() => {
-    form.setFieldsValue({ ipfsCid: ipfsContent?.cid });
-  }, [ipfsContent, form]);
-
+export default function Form() {
+  const state = useSelector(s => s.createNft);
+  const dispatch = useDispatch();
+  const { name, description } = state.fields;
   return (
-    <Form form={form} layout="vertical" css={{ marginTop: '2em' }}>
-      <fieldset disabled={creatingToken}>
-        <Row>
-          <Col span={10}>
-            <LeftSide onChange={setIpfsContent} />
-          </Col>
-          <Col offset={2} span={10}>
-            <RightSide ipfsContent={ipfsContent} form={form} />
-          </Col>
-        </Row>
-        <Row>
-          <Col span={24}>
-            <Form.Item>
-              <Button
-                onClick={handleCreateToken}
-                type="primary"
-                loading={creatingToken}
-                disabled={!contracts}
-                shape="round"
-                size="large"
-                css={{ width: '12em' }}
-              >
-                Create
-              </Button>
-            </Form.Item>
-          </Col>
-        </Row>
-      </fieldset>
-    </Form>
+    <>
+      <Heading size="md" paddingBottom={6}>
+        What properties would you like to give your assets?
+      </Heading>
+      <FormControl paddingBottom={6}>
+        <FormLabel fontFamily="mono">Asset Name</FormLabel>
+        <Input
+          autoFocus={true}
+          placeholder="Input your asset name"
+          value={name || ''}
+          onChange={e =>
+            dispatch(updateField({ name: 'name', value: e.target.value }))
+          }
+        />
+      </FormControl>
+      <FormControl paddingBottom={6}>
+        <FormLabel fontFamily="mono" display="flex">
+          Description
+          <Text marginLeft={2} color="brand.lightGray">
+            (Optional)
+          </Text>
+        </FormLabel>
+        <Textarea
+          minHeight="150px"
+          fontFamily="mono"
+          placeholder={DESCRIPTION_PLACEHOLDER}
+          value={description || ''}
+          onChange={e =>
+            dispatch(
+              updateField({ name: 'description', value: e.target.value })
+            )
+          }
+        />
+      </FormControl>
+      <Box>
+        <Text
+          fontFamily="mono"
+          fontSize="xs"
+          paddingBottom={3}
+          textTransform="uppercase"
+        >
+          IPFS Hash
+        </Text>
+        {/* <Text>{(state.artifactUri && uriToCid(state.artifactUri)) || ''}</Text> */}
+      </Box>
+      <Divider borderColor="brand.lightBlue" opacity="1" marginY={10} />
+      <Heading size="md" paddingBottom={6}>
+        Add attributes to your asset
+      </Heading>
+      {state.metadataRows.map(({ name, value }, key) => {
+        return (
+          <Flex key={key} align="center" justify="stretch">
+            <FormControl paddingBottom={6} paddingRight={2} flex="1">
+              <FormLabel fontFamily="mono">Name</FormLabel>
+              <Input
+                placeholder="e.g. Country"
+                value={name || ''}
+                onChange={e =>
+                  dispatch(updateMetadataRowName({ key, name: e.target.value }))
+                }
+              />
+            </FormControl>
+            <FormControl paddingBottom={6} paddingLeft={2} flex="1">
+              <FormLabel fontFamily="mono">Value</FormLabel>
+              <Input
+                placeholder="e.g. India"
+                value={value || ''}
+                onChange={e =>
+                  dispatch(
+                    updateMetadataRowValue({ key, value: e.target.value })
+                  )
+                }
+              />
+            </FormControl>
+            <Box
+              color="gray.400"
+              ml={4}
+              mt={1}
+              cursor="pointer"
+              onClick={() => dispatch(deleteMetadataRow({ key }))}
+              _hover={{
+                color: 'brand.red'
+              }}
+            >
+              <X size={30} />
+            </Box>
+          </Flex>
+        );
+      })}
+      <MinterButton
+        variant="primaryActionInverted"
+        onClick={() => dispatch(addMetadataRow())}
+        pl={3}
+        pr={3}
+        pt={2}
+        pb={2}
+      >
+        <Box color="currentcolor">
+          <Plus size={16} strokeWidth="3" />
+        </Box>
+        <Text ml={2}>Add field</Text>
+      </MinterButton>
+    </>
   );
-};
-
-export default InputForm;
+}

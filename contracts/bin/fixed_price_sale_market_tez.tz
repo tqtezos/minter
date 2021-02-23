@@ -82,14 +82,24 @@
                  PAIR ;
                  CONS ;
                  TRANSFER_TOKENS } } ;
-         DIG 3 ;
-         DUP ;
-         DUG 4 ;
-         CDR ;
+         LAMBDA
+           string
+           string
+           { PUSH string ")" ;
+             SWAP ;
+             CONCAT ;
+             PUSH string "DON'T TRANSFER TEZ TO THIS ENTRYPOINT (" ;
+             CONCAT } ;
          DIG 4 ;
+         DUP ;
+         DUG 5 ;
+         CDR ;
+         DIG 5 ;
          CAR ;
          IF_LEFT
-           { IF_LEFT
+           { DIG 2 ;
+             DROP ;
+             IF_LEFT
                { DIG 2 ;
                  DROP ;
                  DIG 2 ;
@@ -186,18 +196,16 @@
                  DUP ;
                  DUG 2 ;
                  CAR ;
-                 SWAP ;
-                 PAIR ;
-                 DUP ;
-                 CDR ;
                  CONTRACT unit ;
                  IF_NONE { PUSH string "NO_SELLER_ACCOUNT" ; FAILWITH } {} ;
                  SWAP ;
-                 CAR ;
+                 DUP ;
+                 DUG 2 ;
                  AMOUNT ;
                  COMPARE ;
                  NEQ ;
-                 IF { PUSH string "WRONG_TEZ_PRICE" ; FAILWITH } {} ;
+                 IF { AMOUNT ; DIG 2 ; PUSH string "WRONG_TEZ_PRICE" ; PAIR ; PAIR ; FAILWITH }
+                    { SWAP ; DROP } ;
                  AMOUNT ;
                  PUSH unit Unit ;
                  TRANSFER_TOKENS ;
@@ -243,14 +251,14 @@
                  SENDER ;
                  COMPARE ;
                  EQ ;
-                 IF { DIG 4 ; DROP ; PUSH unit Unit }
+                 IF { DIG 5 ; DROP ; PUSH unit Unit }
                     { PUSH string " OR A SELLER" ;
                       SOME ;
                       DIG 2 ;
                       DUP ;
                       DUG 3 ;
                       CAR ;
-                      DIG 6 ;
+                      DIG 7 ;
                       SWAP ;
                       EXEC ;
                       SWAP ;
@@ -260,10 +268,16 @@
                  DUP ;
                  DUG 2 ;
                  CAR ;
-                 DIG 4 ;
+                 DIG 5 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
+                 PUSH mutez 0 ;
+                 AMOUNT ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string "CANCEL" ; DIG 3 ; SWAP ; EXEC ; FAILWITH }
+                    { DIG 2 ; DROP } ;
                  SWAP ;
                  DUP ;
                  DUG 2 ;
@@ -317,13 +331,13 @@
                           CONS ;
                           PAIR }
                         { DROP 3 ; PUSH string "NOT_OWNER" ; FAILWITH } } }
-               { DIG 4 ;
+               { DIG 5 ;
                  DROP ;
                  SWAP ;
                  DUP ;
                  DUG 2 ;
                  CAR ;
-                 DIG 4 ;
+                 DIG 5 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
@@ -341,6 +355,11 @@
                  DUG 2 ;
                  CAR ;
                  CAR ;
+                 PUSH mutez 0 ;
+                 AMOUNT ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string "SELL" ; DIG 4 ; SWAP ; EXEC ; FAILWITH } { DIG 3 ; DROP } ;
                  SELF ;
                  ADDRESS ;
                  SENDER ;

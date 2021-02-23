@@ -61,7 +61,10 @@ let transfer_tez (price, seller : tez * address) : operation =
   let seller_account = match (Tezos.get_contract_opt seller : unit contract option) with
     | None -> (failwith "NO_SELLER_ACCOUNT" : unit contract)
     | Some acc -> acc
-     in let amountError = if Tezos.amount <> price then failwith "WRONG_TEZ_PRICE" else () in
+  in let amountError =
+       if Tezos.amount <> price
+       then ([%Michelson ({| { FAILWITH } |} : string * tez * tez -> unit)] ("WRONG_TEZ_PRICE", price, Tezos.amount) : unit)
+       else () in
         Tezos.transaction () Tezos.amount seller_account
 
 let buy_token(sale, storage: sale_param_tez * storage) : (operation list * storage) =
@@ -73,14 +76,19 @@ let buy_token(sale, storage: sale_param_tez * storage) : (operation list * stora
   let new_s = { storage with sales = Big_map.remove sale storage.sales } in
   (tx_ops :: tx_nft_op :: []), new_s
 
+let tez_stuck_guard(entrypoint: string) : string = "DON'T TRANSFER TEZ TO THIS ENTRYPOINT (" ^ entrypoint ^ ")"
+
 let deposit_for_sale(sale_token, price, storage: sale_token_param_tez * tez * storage) : (operation list * storage) =
+    let u = if Tezos.amount <> 0tez then failwith (tez_stuck_guard "SELL") else () in
     let transfer_op =
       transfer_nft (sale_token.token_for_sale_address, sale_token.token_for_sale_token_id, Tezos.sender, Tezos.self_address) in
     let sale_param = { sale_seller = Tezos.sender; sale_token = sale_token } in
     let new_s = { storage with sales = Big_map.add sale_param price storage.sales } in
     (transfer_op :: []), new_s
 
-let cancel_sale(sale, storage: sale_param_tez * storage) : (operation list * storage) = match Big_map.find_opt sale storage.sales with
+let cancel_sale(sale, storage: sale_param_tez * storage) : (operation list * storage) =
+  let u = if Tezos.amount <> 0tez then failwith (tez_stuck_guard "CANCEL") else () in
+  match Big_map.find_opt sale storage.sales with
     | None -> (failwith "NO_SALE" : (operation list * storage))
     | Some price -> if sale.sale_seller = Tezos.sender then
                       let tx_nft_back_op = transfer_nft(sale.sale_token.token_for_sale_address, sale.sale_token.token_for_sale_token_id, Tezos.self_address, Tezos.sender) in
