@@ -169,7 +169,7 @@ export default function CreateNonFungiblePage() {
           <Box pb={10} w="100%" />
         </Box>
       </Flex>
-      {state.step === 'file_upload' && !state.artifactUri ? (
+      {state.step === 'file_upload' && state.selectedFile === null ? (
         <Flex
           bg="brand.darkGray"
           borderLeftWidth="1px"

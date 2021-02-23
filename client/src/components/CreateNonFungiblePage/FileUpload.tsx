@@ -2,12 +2,8 @@ import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Box, Flex, Heading, Text, Image } from '@chakra-ui/react';
 import { useSelector, useDispatch } from '../../reducer';
-import {
-  updateArtifactUri,
-  updateThumbnailUri
-} from '../../reducer/slices/createNft';
 import { ipfsUriToGatewayUrl } from '../../lib/util/ipfs';
-import { uploadFiletoIpfs } from '../../lib/util/ipfs';
+import { readFileAsDataUrlAction } from '../../reducer/async/actions';
 
 export default function FileUpload() {
   const state = useSelector(s => s.createNft);
@@ -15,10 +11,8 @@ export default function FileUpload() {
   const dispatch = useDispatch();
 
   const onDrop = useCallback(
-    async (acceptedFiles: File[]) => {
-      const response = await uploadFiletoIpfs(acceptedFiles[0]);
-      dispatch(updateArtifactUri(response.data.ipfsUri));
-      dispatch(updateThumbnailUri(response.data.thumbnail.ipfsUri));
+    (files: File[]) => {
+      dispatch(readFileAsDataUrlAction({ ns: 'createNft', file: files[0] }));
     },
     [dispatch]
   );
@@ -55,12 +49,12 @@ export default function FileUpload() {
         {...getRootProps()}
       >
         <Box as="input" {...getInputProps()} />
-        {state.artifactUri ? (
+        {state.selectedFile?.objectUrl ? (
           <Image
             p={4}
             maxWidth="400px"
             maxHeight="400px"
-            src={ipfsUriToGatewayUrl(network, state.artifactUri)}
+            src={ipfsUriToGatewayUrl(network, state.selectedFile.objectUrl)}
           />
         ) : (
           <Flex

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Divider, Heading, Flex, Image, Text } from '@chakra-ui/react';
-import { ipfsUriToGatewayUrl, uriToCid } from '../../lib/util/ipfs';
 import { useSelector } from '../../reducer';
+import { ipfsUriToGatewayUrl } from '../../lib/util/ipfs';
 
 export default function Preview() {
   const network = useSelector(s => s.system.config.network);
@@ -26,8 +26,8 @@ export default function Preview() {
       >
         <Image
           src={
-            (state.artifactUri &&
-              ipfsUriToGatewayUrl(network, state.artifactUri)) ||
+            (state.selectedFile?.objectUrl &&
+              ipfsUriToGatewayUrl(network, state.selectedFile?.objectUrl)) ||
             ''
           }
           overflow="hidden"
@@ -52,7 +52,7 @@ export default function Preview() {
         <Text pb={2} fontSize="xs" color="brand.gray" textTransform="uppercase">
           IPFS Hash
         </Text>
-        <Text>{(state.artifactUri && uriToCid(state.artifactUri)) || ''}</Text>
+        {/* <Text>{(state.artifactUri && uriToCid(state.artifactUri)) || ''}</Text> */}
       </Flex>
     </Flex>
   );

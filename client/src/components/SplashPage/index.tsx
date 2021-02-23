@@ -74,7 +74,9 @@ export default function SplashPage() {
         paddingY={4}
         justifyContent="space-between"
       >
-        <Text fontSize="xs">OpenMinter Version v0.1</Text>
+        <Text fontSize="xs">
+          OpenMinter Version v{process.env.REACT_APP_VERSION}
+        </Text>
         <Flex>
           <Link
             fontSize="xs"
