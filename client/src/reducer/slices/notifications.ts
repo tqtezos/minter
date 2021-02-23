@@ -15,7 +15,7 @@ import { ErrorKind } from '../async/errors';
 interface Notification {
   requestId: string;
   read: boolean;
-  hidden: boolean;
+  delivered: boolean;
   status: 'success' | 'warning' | 'error';
   title: string;
   description: string;
@@ -38,10 +38,10 @@ const slice = createSlice({
         }
       }
     },
-    hideNotification(state, { payload: requestId }: PayloadAction<string>) {
+    deliverNotification(state, { payload: requestId }: PayloadAction<string>) {
       for (let notification of state) {
         if (notification.requestId === requestId) {
-          notification.hidden = true;
+          notification.delivered = true;
           break;
         }
       }
@@ -65,7 +65,7 @@ const slice = createSlice({
         state.push({
           requestId: meta.requestId,
           read: false,
-          hidden: false,
+          delivered: false,
           status: 'error',
           title: 'Error',
           description: payload.message,
@@ -76,6 +76,6 @@ const slice = createSlice({
   }
 });
 
-export const { readNotification, hideNotification } = slice.actions;
+export const { readNotification, deliverNotification } = slice.actions;
 
 export default slice;
