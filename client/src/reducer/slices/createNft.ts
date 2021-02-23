@@ -37,7 +37,6 @@ export interface UploadedArtifact {
 export interface CreateNftState {
   step: Step;
   selectedFile: SelectedFile | null;
-  displayImageBlob: { blob: Blob; type: string } | null;
   displayImageFile: SelectedFile | null;
   uploadedArtifact: UploadedArtifact | null;
   fields: Fields;
@@ -49,7 +48,6 @@ export interface CreateNftState {
 export const initialState: CreateNftState = {
   step: 'file_upload',
   selectedFile: null,
-  displayImageBlob: null,
   displayImageFile: null,
   uploadedArtifact: null,
   fields: {
@@ -68,7 +66,6 @@ export const initialState: CreateNftState = {
 type UpdateFieldAction = PayloadAction<{ name: keyof Fields; value: string }>;
 type UpdateRowNameAction = PayloadAction<{ key: number; name: string }>;
 type UpdateRowValueAction = PayloadAction<{ key: number; value: string }>;
-type UpdateDisplayImageBlobAction = PayloadAction<{ blob: Blob; type: string }>;
 
 const slice = createSlice({
   name: 'createNft',
@@ -94,12 +91,6 @@ const slice = createSlice({
     },
     clearSelectedfile(state) {
       state.selectedFile = null;
-    },
-    updateDisplayImageBlob(state, action: UpdateDisplayImageBlobAction) {
-      state.displayImageBlob = action.payload;
-    },
-    clearDisplayImageBlob(state) {
-      state.displayImageBlob = null;
     },
     updateDisplayImageFile(state, action: PayloadAction<SelectedFile>) {
       state.displayImageFile = action.payload;
@@ -148,9 +139,7 @@ export const {
   updateField,
   updateSelectedFile,
   clearSelectedfile,
-  updateDisplayImageBlob,
   updateDisplayImageFile,
-  clearDisplayImageBlob,
   addMetadataRow,
   updateMetadataRowName,
   updateMetadataRowValue,

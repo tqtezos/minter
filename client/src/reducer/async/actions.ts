@@ -187,7 +187,7 @@ export const mintTokenAction = createAsyncThunk<
   try {
     const op = await mintToken(system, address, metadata);
     await op.confirmation();
-    dispatch(getContractNftsQuery(address as string));
+    dispatch(getContractNftsQuery(address));
     return { contract: address };
   } catch (e) {
     return rejectWithValue({

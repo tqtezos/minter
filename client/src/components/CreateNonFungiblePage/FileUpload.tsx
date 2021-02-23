@@ -37,7 +37,6 @@ export function FilePreview({ file }: { file: SelectedFile }) {
               if (!blob) {
                 return console.error('Could not convert canvas to blob');
               }
-              // dispatch(updateDisplayImageBlob({ type, blob }));
               dispatch(
                 updateDisplayImageFile({
                   objectUrl: URL.createObjectURL(blob),

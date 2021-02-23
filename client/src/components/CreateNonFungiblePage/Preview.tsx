@@ -39,12 +39,7 @@ export default function Preview() {
         {description ? description : 'Asset description...'}
       </Text>
       <Divider borderColor="brand.lightBlue" opacity="1" />
-      <Flex flexDir="column" px={8} py={6}>
-        <Text pb={2} fontSize="xs" color="brand.gray" textTransform="uppercase">
-          IPFS Hash
-        </Text>
-        {/* <Text>{(state.artifactUri && uriToCid(state.artifactUri)) || ''}</Text> */}
-      </Flex>
+      {/* TODO: Render metadata in preview */}
     </Flex>
   );
 }
