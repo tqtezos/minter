@@ -8,14 +8,14 @@ type contract_info = {
 type storage = (address, contract_info) big_map
 
 let create_contract : (key_hash option * tez * nft_asset_storage) -> (operation * address) =
-  [%Michelson ( {| 
-    { 
-        UNPPAIIR ; 
-        CREATE_CONTRACT 
+  [%Michelson ( {|
+    {
+        UNPPAIIR ;
+        CREATE_CONTRACT
         ${code}
-        ; 
-        PAIR 
-    } 
+        ;
+        PAIR
+    }
   |} : (key_hash option * tez * nft_asset_storage) -> (operation * address))]
 
 
@@ -32,6 +32,7 @@ let factory_main (name, storage : string * storage) : operation list * storage =
       pending_admin = (None : address option);
       paused = false;
     };
+    metadata = (Big_map.empty : (string, bytes) big_map);
   } in
  let op, fa2_nft = create_contract ((None: key_hash option), 0tez, init_storage) in
  let contract_info = { owner = Tezos.sender; name = name } in
