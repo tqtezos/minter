@@ -24,7 +24,7 @@ async function main(): Promise<void> {
 
 async function compileNftFaucetContract(env: LigoEnv): Promise<void> {
   $log.info('compiling NFT faucet contract');
-  await await compileContract(
+  await compileContract(
     env,
     'fa2_multi_nft_faucet.mligo',
     'nft_faucet_main',
@@ -35,7 +35,7 @@ async function compileNftFaucetContract(env: LigoEnv): Promise<void> {
 
 async function compileNftContract(env: LigoEnv): Promise<void> {
   $log.info('compiling NFT contract');
-  await await compileContract(
+  await compileContract(
     env,
     'fa2_multi_nft_asset.mligo',
     'nft_asset_main',
@@ -58,30 +58,33 @@ async function compileNftFactoryContract(env: LigoEnv): Promise<void> {
   $log.info('compiled NFT factory contract');
 }
 
-async function compileFixedPriceSaleMarketPlaceContract(env: LigoEnv): Promise<void> {
-    $log.info('compiling fixed price sale marketplace contract');
+async function compileFixedPriceSaleMarketPlaceContract(
+  env: LigoEnv
+): Promise<void> {
+  $log.info('compiling fixed price sale marketplace contract');
 
-    await await compileContract(
-        env,
-        'fixed_price_sale_market.mligo',
-        'fixed_price_sale_main',
-        'fixed_price_sale_market.tz'
-    );
-    $log.info('compiled fixed price sale marketplace contract');
+  await compileContract(
+    env,
+    'fixed_price_sale_market.mligo',
+    'fixed_price_sale_main',
+    'fixed_price_sale_market.tz'
+  );
+  $log.info('compiled fixed price sale marketplace contract');
 }
 
-async function compileFixedPriceSaleTezMarketPlaceContract(env: LigoEnv): Promise<void> {
-    $log.info('compiling fixed price sale (sold in tez) marketplace contract');
+async function compileFixedPriceSaleTezMarketPlaceContract(
+  env: LigoEnv
+): Promise<void> {
+  $log.info('compiling fixed price sale (sold in tez) marketplace contract');
 
-    await compileContract(
-        env,
-        'fixed_price_sale_market_tez.mligo',
-        'fixed_price_sale_tez_main',
-        'fixed_price_sale_market_tez.tz'
-    );
-    $log.info('compiled fixed price sale (sold in tez) marketplace contract');
+  await compileContract(
+    env,
+    'fixed_price_sale_market_tez.mligo',
+    'fixed_price_sale_tez_main',
+    'fixed_price_sale_market_tez.tz'
+  );
+  $log.info('compiled fixed price sale (sold in tez) marketplace contract');
 }
-
 
 function prepareNftFactoryContract(env: LigoEnv): void {
   const templatePath = env.srcFilePath('fa2_nft_factory.template.mligo');
