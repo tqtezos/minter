@@ -23,6 +23,7 @@ type auction =
     extend_time : int;
     asset : (tokens list);
     min_raise_percent : nat;
+    min_raise : tez;
     end_time : timestamp;
     highest_bidder : address;
   }
@@ -32,6 +33,7 @@ type configure_param =
   {
     opening_price : tez;
     min_raise_percent : nat;
+    min_raise : tez;
     round_time : nat;
     extend_time : nat;
     asset : (tokens list);
@@ -113,6 +115,7 @@ let first_bid (auction, storage : auction * storage) : bool =
 
 let valid_bid_amount (auction, storage : auction * storage) : bool =
   (Tezos.amount >= (auction.current_bid + ((auction.min_raise_percent *  auction.current_bid)/ 100n))) ||
+  (Tezos.amount >= auction.current_bid + auction.min_raise)                                            ||
   ((Tezos.amount >= auction.current_bid) && first_bid(auction, storage))
 
 let configure_auction(configure_param, storage : configure_param * storage) : return = begin
@@ -135,6 +138,7 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
       extend_time = int(configure_param.extend_time);
       asset = configure_param.asset;
       min_raise_percent = configure_param.min_raise_percent;
+      min_raise = configure_param.min_raise;
       end_time = configure_param.end_time;
       highest_bidder = Tezos.sender;
       last_bid_time = configure_param.start_time; 
