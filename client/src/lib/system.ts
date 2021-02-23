@@ -86,7 +86,7 @@ function createMetadataResolver(
   const ipfsGateway =
     system.config.network === 'sandboxnet'
       ? 'localhost:8080'
-      : 'cloudflare-ipfs.com';
+      : 'gateway.ipfs.io';
   const gatewayProtocol =
     system.config.network === 'sandboxnet' ? 'http' : 'https';
   const ipfsHandler = new CustomIpfsHttpHandler(ipfsGateway, gatewayProtocol);

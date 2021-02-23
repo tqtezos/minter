@@ -43,47 +43,70 @@ function NotFound() {
   );
 }
 
+function MediaNotFound() {
+  return (
+    <AspectRatio
+      ratio={4 / 3}
+      width="100%"
+      borderRadius="3px"
+      bg="gray.100"
+      overflow="hidden"
+    >
+      <Flex flexDir="column" align="center" justify="center">
+        <Box color="gray.300" pb={10}>
+          <HelpCircle size="100px" />
+        </Box>
+        <Heading color="gray.300" size="xl">
+          Image not found
+        </Heading>
+      </Flex>
+    </AspectRatio>
+  );
+}
+
 function TokenImage(props: { src: string }) {
   const [errored, setErrored] = useState(false);
+  const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
+  useEffect(() => {
+    (async () => {
+      let blob;
+      try {
+        blob = await fetch(props.src).then(r => r.blob());
+      } catch (e) {
+        return setErrored(true);
+      }
+      setObj({
+        url: URL.createObjectURL(blob),
+        type: blob.type
+      });
+    })();
+  }, [props.src]);
 
   if (errored) {
+    return <MediaNotFound />;
+  }
+  if (!obj) return null;
+
+  if (/^image\/.*/.test(obj.type)) {
     return (
-      <AspectRatio
-        ratio={4 / 3}
-        width="100%"
-        borderRadius="3px"
-        bg="gray.100"
-        overflow="hidden"
-      >
-        <Flex flexDir="column" align="center" justify="center">
-          <Box color="gray.300" pb={10}>
-            <HelpCircle size="100px" />
-          </Box>
-          <Heading color="gray.300" size="xl">
-            Image not found
-          </Heading>
-        </Flex>
-      </AspectRatio>
+      <Image
+        src={props.src}
+        objectFit="contain"
+        flex="1"
+        onError={() => setErrored(true)}
+      />
     );
   }
 
-  return (
-    <AspectRatio
-      ratio={1}
-      width="100%"
-      borderRadius="3px"
-      boxShadow="0 0 5px rgba(0,0,0,.15)"
-      overflow="hidden"
-    >
-      <Box>
-        <Image
-          src={props.src}
-          objectFit="contain"
-          onError={() => setErrored(true)}
-        />
-      </Box>
-    </AspectRatio>
-  );
+  if (/^video\/.*/.test(obj.type)) {
+    return (
+      <video controls>
+        <source src={obj.url} type={obj.type} />
+      </video>
+    );
+  }
+
+  return <MediaNotFound />;
 }
 
 interface TokenDetailProps {
@@ -134,9 +157,22 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           </MinterButton>
         </Flex>
         <Flex align="center" justify="center" flex="1" px={16}>
-          <TokenImage
-            src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
-          />
+          <AspectRatio
+            ratio={1}
+            width="100%"
+            borderRadius="3px"
+            boxShadow="0 0 5px rgba(0,0,0,.15)"
+            overflow="hidden"
+          >
+            <Box>
+              <TokenImage
+                src={ipfsUriToGatewayUrl(
+                  system.config.network,
+                  token.artifactUri
+                )}
+              />
+            </Box>
+          </AspectRatio>
         </Flex>
       </Flex>
       <Flex w="50%" h="100%" flexDir="column">

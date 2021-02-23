@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { AspectRatio, Box, Flex, Grid, Image, Text } from '@chakra-ui/react';
 import { Wind, HelpCircle } from 'react-feather';
@@ -11,32 +11,66 @@ interface TokenTileProps extends Token {
   selectedCollection: string;
 }
 
+function MediaNotFound() {
+  return (
+    <Flex
+      flexDir="column"
+      align="center"
+      justify="center"
+      flex="1"
+      bg="gray.100"
+      color="gray.300"
+      height="100%"
+    >
+      <HelpCircle size="70px" />
+    </Flex>
+  );
+}
+
 function TokenImage(props: { src: string }) {
   const [errored, setErrored] = useState(false);
+  const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
+  useEffect(() => {
+    (async () => {
+      let blob;
+      try {
+        blob = await fetch(props.src).then(r => r.blob());
+      } catch (e) {
+        return setErrored(true);
+      }
+      setObj({
+        url: URL.createObjectURL(blob),
+        type: blob.type
+      });
+    })();
+  }, [props.src]);
 
   if (errored) {
+    return <MediaNotFound />;
+  }
+
+  if (!obj) return null;
+
+  if (/^image\/.*/.test(obj.type)) {
     return (
-      <Flex
-        flexDir="column"
-        align="center"
-        justify="center"
+      <Image
+        src={props.src}
+        objectFit="contain"
         flex="1"
-        bg="gray.100"
-        color="gray.300"
-      >
-        <HelpCircle size="70px" />
-      </Flex>
+        onError={() => setErrored(true)}
+      />
     );
   }
 
-  return (
-    <Image
-      src={props.src}
-      objectFit="contain"
-      flex="1"
-      onError={() => setErrored(true)}
-    />
-  );
+  if (/^video\/.*/.test(obj.type)) {
+    return (
+      <video controls>
+        <source src={obj.url} type={obj.type} />
+      </video>
+    );
+  }
+
+  return <MediaNotFound />;
 }
 
 function TokenTile(props: TokenTileProps) {

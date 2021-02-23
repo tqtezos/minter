@@ -1,12 +1,12 @@
 import React from 'react';
-import { Divider, Heading, Flex, Image, Text } from '@chakra-ui/react';
+import { Divider, Heading, Flex, Text } from '@chakra-ui/react';
 import { useSelector } from '../../reducer';
-import { ipfsUriToGatewayUrl } from '../../lib/util/ipfs';
+import { FilePreview } from './FileUpload';
 
 export default function Preview() {
-  const network = useSelector(s => s.system.config.network);
-  const state = useSelector(s => s.createNft);
-  const { name, description } = state.fields;
+  const selectedFile = useSelector(s => s.createNft.selectedFile);
+  const name = useSelector(s => s.createNft.fields.name);
+  const description = useSelector(s => s.createNft.fields.description);
   return (
     <Flex
       flexDir="column"
@@ -24,16 +24,7 @@ export default function Preview() {
         height="300px"
         overflow="hidden"
       >
-        <Image
-          src={
-            (state.selectedFile?.objectUrl &&
-              ipfsUriToGatewayUrl(network, state.selectedFile?.objectUrl)) ||
-            ''
-          }
-          overflow="hidden"
-          objectFit="contain"
-          objectPosition="center"
-        />
+        {selectedFile ? <FilePreview file={selectedFile} /> : null}
       </Flex>
       <Heading size="md" color={name ? 'black' : 'gray.200'} px={8} py={6}>
         {name ? name : 'Asset name...'}

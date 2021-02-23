@@ -22,6 +22,15 @@ export async function uploadIPFSFile(file: File) {
   return axios.post<IpfsResponse>('/ipfs-file-upload', formData);
 }
 
+export async function uploadIPFSImageWithThumbnail(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  return axios.post<IpfsResponse>(
+    '/ipfs-image-with-thumbnail-upload',
+    formData
+  );
+}
+
 // URI Utils
 
 export function ipfsUriToCid(uri: string) {
@@ -37,7 +46,7 @@ export function ipfsUriToGatewayUrl(network: string, uri: string) {
   const ipfsHost =
     network === 'sandboxnet'
       ? 'http://localhost:8080'
-      : 'https://cloudflare-ipfs.com';
+      : 'https://gateway.ipfs.io';
   const cid = ipfsUriToCid(uri);
   return cid ? `${ipfsHost}/ipfs/${cid}` : uri;
 }
