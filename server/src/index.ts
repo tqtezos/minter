@@ -1,49 +1,33 @@
-import express, { Express, Response } from 'express';
-import IpfsClient from 'ipfs-http-client';
-import url from 'url';
+import express, { Express } from 'express';
 import bodyParser from 'body-parser';
 import fileUpload from 'express-fileupload';
 import http from 'http';
+import fs from 'fs';
+import { getPinataConfig } from './helpers/pinata';
+import { handleIpfsFileUpload, handleIpfsJSONUpload } from './handlers';
 
-// TODO: Move this configuration to a JSON definition
-const ipfsConfig = {
-  // The URL of our IPFS API server, our Web UI uploads files to.
-  apiUrl: 'http://ipfs:5001',
+if (!fs.existsSync('./tmp')) {
+  fs.mkdirSync('./tmp');
+}
 
-  // The URL of our IPFS gateway server, which can be used for fast file download
-  // It is the same server as the one running IPFS API.
-  gatewayUrl: 'http://127.0.0.1:8080/',
-
-  // The URL of a public IPFS read-only gateway server. It may take time to
-  // propagate information from our IPFS server to a public one.
-  // It can be also used for file download but it may be very slow.
-  publicGatewayUrl: 'https://ipfs.io/'
-};
-
-function createHttpServer(app: Express) {
+async function createHttpServer(app: Express) {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
   app.use(
     fileUpload({
-      limits: { fileSize: 10 * 1024 * 1024 } // 20MB
+      limits: { fileSize: 30 * 1024 * 1024 }, // 30MB
+      useTempFiles: true
     })
   );
 
-  app.post('/ipfs-upload', async (req: any, res: Response) => {
-    if (!req.files?.file?.data) {
-      throw Error('No file data found');
-    }
+  const pinataConfig = await getPinataConfig();
 
-    const ipfsClient = IpfsClient(ipfsConfig.apiUrl);
-    const ipfsFile = await ipfsClient.add(req.files.file.data);
-    const cid = ipfsFile.cid.toString();
+  app.post('/ipfs-file-upload', (req, res) => {
+    return handleIpfsFileUpload(pinataConfig, req, res);
+  });
 
-    return res.status(200).send({
-      cid,
-      size: ipfsFile.size,
-      url: url.resolve(ipfsConfig.gatewayUrl, `ipfs/${cid}`),
-      publicGatewayUrl: url.resolve(ipfsConfig.publicGatewayUrl, `ipfs/${cid}`)
-    });
+  app.post('/ipfs-json-upload', (req, res) => {
+    return handleIpfsJSONUpload(pinataConfig, req, res);
   });
 
   const httpServer = http.createServer(app);
@@ -62,7 +46,8 @@ async function run() {
   const envPort = process.env.MINTER_API_PORT;
   const port = envPort ? parseInt(envPort) : 3300;
   const app = express();
-  createHttpServer(app).listen(port, () => {
+  const server = await createHttpServer(app);
+  server.listen(port, () => {
     console.log(`[Server] Serving on port ${port}`);
   });
 }

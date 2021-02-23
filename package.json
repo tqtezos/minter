@@ -12,20 +12,12 @@
     "stop:mainnet": "bin/stop dev-mainnet",
     "log": "bin/log",
     "log:api": "bin/log api",
-    "log:ui": "bin/log ui"
+    "log:ui": "bin/log ui",
+    "clear-data": "bin/reset --confirm"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^1.9.1",
-    "@graphql-codegen/fragment-matcher": "^1.11.2",
-    "@graphql-codegen/introspection": "1.13.5",
-    "@graphql-codegen/typescript": "1.13.5",
-    "@graphql-codegen/typescript-operations": "^1.9.1",
-    "@graphql-codegen/typescript-react-apollo": "1.13.5",
-    "@graphql-codegen/typescript-resolvers": "^1.9.1",
     "@types/async-retry": "^1.4.2",
     "@types/configstore": "^4.0.0",
-    "graphql": "^14.2.0",
-    "graphql-tag": "^2.10.3",
     "prettier": "^2.0.5"
   },
   "dependencies": {

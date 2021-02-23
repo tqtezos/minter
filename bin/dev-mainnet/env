@@ -1,8 +1,3 @@
 TEZOS_RPC_URL=https://mainnet-tezos.giganode.io
-
-BCD_API_URL=https://api.better-call.dev
-BCD_GUI_URL=https://better-call.dev
-
 BCD_NETWORK="mainnet"
-
 TZ_NETWORK=mainnet
