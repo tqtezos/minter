@@ -1,4 +1,5 @@
 #include "../fa2/fa2_tzip16_interface.mligo"
+#include "../fa2_modules/simple_admin.mligo"
 
 type fa2_tokens =
   [@layout:comb]
@@ -44,12 +45,12 @@ type auction_entrypoints =
   | Bid of nat
   | Cancel of nat
   | Resolve of nat
-  | Change_admin of address
+  | Admin of simple_admin
 
 type storage =
   [@layout:comb]
   {
-    admin : address;
+    simple_admin : simple_admin_storage;
     current_id : nat;
     max_auction_time : nat;
     max_config_to_start_time : nat;
@@ -109,14 +110,15 @@ let auction_in_progress (auction : auction) : bool =
 
 (*This condition is met iff no bid has been placed before the function executes*)
 let first_bid (auction, storage : auction * storage) : bool =
-  auction.highest_bidder = storage.admin
+  auction.highest_bidder = storage.simple_admin.admin
 
 let valid_bid_amount (auction, storage : auction * storage) : bool =
   (Tezos.amount >= (auction.current_bid + ((auction.min_raise_percent *  auction.current_bid)/ 100n))) ||
   ((Tezos.amount >= auction.current_bid) && first_bid(auction, storage))
 
 let configure_auction(configure_param, storage : configure_param * storage) : return = begin
-    assert_msg (Tezos.sender = storage.admin, "Only admin can configure auction");
+    (fail_if_not_admin storage.simple_admin);
+    (fail_if_paused storage.simple_admin);
 
     assert_msg (configure_param.end_time > configure_param.start_time, "end_time must be after start_time");
     assert_msg (abs(configure_param.end_time - configure_param.start_time) <= storage.max_auction_time, "Auction time must be less than max_auction_time");
@@ -148,9 +150,10 @@ let resolve_auction(asset_id, storage : nat * storage) : return = begin
     let auction : auction = get_auction_data(asset_id, storage) in
     assert_msg (auction_ended(auction) , "Auction must have ended");
     assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez");
+    (fail_if_paused storage.simple_admin);
 
     let fa2_transfers : operation list = tokens_to_operation_list(auction.asset, Tezos.self_address, auction.highest_bidder) in
-    let seller_contract : unit contract = resolve_contract(storage.admin) in
+    let seller_contract : unit contract = resolve_contract(storage.simple_admin.admin) in
     let send_fee = Tezos.transaction unit auction.current_bid seller_contract in
     let updated_auctions = Big_map.remove asset_id storage.auctions in
     (send_fee :: fa2_transfers, {storage with auctions = updated_auctions})
@@ -158,11 +161,12 @@ let resolve_auction(asset_id, storage : nat * storage) : return = begin
 
 let cancel_auction(asset_id, storage : nat * storage) : return = begin
     let auction : auction = get_auction_data(asset_id, storage) in
-    assert_msg (Tezos.sender = storage.admin, "Only seller can cancel the auction");
+    (fail_if_not_admin storage.simple_admin);
+    (fail_if_paused storage.simple_admin);
     assert_msg (not auction_ended(auction), "Auction must not have ended");
     assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez");
 
-    let fa2_transfers : operation list = tokens_to_operation_list(auction.asset, Tezos.self_address, storage.admin) in
+    let fa2_transfers : operation list = tokens_to_operation_list(auction.asset, Tezos.self_address, storage.simple_admin.admin) in
     let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
     let return_bid = Tezos.transaction unit auction.current_bid highest_bidder_contract in
     let updated_auctions = Big_map.remove asset_id storage.auctions in
@@ -174,7 +178,7 @@ let place_bid(asset_id, storage : nat * storage) : return = begin
     assert_msg (Tezos.sender = Tezos.source, "Bidder must be an implicit account");
     assert_msg (auction_in_progress(auction), "Auction must be in progress");
     assert_msg (valid_bid_amount(auction, storage), "Bid must raised by at least min_raise_percent of the previous bid or at least opening price if it is the first bid");
-    assert_msg(Tezos.sender <> storage.admin, "Seller cannot place a bid");
+    assert_msg(Tezos.sender <> storage.simple_admin.admin, "Admin cannot place a bid");
 
     let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
     let return_bid = Tezos.transaction unit auction.current_bid highest_bidder_contract in
@@ -185,14 +189,15 @@ let place_bid(asset_id, storage : nat * storage) : return = begin
     ([return_bid] , {storage with auctions = updated_auctions})
   end
 
-let change_admin(new_admin, storage : address * storage) : return = 
-  let u : unit = assert_msg (Tezos.sender = storage.admin, "Only admin can change admin") in 
-  let u = assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez") in
-  ([] : operation list), {storage with admin = new_admin}
+let admin(admin_param, storage : simple_admin * storage) : return = 
+    let u = assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez") in
+    let ops, simple_admin = simple_admin(admin_param, storage.simple_admin) in
+    let new_storage = { storage with simple_admin = simple_admin; } in
+    ops, new_storage
 
 let english_auction_tez_main (p,storage : auction_entrypoints * storage) : return = match p with
     | Configure config -> configure_auction(config, storage)
     | Bid asset_id -> place_bid(asset_id, storage)
     | Cancel asset_id -> cancel_auction(asset_id, storage)
     | Resolve asset_id -> resolve_auction(asset_id, storage)
-    | Change_admin new_admin -> change_admin(new_admin, storage)
+    | Admin a -> admin(a, storage)

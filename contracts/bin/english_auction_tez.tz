@@ -1,6 +1,7 @@
 { parameter
-    (or (or (or (nat %bid) (nat %cancel))
-            (or (address %change_admin)
+    (or (or (or (or %admin (or (unit %confirm_admin) (bool %pause)) (address %set_admin))
+                (nat %bid))
+            (or (nat %cancel)
                 (pair %configure
                    (mutez %opening_price)
                    (pair (nat %min_raise_percent)
@@ -11,7 +12,9 @@
                                            (pair (timestamp %start_time) (timestamp %end_time)))))))))
         (nat %resolve)) ;
   storage
-    (pair (address %admin)
+    (pair (pair %simple_admin
+             (pair (address %admin) (bool %paused))
+             (option %pending_admin address))
           (pair (nat %current_id)
                 (pair (nat %max_auction_time)
                       (pair (nat %max_config_to_start_time)
@@ -26,6 +29,19 @@
                                                                       (pair (address %fa2_address) (list %fa2_batch (pair (nat %token_id) (nat %amount)))))
                                                                    (pair (nat %min_raise_percent) (pair (timestamp %end_time) (address %highest_bidder)))))))))))))) ;
   code { LAMBDA
+           (pair (pair address bool) (option address))
+           unit
+           { CAR ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             NEQ ;
+             IF { PUSH string "NOT_AN_ADMIN" ; FAILWITH } { UNIT } } ;
+         LAMBDA
+           (pair (pair address bool) (option address))
+           unit
+           { CAR ; CDR ; IF { PUSH string "PAUSED" ; FAILWITH } { UNIT } } ;
+         LAMBDA
            (pair bool string)
            unit
            { DUP ; CAR ; NOT ; IF { CDR ; FAILWITH } { DROP ; UNIT } } ;
@@ -74,7 +90,7 @@
              DROP } ;
          LAMBDA
            (pair nat
-                 (pair address
+                 (pair (pair (pair address bool) (option address))
                        (pair nat
                              (pair nat
                                    (pair nat
@@ -147,16 +163,107 @@
              COMPARE ;
              GE ;
              OR } ;
-         DIG 5 ;
+         DIG 7 ;
          DUP ;
-         DUG 6 ;
+         DUG 8 ;
          CDR ;
-         DIG 6 ;
+         DIG 8 ;
          CAR ;
          IF_LEFT
            { IF_LEFT
-               { IF_LEFT
-                   { DIG 5 ;
+               { DIG 5 ;
+                 DROP ;
+                 DIG 6 ;
+                 DROP ;
+                 IF_LEFT
+                   { DIG 2 ;
+                     DROP ;
+                     DIG 2 ;
+                     DROP ;
+                     DIG 2 ;
+                     DROP ;
+                     PAIR ;
+                     DUP ;
+                     CDR ;
+                     PUSH string "Amount must be 0mutez" ;
+                     PUSH mutez 0 ;
+                     AMOUNT ;
+                     COMPARE ;
+                     EQ ;
+                     PAIR ;
+                     DIG 3 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     DUP ;
+                     CAR ;
+                     DIG 2 ;
+                     CAR ;
+                     IF_LEFT
+                       { IF_LEFT
+                           { DROP ;
+                             DIG 2 ;
+                             DROP ;
+                             DUP ;
+                             CDR ;
+                             IF_NONE
+                               { DROP ; PUSH string "NO_PENDING_ADMIN" ; FAILWITH }
+                               { SENDER ;
+                                 COMPARE ;
+                                 EQ ;
+                                 IF { NONE address ; SWAP ; CAR ; CDR ; SENDER ; PAIR ; PAIR }
+                                    { DROP ; PUSH string "NOT_A_PENDING_ADMIN" ; FAILWITH } } ;
+                             NIL operation ;
+                             PAIR }
+                           { SWAP ;
+                             DUP ;
+                             DUG 2 ;
+                             DIG 4 ;
+                             SWAP ;
+                             EXEC ;
+                             DROP ;
+                             PAIR ;
+                             DUP ;
+                             CDR ;
+                             DUP ;
+                             CDR ;
+                             DIG 2 ;
+                             CAR ;
+                             DIG 2 ;
+                             CAR ;
+                             CAR ;
+                             PAIR ;
+                             PAIR ;
+                             NIL operation ;
+                             PAIR } }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         DIG 4 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         PAIR ;
+                         DUP ;
+                         CAR ;
+                         SOME ;
+                         SWAP ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         NIL operation ;
+                         PAIR } ;
+                     SWAP ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     PAIR ;
+                     SWAP ;
+                     CAR ;
+                     PAIR }
+                   { DIG 6 ;
                      DROP ;
                      SWAP ;
                      DUP ;
@@ -218,6 +325,8 @@
                      DUP ;
                      CDR ;
                      CAR ;
+                     CAR ;
+                     CAR ;
                      SWAP ;
                      CAR ;
                      CDR ;
@@ -271,10 +380,12 @@
                      SWAP ;
                      EXEC ;
                      DROP ;
-                     PUSH string "Seller cannot place a bid" ;
+                     PUSH string "Admin cannot place a bid" ;
                      DIG 3 ;
                      DUP ;
                      DUG 4 ;
+                     CAR ;
+                     CAR ;
                      CAR ;
                      SENDER ;
                      COMPARE ;
@@ -516,7 +627,8 @@
                      NIL operation ;
                      DIG 2 ;
                      CONS ;
-                     PAIR }
+                     PAIR } }
+               { IF_LEFT
                    { SWAP ;
                      DUP ;
                      DUG 2 ;
@@ -527,18 +639,19 @@
                      DIG 5 ;
                      SWAP ;
                      EXEC ;
-                     PUSH string "Only seller can cancel the auction" ;
-                     DIG 3 ;
+                     DIG 2 ;
                      DUP ;
-                     DUG 4 ;
+                     DUG 3 ;
                      CAR ;
-                     SENDER ;
-                     COMPARE ;
-                     EQ ;
-                     PAIR ;
-                     DIG 7 ;
+                     DIG 9 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     DIG 2 ;
                      DUP ;
-                     DUG 8 ;
+                     DUG 3 ;
+                     CAR ;
+                     DIG 8 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
@@ -570,6 +683,8 @@
                      DIG 2 ;
                      DUP ;
                      DUG 3 ;
+                     CAR ;
+                     CAR ;
                      CAR ;
                      SELF ;
                      ADDRESS ;
@@ -647,62 +762,26 @@
                      PAIR ;
                      DUG 2 ;
                      CONS ;
-                     PAIR } }
-               { DIG 2 ;
-                 DROP ;
-                 DIG 2 ;
-                 DROP ;
-                 DIG 2 ;
-                 DROP ;
-                 IF_LEFT
+                     PAIR }
                    { DIG 2 ;
                      DROP ;
-                     PAIR ;
-                     DUP ;
-                     CDR ;
-                     PUSH string "Only admin can change admin" ;
+                     DIG 2 ;
+                     DROP ;
+                     DIG 2 ;
+                     DROP ;
                      SWAP ;
                      DUP ;
                      DUG 2 ;
                      CAR ;
-                     SENDER ;
-                     COMPARE ;
-                     EQ ;
-                     PAIR ;
-                     DIG 3 ;
-                     DUP ;
-                     DUG 4 ;
+                     DIG 6 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
-                     PUSH string "Amount must be 0mutez" ;
-                     PUSH mutez 0 ;
-                     AMOUNT ;
-                     COMPARE ;
-                     EQ ;
-                     PAIR ;
-                     DIG 3 ;
                      SWAP ;
-                     EXEC ;
-                     DROP ;
-                     CDR ;
-                     SWAP ;
-                     CAR ;
-                     PAIR ;
-                     NIL operation ;
-                     PAIR }
-                   { PUSH string "Only admin can configure auction" ;
-                     DIG 2 ;
                      DUP ;
-                     DUG 3 ;
+                     DUG 2 ;
                      CAR ;
-                     SENDER ;
-                     COMPARE ;
-                     EQ ;
-                     PAIR ;
-                     DIG 4 ;
-                     DUP ;
-                     DUG 5 ;
+                     DIG 5 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
@@ -1002,7 +1081,9 @@
                      PAIR ;
                      SWAP ;
                      PAIR } } }
-           { SWAP ;
+           { DIG 8 ;
+             DROP ;
+             SWAP ;
              DUP ;
              DUG 2 ;
              SWAP ;
@@ -1036,6 +1117,14 @@
              SWAP ;
              EXEC ;
              DROP ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CAR ;
+             DIG 6 ;
+             SWAP ;
+             EXEC ;
+             DROP ;
              DUP ;
              CDR ;
              CDR ;
@@ -1064,6 +1153,8 @@
              DIG 3 ;
              DUP ;
              DUG 4 ;
+             CAR ;
+             CAR ;
              CAR ;
              DIG 5 ;
              SWAP ;

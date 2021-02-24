@@ -132,6 +132,6 @@ export async function originateEnglishAuctionTez(
         'english_auction_tez.tz',
     );
     const tzAddress = await tz.signer.publicKeyHash();
-    const storage = `(Pair "${tzAddress}" (Pair 0 (Pair 86400 (Pair 86400 {}))))`;
+    const storage = `(Pair (Pair (Pair "${tzAddress}" False) None) (Pair 0 (Pair 86400 (Pair 86400 {}))))`;
     return originateContract(tz, code, storage, 'english_auction_tez');
 }
