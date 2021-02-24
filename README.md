@@ -1,6 +1,12 @@
 ![OpenMinter header](/docs/assets/minterhead.png)
 
-[![](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE) [![](https://img.shields.io/badge/Docker-19.03.x-blue)](https://www.docker.com/) [![](https://img.shields.io/badge/version-v0.1-orange)](https://github.com/tqtezos/minter)
+[![](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE) [![](https://img.shields.io/badge/Docker-20.10.x-blue)](https://www.docker.com/) [![](https://img.shields.io/badge/version-v0.1.2-orange)](https://github.com/tqtezos/minter)
+
+## Notice
+
+This software is in beta. At the moment, the smart contracts 
+that OpenMinter uses have **not** been formally audited. Please
+use this software at your own risk. 
 
 ## OpenMinter
 
@@ -10,24 +16,30 @@ create an NFT by filling in just a few fields, create new collection
 contracts, see their NFTs across contracts, and enable marketplace
 capabilities to trade them.
 
-Current version supports the following:
-#### 🌐 Mainnet and Delphinet (Edonet soon)
-#### 🎨 Image-based NFTs
-#### 👛 [Beacon](https://www.walletbeacon.io/) support
-#### ⚙️ The latest [FA2](https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md) spec
-#### 🚀 [IPFS](https://ipfs.io/) support (locally and [Pinata](https://pinata.cloud/))
+OpenMinter supports the following networks and software components:
+#### 🌐 Mainnet and Delphinet networks (Edonet soon)
+#### 📦 Sandboxed development via [Flextesa][flextesa]
+#### 🎨 Creating multimedia NFTs
+#### 👛 Various wallets via [Beacon](https://www.walletbeacon.io/)
+#### 📖 Reading blockchain data via [Better Call Dev][bcdhub]
+#### ⚙️ The latest [FA2](https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md) specification
+#### 🚀 [IPFS](https://ipfs.io/) via a local node or [Pinata](https://pinata.cloud/)
 
 ## Dependencies
 
-- Tezos sandbox: [Flextesa][flextesa]
-- Blockhain indexer: [Better Call Dev Backend][bcdhub]
-- Database: [PostgreSQL][postgres]
-- InterPlanetary File System: [IPFS][ipfs]
+The following dependencies are required to run OpenMinter.
+
+| Dependency | Version|
+|-|-|
+| [Docker][docker] | `v20.10.*` or above |
+| [Yarn][yarn] | `v1.22.*` or above |
 
 [bcdhub]: https://github.com/baking-bad/bcdhub
 [flextesa]: https://gitlab.com/tezos/flextesa
 [postgres]: https://www.postgresql.org/
 [ipfs]: https://ipfs.io/
+[docker]: https://www.docker.com/get-started
+[yarn]: https://classic.yarnpkg.com/en/docs/install
 
 ## Usage
 
