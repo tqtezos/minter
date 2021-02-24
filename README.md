@@ -4,9 +4,9 @@
 
 ## Notice
 
-This software is in beta. At the moment, the smart contracts 
+This software is in beta. At the moment, the smart contracts
 that OpenMinter uses have **not** been formally audited. Please
-use this software at your own risk. 
+use this software at your own risk.
 
 ## OpenMinter
 
@@ -17,7 +17,7 @@ contracts, see their NFTs across contracts, and enable marketplace
 capabilities to trade them.
 
 OpenMinter supports the following networks and software components:
-#### 🌐 Mainnet and Delphinet networks (Edonet soon)
+#### 🌐 Mainnet and Edonet networks
 #### 📦 Sandboxed development via [Flextesa][flextesa]
 #### 🎨 Creating multimedia NFTs
 #### 👛 Various wallets via [Beacon](https://www.walletbeacon.io/)
@@ -57,7 +57,7 @@ the `minter-ui-dev` and `minter-api-dev` Docker images.
 ### Configuration
 
 The Minter can be configured to run on three different networks: `sandbox`,
-`testnet` (currently set to delphinet), and `mainnet`.
+`testnet` (currently set to edonet), and `mainnet`.
 
 Each network has its own configuration file in the `config` folder under
 `minter.<network>.json`. The schema of these files can be defined as this
