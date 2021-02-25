@@ -123,23 +123,47 @@ function networkType(config: Config) {
 
 let wallet: BeaconWallet | null = null;
 
-export async function connectWallet(
+function getWallet(
   system: SystemWithToolkit,
   eventHandlers?: DAppClientOptions['eventHandlers']
-): Promise<SystemWithWallet> {
-  const network = networkType(system.config);
-
+): BeaconWallet {
   if (wallet === null) {
     wallet = new BeaconWallet({
       name: 'OpenSystem dApp',
-      preferredNetwork: network,
+      preferredNetwork: networkType(system.config),
       eventHandlers
     });
   }
+  return wallet;
+}
 
-  await wallet.requestPermissions({
-    network: { type: network, rpcUrl: system.config.rpc }
-  });
+async function initWallet(
+  system: SystemWithToolkit,
+  forceConnect: boolean,
+  eventHandlers?: DAppClientOptions['eventHandlers']
+): Promise<boolean> {
+  const network = networkType(system.config);
+  const wallet = getWallet(system, eventHandlers);
+
+  const activeAccount = await wallet.client.getActiveAccount();
+
+  if (!activeAccount) {
+    if (forceConnect) {
+      await wallet.requestPermissions({
+        network: { type: network, rpcUrl: system.config.rpc }
+      });
+    } else {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+async function createSystemWithWallet(
+  system: SystemWithToolkit
+): Promise<SystemWithWallet> {
+  const wallet = getWallet(system);
 
   system.toolkit.setWalletProvider(wallet);
   tzUtils.setConfirmationPollingInterval(system.toolkit);
@@ -152,6 +176,26 @@ export async function connectWallet(
     wallet: wallet,
     tzPublicKey: tzPublicKey
   };
+}
+
+export async function reconnectWallet(
+  system: SystemWithToolkit,
+  eventHandlers?: DAppClientOptions['eventHandlers']
+): Promise<SystemWithWallet | SystemWithToolkit> {
+  const connected = await initWallet(system, false, eventHandlers);
+  if (connected) {
+    return await createSystemWithWallet(system);
+  } else {
+    return system;
+  }
+}
+
+export async function connectWallet(
+  system: SystemWithToolkit,
+  eventHandlers?: DAppClientOptions['eventHandlers']
+): Promise<SystemWithWallet> {
+  await initWallet(system, true, eventHandlers);
+  return await createSystemWithWallet(system);
 }
 
 export async function disconnectWallet(
@@ -170,6 +214,7 @@ export async function disconnectWallet(
 
 export const Minter = {
   configure,
+  reconnectWallet,
   connectToolkit,
   connectWallet,
   disconnectWallet

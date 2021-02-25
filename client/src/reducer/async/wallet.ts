@@ -74,6 +74,21 @@ export const connectWallet = createAsyncThunk<
   }
 );
 
+export const reconnectWallet = createAsyncThunk<
+  SystemWithWallet | SystemWithToolkit,
+  undefined,
+  Options
+>('wallet/reconnect', async (_arg, { getState, rejectWithValue }) => {
+  const { system } = getState();
+  if (system.status === 'ToolkitConnected') {
+    return await Minter.reconnectWallet(system);
+  }
+  return rejectWithValue({
+    kind: ErrorKind.WalletNotConnected,
+    message: 'Wallet already connected'
+  });
+});
+
 export const disconnectWallet = createAsyncThunk<
   SystemWithToolkit,
   undefined,

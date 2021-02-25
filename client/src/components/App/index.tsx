@@ -7,8 +7,14 @@ import CollectionsTokenDetail from '../Collections/TokenDetail';
 import Header from '../common/Header';
 import { Flex } from '@chakra-ui/react';
 import Notifications from '../common/Notifications';
+import { useDispatch } from '../../reducer';
+import { reconnectWallet } from '../../reducer/async/wallet';
 
 export default function App() {
+  const dispatch = useDispatch();
+
+  dispatch(reconnectWallet());
+
   return (
     <Flex pos="absolute" w="100%" h="100%">
       <Flex justifyContent="space-between" width="100%" flexDir="column">
