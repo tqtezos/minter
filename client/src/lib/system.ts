@@ -30,6 +30,7 @@ export interface SystemConfigured {
   betterCallDev: BetterCallDev;
   toolkit: null;
   wallet: null;
+  walletReconnectAttempted: boolean;
   tzPublicKey: null;
 }
 
@@ -44,6 +45,7 @@ export interface SystemWithToolkit {
   toolkit: TezosToolkit;
   resolveMetadata: ResolveMetadata;
   wallet: null;
+  walletReconnectAttempted: boolean;
   tzPublicKey: null;
 }
 
@@ -54,6 +56,7 @@ export interface SystemWithWallet {
   toolkit: TezosToolkit;
   resolveMetadata: ResolveMetadata;
   wallet: BeaconWallet;
+  walletReconnectAttempted: boolean;
   tzPublicKey: string;
 }
 
@@ -74,6 +77,7 @@ export function configure(config: Config): SystemConfigured {
     betterCallDev: new BetterCallDev(compatibilityConfig),
     toolkit: null,
     wallet: null,
+    walletReconnectAttempted: false,
     tzPublicKey: null
   };
 }
@@ -115,7 +119,8 @@ export function connectToolkit(system: SystemConfigured): SystemWithToolkit {
     ...system,
     status: Status.ToolkitConnected,
     toolkit: toolkit,
-    resolveMetadata: createMetadataResolver(system, toolkit, faucetAddress)
+    resolveMetadata: createMetadataResolver(system, toolkit, faucetAddress),
+    walletReconnectAttempted: false
   };
 }
 
@@ -206,9 +211,10 @@ export async function reconnectWallet(
 ): Promise<SystemWithWallet | SystemWithToolkit> {
   const connected = await initWallet(system, false, eventHandlers);
   if (connected) {
-    return await createSystemWithWallet(system);
+    const systemWithWallet = await createSystemWithWallet(system);
+    return { ...systemWithWallet, walletReconnectAttempted: true };
   } else {
-    return system;
+    return { ...system, walletReconnectAttempted: true };
   }
 }
 

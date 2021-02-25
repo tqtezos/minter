@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Switch, Route } from 'wouter';
 import SplashPage from '../SplashPage';
 import CreateNonFungiblePage from '../CreateNonFungiblePage';
@@ -7,22 +7,22 @@ import CollectionsTokenDetail from '../Collections/TokenDetail';
 import Header from '../common/Header';
 import { Flex } from '@chakra-ui/react';
 import Notifications from '../common/Notifications';
-import { useDispatch } from '../../reducer';
+import { useSelector, useDispatch } from '../../reducer';
 import { reconnectWallet } from '../../reducer/async/wallet';
 
 export default function App() {
-  const [reconnectAttempted, setReconnectAttempted] = useState(false);
   const dispatch = useDispatch();
+  const walletReconnectAttempted = useSelector(
+    s => s.system.walletReconnectAttempted
+  );
 
   useEffect(() => {
-    if (reconnectAttempted) return;
-    (async () => {
-      await dispatch(reconnectWallet());
-      setReconnectAttempted(true);
-    })();
-  }, [reconnectAttempted, dispatch]);
+    if (!walletReconnectAttempted) {
+      dispatch(reconnectWallet());
+    }
+  }, [walletReconnectAttempted, dispatch]);
 
-  if (!reconnectAttempted) {
+  if (!walletReconnectAttempted) {
     return null;
   }
 
