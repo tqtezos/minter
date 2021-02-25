@@ -11,7 +11,7 @@
     "stop:testnet": "bin/stop dev-testnet",
     "stop:mainnet": "bin/stop dev-mainnet",
     "log": "bin/log",
-    "log:api": "bin/log api",
+    "log:api": "bin/log api-server",
     "log:ui": "bin/log ui",
     "clear-data": "bin/reset --confirm"
   },
