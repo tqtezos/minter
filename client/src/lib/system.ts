@@ -30,6 +30,7 @@ export interface SystemConfigured {
   betterCallDev: BetterCallDev;
   toolkit: null;
   wallet: null;
+  walletReconnectAttempted: boolean;
   tzPublicKey: null;
 }
 
@@ -44,6 +45,7 @@ export interface SystemWithToolkit {
   toolkit: TezosToolkit;
   resolveMetadata: ResolveMetadata;
   wallet: null;
+  walletReconnectAttempted: boolean;
   tzPublicKey: null;
 }
 
@@ -54,6 +56,7 @@ export interface SystemWithWallet {
   toolkit: TezosToolkit;
   resolveMetadata: ResolveMetadata;
   wallet: BeaconWallet;
+  walletReconnectAttempted: boolean;
   tzPublicKey: string;
 }
 
@@ -74,6 +77,7 @@ export function configure(config: Config): SystemConfigured {
     betterCallDev: new BetterCallDev(compatibilityConfig),
     toolkit: null,
     wallet: null,
+    walletReconnectAttempted: false,
     tzPublicKey: null
   };
 }
@@ -115,7 +119,8 @@ export function connectToolkit(system: SystemConfigured): SystemWithToolkit {
     ...system,
     status: Status.ToolkitConnected,
     toolkit: toolkit,
-    resolveMetadata: createMetadataResolver(system, toolkit, faucetAddress)
+    resolveMetadata: createMetadataResolver(system, toolkit, faucetAddress),
+    walletReconnectAttempted: false
   };
 }
 
@@ -139,29 +144,53 @@ function networkType(config: Config) {
 
 let wallet: BeaconWallet | null = null;
 
-export async function connectWallet(
+function getWallet(
   system: SystemWithToolkit,
   eventHandlers?: DAppClientOptions['eventHandlers']
-): Promise<SystemWithWallet> {
-  const network = networkType(system.config);
-
+): BeaconWallet {
   if (wallet === null) {
     wallet = new BeaconWallet({
       name: 'OpenSystem dApp',
-      preferredNetwork: network,
+      preferredNetwork: networkType(system.config),
       eventHandlers
     });
   }
+  return wallet;
+}
 
-  await wallet.requestPermissions({
-    network: {
-      type:
-        system.config.network === 'edo2net'
-          ? (system.config.network as NetworkType)
-          : network,
-      rpcUrl: system.config.rpc
+async function initWallet(
+  system: SystemWithToolkit,
+  forceConnect: boolean,
+  eventHandlers?: DAppClientOptions['eventHandlers']
+): Promise<boolean> {
+  const network = networkType(system.config);
+  const wallet = getWallet(system, eventHandlers);
+
+  const activeAccount = await wallet.client.getActiveAccount();
+
+  if (!activeAccount) {
+    if (forceConnect) {
+      await wallet.requestPermissions({
+        network: {
+          type:
+            system.config.network === 'edo2net'
+              ? (system.config.network as NetworkType)
+              : network,
+          rpcUrl: system.config.rpc
+        }
+      });
+    } else {
+      return false;
     }
-  });
+  }
+
+  return true;
+}
+
+async function createSystemWithWallet(
+  system: SystemWithToolkit
+): Promise<SystemWithWallet> {
+  const wallet = getWallet(system);
 
   system.toolkit.setWalletProvider(wallet);
   tzUtils.setConfirmationPollingInterval(system.toolkit);
@@ -176,11 +205,33 @@ export async function connectWallet(
   };
 }
 
+export async function reconnectWallet(
+  system: SystemWithToolkit,
+  eventHandlers?: DAppClientOptions['eventHandlers']
+): Promise<SystemWithWallet | SystemWithToolkit> {
+  const connected = await initWallet(system, false, eventHandlers);
+  if (connected) {
+    const systemWithWallet = await createSystemWithWallet(system);
+    return { ...systemWithWallet, walletReconnectAttempted: true };
+  } else {
+    return { ...system, walletReconnectAttempted: true };
+  }
+}
+
+export async function connectWallet(
+  system: SystemWithToolkit,
+  eventHandlers?: DAppClientOptions['eventHandlers']
+): Promise<SystemWithWallet> {
+  await initWallet(system, true, eventHandlers);
+  return await createSystemWithWallet(system);
+}
+
 export async function disconnectWallet(
   system: SystemWithWallet
 ): Promise<SystemWithToolkit> {
   await system.wallet.disconnect();
   const toolkit = new TezosToolkit(system.config.rpc);
+  wallet = null;
   return {
     ...system,
     status: Status.ToolkitConnected,
@@ -192,6 +243,7 @@ export async function disconnectWallet(
 
 export const Minter = {
   configure,
+  reconnectWallet,
   connectToolkit,
   connectWallet,
   disconnectWallet
