@@ -28,6 +28,7 @@ export const store = configureStore({
         ignoredPaths: ['system'],
         ignoredActions: [
           'wallet/connect/fulfilled',
+          'wallet/reconnect/fulfilled',
           'wallet/disconnect/fulfilled'
         ]
       }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Switch, Route } from 'wouter';
 import SplashPage from '../SplashPage';
 import CreateNonFungiblePage from '../CreateNonFungiblePage';
@@ -11,9 +11,20 @@ import { useDispatch } from '../../reducer';
 import { reconnectWallet } from '../../reducer/async/wallet';
 
 export default function App() {
+  const [reconnectAttempted, setReconnectAttempted] = useState(false);
   const dispatch = useDispatch();
 
-  dispatch(reconnectWallet());
+  useEffect(() => {
+    if (reconnectAttempted) return;
+    (async () => {
+      await dispatch(reconnectWallet());
+      setReconnectAttempted(true);
+    })();
+  }, [reconnectAttempted, dispatch]);
+
+  if (!reconnectAttempted) {
+    return null;
+  }
 
   return (
     <Flex pos="absolute" w="100%" h="100%">

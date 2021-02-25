@@ -225,6 +225,7 @@ export async function disconnectWallet(
 ): Promise<SystemWithToolkit> {
   await system.wallet.disconnect();
   const toolkit = new TezosToolkit(system.config.rpc);
+  wallet = null;
   return {
     ...system,
     status: Status.ToolkitConnected,
