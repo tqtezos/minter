@@ -4,7 +4,11 @@ import fileUpload from 'express-fileupload';
 import http from 'http';
 import fs from 'fs';
 import { getPinataConfig } from './helpers/pinata';
-import { handleIpfsFileUpload, handleIpfsJSONUpload } from './handlers';
+import {
+  handleIpfsFileUpload,
+  handleIpfsImageWithThumbnailUpload,
+  handleIpfsJSONUpload
+} from './handlers';
 
 if (!fs.existsSync('./tmp')) {
   fs.mkdirSync('./tmp');
@@ -24,6 +28,10 @@ async function createHttpServer(app: Express) {
 
   app.post('/ipfs-file-upload', (req, res) => {
     return handleIpfsFileUpload(pinataConfig, req, res);
+  });
+
+  app.post('/ipfs-image-with-thumbnail-upload', (req, res) => {
+    return handleIpfsImageWithThumbnailUpload(pinataConfig, req, res);
   });
 
   app.post('/ipfs-json-upload', (req, res) => {

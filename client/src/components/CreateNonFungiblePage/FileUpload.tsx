@@ -1,13 +1,64 @@
-import React, { useCallback } from 'react';
+import React, { createRef, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Box, Flex, Heading, Text, Image } from '@chakra-ui/react';
 import { useSelector, useDispatch } from '../../reducer';
-import { ipfsUriToGatewayUrl } from '../../lib/util/ipfs';
 import { readFileAsDataUrlAction } from '../../reducer/async/actions';
+import {
+  updateDisplayImageFile,
+  SelectedFile
+} from '../../reducer/slices/createNft';
+
+export function FilePreview({ file }: { file: SelectedFile }) {
+  const dispatch = useDispatch();
+  if (/^image\/.*/.test(file.type)) {
+    return <Image src={file.objectUrl} />;
+  }
+  if (/^video\/.*/.test(file.type)) {
+    const canvasRef = createRef<HTMLCanvasElement>();
+    return (
+      <>
+        <video
+          controls
+          onLoadedData={e => {
+            const canvas = canvasRef.current;
+            if (!canvas) {
+              return console.error('`canvasRef` current element is null');
+            }
+            const video = e.currentTarget;
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            var canvasContext = canvas.getContext('2d');
+            if (!canvasContext) {
+              return console.error('`2d` canvas context not supported');
+            }
+            canvasContext.drawImage(video, 0, 0);
+            const type = 'image/png';
+            canvas.toBlob(blob => {
+              if (!blob) {
+                return console.error('Could not convert canvas to blob');
+              }
+              dispatch(
+                updateDisplayImageFile({
+                  objectUrl: URL.createObjectURL(blob),
+                  name: 'foo',
+                  size: blob.size,
+                  type: blob.type
+                })
+              );
+            }, type);
+          }}
+        >
+          <source src={file.objectUrl} type={file.type} />
+        </video>
+        <canvas ref={canvasRef} style={{ display: 'none' }} />
+      </>
+    );
+  }
+  return null;
+}
 
 export default function FileUpload() {
   const state = useSelector(s => s.createNft);
-  const network = useSelector(s => s.system.config.network);
   const dispatch = useDispatch();
 
   const onDrop = useCallback(
@@ -21,7 +72,7 @@ export default function FileUpload() {
     onDrop,
     maxFiles: 1,
     maxSize: 30 * 1024 * 1024,
-    accept: 'image/*'
+    accept: ['image/*', 'video/*']
   });
 
   return (
@@ -50,12 +101,9 @@ export default function FileUpload() {
       >
         <Box as="input" {...getInputProps()} />
         {state.selectedFile?.objectUrl ? (
-          <Image
-            p={4}
-            maxWidth="400px"
-            maxHeight="400px"
-            src={ipfsUriToGatewayUrl(network, state.selectedFile.objectUrl)}
-          />
+          <Box p={4} maxWidth="400px" maxHeight="400px">
+            <FilePreview file={state.selectedFile} />
+          </Box>
         ) : (
           <Flex
             borderColor="white"

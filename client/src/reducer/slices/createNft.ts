@@ -37,6 +37,7 @@ export interface UploadedArtifact {
 export interface CreateNftState {
   step: Step;
   selectedFile: SelectedFile | null;
+  displayImageFile: SelectedFile | null;
   uploadedArtifact: UploadedArtifact | null;
   fields: Fields;
   metadataRows: { name: string | null; value: string | null }[];
@@ -47,6 +48,7 @@ export interface CreateNftState {
 export const initialState: CreateNftState = {
   step: 'file_upload',
   selectedFile: null,
+  displayImageFile: null,
   uploadedArtifact: null,
   fields: {
     name: null,
@@ -90,6 +92,12 @@ const slice = createSlice({
     clearSelectedfile(state) {
       state.selectedFile = null;
     },
+    updateDisplayImageFile(state, action: PayloadAction<SelectedFile>) {
+      state.displayImageFile = action.payload;
+    },
+    clearDisplayImagFile(state) {
+      state.displayImageFile = null;
+    },
     addMetadataRow(state) {
       state.metadataRows.push({ name: null, value: null });
     },
@@ -131,6 +139,7 @@ export const {
   updateField,
   updateSelectedFile,
   clearSelectedfile,
+  updateDisplayImageFile,
   addMetadataRow,
   updateMetadataRowName,
   updateMetadataRowValue,

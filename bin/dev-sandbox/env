@@ -4,15 +4,9 @@ TEZOS_RPC_PROTO=http
 
 TEZOS_RPC_URL=${TEZOS_RPC_PROTO}://${TEZOS_RPC_HOST}:20000
 
-BCD_API_PORT=14000
-BCD_GUI_PORT=8009
-
-BCD_API_URL=http://bcdapi:${BCD_API_PORT}
-BCD_GUI_URL=http://localhost:${BCD_GUI_PORT}
-
 BCD_NETWORK="sandboxnet"
 
-FLEXTESA_DOCKER_IMG=registry.gitlab.com/tezos/flextesa:00b415f2-run
+FLEXTESA_DOCKER_IMG=registry.gitlab.com/tezos/flextesa:56f651af-run
 
 TZ_INDEX_DB_PATH=$PROJECT_ROOT_DIR/.tzindex
 FLEXTESA_DATA_DIR=$PROJECT_ROOT_DIR/.flextesa

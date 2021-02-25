@@ -60,10 +60,18 @@ export interface SystemWithWallet {
 export type System = SystemConfigured | SystemWithToolkit | SystemWithWallet;
 
 export function configure(config: Config): SystemConfigured {
+  // Upgrade `edonet` reference in config to `edo2net`. This is done for the
+  // sake of compatibility since the meaning of "edonet" is ambiguous: in some
+  // parts of the ecosystem it refers to latest version of edonet, which is also
+  // referred to as "edo2net".
+  const compatibilityConfig = {
+    ...config,
+    network: config.network === 'edonet' ? 'edo2net' : config.network
+  };
   return {
     status: Status.Configured,
-    config: config,
-    betterCallDev: new BetterCallDev(config),
+    config: compatibilityConfig,
+    betterCallDev: new BetterCallDev(compatibilityConfig),
     toolkit: null,
     wallet: null,
     tzPublicKey: null
@@ -78,7 +86,7 @@ function createMetadataResolver(
   const ipfsGateway =
     system.config.network === 'sandboxnet'
       ? 'localhost:8080'
-      : 'cloudflare-ipfs.com';
+      : 'gateway.ipfs.io';
   const gatewayProtocol =
     system.config.network === 'sandboxnet' ? 'http' : 'https';
   const ipfsHandler = new CustomIpfsHttpHandler(ipfsGateway, gatewayProtocol);
@@ -118,6 +126,14 @@ function networkType(config: Config) {
   if (config.network === 'delphinet') {
     return NetworkType.DELPHINET;
   }
+  // Edonet support is split between two network types, edonet and edo2net. For
+  // now, .CUSTOM must be used when referring to edo2net.
+  if (config.network === 'edonet') {
+    return NetworkType.EDONET;
+  }
+  if (config.network === 'edo2net') {
+    return NetworkType.CUSTOM;
+  }
   return NetworkType.CUSTOM;
 }
 
@@ -150,7 +166,13 @@ async function initWallet(
   if (!activeAccount) {
     if (forceConnect) {
       await wallet.requestPermissions({
-        network: { type: network, rpcUrl: system.config.rpc }
+        network: {
+          type:
+            system.config.network === 'edo2net'
+              ? (system.config.network as NetworkType)
+              : network,
+          rpcUrl: system.config.rpc
+        }
       });
     } else {
       return false;

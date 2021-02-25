@@ -9,9 +9,11 @@ import {
 import { ErrorKind, RejectValue } from './errors';
 import { getContractNftsQuery, getWalletAssetContractsQuery } from './queries';
 import { validateCreateNftForm } from '../validators/createNft';
-import { uploadIPFSFile, IpfsResponse } from '../../lib/util/ipfs';
+import {
+  uploadIPFSFile,
+  uploadIPFSImageWithThumbnail
+} from '../../lib/util/ipfs';
 import { SelectedFile } from '../slices/createNft';
-import { AxiosResponse } from 'axios';
 
 type Options = {
   state: State;
@@ -79,26 +81,24 @@ export const createAssetContractAction = createAsyncThunk<
   }
 );
 
-function buildMetadataFromState(state: State['createNft'], data: IpfsResponse) {
-  const address = state.collectionAddress as string;
-  const metadata: Record<string, string> = {};
-
-  metadata.artifactUri = data.ipfsUri;
-  metadata.displayUri = data.ipfsUri;
-  metadata.thumbnailUri = data.thumbnail.ipfsUri;
-  metadata.name = state.fields.name as string;
+function appendStateMetadata(
+  state: State['createNft'],
+  metadata: Record<string, string>
+) {
+  const appendedMetadata = { ...metadata };
+  appendedMetadata.name = state.fields.name as string;
 
   if (state.fields.description) {
-    metadata.description = state.fields.description;
+    appendedMetadata.description = state.fields.description;
   }
 
   for (let row of state.metadataRows) {
     if (row.name !== null && row.value !== null) {
-      metadata[row.name] = row.value;
+      appendedMetadata[row.name] = row.value;
     }
   }
 
-  return { address, metadata };
+  return appendedMetadata;
 }
 
 export const mintTokenAction = createAsyncThunk<
@@ -133,13 +133,47 @@ export const mintTokenAction = createAsyncThunk<
   } catch (e) {
     return rejectWithValue({
       kind: ErrorKind.UknownError,
-      message: 'Could not mint token: file not found'
+      message: 'Could not mint token: selected file not found'
     });
   }
 
-  let response: AxiosResponse<IpfsResponse>;
+  let ipfsMetadata: Record<string, string> = {};
   try {
-    response = await uploadIPFSFile(file);
+    if (/^image\/.*/.test(file.type)) {
+      const imageResponse = await uploadIPFSImageWithThumbnail(file);
+      ipfsMetadata.artifactUri = imageResponse.data.ipfsUri;
+      ipfsMetadata.displayUri = imageResponse.data.ipfsUri;
+      ipfsMetadata.thumbnailUri = imageResponse.data.thumbnail.ipfsUri;
+    } else if (/^video\/.*/.test(file.type)) {
+      if (state.displayImageFile === null) {
+        return rejectWithValue({
+          kind: ErrorKind.IPFSUploadFailed,
+          message: 'Ipfs upload failed: Video display file not found'
+        });
+      }
+      let displayFile: File;
+      try {
+        const { objectUrl, name, type } = state.displayImageFile;
+        const fetched = await fetch(objectUrl);
+        const blob = await fetched.blob();
+        displayFile = new File([blob], name, { type });
+      } catch (e) {
+        return rejectWithValue({
+          kind: ErrorKind.UknownError,
+          message: 'Could not mint token: video display file not found'
+        });
+      }
+      const fileResponse = await uploadIPFSFile(file);
+      const imageResponse = await uploadIPFSImageWithThumbnail(displayFile);
+      ipfsMetadata.artifactUri = fileResponse.data.ipfsUri;
+      ipfsMetadata.displayUri = imageResponse.data.ipfsUri;
+      ipfsMetadata.thumbnailUri = imageResponse.data.thumbnail.ipfsUri;
+    } else {
+      return rejectWithValue({
+        kind: ErrorKind.IPFSUploadFailed,
+        message: 'IPFS upload failed: unknown file type'
+      });
+    }
   } catch (e) {
     return rejectWithValue({
       kind: ErrorKind.IPFSUploadFailed,
@@ -147,7 +181,8 @@ export const mintTokenAction = createAsyncThunk<
     });
   }
 
-  const { address, metadata } = buildMetadataFromState(state, response.data);
+  const address = state.collectionAddress as string;
+  const metadata = appendStateMetadata(state, ipfsMetadata);
 
   try {
     const op = await mintToken(system, address, metadata);
