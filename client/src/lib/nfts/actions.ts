@@ -3,7 +3,7 @@ import { Buffer } from 'buffer';
 import { SystemWithWallet } from '../system';
 import faucetCode from './code/fa2_tzip16_compat_multi_nft_faucet';
 import assetCode from './code/fa2_tzip16_compat_multi_nft_asset';
-import { uploadJSONToIpfs } from '../util/ipfs';
+import { uploadIPFSJSON } from '../util/ipfs';
 
 function toHexString(input: string) {
   return Buffer.from(input).toString('hex');
@@ -13,15 +13,14 @@ export async function createFaucetContract(
   system: SystemWithWallet,
   name: string
 ) {
-  const metadata = new MichelsonMap<string, string>();
-  const contents = {
+  const metadataMap = new MichelsonMap<string, string>();
+  const resp = await uploadIPFSJSON({
     name,
     description: 'An OpenMinter base collection contract.',
     interfaces: ['TZIP-012', 'TZIP-016', 'TZIP-020'],
     tokenCategory: 'collectibles'
-  };
-  metadata.set('', toHexString('tezos-storage:contents'));
-  metadata.set('contents', toHexString(JSON.stringify(contents)));
+  });
+  metadataMap.set('', toHexString(resp.data.ipfsUri));
   return await system.toolkit.wallet
     .originate({
       code: faucetCode,
@@ -32,7 +31,7 @@ export async function createFaucetContract(
           operators: new MichelsonMap(),
           token_metadata: new MichelsonMap()
         },
-        metadata: metadata
+        metadata: metadataMap
       }
     })
     .send();
@@ -43,11 +42,11 @@ export async function createAssetContract(
   metadata: Record<string, string>
 ) {
   const metadataMap = new MichelsonMap<string, string>();
-  const resp = await uploadJSONToIpfs({
-    ...metadata,
+  const resp = await uploadIPFSJSON({
     description: 'An OpenMinter assets contract.',
     interfaces: ['TZIP-012', 'TZIP-016', 'TZIP-020'],
-    tokenCategory: 'collectibles'
+    tokenCategory: 'collectibles',
+    ...metadata
   });
   metadataMap.set('', toHexString(resp.data.ipfsUri));
   return await system.toolkit.wallet
@@ -81,7 +80,7 @@ export async function mintToken(
 
   const token_id = storage.assets.next_token_id;
   const token_info = new MichelsonMap<string, string>();
-  const resp = await uploadJSONToIpfs({
+  const resp = await uploadIPFSJSON({
     ...metadata,
     decimals: 0,
     booleanAmount: true

@@ -30,6 +30,7 @@ export interface SystemConfigured {
   betterCallDev: BetterCallDev;
   toolkit: null;
   wallet: null;
+  walletReconnectAttempted: boolean;
   tzPublicKey: null;
 }
 
@@ -44,6 +45,7 @@ export interface SystemWithToolkit {
   toolkit: TezosToolkit;
   resolveMetadata: ResolveMetadata;
   wallet: null;
+  walletReconnectAttempted: boolean;
   tzPublicKey: null;
 }
 
@@ -54,18 +56,28 @@ export interface SystemWithWallet {
   toolkit: TezosToolkit;
   resolveMetadata: ResolveMetadata;
   wallet: BeaconWallet;
+  walletReconnectAttempted: boolean;
   tzPublicKey: string;
 }
 
 export type System = SystemConfigured | SystemWithToolkit | SystemWithWallet;
 
 export function configure(config: Config): SystemConfigured {
+  // Upgrade `edonet` reference in config to `edo2net`. This is done for the
+  // sake of compatibility since the meaning of "edonet" is ambiguous: in some
+  // parts of the ecosystem it refers to latest version of edonet, which is also
+  // referred to as "edo2net".
+  const compatibilityConfig = {
+    ...config,
+    network: config.network === 'edonet' ? 'edo2net' : config.network
+  };
   return {
     status: Status.Configured,
-    config: config,
-    betterCallDev: new BetterCallDev(config),
+    config: compatibilityConfig,
+    betterCallDev: new BetterCallDev(compatibilityConfig),
     toolkit: null,
     wallet: null,
+    walletReconnectAttempted: false,
     tzPublicKey: null
   };
 }
@@ -78,7 +90,7 @@ function createMetadataResolver(
   const ipfsGateway =
     system.config.network === 'sandboxnet'
       ? 'localhost:8080'
-      : 'cloudflare-ipfs.com';
+      : 'gateway.ipfs.io';
   const gatewayProtocol =
     system.config.network === 'sandboxnet' ? 'http' : 'https';
   const ipfsHandler = new CustomIpfsHttpHandler(ipfsGateway, gatewayProtocol);
@@ -107,7 +119,8 @@ export function connectToolkit(system: SystemConfigured): SystemWithToolkit {
     ...system,
     status: Status.ToolkitConnected,
     toolkit: toolkit,
-    resolveMetadata: createMetadataResolver(system, toolkit, faucetAddress)
+    resolveMetadata: createMetadataResolver(system, toolkit, faucetAddress),
+    walletReconnectAttempted: false
   };
 }
 
@@ -118,28 +131,66 @@ function networkType(config: Config) {
   if (config.network === 'delphinet') {
     return NetworkType.DELPHINET;
   }
+  // Edonet support is split between two network types, edonet and edo2net. For
+  // now, .CUSTOM must be used when referring to edo2net.
+  if (config.network === 'edonet') {
+    return NetworkType.EDONET;
+  }
+  if (config.network === 'edo2net') {
+    return NetworkType.CUSTOM;
+  }
   return NetworkType.CUSTOM;
 }
 
 let wallet: BeaconWallet | null = null;
 
-export async function connectWallet(
+function getWallet(
   system: SystemWithToolkit,
   eventHandlers?: DAppClientOptions['eventHandlers']
-): Promise<SystemWithWallet> {
-  const network = networkType(system.config);
-
+): BeaconWallet {
   if (wallet === null) {
     wallet = new BeaconWallet({
       name: 'OpenSystem dApp',
-      preferredNetwork: network,
+      preferredNetwork: networkType(system.config),
       eventHandlers
     });
   }
+  return wallet;
+}
 
-  await wallet.requestPermissions({
-    network: { type: network, rpcUrl: system.config.rpc }
-  });
+async function initWallet(
+  system: SystemWithToolkit,
+  forceConnect: boolean,
+  eventHandlers?: DAppClientOptions['eventHandlers']
+): Promise<boolean> {
+  const network = networkType(system.config);
+  const wallet = getWallet(system, eventHandlers);
+
+  const activeAccount = await wallet.client.getActiveAccount();
+
+  if (!activeAccount) {
+    if (forceConnect) {
+      await wallet.requestPermissions({
+        network: {
+          type:
+            system.config.network === 'edo2net'
+              ? (system.config.network as NetworkType)
+              : network,
+          rpcUrl: system.config.rpc
+        }
+      });
+    } else {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+async function createSystemWithWallet(
+  system: SystemWithToolkit
+): Promise<SystemWithWallet> {
+  const wallet = getWallet(system);
 
   system.toolkit.setWalletProvider(wallet);
   tzUtils.setConfirmationPollingInterval(system.toolkit);
@@ -154,11 +205,33 @@ export async function connectWallet(
   };
 }
 
+export async function reconnectWallet(
+  system: SystemWithToolkit,
+  eventHandlers?: DAppClientOptions['eventHandlers']
+): Promise<SystemWithWallet | SystemWithToolkit> {
+  const connected = await initWallet(system, false, eventHandlers);
+  if (connected) {
+    const systemWithWallet = await createSystemWithWallet(system);
+    return { ...systemWithWallet, walletReconnectAttempted: true };
+  } else {
+    return { ...system, walletReconnectAttempted: true };
+  }
+}
+
+export async function connectWallet(
+  system: SystemWithToolkit,
+  eventHandlers?: DAppClientOptions['eventHandlers']
+): Promise<SystemWithWallet> {
+  await initWallet(system, true, eventHandlers);
+  return await createSystemWithWallet(system);
+}
+
 export async function disconnectWallet(
   system: SystemWithWallet
 ): Promise<SystemWithToolkit> {
   await system.wallet.disconnect();
   const toolkit = new TezosToolkit(system.config.rpc);
+  wallet = null;
   return {
     ...system,
     status: Status.ToolkitConnected,
@@ -170,6 +243,7 @@ export async function disconnectWallet(
 
 export const Minter = {
   configure,
+  reconnectWallet,
   connectToolkit,
   connectWallet,
   disconnectWallet

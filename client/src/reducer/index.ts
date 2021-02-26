@@ -7,12 +7,14 @@ import collectionsSlice from './slices/collections';
 import createNftSlice from './slices/createNft';
 import systemSlice from './slices/system';
 import statusSlice from './slices/status';
+import notificationsSlice from './slices/notifications';
 
 export const reducer = combineReducers({
   collections: collectionsSlice.reducer,
   createNft: createNftSlice.reducer,
   system: systemSlice.reducer,
-  status: statusSlice.reducer
+  status: statusSlice.reducer,
+  notifications: notificationsSlice.reducer
 });
 
 export const store = configureStore({
@@ -26,6 +28,7 @@ export const store = configureStore({
         ignoredPaths: ['system'],
         ignoredActions: [
           'wallet/connect/fulfilled',
+          'wallet/reconnect/fulfilled',
           'wallet/disconnect/fulfilled'
         ]
       }

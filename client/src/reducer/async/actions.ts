@@ -9,14 +9,50 @@ import {
 import { ErrorKind, RejectValue } from './errors';
 import { getContractNftsQuery, getWalletAssetContractsQuery } from './queries';
 import { validateCreateNftForm } from '../validators/createNft';
+import {
+  uploadIPFSFile,
+  uploadIPFSImageWithThumbnail
+} from '../../lib/util/ipfs';
+import { SelectedFile } from '../slices/createNft';
 
 type Options = {
   state: State;
   rejectValue: RejectValue;
 };
 
+export const readFileAsDataUrlAction = createAsyncThunk<
+  { ns: string; result: SelectedFile },
+  { ns: string; file: File },
+  Options
+>('action/readFileAsDataUrl', async ({ ns, file }, { rejectWithValue }) => {
+  const readFile = new Promise<{ ns: string; result: SelectedFile }>(
+    (resolve, reject) => {
+      const { name, type, size } = file;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const buffer = e.target?.result;
+        if (!buffer || !(buffer instanceof ArrayBuffer)) {
+          return reject();
+        }
+        const blob = new Blob([new Uint8Array(buffer)], { type });
+        const objectUrl = window.URL.createObjectURL(blob);
+        return resolve({ ns, result: { objectUrl, name, type, size } });
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  );
+  try {
+    return await readFile;
+  } catch (e) {
+    return rejectWithValue({
+      kind: ErrorKind.UknownError,
+      message: 'Could not read file'
+    });
+  }
+});
+
 export const createAssetContractAction = createAsyncThunk<
-  { address: string },
+  { name: string; address: string },
   string,
   Options
 >(
@@ -45,26 +81,24 @@ export const createAssetContractAction = createAsyncThunk<
   }
 );
 
-function buildMetadataFromState(state: State['createNft']) {
-  const address = state.collectionAddress as string;
-  const metadata: Record<string, string> = {};
-
-  metadata.artifactUri = state.artifactUri as string;
-  metadata.displayUri = state.artifactUri as string;
-  metadata.thumbnailUri = state.thumbnailUri as string;
-  metadata.name = state.fields.name as string;
+function appendStateMetadata(
+  state: State['createNft'],
+  metadata: Record<string, string>
+) {
+  const appendedMetadata = { ...metadata };
+  appendedMetadata.name = state.fields.name as string;
 
   if (state.fields.description) {
-    metadata.description = state.fields.description;
+    appendedMetadata.description = state.fields.description;
   }
 
   for (let row of state.metadataRows) {
     if (row.name !== null && row.value !== null) {
-      metadata[row.name] = row.value;
+      appendedMetadata[row.name] = row.value;
     }
   }
 
-  return { address, metadata };
+  return appendedMetadata;
 }
 
 export const mintTokenAction = createAsyncThunk<
@@ -73,19 +107,82 @@ export const mintTokenAction = createAsyncThunk<
   Options
 >('actions/mintToken', async (_, { getState, rejectWithValue, dispatch }) => {
   const { system, createNft: state } = getState();
-  if (!validateCreateNftForm(state)) {
+  if (state.selectedFile === null) {
     return rejectWithValue({
-      kind: ErrorKind.CreateNftFormInvalid,
-      message: 'Could not mint token: Form validation failed'
+      kind: ErrorKind.UknownError,
+      message: 'Could not mint token: no file selected'
     });
   } else if (system.status !== 'WalletConnected') {
     return rejectWithValue({
       kind: ErrorKind.WalletNotConnected,
       message: 'Could not mint token: no wallet connected'
     });
+  } else if (!validateCreateNftForm(state)) {
+    return rejectWithValue({
+      kind: ErrorKind.CreateNftFormInvalid,
+      message: 'Could not mint token: form validation failed'
+    });
   }
 
-  const { address, metadata } = buildMetadataFromState(state);
+  let file: File;
+  try {
+    const { objectUrl, name, type } = state.selectedFile;
+    const fetched = await fetch(objectUrl);
+    const blob = await fetched.blob();
+    file = new File([blob], name, { type });
+  } catch (e) {
+    return rejectWithValue({
+      kind: ErrorKind.UknownError,
+      message: 'Could not mint token: selected file not found'
+    });
+  }
+
+  let ipfsMetadata: Record<string, string> = {};
+  try {
+    if (/^image\/.*/.test(file.type)) {
+      const imageResponse = await uploadIPFSImageWithThumbnail(file);
+      ipfsMetadata.artifactUri = imageResponse.data.ipfsUri;
+      ipfsMetadata.displayUri = imageResponse.data.ipfsUri;
+      ipfsMetadata.thumbnailUri = imageResponse.data.thumbnail.ipfsUri;
+    } else if (/^video\/.*/.test(file.type)) {
+      if (state.displayImageFile === null) {
+        return rejectWithValue({
+          kind: ErrorKind.IPFSUploadFailed,
+          message: 'Ipfs upload failed: Video display file not found'
+        });
+      }
+      let displayFile: File;
+      try {
+        const { objectUrl, name, type } = state.displayImageFile;
+        const fetched = await fetch(objectUrl);
+        const blob = await fetched.blob();
+        displayFile = new File([blob], name, { type });
+      } catch (e) {
+        return rejectWithValue({
+          kind: ErrorKind.UknownError,
+          message: 'Could not mint token: video display file not found'
+        });
+      }
+      const fileResponse = await uploadIPFSFile(file);
+      const imageResponse = await uploadIPFSImageWithThumbnail(displayFile);
+      ipfsMetadata.artifactUri = fileResponse.data.ipfsUri;
+      ipfsMetadata.displayUri = imageResponse.data.ipfsUri;
+      ipfsMetadata.thumbnailUri = imageResponse.data.thumbnail.ipfsUri;
+    } else {
+      return rejectWithValue({
+        kind: ErrorKind.IPFSUploadFailed,
+        message: 'IPFS upload failed: unknown file type'
+      });
+    }
+  } catch (e) {
+    return rejectWithValue({
+      kind: ErrorKind.IPFSUploadFailed,
+      message: 'IPFS upload failed'
+    });
+  }
+
+  const address = state.collectionAddress as string;
+  const metadata = appendStateMetadata(state, ipfsMetadata);
 
   try {
     const op = await mintToken(system, address, metadata);

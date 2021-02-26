@@ -1,12 +1,12 @@
 ![OpenMinter header](/docs/assets/minterhead.png)
 
-[![](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE) [![](https://img.shields.io/badge/Docker-20.10.x-blue)](https://www.docker.com/) [![](https://img.shields.io/badge/version-v0.1.2-orange)](https://github.com/tqtezos/minter)
+[![](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE) [![](https://img.shields.io/badge/Docker-20.10.x-blue)](https://www.docker.com/) [![](https://img.shields.io/badge/version-v0.2.0-orange)](https://github.com/tqtezos/minter)
 
 ## Notice
 
-This software is in beta. At the moment, the smart contracts 
+This software is in beta. At the moment, the smart contracts
 that OpenMinter uses have **not** been formally audited. Please
-use this software at your own risk. 
+use this software at your own risk.
 
 ## OpenMinter
 
@@ -17,7 +17,7 @@ contracts, see their NFTs across contracts, and enable marketplace
 capabilities to trade them.
 
 OpenMinter supports the following networks and software components:
-#### 🌐 Mainnet and Delphinet networks (Edonet soon)
+#### 🌐 Mainnet and Edonet networks
 #### 📦 Sandboxed development via [Flextesa][flextesa]
 #### 🎨 Creating multimedia NFTs
 #### 👛 Various wallets via [Beacon](https://www.walletbeacon.io/)
@@ -57,7 +57,7 @@ the `minter-ui-dev` and `minter-api-dev` Docker images.
 ### Configuration
 
 The Minter can be configured to run on three different networks: `sandbox`,
-`testnet` (currently set to delphinet), and `mainnet`.
+`testnet` (currently set to edonet), and `mainnet`.
 
 Each network has its own configuration file in the `config` folder under
 `minter.<network>.json`. The schema of these files can be defined as this

@@ -11,8 +11,9 @@
     "stop:testnet": "bin/stop dev-testnet",
     "stop:mainnet": "bin/stop dev-mainnet",
     "log": "bin/log",
-    "log:api": "bin/log api",
-    "log:ui": "bin/log ui"
+    "log:api": "bin/log api-server",
+    "log:ui": "bin/log ui",
+    "clear-data": "bin/reset --confirm"
   },
   "devDependencies": {
     "@types/async-retry": "^1.4.2",

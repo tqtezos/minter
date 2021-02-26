@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { readFileAsDataUrlAction } from '../async/actions';
 
 // State
 
@@ -21,10 +22,23 @@ export enum CreateStatus {
   Complete = 'complete'
 }
 
+export interface SelectedFile {
+  objectUrl: string;
+  name: string;
+  type: string;
+  size: number;
+}
+
+export interface UploadedArtifact {
+  artifactUri: string;
+  thumbnailUri: string;
+}
+
 export interface CreateNftState {
   step: Step;
-  artifactUri: string | null;
-  thumbnailUri: string | null;
+  selectedFile: SelectedFile | null;
+  displayImageFile: SelectedFile | null;
+  uploadedArtifact: UploadedArtifact | null;
   fields: Fields;
   metadataRows: { name: string | null; value: string | null }[];
   collectionAddress: string | null;
@@ -33,8 +47,9 @@ export interface CreateNftState {
 
 export const initialState: CreateNftState = {
   step: 'file_upload',
-  artifactUri: null,
-  thumbnailUri: null,
+  selectedFile: null,
+  displayImageFile: null,
+  uploadedArtifact: null,
   fields: {
     name: null,
     description: null
@@ -71,11 +86,17 @@ const slice = createSlice({
     updateField(state, action: UpdateFieldAction) {
       state.fields[action.payload.name] = action.payload.value;
     },
-    updateArtifactUri(state, action: PayloadAction<string>) {
-      state.artifactUri = action.payload;
+    updateSelectedFile(state, action: PayloadAction<SelectedFile>) {
+      state.selectedFile = action.payload;
     },
-    updateThumbnailUri(state, action: PayloadAction<string>) {
-      state.thumbnailUri = action.payload;
+    clearSelectedfile(state) {
+      state.selectedFile = null;
+    },
+    updateDisplayImageFile(state, action: PayloadAction<SelectedFile>) {
+      state.displayImageFile = action.payload;
+    },
+    clearDisplayImagFile(state) {
+      state.displayImageFile = null;
     },
     addMetadataRow(state) {
       state.metadataRows.push({ name: null, value: null });
@@ -102,6 +123,13 @@ const slice = createSlice({
     clearForm() {
       return initialState;
     }
+  },
+  extraReducers: ({ addCase }) => {
+    addCase(readFileAsDataUrlAction.fulfilled, (state, action) => {
+      if (action.payload.ns === 'createNft') {
+        state.selectedFile = action.payload.result;
+      }
+    });
   }
 });
 
@@ -109,8 +137,9 @@ export const {
   incrementStep,
   decrementStep,
   updateField,
-  updateArtifactUri,
-  updateThumbnailUri,
+  updateSelectedFile,
+  clearSelectedfile,
+  updateDisplayImageFile,
   addMetadataRow,
   updateMetadataRowName,
   updateMetadataRowValue,
