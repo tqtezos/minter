@@ -176,6 +176,7 @@ let cancel_auction(asset_id, storage : nat * storage) : return = begin
 let place_bid(asset_id, storage : nat * storage) : return = begin
     let auction : auction = get_auction_data(asset_id, storage) in
     assert_msg (Tezos.sender = Tezos.source, "Bidder must be an implicit account");
+    (fail_if_paused storage.simple_admin);
     assert_msg (auction_in_progress(auction), "Auction must be in progress");
     assert_msg (valid_bid_amount(auction, storage), "Bid must raised by at least min_raise_percent of the previous bid or at least opening price if it is the first bid");
     assert_msg(Tezos.sender <> storage.simple_admin.admin, "Admin cannot place a bid");

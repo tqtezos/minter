@@ -173,14 +173,14 @@
            { IF_LEFT
                { DIG 5 ;
                  DROP ;
-                 DIG 6 ;
-                 DROP ;
                  IF_LEFT
                    { DIG 2 ;
                      DROP ;
                      DIG 2 ;
                      DROP ;
                      DIG 2 ;
+                     DROP ;
+                     DIG 3 ;
                      DROP ;
                      PAIR ;
                      DUP ;
@@ -263,7 +263,7 @@
                      SWAP ;
                      CAR ;
                      PAIR }
-                   { DIG 6 ;
+                   { DIG 7 ;
                      DROP ;
                      SWAP ;
                      DUP ;
@@ -284,6 +284,14 @@
                      DIG 6 ;
                      DUP ;
                      DUG 7 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     CAR ;
+                     DIG 7 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
