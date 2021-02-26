@@ -16,7 +16,8 @@ import {
 import {
     BalanceOfRequest,
     addOperator,
-    TokenMetadata
+    TokenMetadata,
+    transfer
 } from '../src/fa2-interface';
 import { originateInspector, queryBalances } from './fa2-balance-inspector';
 
@@ -59,6 +60,13 @@ describe.each([originateFixedPriceSale])
             tokenMetadata = new MichelsonMap();
             salePrice = new BigNumber(1000000);
         });
+
+        function toHexString(input: string): string {
+            const unit8Array: Uint8Array = new TextEncoder().encode(input);
+            return Array.from(unit8Array, (byte: number) => {
+                return ('0' + (byte & 0xff).toString(16)).slice(-2);
+            }).join('');
+        }
 
         async function hasNftTokens(requests: BalanceOfRequest[]): Promise<boolean[]> {
             const responses = await queryBalances(inspector, nft.address, requests);
@@ -123,7 +131,7 @@ describe.each([originateFixedPriceSale])
 
                     token_id: ftTokenId,
                     owner: aliceAddress,
-                    amount: new BigNumber(100)
+                    amount: new BigNumber(1000)
                 }
             ]);
 
@@ -158,38 +166,98 @@ describe.each([originateFixedPriceSale])
             $log.info('making marketplace an operator of bob\'s NFT token');
             await addOperator(nft.address, tezos.bob, marketAddress, nftTokenId);
 
-            // $log.info(JSON.stringify(methods, null, 2));
+            $log.info('starting sale...');
+
+            $log.info('pause marketplace');
+            const pauseOp = await marketplace.methods.pause(true).send({ amount: 0 });
+            $log.info(`Waiting for ${pauseOp.hash} to be confirmed...`);
+            const pauseOpHash = await pauseOp.confirmation().then(() => pauseOp.hash);
+            $log.info(`Operation injected at hash=${pauseOpHash}`);
 
             try {
-
-                $log.info('starting sale...');
-
-                // const bobSaleContract = await tezos.bob.contract.at(marketplace.address);
-
-                // let methods =  marketplace.parameterSchema.ExtractSignatures();
-                // $log.info(`Error: ${JSON.stringify(methods, null, 2)}`);
-
-                // $log.info('a wat');
-
-                // const sellOp = await marketplace.methods.sell(new BigNumber(20)
-                //                                                   ,nft.address
-                //                                                   ,new BigNumber(1)
-                //                                                   ,ft.address
-                //                                                   , new BigNumber(5)).send({amount: 0});
-                // $log.info(`waiting for ${sellOp.hash} to be confirmed...`);
-                // const sellOpHash = await sellOp.confirmation().then(() => sellOp.hash);
-                // $log.info(`Operation injected at hash=${sellOpHash}`);
-
-                $log.info('pause marketplace');
-                const pauseOp = await marketplace.methods.pause(true).send({ amount: 0 });
-                $log.info(`Waiting for ${pauseOp.hash} to be confirmed...`);
-                const pauseOpHash = await pauseOp.confirmation().then(() => pauseOp.hash);
-                $log.info(`Operation injected at hash=${pauseOpHash}`);
-
+                $log.info(`Attempting to create sale while contract is paused`);
+                const sellOp = await marketplace.methods.sell(new BigNumber(20) , nft.address, nftTokenId ,ft.address , ftTokenId).send({amount: 0});
             }
-            catch (error) {
-                $log.info(`same error as before`);
-                // $log.info(`Error: ${JSON.stringify(error, null, 2)}`);
+            catch (error) {$log.info(`Confirmation: Cannot create sale while contract is paused`);}
+
+            $log.info('unpause marketplace');
+            const unpauseOp = await marketplace.methods.pause(false).send({ amount: 0 });
+            $log.info(`Waiting for ${unpauseOp.hash} to be confirmed...`);
+            const unpauseOpHash = await unpauseOp.confirmation().then(() => unpauseOp.hash);
+            $log.info(`Operation injected at hash=${unpauseOpHash}`);
+
+            $log.info(`Creating sale`);
+            const sellOp = await marketplace.methods.sell(new BigNumber(20), nft.address, nftTokenId, ft.address, ftTokenId).send({source: bobAddress, amount: 0});
+            $log.info(`Waiting for ${sellOp.hash} to be confirmed...`);
+            const sellOpHash = await sellOp.confirmation().then(() => sellOp.hash);
+            $log.info(`Operation injected at hash=${sellOpHash}`);
+
+            const aliceSaleContract = await tezos.alice.contract.at(marketplace.address);
+
+            $log.info(`Alice buys non-fungible token with her fungible tokens`);
+            const buyOp = await aliceSaleContract.methods.buy(bobAddress, nft.address, nftTokenId, ft.address, ftTokenId).send({source:aliceAddress, amount: 0});
+            $log.info(`Waiting for ${buyOp.hash} to be confirmed...`);
+            const buyOpHash = await buyOp.confirmation().then(() => buyOp.hash);
+            $log.info(`Operation injected at hash=${buyOpHash}`);
+
+        })
+
+        test.only('bob makes sale, cancels it, then alice unsuccessfully tries to buy', async () => {
+
+
+            await createFtToken(tezos.alice, { token_id : ftTokenId, token_metadata_map: tokenMetadata, });
+            await mintFtTokens(tezos.alice, [
+                {
+
+                    token_id: ftTokenId,
+                    owner: aliceAddress,
+                    amount: new BigNumber(1000)
+                }
+            ]);
+
+            await mintNftTokens(tezos.bob, [
+                {
+                    token_metadata: {
+                        token_id: nftTokenId,
+                        token_metadata_map: tokenMetadata,
+                    },
+                    owner: bobAddress
+                }
+            ]);
+
+
+            $log.info('making marketplace an operator of bob\'s token');
+            await addOperator(nft.address, tezos.bob, marketAddress, nftTokenId);
+
+            $log.info('making marketplace an operator of alice\'s FT tokens');
+            await addOperator(ft.address, tezos.alice, marketAddress, ftTokenId);
+
+            $log.info(`Creating sale`);
+            const sellOp = await marketplace.methods.sell(new BigNumber(20), nft.address, nftTokenId, ft.address, ftTokenId).send({source: bobAddress, amount: 0});
+            $log.info(`Waiting for ${sellOp.hash} to be confirmed...`);
+            const sellOpHash = await sellOp.confirmation().then(() => sellOp.hash);
+            $log.info(`Operation injected at hash=${sellOpHash}`);
+
+            try {
+                $log.info('alice cancels sale (not admin nor seller)');
+                const removeSaleOp = await marketplace.methods.cancel(aliceAddress, nft.address, nftTokenId, ft.address, ftTokenId).send({source:aliceAddress, amount: 0 });
+            } catch (error) {
+                $log.info(`Alice cannot cancel sale, since she is not admin`);
+            }
+
+            $log.info('bob cancels sale');
+            const removeSaleOp = await marketplace.methods.cancel(bobAddress, nft.address, nftTokenId, ft.address, ftTokenId).send({source:bobAddress, amount: 0 });
+            $log.info(`Waiting for ${removeSaleOp.hash} to be confirmed...`);
+            const removeSaleOpHash = await removeSaleOp.confirmation().then(() => removeSaleOp.hash);
+            $log.info(`Operation injected at hash=${removeSaleOpHash}`);
+
+            const aliceSaleContract = await tezos.alice.contract.at(marketplace.address);
+
+            try {
+                $log.info(`Alice buys non-fungible token with her fungible tokens`);
+                const buyOp = await aliceSaleContract.methods.buy(bobAddress, nft.address, nftTokenId, ft.address, ftTokenId).send({source:aliceAddress, amount: 0});
+            } catch (error) {
+                $log.info(`alice cannot buy`);
             }
 
         })

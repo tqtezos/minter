@@ -78,16 +78,18 @@ let buy_token(sale, storage: sale_param * storage) : (operation list * storage) 
   | None -> (failwith "NO_SALE": nat)
   | Some s -> s
   in
-  let tx_money_op = transfer_money(sale.tokens.money_token_address, sale.tokens.money_token_token_id, sale_price, Tezos.sender, sale.sale_seller) in
+  let tx_money_op1 = transfer_money(sale.tokens.money_token_address, sale.tokens.money_token_token_id, sale_price, Tezos.sender, Tezos.self_address) in
+  let tx_money_op2 = transfer_money(sale.tokens.money_token_address, sale.tokens.money_token_token_id, sale_price, Tezos.self_address, sale.sale_seller) in
   let tx_nft_op = transfer_nft(sale.tokens.token_for_sale_address, sale.tokens.token_for_sale_token_id, Tezos.self_address, Tezos.sender) in
   let new_s = {storage with sales = Big_map.remove sale storage.sales } in
-  (tx_money_op :: tx_nft_op :: []), new_s
+  (tx_money_op1 :: tx_money_op2 :: tx_nft_op :: []), new_s
+
 
 let deposit_for_sale(sale, storage: init_sale_param * storage) : (operation list * storage) =
-    let transfer_op =
-      transfer_nft (sale.sale_tokens_param.token_for_sale_address, sale.sale_tokens_param.token_for_sale_token_id, Tezos.sender, Tezos.self_address) in
-    let sale_param = { sale_seller = Tezos.sender; tokens = sale.sale_tokens_param; } in
-    let new_s = { storage with sales = Big_map.add sale_param sale.sale_price storage.sales } in
+  let transfer_op =
+    transfer_nft (sale.sale_tokens_param.token_for_sale_address, sale.sale_tokens_param.token_for_sale_token_id, Tezos.sender, Tezos.self_address) in
+  let sale_param = { sale_seller = Tezos.sender; tokens = sale.sale_tokens_param; } in
+  let new_s = { storage with sales = Big_map.add sale_param sale.sale_price storage.sales } in
     (transfer_op :: []), new_s
 
 let cancel_sale(sale, storage: sale_param * storage) : (operation list * storage) = match Big_map.find_opt sale storage.sales with
@@ -107,7 +109,7 @@ let fixed_price_sale_main (p, storage : market_entry_points * storage) : operati
   | Cancel sale ->
      let is_seller = Tezos.sender = sale.sale_seller in
      let u = if is_seller then ()
-             else fail_if_not_admin storage.admin (Some " OR A SELLER") in
+             else fail_if_not_admin storage.admin (Some "OR A SELLER") in
      let v = fail_if_paused(storage.admin) in
      cancel_sale(sale,storage)
   | Admin a ->

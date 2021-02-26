@@ -51,6 +51,7 @@ describe.each([originateFixedPriceTezSale])
             tokenMetadata = new MichelsonMap();
             salePrice = new BigNumber(1000000);
         });
+
         async function hasTokens(requests: BalanceOfRequest[]): Promise<boolean[]> {
             const responses = await queryBalances(inspector, nft.address, requests);
             const results = responses.map(r => {
@@ -96,6 +97,19 @@ describe.each([originateFixedPriceTezSale])
                 $log.info('making marketplace an operator of bob\'s token');
                 await addOperator(nft.address, tezos.bob, marketAddress, tokenId);
 
+                const storage:any = await nft.storage();
+                const assets:any = await storage.assets;
+                const operators:any = await assets.operators;
+                $log.info(`operators ${JSON.stringify(operators,null,2)}`);
+                // const assets = await storage.assets;
+
+                // const ret = await assets.operators;
+
+                // const retIterator = ret.keys();
+
+                // $log.info(`storage.assets: ${JSON.stringify(assets,null,2)}`);
+                // $log.info(retIterator.next());
+
                 $log.info('starting sale...');
 
                 $log.info('pause marketplace');
@@ -116,6 +130,7 @@ describe.each([originateFixedPriceTezSale])
                 const unpauseOpHash = await unpauseOp.confirmation(1).then(() => unpauseOp.hash);
                 $log.info(`Operation injected at hash=${unpauseOpHash}`);
 
+                $log.info(`Creating sale`);
                 const sellOp = await marketplace.methods.sell(salePrice, nft.address, tokenId).send({ source: bobAddress, amount: 0 });
                 $log.info(`Waiting for ${sellOp.hash} to be confirmed...`);
                 const sellOpHash = await sellOp.confirmation(1).then(() => sellOp.hash);
@@ -123,8 +138,8 @@ describe.each([originateFixedPriceTezSale])
                 $log.info('alice buys nft...');
 
 
-                const aliceSaleContract = await tezos.alice.contract.at(marketplace.address);
-                const buyOp = await aliceSaleContract.methods.buy(bobAddress, nft.address, tokenId).send({ source: aliceAddress, amount: 1 });
+                // const aliceSaleContract = await tezos.alice.contract.at(marketplace.address);
+                const buyOp = await marketplace.methods.buy(bobAddress, nft.address, tokenId).send({ source: aliceAddress, amount: 1 });
                 $log.info(`Waiting for ${buyOp.hash} to be confirmed...`);
                 const buyOpHash = await buyOp.confirmation().then(() => buyOp.hash);
                 $log.info(`Operation injected at hash=${buyOpHash}`);
@@ -163,32 +178,18 @@ describe.each([originateFixedPriceTezSale])
                 $log.info('starting sale...');
                 const sellOp = await marketplace.methods.sell(salePrice, nft.address, tokenId).send({ source: bobAddress, amount: 0 });
                 $log.info(`Waiting for ${sellOp.hash} to be confirmed...`);
-                const sellOpHash = await sellOp.confirmation(1).then(() => sellOp.hash);
+                const sellOpHash = await sellOp.confirmation().then(() => sellOp.hash);
                 $log.info(`Operation injected at hash=${sellOpHash}`);
 
                 try
                 {
-                    $log.info('bob cancels sale (not admin)');
-                    const removeSaleOp = await marketplace.methods.cancel(salePrice, nft.address, tokenId).send({ source: bobAddress, amount: 0 });
+                    $log.info('alice cancels sale (not admin nor seller)');
+                    const removeSaleOp = await marketplace.methods.cancel(salePrice, nft.address, tokenId).send({ source: aliceAddress, amount: 0 });
                 } catch (error) {
-                    $log.info(`Bob cannot cancel sale, since he is not an admin`);
+                    $log.info(`Alice cannot cancel sale, since she is not an admin`);
                 }
 
-                $log.info('change admin workflow');
-
-                $log.info('set admin');
-                const setAdminOp = await (await adminToolkit.contract.at(marketplace.address)).methods.set_admin(bobAddress).send({source: adminAddress, amount: 0 });
-                $log.info(`Waiting for ${setAdminOp.hash} to be confirmed...`);
-                const setAdminOpHash = await setAdminOp.confirmation(1).then(() => setAdminOp.hash);
-                $log.info(`Operation injected at hash=${setAdminOpHash}`);
-
-                $log.info('confirm admin');
-                const confirmAdminOp = await (await adminToolkit.contract.at(marketplace.address)).methods.confirm_admin({}).send({amount: 0});
-                $log.info(`Waiting for ${confirmAdminOp.hash} to be confirmed...`);
-                const confirmAdminOpHash = await confirmAdminOp.confirmation(1).then(() => confirmAdminOp.hash);
-                $log.info(`Operation injected at hash=${confirmAdminOpHash}`);
-
-                $log.info('bob cancels sale (now admin)');
+                $log.info('bob cancels sale');
                 const removeSaleOp = await marketplace.methods.cancel(salePrice, nft.address, tokenId).send({ source: bobAddress, amount: 0 });
                 $log.info(`Waiting for ${removeSaleOp.hash} to be confirmed...`);
                 const removeSaleOpHash = await removeSaleOp.confirmation(1).then(() => removeSaleOp.hash);
@@ -196,7 +197,7 @@ describe.each([originateFixedPriceTezSale])
                 $log.info(`alice tries to buy`);
                 const buyOp = await marketplace.methods.buy(bobAddress, nft.address, tokenId).send({ source: aliceAddress, amount: 1 });
             } catch (error) {
-                $log.info(`alice couldn't buy`);
+                $log.info(`alice cannot buy`);
             }
 
         });

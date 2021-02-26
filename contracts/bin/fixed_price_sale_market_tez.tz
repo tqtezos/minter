@@ -252,7 +252,7 @@
                  COMPARE ;
                  EQ ;
                  IF { DIG 5 ; DROP ; PUSH unit Unit }
-                    { PUSH string " OR A SELLER" ;
+                    { PUSH string "OR A SELLER" ;
                       SOME ;
                       DIG 2 ;
                       DUP ;
