@@ -7,6 +7,7 @@ import {
   updateDisplayImageFile,
   SelectedFile
 } from '../../reducer/slices/createNft';
+import { OBJModel, GLTFModel, DAEModel } from 'react-3d-viewer';
 
 export function FilePreview({ file }: { file: SelectedFile }) {
   const dispatch = useDispatch();
@@ -54,6 +55,17 @@ export function FilePreview({ file }: { file: SelectedFile }) {
       </>
     );
   }
+  // TODO: Extract to component.
+  if (/.*\.obj/.test(file.name)) {
+    return <OBJModel src={file.objectUrl}/>;
+  }
+  if (/.*\.(gltf|glb)/.test(file.name)) {
+    return <GLTFModel src={file.objectUrl} />
+  }
+  if (/.*\.dae/.test(file.name)) {
+    return <DAEModel src={file.objectUrl} />
+  }
+
   return null;
 }
 
@@ -72,7 +84,6 @@ export default function FileUpload() {
     onDrop,
     maxFiles: 1,
     maxSize: 30 * 1024 * 1024,
-    accept: ['image/*', 'video/*']
   });
 
   return (

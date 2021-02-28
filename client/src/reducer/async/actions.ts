@@ -168,6 +168,11 @@ export const mintTokenAction = createAsyncThunk<
       ipfsMetadata.artifactUri = fileResponse.data.ipfsUri;
       ipfsMetadata.displayUri = imageResponse.data.ipfsUri;
       ipfsMetadata.thumbnailUri = imageResponse.data.thumbnail.ipfsUri;
+    // TODO: Move regexps to single place, so decison logic is in one place.
+    } else if (/.*\.(obj|glb|gltf|dae)/.test(file.name)) {
+      // TODO: Set more metadata, maybe thumbnail, maybe different for different 3d model types.
+      const fileResponse = await uploadIPFSFile(file);
+      ipfsMetadata.artifactUri = fileResponse.data.ipfsUri;
     } else {
       return rejectWithValue({
         kind: ErrorKind.IPFSUploadFailed,

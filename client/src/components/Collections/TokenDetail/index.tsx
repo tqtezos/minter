@@ -14,6 +14,7 @@ import {
   getContractNftsQuery,
   getNftAssetContractQuery
 } from '../../../reducer/async/queries';
+import { OBJModel } from 'react-3d-viewer';
 
 function NotFound() {
   return (
@@ -71,12 +72,14 @@ function TokenImage(props: { src: string }) {
     (async () => {
       let blob;
       try {
+        // TODO: Here figure out whether file is a 3d model and which type.
         blob = await fetch(props.src).then(r => r.blob());
       } catch (e) {
         return setErrored(true);
       }
       setObj({
         url: URL.createObjectURL(blob),
+        // TODO: Here set proper type for 3d models.
         type: blob.type
       });
     })();
@@ -104,6 +107,11 @@ function TokenImage(props: { src: string }) {
         <source src={obj.url} type={obj.type} />
       </video>
     );
+  }
+
+  // TODO: Here check whether type is 3d model, and pick proper component.
+  if (/^text\/.*/.test(obj.type)) {
+      return <OBJModel src={obj.url}/>;
   }
 
   return <MediaNotFound />;

@@ -23,6 +23,7 @@
     "joi": "17.3.0",
     "prettier": "2.1.1",
     "react": "16.13.1",
+    "react-3d-viewer": "1.0.12",
     "react-dom": "16.13.1",
     "react-dropzone": "11.2.4",
     "react-feather": "2.0.9",
