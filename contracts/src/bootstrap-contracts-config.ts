@@ -95,7 +95,7 @@ async function bootstrapNftFaucet2(
   tz: TezosToolkit
 ): Promise<void> {
   const configKey = 'contracts.nftFaucet';
-  const contractFilename = 'fa2_multi_nft_faucet_tzip16_compat.tz';
+  const contractFilename = 'fa2_multi_nft_faucet.tz';
   const shouldOrig = await shouldOriginate(config, tz, configKey);
   if (!shouldOrig) return;
 
