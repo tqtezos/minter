@@ -6,7 +6,7 @@ import {
   originateEnglishAuctionTez,
   originateNftFactory,
   MintNftParam
-} from '../../src/nft-contracts-tzip16';
+} from '../../src/nft-contracts';
 import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 
 import { TransactionOperation } from '@taquito/taquito/dist/types/operations/transaction-operation';
@@ -15,7 +15,7 @@ import {
   OperationContentsAndResultTransaction,
   OperationResultTransaction
 } from '@taquito/rpc';
-import {addOperator} from '../../src/fa2-tzip16-compat-interface'
+import {addOperator} from '../../src/fa2-interface'
 import {Fa2_tokens, Tokens } from '../../src/auction-interface'
 
 jest.setTimeout(180000); // 3 minutes

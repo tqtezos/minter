@@ -36,6 +36,12 @@ export async function getWalletContracts(config: Config, address: string) {
   return response.data;
 }
 
+export async function getAccountMetadata(config: Config, address: string) {
+  const uri = `${config.bcd.api}/v1/account/${config.network}/${address}/metadata`;
+  const response = await axios.get(uri);
+  return response.data;
+}
+
 export class BetterCallDev {
   config: Config;
 
@@ -61,5 +67,9 @@ export class BetterCallDev {
 
   getWalletContracts(address: string) {
     return getWalletContracts(this.config, address);
+  }
+
+  getAccountMetadata(address: string) {
+    return getAccountMetadata(this.config, address);
   }
 }

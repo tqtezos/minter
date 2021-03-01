@@ -8,11 +8,9 @@
 #include "../fa2/lib/fa2_operator_lib.mligo"
 #include "../fa2/lib/fa2_owner_hooks_lib.mligo"
 
-
 type nft_meta = (token_id, token_metadata) big_map
 
 type ledger = (token_id, address) big_map
-
 
 #if !OWNER_HOOKS
 
@@ -53,8 +51,8 @@ let dec_balance(owner, token_id, ledger : address option * token_id * ledger) : 
   | Some o -> (
     let current_owner = Big_map.find_opt token_id ledger in
     match current_owner with
-    | None -> (failwith fa2_insufficient_balance : ledger)
-    | Some cur_o -> 
+    | None -> (failwith fa2_token_undefined : ledger)
+    | Some cur_o ->
       if cur_o = o
       then Big_map.remove token_id ledger
       else (failwith fa2_insufficient_balance : ledger)
@@ -70,39 +68,41 @@ let inc_balance(owner, token_id, ledger : address option * token_id * ledger) : 
 Update leger balances according to the specified transfers. Fails if any of the
 permissions or constraints are violated.
 @param txs transfers to be applied to the ledger
-@param validate_op function that validates of the tokens from the particular owner can be transferred. 
+@param validate_op function that validates of the tokens from the particular owner can be transferred.
  *)
 let transfer (txs, validate_op, ops_storage, ledger
     : (transfer_descriptor list) * operator_validator * operator_storage * ledger)
-    : ledger = 
+    : ledger =
   let make_transfer = fun (l, tx : ledger * transfer_descriptor) ->
-    List.fold 
+    List.fold
       (fun (ll, dst : ledger * transfer_destination_descriptor) ->
-        let u = match tx.from_ with 
+        let u = match tx.from_ with
         | None -> unit
         | Some owner -> validate_op (owner, Tezos.sender, dst.token_id, ops_storage)
         in
         if dst.amount > 1n
         then (failwith fa2_insufficient_balance : ledger)
         else if dst.amount = 0n
-        then ll (* zero transfer, don't change the ledger *)
+        then match Big_map.find_opt dst.token_id ll with
+               | None -> (failwith fa2_token_undefined : ledger)
+               | Some cur_o -> ll (* zero transfer, don't change the ledger *)
         else
           let lll = dec_balance (tx.from_, dst.token_id, ll) in
           inc_balance(dst.to_, dst.token_id, lll)
       ) tx.txs l
-  in    
+  in
   List.fold make_transfer txs ledger
 
 let fa2_transfer (tx_descriptors, validate_op, storage
     : (transfer_descriptor list) * operator_validator * nft_token_storage)
     : (operation list) * nft_token_storage =
-  
+
   let new_ledger = transfer (tx_descriptors, validate_op, storage.operators, storage.ledger) in
   let new_storage = { storage with ledger = new_ledger; } in
   let ops = get_owner_hook_ops (tx_descriptors, storage) in
   ops, new_storage
 
-(** 
+(**
 Retrieve the balances for the specified tokens and owners
 @return callback operation
 *)
@@ -122,9 +122,9 @@ let get_balance (p, ledger : balance_of_param * ledger) : operation =
 let fa2_main (param, storage : fa2_entry_points * nft_token_storage)
     : (operation  list) * nft_token_storage =
   match param with
-  | Transfer txs -> 
+  | Transfer txs ->
     let tx_descriptors = transfers_to_descriptors txs in
-    (* 
+    (*
     will validate that a sender is either `from_` parameter of each transfer
     or a permitted operator for the owner `from_` address.
     *)
@@ -139,9 +139,9 @@ let fa2_main (param, storage : fa2_entry_points * nft_token_storage)
     let new_storage = { storage with operators = new_operators; } in
     ([] : operation list), new_storage
 
-  | Token_metadata_registry callback ->
-    (* the contract storage holds `token_metadata` big_map*)
-    let callback_op = Operation.transaction Tezos.self_address 0mutez callback in
-    [callback_op], storage
+  (* | Token_metadata_registry callback ->
+   *   (\* the contract storage holds `token_metadata` big_map*\)
+   *   let callback_op = Operation.transaction Tezos.self_address 0mutez callback in
+   *   [callback_op], storage *)
 
 #endif
