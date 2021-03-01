@@ -3,7 +3,7 @@ import { BigNumber } from 'bignumber.js';
 import { bootstrap, TestTz } from '../bootstrap-sandbox';
 import { Contract, nat, bytes, address } from '../../src/type-aliases';
 import {
-  originateEnglishAuctionTez,
+  originateEnglishAuctionTezAdmin,
   originateNftFactory,
   MintNftParam
 } from '../../src/nft-contracts-tzip16';
@@ -39,7 +39,7 @@ describe('test NFT auction', () => {
 
   beforeEach(async() => {
     $log.info('originating nft auction...');
-    nftAuction = await originateEnglishAuctionTez(tezos.bob);
+    nftAuction = await originateEnglishAuctionTezAdmin(tezos.bob);
     nftAuctionBob = await tezos.bob.contract.at(nftAuction.address);
     nftAuctionAlice = await tezos.alice.contract.at(nftAuction.address);
 

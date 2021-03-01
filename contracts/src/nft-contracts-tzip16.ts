@@ -122,16 +122,16 @@ export async function originateFixedPriceTezSale(
     return originateContract(tz, code, storage, 'fixed-price-sale-market-tez');
 }
 
-export async function originateEnglishAuctionTez(
+export async function originateEnglishAuctionTezAdmin(
     tz: TezosToolkit,
 ): Promise<Contract> {
     const code = await compileAndLoadContract(
         defaultEnv,
-        'english_auction_tez.mligo',
-        'english_auction_tez_main',
-        'english_auction_tez.tz',
+        'english_auction_tez_admin.mligo',
+        'english_auction_tez_admin_main',
+        'english_auction_tez_admin.tz',
     );
     const tzAddress = await tz.signer.publicKeyHash();
     const storage = `(Pair (Pair (Pair "${tzAddress}" False) None) (Pair 0 (Pair 86400 (Pair 86400 {}))))`;
-    return originateContract(tz, code, storage, 'english_auction_tez');
+    return originateContract(tz, code, storage, 'english_auction_tez_admin');
 }

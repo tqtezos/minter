@@ -202,7 +202,7 @@ let admin(admin_param, storage : simple_admin * storage) : return =
     let new_storage = { storage with simple_admin = simple_admin; } in
     ops, new_storage
 
-let english_auction_tez_main (p,storage : auction_entrypoints * storage) : return = match p with
+let english_auction_tez_admin_main (p,storage : auction_entrypoints * storage) : return = match p with
     | Configure config -> configure_auction(config, storage)
     | Bid asset_id -> place_bid(asset_id, storage)
     | Cancel asset_id -> cancel_auction(asset_id, storage)

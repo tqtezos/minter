@@ -128,9 +128,9 @@ async function compileEnglishAuctionTezContract(env: LigoEnv): Promise<void> {
 
   await compileContract(
       env,
-      'english_auction_tez.mligo',
-      'english_auction_tez_main',
-      'english_auction_tez.tz'
+      'english_auction_tez_admin.mligo',
+      'english_auction_tez_admin_main',
+      'english_auction_tez_admin.tz'
   );
   $log.info('compiled english auction tez contract');
 }
