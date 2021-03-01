@@ -42,7 +42,7 @@ let pause (paused, s: bool * simple_admin_storage) : simple_admin_storage =
   { s with paused = paused; }
 
 let fail_if_not_admin (a : simple_admin_storage) : unit =
-  if sender <> a.admin
+  if Tezos.sender <> a.admin
   then failwith "NOT_AN_ADMIN"
   else unit
 
