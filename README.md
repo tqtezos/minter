@@ -17,11 +17,11 @@ contracts, see their NFTs across contracts, and enable marketplace
 capabilities to trade them.
 
 OpenMinter supports the following networks and software components:
-#### 🌐 Mainnet and Edonet networks
+#### 🌐 Mainnet and Edonet
 #### 📦 Sandboxed development via [Flextesa][flextesa]
-#### 🎨 Creating multimedia NFTs
+#### 🎨 Multimedia NFTs powered by [TZIP-21](https://tzip.tezosagora.org/proposal/tzip-21/)
 #### 👛 Various wallets via [Beacon](https://www.walletbeacon.io/)
-#### 📖 Reading blockchain data via [Better Call Dev][bcdhub]
+#### 📖 Indexing via [Better Call Dev][bcdhub]
 #### ⚙️ The latest [FA2](https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md) specification
 #### 🚀 [IPFS](https://ipfs.io/) via a local node or [Pinata](https://pinata.cloud/)
 
