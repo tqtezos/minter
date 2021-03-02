@@ -30,6 +30,11 @@ describe('test NFT auction', () => {
   let aliceAddress : address;
   let startTime : Date;
   let endTime : Date;
+  let empty_metadata_map: MichelsonMap<string, bytes>;
+  let tokenId : BigNumber;
+  let token : MintNftParam;
+  let fa2_tokens : Fa2_tokens;
+  let auction_tokens : Tokens;
 
   beforeAll(async () => {
     tezos = await bootstrap();
@@ -54,11 +59,11 @@ describe('test NFT auction', () => {
 
     bobAddress = await tezos.bob.signer.publicKeyHash();
     aliceAddress = await tezos.alice.signer.publicKeyHash();
-    const empty_metadata_map: MichelsonMap<string, bytes> = new MichelsonMap();
+    empty_metadata_map = new MichelsonMap();
 
-    const tokenId = new BigNumber(0);
+    tokenId = new BigNumber(0);
 
-    const token: MintNftParam = {
+    token = {
       token_metadata: {
         token_id: tokenId,
         token_metadata_map: empty_metadata_map
@@ -73,26 +78,35 @@ describe('test NFT auction', () => {
     await addOperator(nftContract.address, tezos.bob, nftAuction.address, tokenId);
     $log.info('Auction contract added as operator');
     
-    const fa2_tokens : Fa2_tokens = {
+    fa2_tokens = {
         token_id : tokenId,
         amount : new BigNumber(1)
     }
 
-    const tokens : Tokens = {
+    auction_tokens = {
         fa2_address : nftAddress,
         fa2_batch : [fa2_tokens]
     }
     
-    startTime = new Date()
-    startTime.setSeconds(startTime.getSeconds() + 7)
-    endTime = new Date(startTime.valueOf())
-    endTime.setHours(endTime.getHours() + 1)
+    startTime = new Date();
+    startTime.setSeconds(startTime.getSeconds() + 7);
+    endTime = new Date(startTime.valueOf());
+    endTime.setHours(endTime.getHours() + 1);
+    $log.info(`Bob attempts to configure auction`);
     //opening price = 10 tz, percent raise =10, min_raise = 10tz, round_time = 1 hr, extend_time = 5 mins, end_time = start_time + 1hr, 
-    const opAuction = await nftAuction.methods.configure(new BigNumber(10000000), new BigNumber(10), new BigNumber(10000000), new BigNumber(3600), new BigNumber(300), [tokens], startTime, endTime).send({amount : 10, source : bobAddress});
+    const opAuction = await nftAuctionBob.methods.configure(new BigNumber(10000000), new BigNumber(10), new BigNumber(10000000), new BigNumber(3600), new BigNumber(300), [auction_tokens], startTime, endTime).send({amount : 10});
     await opAuction.confirmation();
     $log.info(`Auction configured. Consumed gas: ${opAuction.consumedGas}`);
   });
-
+  test('configuration not from admin should fail', async() => {
+    startTime = new Date();
+    startTime.setSeconds(startTime.getSeconds() + 7);
+    tokenId = tokenId.plus(1);
+    $log.info(`Alice attempts to configure auction, we expect it to fail`);
+    //opening price = 10 tz, percent raise =10, min_raise = 10tz, round_time = 1 hr, extend_time = 5 mins, end_time = start_time + 1hr, 
+    const opAuctionPromise = nftAuctionAlice.methods.configure(new BigNumber(10000000), new BigNumber(10), new BigNumber(10000000), new BigNumber(3600), new BigNumber(300), [auction_tokens], startTime, endTime).send({amount : 10});
+    return expect(opAuctionPromise).rejects.toHaveProperty('message', "NOT_AN_ADMIN");
+  });  
   test('bid of less than asking price should fail', async() => {
     $log.info(`Alice bids 9tz expecting it to fail`);
     const failedOpeningBid = nftAuctionAlice.methods.bid(0).send({amount : 9});
