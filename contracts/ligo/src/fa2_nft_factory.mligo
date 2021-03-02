@@ -230,13 +230,25 @@ let create_contract : (key_hash option * tez * nft_asset_storage) -> (operation 
          APPLY ;
          LAMBDA
            (pair (pair address bool) (option address))
-           unit
-           { CAR ;
-             CAR ;
-             SENDER ;
-             COMPARE ;
-             NEQ ;
-             IF { PUSH string "NOT_AN_ADMIN" ; FAILWITH } { UNIT } } ;
+           (lambda (option string) unit)
+           { LAMBDA
+               (pair (pair (pair address bool) (option address)) (option string))
+               unit
+               { DUP ;
+                 CDR ;
+                 SWAP ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { IF_NONE
+                        { PUSH string "NOT_AN_ADMIN" ; FAILWITH }
+                        { PUSH string " " ; CONCAT ; PUSH string "NOT_AN_ADMIN" ; CONCAT ; FAILWITH } }
+                    { DROP ; UNIT } } ;
+             SWAP ;
+             APPLY } ;
          DIG 3 ;
          DUP ;
          DUG 4 ;

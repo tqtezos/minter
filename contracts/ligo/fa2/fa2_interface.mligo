@@ -78,6 +78,13 @@ type token_metadata_param =
   handler : (token_metadata list) -> unit;
 }
 
+(*
+One of the options to make token metadata discoverable is to declare
+`token_metadata : token_metadata_storage` field inside the FA2 contract storage
+*)
+type token_metadata_storage = (token_id, token_metadata) big_map
+
+
 type fa2_entry_points =
   | Transfer of transfer list
   | Balance_of of balance_of_param

@@ -62,7 +62,7 @@ type storage =
 
 type return = operation list * storage
 
-let assert_msg (condition, msg : bool * string ) : unit = 
+let assert_msg (condition, msg : bool * string ) : unit =
   if (not condition) then failwith(msg) else unit
 
 let address_to_contract_transfer_entrypoint(add : address) : ((transfer list) contract) =
@@ -105,10 +105,10 @@ let auction_ended (auction : auction) : bool =
   ((Tezos.now >= auction.end_time) || (* auction has passed auction time*)
    (Tezos.now > auction.last_bid_time + auction.round_time)) (*round time has passed after bid has been placed*)
 
-let auction_started (auction : auction) : bool = 
+let auction_started (auction : auction) : bool =
   Tezos.now >= auction.start_time
 
-let auction_in_progress (auction : auction) : bool = 
+let auction_in_progress (auction : auction) : bool =
   auction_started(auction) && (not auction_ended(auction))
 
 (*This condition is met iff no bid has been placed before the function executes*)
@@ -121,15 +121,15 @@ let valid_bid_amount (auction, storage : auction * storage) : bool =
   ((Tezos.amount >= auction.current_bid) && first_bid(auction))
 
 let configure_auction(configure_param, storage : configure_param * storage) : return = begin
-    (fail_if_not_admin storage.simple_admin);
+    (fail_if_not_admin storage.simple_admin (None : string option));
     (fail_if_paused storage.simple_admin);
 
     assert_msg (configure_param.end_time > configure_param.start_time, "end_time must be after start_time");
     assert_msg (abs(configure_param.end_time - configure_param.start_time) <= storage.max_auction_time, "Auction time must be less than max_auction_time");
-    
+
     assert_msg (configure_param.start_time >= Tezos.now, "Start_time must not have already passed");
     assert_msg (abs(configure_param.start_time - Tezos.now) <= storage.max_config_to_start_time, "start_time must not be greater than the sum of current time and max_config_to_start_time");
-    
+
     assert_msg (configure_param.opening_price > 0mutez, "Opening price must be greater than 0mutez");
     assert_msg (Tezos.amount = configure_param.opening_price, "Amount must be equal to opening_price");
     assert_msg (configure_param.round_time > 0n, "Round_time must be greater than 0 seconds");
@@ -145,7 +145,7 @@ let configure_auction(configure_param, storage : configure_param * storage) : re
       min_raise = configure_param.min_raise;
       end_time = configure_param.end_time;
       highest_bidder = Tezos.sender;
-      last_bid_time = configure_param.start_time; 
+      last_bid_time = configure_param.start_time;
     } in
     let updated_auctions : (nat, auction) big_map = Big_map.update storage.current_id (Some auction_data) storage.auctions in
     let fa2_transfers : operation list = tokens_to_operation_list(configure_param.asset, Tezos.sender, Tezos.self_address) in
@@ -189,14 +189,14 @@ let place_bid(asset_id, storage : nat * storage) : return = begin
 
     let highest_bidder_contract : unit contract = resolve_contract(auction.highest_bidder) in
     let return_bid = Tezos.transaction unit auction.current_bid highest_bidder_contract in
-    let new_end_time = if auction.end_time - Tezos.now <= auction.extend_time then 
+    let new_end_time = if auction.end_time - Tezos.now <= auction.extend_time then
       Tezos.now + auction.extend_time else auction.end_time in
     let updated_auction_data = {auction with current_bid = Tezos.amount; highest_bidder = Tezos.sender; last_bid_time = Tezos.now; end_time = new_end_time;} in
     let updated_auctions = Big_map.update asset_id (Some updated_auction_data) storage.auctions in
     ([return_bid] , {storage with auctions = updated_auctions})
   end
 
-let admin(admin_param, storage : simple_admin * storage) : return = 
+let admin(admin_param, storage : simple_admin * storage) : return =
     let u = assert_msg (Tezos.amount = 0mutez, "Amount must be 0mutez") in
     let ops, simple_admin = simple_admin(admin_param, storage.simple_admin) in
     let new_storage = { storage with simple_admin = simple_admin; } in

@@ -128,7 +128,13 @@
                  DIG 2 ;
                  CONS ;
                  PAIR }
-               { PUSH mutez 0 ;
+               { DUP ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "NOT SELLER (CANNOT CANCEL)" ; FAILWITH } ;
+                 PUSH mutez 0 ;
                  AMOUNT ;
                  COMPARE ;
                  NEQ ;

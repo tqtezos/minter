@@ -12,6 +12,17 @@ export interface MintNftParam {
     owner: address;
 }
 
+export interface MintFtParam {
+    owner: address;
+    token_id: nat;
+    amount: nat;
+}
+
+export interface MintFtPaarm {
+    token_medata: TokenMetadata;
+    owner: address;
+}
+
 export interface SaleTokenParamTez {
     token_for_sale_address: address;
     token_for_sale_token_id: nat;
@@ -88,9 +99,34 @@ export async function originateNftFaucet(
     return originateContract(tz, code, storage, 'nftFaucet');
 }
 
-export async function originateFixedPriceSale(
+export async function originateFtFaucet(
     tz: TezosToolkit,
     admin: address
+): Promise<Contract> {
+    const code = await compileAndLoadContract(
+        defaultEnv,
+        'fa2_multi_ft_faucet.mligo',
+        'ft_faucet_main',
+        'fa2_multi_ft_faucet.tz'
+    );
+
+    const meta_uri = char2Bytes('tezos-storage:content');
+    const meta = {
+        name: 'example_name',
+        description: 'sample_token',
+        interfaces: ['TZIP-012','TZIP-106']
+    };
+
+    const meta_content = char2Bytes(JSON.stringify(meta,null,2));
+
+    const storage = `(Pair (Pair (Pair {} {}) (Pair {} {}))
+        { Elt "" 0x${meta_uri} ; Elt "contents" 0x${meta_content} })`;
+
+    return originateContract(tz,code,storage,'ftFaucet');
+}
+
+export async function originateFixedPriceSale(
+    tz: TezosToolkit,
 ): Promise<Contract> {
     const code = await compileAndLoadContract(
         defaultEnv,
@@ -113,6 +149,34 @@ export async function originateFixedPriceTezSale(
     );
     const storage = `{}`;
     return originateContract(tz, code, storage, 'fixed-price-sale-market-tez');
+}
+
+export async function originateFixedPriceAdminSale(
+    tz: TezosToolkit,
+    adminAddress: address
+): Promise<Contract> {
+    const code = await compileAndLoadContract(
+        defaultEnv,
+        'fixed_price_sale_market_with_admin.mligo',
+        'fixed_price_sale_main',
+        'fixed_price_sale_market_with_admin.tz'
+    );
+    const storage = `(Pair (Pair (Pair \"${adminAddress}\" False) None) {})`;
+    return originateContract(tz, code, storage, 'fixed-price-sale-market-with-admin');
+}
+
+export async function originateFixedPriceTezAdminSale(
+    tz: TezosToolkit,
+    adminAddress: address
+): Promise<Contract> {
+    const code = await compileAndLoadContract(
+        defaultEnv,
+        'fixed_price_sale_market_tez_with_adminx.mligo',
+        'fixed_price_sale_tez_main',
+        'fixed_price_sale_market_tez_with_admin.tz',
+    );
+    const storage = `(Pair (Pair (Pair \"${adminAddress}\" False) None) {})`;
+    return originateContract(tz, code, storage, 'fixed-price-sale-market-tez-with-admin');
 }
 
 export async function originateEnglishAuctionTez(

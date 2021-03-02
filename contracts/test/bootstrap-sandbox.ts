@@ -58,6 +58,16 @@ export async function bootstrap(): Promise<TestTz> {
     };
 }
 
+export async function adminBootstrap(): Promise<TezosToolkit> {
+
+    // NOTE: MAKE SURE TO CHANGE THIS PIECE OF CODE
+    // I HAD TO CREATE AN ACCOUNT WITH TEZOS-CLIENT. THIS WILL NOT WORK IN FUTURE TESTS.
+    const secret = 'edsk3hkSt6KzF1DmAiASq8xgZTdnvEtgP1fFeW2wEh3oJbAozpb8Ke';
+    const adminSigner = await InMemorySigner.fromSecretKey(secret);
+    const rpc = 'http://localhost:20000';
+    return signerToToolkit(adminSigner, rpc);
+}
+
 export async function bootstrapTestnet(): Promise<TestTz> {
     const { bob, alice } = await testnetKeys();
     const rpc = 'https://testnet-tezos.giganode.io';
