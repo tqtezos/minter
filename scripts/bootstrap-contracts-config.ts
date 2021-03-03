@@ -1,19 +1,27 @@
-// TODO: This module should be moved away from the `contracts/` folder and split
-//       into an SDK command line utility that:
-//         - Originates a default OpenMinter contract
-//         - Generates client and server configuration
-import { $log } from '@tsed/logger';
 import * as fs from 'fs';
 import * as path from 'path';
+import { $log } from '@tsed/logger';
+import axios from 'axios';
 import retry from 'async-retry';
 import Configstore from 'configstore';
-import { defaultEnv, loadFile } from './ligo';
-import { MichelsonMap, TezosToolkit } from '@taquito/taquito';
+import {
+  MichelsonMap,
+  TezosToolkit,
+  ContractAbstraction,
+  ContractProvider
+} from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
-import { Contract } from './type-aliases';
+
+async function loadFile(fileName: string): Promise<string> {
+  return new Promise<string>((resolve, reject) =>
+    fs.readFile(fileName, (err, buff) =>
+      err ? reject(err) : resolve(buff.toString())
+    )
+  );
+}
 
 function genClientConfig(mainConfig: Configstore) {
-  const configPath = path.join(__dirname, `../../client/src/config.json`);
+  const configPath = path.join(__dirname, `../client/src/config.json`);
   const clientConfig = new Configstore('client', {}, { configPath });
 
   const clientConfigKeys = ['rpc', 'network', 'bcd', 'ipfs', 'contracts'];
@@ -24,7 +32,7 @@ function genClientConfig(mainConfig: Configstore) {
 }
 
 function genServerConfig(mainConfig: Configstore) {
-  const configPath = path.join(__dirname, `../../server/src/config.json`);
+  const configPath = path.join(__dirname, `../server/src/config.json`);
   const clientConfig = new Configstore('server', {}, { configPath });
 
   const clientConfigKeys = ['pinata'];
@@ -74,34 +82,17 @@ async function createToolkit(config: Configstore): Promise<TezosToolkit> {
 async function awaitForNetwork(tz: TezosToolkit): Promise<void> {
   $log.info('connecting to network...');
 
-  await retry(
-    async () => {
-      await tz.rpc.getBlockHeader({ block: '2' });
-    },
-    { retries: 8 }
-  );
+  await retry(async () => await tz.rpc.getBlockHeader({ block: '2' }), {
+    retries: 8
+  });
 
   $log.info('connected');
-}
-
-async function shouldOriginate(
-  config: Configstore,
-  tz: TezosToolkit,
-  configKey: string
-): Promise<boolean> {
-  const existingAddress = config.get(configKey);
-  if (!existingAddress) return true;
-
-  return tz.contract
-    .at(existingAddress)
-    .then(() => false)
-    .catch(() => true);
 }
 
 export async function originateNftFaucet(
   tz: TezosToolkit,
   code: string
-): Promise<Contract> {
+): Promise<ContractAbstraction<ContractProvider>> {
   const name = 'nft_faucet_main';
   const metadata = new MichelsonMap<string, string>();
   const contents = {
@@ -137,18 +128,41 @@ export async function originateNftFaucet(
   }
 }
 
+async function findConfigContract(
+  config: Configstore,
+  tz: TezosToolkit,
+  configKey: string
+): Promise<string | null> {
+  const address = config.get(configKey);
+  if (!address) return null;
+
+  try {
+    await tz.contract.at(address);
+    return address;
+  } catch (e) {
+    return null;
+  }
+}
+
 async function bootstrapNftFaucet(
   config: Configstore,
   tz: TezosToolkit
 ): Promise<void> {
   const configKey = 'contracts.nftFaucet';
-  const contractFilename = 'fa2_multi_nft_faucet.tz';
-  const shouldOrig = await shouldOriginate(config, tz, configKey);
-  if (!shouldOrig) return;
+  const configContract = await findConfigContract(config, tz, configKey);
+  if (configContract) {
+    $log.info(
+      `Contract already exists at ${configContract}. Skipping origination...`
+    );
+    process.exit(0);
+  }
 
   $log.info('originating...');
-  const codeFilepath = defaultEnv.outFilePath(contractFilename);
-  const code = await loadFile(codeFilepath);
+  const code = (
+    await axios.get(
+      'https://raw.githubusercontent.com/tqtezos/minter-sdk/8f67bb8c2abc12b8e6f8e529e1412262972deab3/contracts/bin/fa2_multi_nft_faucet.tz?token=AA4RXDSXK4NNKZEJJWX53BTAJECMW'
+    )
+  ).data;
   const contract = await originateNftFaucet(tz, code);
   config.set(configKey, contract.address);
   $log.info('originated');
