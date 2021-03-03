@@ -61,7 +61,7 @@ describe('test NFT auction', () => {
     const token: MintNftParam = {
       token_metadata: {
         token_id: tokenId,
-        token_metadata_map: empty_metadata_map
+        token_info: empty_metadata_map
       },
       owner: bobAddress
     };

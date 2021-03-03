@@ -26,7 +26,7 @@ export interface BalanceOfResponse {
 
 export interface TokenMetadata {
     token_id: nat;
-    token_metadata_map: MichelsonMap<string, string>;
+    token_info: MichelsonMap<string, string>;
 }
 
 export async function transfer(

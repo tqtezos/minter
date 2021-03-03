@@ -107,7 +107,7 @@ describe.each([originateFixedPriceAdminSale])
         ): Promise<void> {
             $log.info('minting...');
             const op =
-                await ft.methods.create_token(token_metadata.token_id,token_metadata.token_metadata_map).send();
+                await ft.methods.create_token(token_metadata.token_id,token_metadata.token_info).send();
             const hash = await op.confirmation();
             $log.info(`Created fungible token. Consumed gas: ${op.consumedGas}`);
         }
@@ -118,7 +118,7 @@ describe.each([originateFixedPriceAdminSale])
             // let methods = ft.parameterSchema.ExtractSignatures();
             // $log.info(`Error: ${JSON.stringify(methods, null, 2)}`);
 
-            await createFtToken(tezos.alice, { token_id : ftTokenId, token_metadata_map: tokenMetadata, });
+            await createFtToken(tezos.alice, { token_id : ftTokenId, token_info: tokenMetadata, });
             await mintFtTokens(tezos.alice, [
                 {
 
@@ -140,7 +140,7 @@ describe.each([originateFixedPriceAdminSale])
                 {
                     token_metadata: {
                         token_id: nftTokenId,
-                        token_metadata_map: tokenMetadata,
+                        token_info: tokenMetadata,
                     },
                     owner: bobAddress
                 }
@@ -198,7 +198,7 @@ describe.each([originateFixedPriceAdminSale])
         test.only('bob makes sale, cancels it, then alice unsuccessfully tries to buy', async () => {
 
 
-            await createFtToken(tezos.alice, { token_id : ftTokenId, token_metadata_map: tokenMetadata, });
+            await createFtToken(tezos.alice, { token_id : ftTokenId, token_info: tokenMetadata, });
             await mintFtTokens(tezos.alice, [
                 {
 
@@ -212,7 +212,7 @@ describe.each([originateFixedPriceAdminSale])
                 {
                     token_metadata: {
                         token_id: nftTokenId,
-                        token_metadata_map: tokenMetadata,
+                        token_info: tokenMetadata,
                     },
                     owner: bobAddress
                 }

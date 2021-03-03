@@ -68,7 +68,7 @@ type token_metadata =
 [@layout:comb]
   {
     token_id: token_id;
-    token_metadata_map: ((string, bytes) map);
+    token_info: ((string, bytes) map);
   }
 
 type token_metadata_param =

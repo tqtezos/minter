@@ -72,21 +72,21 @@ describe.each([originateNftFaucet /*, originateNft*/])(
 
         test('mint token', async () => {
             const bobAddress = await tezos.bob.signer.publicKeyHash();
-            const token_metadata_map: MichelsonMap<
+            const token_info: MichelsonMap<
                 string,
                 string
             > = new MichelsonMap();
 
-            token_metadata_map.set('name', char2Bytes('A token'));
-            token_metadata_map.set('description', char2Bytes('description'));
-            token_metadata_map.set('ipfs_hash_image', char2Bytes('ipfs_hash_image'));
-            token_metadata_map.set('symbol', char2Bytes('TK1'));
+            token_info.set('name', char2Bytes('A token'));
+            token_info.set('description', char2Bytes('description'));
+            token_info.set('ipfs_hash_image', char2Bytes('ipfs_hash_image'));
+            token_info.set('symbol', char2Bytes('TK1'));
 
             await mintTokens(tezos.bob, [
                 {
                     token_metadata: {
                         token_id: new BigNumber(0),
-                        token_metadata_map
+                        token_info
                     },
                     owner: bobAddress
                 }
@@ -104,7 +104,7 @@ describe.each([originateNftFaucet /*, originateNft*/])(
 
             expect(ret.token_id).toStrictEqual(new BigNumber(0));
 
-            const entriesIterator = ret.token_metadata_map.entries();
+            const entriesIterator = ret.token_info.entries();
 
             const descriptionIteratee = entriesIterator.next();
             expect(descriptionIteratee.value[0]).toMatch('description');
@@ -133,21 +133,21 @@ describe.each([originateNftFaucet /*, originateNft*/])(
             const aliceAddress = await tezos.alice.signer.publicKeyHash();
             const bobAddress = await tezos.bob.signer.publicKeyHash();
             const tokenId = new BigNumber(0);
-            const token_metadata_map: MichelsonMap<
+            const token_info: MichelsonMap<
                 string,
                 string
             > = new MichelsonMap();
 
-            token_metadata_map.set('name', char2Bytes('A token'));
-            token_metadata_map.set('description', char2Bytes('description'));
-            token_metadata_map.set('ipfs_hash_image', char2Bytes('ipfs_hash_image'));
-            token_metadata_map.set('symbol', char2Bytes('TK1'));
+            token_info.set('name', char2Bytes('A token'));
+            token_info.set('description', char2Bytes('description'));
+            token_info.set('ipfs_hash_image', char2Bytes('ipfs_hash_image'));
+            token_info.set('symbol', char2Bytes('TK1'));
 
             await mintTokens(tezos.bob, [
                 {
                     token_metadata: {
                         token_id: tokenId,
-                        token_metadata_map
+                        token_info
                     },
                     owner: bobAddress
                 }
@@ -179,22 +179,22 @@ describe.each([originateNftFaucet /*, originateNft*/])(
             const aliceAddress = await tezos.alice.signer.publicKeyHash();
             const bobAddress = await tezos.bob.signer.publicKeyHash();
             const tokenId = new BigNumber(0);
-            const token_metadata_map: MichelsonMap<
+            const token_info: MichelsonMap<
                 string,
                 string
             > = new MichelsonMap();
 
-            token_metadata_map.set('name', char2Bytes('A token'));
-            token_metadata_map.set('description', char2Bytes('description'));
-            token_metadata_map.set('ipfs_hash_image', char2Bytes('ipfs_hash_image'));
-            token_metadata_map.set('symbol', char2Bytes('TK1'));
+            token_info.set('name', char2Bytes('A token'));
+            token_info.set('description', char2Bytes('description'));
+            token_info.set('ipfs_hash_image', char2Bytes('ipfs_hash_image'));
+            token_info.set('symbol', char2Bytes('TK1'));
 
             await mintTokens(tezos.bob, [
                 {
                     owner: bobAddress,
                     token_metadata: {
                         token_id: tokenId,
-                        token_metadata_map
+                        token_info
                     }
                 }
             ]);
@@ -215,45 +215,45 @@ describe.each([originateNftFaucet /*, originateNft*/])(
             const bobAddress = await tezos.bob.signer.publicKeyHash();
             const tokenId1 = new BigNumber(0);
             const tokenId2 = new BigNumber(1);
-            const token_metadata_map_bob: MichelsonMap<
+            const token_info_bob: MichelsonMap<
                 string,
                 string
             > = new MichelsonMap();
 
-            token_metadata_map_bob.set('name', char2Bytes('A token'));
-            token_metadata_map_bob.set('description', char2Bytes('description'));
-            token_metadata_map_bob.set(
+            token_info_bob.set('name', char2Bytes('A token'));
+            token_info_bob.set('description', char2Bytes('description'));
+            token_info_bob.set(
                 'ipfs_hash_image',
                 char2Bytes('ipfs_hash_image')
             );
-            token_metadata_map_bob.set('symbol', char2Bytes('TK1'));
+            token_info_bob.set('symbol', char2Bytes('TK1'));
 
-            const token_metadata_map_alice: MichelsonMap<
+            const token_info_alice: MichelsonMap<
                 string,
                 string
             > = new MichelsonMap();
 
-            token_metadata_map_alice.set('name', char2Bytes('B token'));
-            token_metadata_map_alice.set('description', char2Bytes('description'));
-            token_metadata_map_alice.set(
+            token_info_alice.set('name', char2Bytes('B token'));
+            token_info_alice.set('description', char2Bytes('description'));
+            token_info_alice.set(
                 'ipfs_hash_image',
                 char2Bytes('ipfs_hash_image')
             );
-            token_metadata_map_alice.set('symbol', char2Bytes('TK2'));
+            token_info_alice.set('symbol', char2Bytes('TK2'));
 
             await mintTokens(tezos.bob, [
                 {
                     owner: bobAddress,
                     token_metadata: {
                         token_id: tokenId1,
-                        token_metadata_map: token_metadata_map_bob
+                        token_info: token_info_bob
                     }
                 },
                 {
                     owner: aliceAddress,
                     token_metadata: {
                         token_id: tokenId2,
-                        token_metadata_map: token_metadata_map_alice
+                        token_info: token_info_alice
                     }
                 }
             ]);
