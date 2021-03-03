@@ -77,7 +77,7 @@ type Config = {
   },
   pinata?: {
     apiKey: string,
-    secretKey: string
+    aipSecret: string
   },
   contracts?: {
     nftFaucet?: string
