@@ -158,11 +158,12 @@ async function bootstrapNftFaucet(
   }
 
   $log.info('originating...');
-  const code = (
-    await axios.get(
-      'https://raw.githubusercontent.com/tqtezos/minter-sdk/8f67bb8c2abc12b8e6f8e529e1412262972deab3/contracts/bin/fa2_multi_nft_faucet.tz?token=AA4RXDSXK4NNKZEJJWX53BTAJECMW'
-    )
-  ).data;
+  const rawRepoUrl = 'https://raw.githubusercontent.com/tqtezos/minter-sdk';
+  const gitHash = '8f67bb8c2abc12b8e6f8e529e1412262972deab3';
+  const resp = await axios.get(
+    `${rawRepoUrl}/${gitHash}/contracts/bin/fa2_multi_nft_faucet.tz`
+  );
+  const code = resp.data;
   const contract = await originateNftFaucet(tz, code);
   config.set(configKey, contract.address);
   $log.info('originated');
