@@ -74,7 +74,7 @@ describe.each([originateFixedPriceTezSale])
                 {
                     token_metadata: {
                         token_id: tokenId,
-                        token_info: tokenMetadata,
+                        token_metadata_map: tokenMetadata,
                     },
                     owner: bobAddress
                 }
@@ -119,7 +119,7 @@ describe.each([originateFixedPriceTezSale])
                 {
                     token_metadata: {
                         token_id: tokenId,
-                        token_info: tokenMetadata,
+                        token_metadata_map: tokenMetadata,
                     },
                     owner: bobAddress
                 }

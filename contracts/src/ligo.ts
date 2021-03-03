@@ -96,7 +96,7 @@ export async function originateContract(
 ): Promise<Contract> {
   try {
     const originationOp = await tz.contract.originate({
-      code,
+      code: code,
       init: storage
     });
 

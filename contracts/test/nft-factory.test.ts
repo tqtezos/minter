@@ -76,7 +76,7 @@ describe('test NFT factory', () => {
                 // name: 'A token',
                 // decimals: new BigNumber(0),
                 // extras: new MichelsonMap<string, string>()
-                token_info: empty_metadata_map
+                token_metadata_map: empty_metadata_map
                 // MichelsonMap.fromLiteral({ symbol: "TK1", name: "A token", decimals: "0" })
             },
             owner: bobAddress

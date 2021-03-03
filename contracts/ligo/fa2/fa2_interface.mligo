@@ -68,7 +68,7 @@ type token_metadata =
 [@layout:comb]
   {
     token_id: token_id;
-    token_info: ((string, bytes) map);
+    token_metadata_map: ((string, bytes) map);
   }
 
 type token_metadata_param =
@@ -77,6 +77,13 @@ type token_metadata_param =
   token_ids : token_id list;
   handler : (token_metadata list) -> unit;
 }
+
+(*
+One of the options to make token metadata discoverable is to declare
+`token_metadata : token_metadata_storage` field inside the FA2 contract storage
+*)
+type token_metadata_storage = (token_id, token_metadata) big_map
+
 
 type fa2_entry_points =
   | Transfer of transfer list
