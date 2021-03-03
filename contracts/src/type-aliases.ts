@@ -6,5 +6,6 @@ export type Contract = ContractAbstraction<ContractProvider>;
 
 export type address = string;
 export type nat = BigNumber;
-
+export type timestamp = string;
+export type mutez = nat;
 export type bytes = string;

@@ -33,9 +33,7 @@ let create_contract : (key_hash option * tez * nft_asset_storage) -> (operation 
                 (pair %assets
                    (pair (big_map %ledger nat address) (nat %next_token_id))
                    (pair (big_map %operators (pair address (pair address nat)) unit)
-                         (big_map %token_metadata
-                            nat
-                            (pair (nat %token_id) (map %token_info string bytes))))))
+                         (big_map %token_metadata nat (pair (nat %token_id) (map %token_info string bytes))))))
           (big_map %metadata string bytes)) ;
   code { PUSH string "FA2_TOKEN_UNDEFINED" ;
          PUSH string "FA2_INSUFFICIENT_BALANCE" ;
@@ -230,13 +228,25 @@ let create_contract : (key_hash option * tez * nft_asset_storage) -> (operation 
          APPLY ;
          LAMBDA
            (pair (pair address bool) (option address))
-           unit
-           { CAR ;
-             CAR ;
-             SENDER ;
-             COMPARE ;
-             NEQ ;
-             IF { PUSH string "NOT_AN_ADMIN" ; FAILWITH } { UNIT } } ;
+           (lambda (option string) unit)
+           { LAMBDA
+               (pair (pair (pair address bool) (option address)) (option string))
+               unit
+               { DUP ;
+                 CDR ;
+                 SWAP ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { IF_NONE
+                        { PUSH string "NOT_AN_ADMIN" ; FAILWITH }
+                        { PUSH string " " ; CONCAT ; PUSH string "NOT_AN_ADMIN" ; CONCAT ; FAILWITH } }
+                    { DROP ; UNIT } } ;
+             SWAP ;
+             APPLY } ;
          DIG 3 ;
          DUP ;
          DUG 4 ;
