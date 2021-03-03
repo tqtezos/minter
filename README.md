@@ -77,7 +77,7 @@ type Config = {
   },
   pinata?: {
     apiKey: string,
-    secretKey: string
+    apiSecret: string
   },
   contracts?: {
     nftFaucet?: string
@@ -91,11 +91,11 @@ administrator during contract origination:
 
 ```json
 {
-	"rpc": "http://localhost:8732",
-	"admin": {
-		"address": "tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU",
-		"secret": "edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx"
-	}
+  "rpc": "http://localhost:8732",
+  "admin": {
+    "address": "tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU",
+    "secret": "edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx"
+  }
 }
 ```
 
