@@ -112,6 +112,19 @@ const Button = {
         bg: 'brand.red',
         color: 'white'
       }
+    },
+    tertiaryAction: {
+      bg: 'gray.200',
+      color: 'gray.500',
+      borderRadius: '2px',
+      _hover: {
+        bg: 'gray.100',
+        color: 'gray.400'
+      },
+      _active: {
+        bg: 'gray.100',
+        color: 'gray.400'
+      }
     }
   }
 };

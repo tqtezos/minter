@@ -13,7 +13,7 @@ import { ErrorKind, RejectValue } from '../async/errors';
 
 export type StatusKey = 'ready' | 'in_transit' | 'complete';
 
-interface Status {
+export interface Status {
   status: StatusKey;
   error: {
     rejectValue: RejectValue;
@@ -77,17 +77,14 @@ const slice = createSlice({
         state[method].status = 'complete';
       });
       addCase(action.rejected, (state, action) => {
-        if (action.payload) {
-          state[method].error = {
-            rejectValue: action.payload,
-            serialized: action.error
-          };
-        }
+        const rejectValue = action.payload
+          ? action.payload
+          : {
+              kind: ErrorKind.UknownError,
+              message: 'Unknown error'
+            };
         state[method].error = {
-          rejectValue: {
-            kind: ErrorKind.UknownError,
-            message: 'Unknown error'
-          },
+          rejectValue,
           serialized: action.error
         };
       });
