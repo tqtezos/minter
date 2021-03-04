@@ -4,6 +4,10 @@ import {
   ButtonProps,
   Link,
   LinkProps,
+  MenuButton,
+  MenuButtonProps,
+  MenuItem,
+  MenuItemProps,
   useStyleConfig
 } from '@chakra-ui/react';
 
@@ -23,4 +27,20 @@ export function MinterLink(
   const { size, variant, ...rest } = props;
   const styles = useStyleConfig('Link', { size, variant });
   return <Link sx={styles} {...rest} />;
+}
+
+export function MinterMenuButton(
+  props: MenuButtonProps & { variant?: string }
+) {
+  const { variant, ...rest } = props;
+  const styles = useStyleConfig('MenuButton', { variant });
+  return <MenuButton sx={styles} {...rest} />;
+}
+
+export function MinterMenuItem(
+  props: MenuItemProps & { variant?: string }
+) {
+  const { variant, ...rest } = props;
+  const styles = useStyleConfig('MenuItem', { variant });
+  return <MenuItem sx={styles} {...rest} />;
 }

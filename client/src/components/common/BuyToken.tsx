@@ -1,12 +1,10 @@
-import React, { useState, MutableRefObject } from 'react';
+import React from 'react';
 import {
   Box,
+  Button,
   Flex,
   Spinner,
   Heading,
-  FormControl,
-  FormLabel,
-  Input,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -14,82 +12,49 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  Text,
   useDisclosure
 } from '@chakra-ui/react';
 import { CheckCircle } from 'react-feather';
-import { MinterButton, MinterMenuItem } from '../common';
+import { MinterButton } from '../common';
 import { useSelector, useDispatch } from '../../reducer';
-import { transferTokenAction } from '../../reducer/async/actions';
+import { buyTokenAction } from '../../reducer/async/actions';
 import { setStatus } from '../../reducer/slices/status';
+import { Nft } from '../../lib/nfts/queries';
 
-interface FormProps {
-  initialRef: MutableRefObject<null>;
-  onSubmit: (form: { toAddress: string }) => void;
+interface BuyTokenButtonProps {
+  contract: string;
+  token: Nft;
 }
 
-function Form({ initialRef, onSubmit }: FormProps) {
-  const [toAddress, setToAddress] = useState('');
-  return (
-    <>
-      <ModalHeader>Transfer Token</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        <FormControl>
-          <FormLabel fontFamily="mono">To Address</FormLabel>
-          <Input
-            autoFocus={true}
-            ref={initialRef}
-            placeholder="Input token recipient"
-            value={toAddress}
-            onChange={e => setToAddress(e.target.value)}
-          />
-        </FormControl>
-      </ModalBody>
-
-      <ModalFooter>
-        <MinterButton
-          variant="primaryAction"
-          onClick={() => onSubmit({ toAddress })}
-        >
-          Transfer
-        </MinterButton>
-      </ModalFooter>
-    </>
-  );
-}
-
-interface TransferMenuItemProps {
-  contractAddress: string;
-  tokenId: number;
-}
-
-export function TransferMenuItem(props: TransferMenuItemProps) {
-  const { status } = useSelector(s => s.status.transferToken);
+export function BuyTokenButton(props: BuyTokenButtonProps) {
+  const { status } = useSelector(s => s.status.buyToken);
   const dispatch = useDispatch();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const initialRef = React.useRef(null);
 
-  const onSubmit = async (form: { toAddress: string }) => {
+  const onSubmit = async () => {
     dispatch(
-      transferTokenAction({
-        contract: props.contractAddress,
-        tokenId: props.tokenId,
-        to: form.toAddress
+      buyTokenAction({
+        contract: props.contract,
+        tokenId: props.token.id,
+        tokenSeller: props.token.sale?.seller || "",
+        salePrice: props.token.sale?.price || 0
       })
     );
   };
 
   const close = () => {
     if (status !== 'in_transit') {
-      dispatch(setStatus({ method: 'transferToken', status: 'ready' }));
+      dispatch(setStatus({ method: 'buyToken', status: 'ready' }));
       onClose();
     }
   };
 
   return (
     <>
-      <MinterMenuItem variant="primary" onClick={onOpen}>Transfer</MinterMenuItem>
+      <MinterButton variant="primaryAction" onClick={onOpen}>Buy now</MinterButton>
 
       <Modal
         isOpen={isOpen}
@@ -99,17 +64,31 @@ export function TransferMenuItem(props: TransferMenuItemProps) {
         closeOnOverlayClick={false}
         onEsc={() => close()}
         onOverlayClick={() => close()}
+        size="xs"
       >
         <ModalOverlay />
         <ModalContent mt={40}>
           {status === 'ready' ? (
-            <Form initialRef={initialRef} onSubmit={onSubmit} />
+            <>
+            <ModalHeader>Checkout</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>
+                You are about to purchase<Box as="span" fontWeight="bold"> {props.token.title} (ꜩ {props.token.sale?.price})</Box>
+              </Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button variant="primaryAction" onClick={onSubmit} isFullWidth={true}>
+                Buy now
+              </Button>
+            </ModalFooter>
+            </>
           ) : null}
           {status === 'in_transit' ? (
             <Flex flexDir="column" align="center" px={4} py={10}>
               <Spinner size="xl" mb={6} color="gray.300" />
               <Heading size="lg" textAlign="center" color="gray.500">
-                Transferring token...
+                Purchasing token...
               </Heading>
             </Flex>
           ) : null}
@@ -119,7 +98,7 @@ export function TransferMenuItem(props: TransferMenuItemProps) {
                 <CheckCircle size="70px" />
               </Box>
               <Heading size="lg" textAlign="center" color="gray.500" mb={6}>
-                Transfer complete
+                Token purchased
               </Heading>
               <MinterButton variant="primaryAction" onClick={() => close()}>
                 Close

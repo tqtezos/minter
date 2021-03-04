@@ -2,7 +2,10 @@ import { createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit';
 import {
   createAssetContractAction,
   mintTokenAction,
-  transferTokenAction
+  transferTokenAction,
+  listTokenAction,
+  cancelTokenSaleAction,
+  buyTokenAction
 } from '../async/actions';
 import {
   getContractNftsQuery,
@@ -25,6 +28,9 @@ export interface StatusState {
   createAssetContract: Status;
   mintToken: Status;
   transferToken: Status;
+  listToken: Status;
+  cancelTokenSale: Status;
+  buyToken: Status;
   getContractNfts: Status;
   getNftAssetContract: Status;
   getWalletAssetContracts: Status;
@@ -38,6 +44,9 @@ const initialState: StatusState = {
   createAssetContract: defaultStatus,
   mintToken: defaultStatus,
   transferToken: defaultStatus,
+  listToken: defaultStatus,
+  cancelTokenSale: defaultStatus,
+  buyToken: defaultStatus,
   getContractNfts: defaultStatus,
   getNftAssetContract: defaultStatus,
   getWalletAssetContracts: defaultStatus
@@ -66,6 +75,9 @@ const slice = createSlice({
       methodMap('createAssetContract', createAssetContractAction),
       methodMap('mintToken', mintTokenAction),
       methodMap('transferToken', transferTokenAction),
+      methodMap('listToken', listTokenAction),
+      methodMap('cancelTokenSale', cancelTokenSaleAction),
+      methodMap('buyToken', buyTokenAction),
       methodMap('getContractNfts', getContractNftsQuery),
       methodMap('getNftAssetContract', getNftAssetContractQuery),
       methodMap('getWalletAssetContracts', getWalletAssetContractsQuery)

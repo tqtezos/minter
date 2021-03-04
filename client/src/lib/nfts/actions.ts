@@ -116,3 +116,74 @@ export async function transferToken(
     ])
     .send();
 }
+
+export async function listTokenForSale(
+  system: SystemWithWallet,
+  marketplaceContract: string,
+  tokenContract: string,
+  tokenId: number,
+  salePrice: number
+) {
+  const contract = await system.toolkit.wallet.at(marketplaceContract);
+  return contract.methods
+    .sell(salePrice, tokenContract, tokenId)
+    .send();
+}
+
+export async function cancelTokenSale(
+  system: SystemWithWallet,
+  marketplaceContract: string,
+  tokenContract: string,
+  tokenId: number
+) {
+  const contractM = await system.toolkit.wallet.at(marketplaceContract);
+  const contractT = await system.toolkit.wallet.at(tokenContract);
+  const batch = await system.toolkit.wallet.batch([])
+    .withContractCall(contractM.methods.cancel(system.tzPublicKey, tokenContract, tokenId))
+    .withContractCall(contractT.methods.update_operators([
+      { remove_operator: { owner: system.tzPublicKey, operator: marketplaceContract, token_id: tokenId }}
+    ]));
+  return batch.send();
+}
+
+export async function approveTokenOperator(
+  system: SystemWithWallet,
+  contractAddress: string,
+  tokenId: number,
+  operatorAddress: string
+) {
+  const contract = await system.toolkit.wallet.at(contractAddress);
+  return contract.methods
+    .update_operators([
+      { add_operator: { owner: system.tzPublicKey, operator: operatorAddress, token_id: tokenId }}
+    ])
+    .send();
+}
+
+export async function removeTokenOperator(
+  system: SystemWithWallet,
+  contractAddress: string,
+  tokenId: number,
+  operatorAddress: string
+) {
+  const contract = await system.toolkit.wallet.at(contractAddress);
+  return contract.methods
+    .update_operators([
+      { remove_operator: { owner: system.tzPublicKey, operator: operatorAddress, token_id: tokenId }}
+    ])
+    .send();
+}
+
+export async function buyToken(
+  system: SystemWithWallet,
+  marketplaceContract: string,
+  tokenContract: string,
+  tokenId: number,
+  tokenSeller: string,
+  salePrice: number
+) {
+  const contract = await system.toolkit.wallet.at(marketplaceContract);
+  return contract.methods
+    .buy(tokenSeller, tokenContract, tokenId)
+    .send({ amount: salePrice });
+}

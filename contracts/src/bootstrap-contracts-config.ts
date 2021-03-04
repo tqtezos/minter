@@ -9,8 +9,19 @@ import retry from 'async-retry';
 import Configstore from 'configstore';
 import { defaultEnv, loadFile } from './ligo';
 import { MichelsonMap, TezosToolkit } from '@taquito/taquito';
+import { OriginateParams } from '@taquito/taquito/dist/types/operations/types';
 import { InMemorySigner } from '@taquito/signer';
 import { Contract } from './type-aliases';
+
+interface OriginateCallback {
+  (tz: TezosToolkit, code: string): Promise<Contract>
+}
+
+interface BootstrapContractParams {
+  configKey: string;
+  contractFilename: string;
+  originate: OriginateCallback;
+}
 
 function genClientConfig(mainConfig: Configstore) {
   const configPath = path.join(__dirname, `../../client/src/config.json`);
@@ -98,33 +109,13 @@ async function shouldOriginate(
     .catch(() => true);
 }
 
-export async function originateNftFaucet(
+async function originate(
   tz: TezosToolkit,
-  code: string
+  name: string,
+  params: OriginateParams
 ): Promise<Contract> {
-  const name = 'nft_faucet_main';
-  const metadata = new MichelsonMap<string, string>();
-  const contents = {
-    name: 'Minter',
-    description: 'An OpenMinter base collection contract.',
-    interfaces: ['TZIP-012', 'TZIP-016', 'TZIP-020'],
-    tokenCategory: 'collectibles'
-  };
-  metadata.set('', toHexString('tezos-storage:contents'));
-  metadata.set('contents', toHexString(JSON.stringify(contents)));
   try {
-    const originationOp = await tz.contract.originate({
-      code: code,
-      storage: {
-        assets: {
-          ledger: new MichelsonMap(),
-          next_token_id: 0,
-          operators: new MichelsonMap(),
-          token_metadata: new MichelsonMap()
-        },
-        metadata: metadata
-      }
-    });
+    const originationOp = await tz.contract.originate(params);
 
     const contract = await originationOp.contract();
     $log.info(`originated contract ${name} with address ${contract.address}`);
@@ -137,20 +128,56 @@ export async function originateNftFaucet(
   }
 }
 
-async function bootstrapNftFaucet(
+export async function originateNftFaucet(
+  tz: TezosToolkit,
+  code: string
+): Promise<Contract> {
+  const metadata = new MichelsonMap<string, string>();
+  const contents = {
+    name: 'Minter',
+    description: 'An OpenMinter base collection contract.',
+    interfaces: ['TZIP-012', 'TZIP-016', 'TZIP-020'],
+    tokenCategory: 'collectibles'
+  };
+  metadata.set('', toHexString('tezos-storage:contents'));
+  metadata.set('contents', toHexString(JSON.stringify(contents)));
+  return originate(tz, 'nft_faucet_main', {
+    code: code,
+    storage: {
+      assets: {
+        ledger: new MichelsonMap(),
+        next_token_id: 0,
+        operators: new MichelsonMap(),
+        token_metadata: new MichelsonMap()
+      },
+      metadata: metadata
+    }
+  });
+}
+
+async function originateFixedPriceMarketTez(
+  tz: TezosToolkit,
+  code: string
+): Promise<Contract> {
+  return originate(tz, 'fixed_price_sale_market_tez', {
+    code: code,
+    storage: new MichelsonMap()
+  });
+}
+
+async function bootstrapContract(
   config: Configstore,
-  tz: TezosToolkit
+  tz: TezosToolkit,
+  params: BootstrapContractParams
 ): Promise<void> {
-  const configKey = 'contracts.nftFaucet';
-  const contractFilename = 'fa2_multi_nft_faucet.tz';
-  const shouldOrig = await shouldOriginate(config, tz, configKey);
+  const shouldOrig = await shouldOriginate(config, tz, params.configKey);
   if (!shouldOrig) return;
 
   $log.info('originating...');
-  const codeFilepath = defaultEnv.outFilePath(contractFilename);
+  const codeFilepath = defaultEnv.outFilePath(params.contractFilename);
   const code = await loadFile(codeFilepath);
-  const contract = await originateNftFaucet(tz, code);
-  config.set(configKey, contract.address);
+  const contract = await params.originate(tz, code);
+  config.set(params.configKey, contract.address);
   $log.info('originated');
 }
 
@@ -162,7 +189,20 @@ async function main() {
     const config = getConfig(env);
     const toolkit = await createToolkit(config);
     await awaitForNetwork(toolkit);
-    await bootstrapNftFaucet(config, toolkit);
+
+    // bootstrap NFT faucet
+    await bootstrapContract(config, toolkit, {
+      configKey: 'contracts.nftFaucet',
+      contractFilename: 'fa2_multi_nft_faucet.tz',
+      originate: originateNftFaucet
+    });
+
+    // bootstrap marketplace fixed price (tez)
+    await bootstrapContract(config, toolkit, {
+      configKey: 'contracts.marketplace.fixedPrice.tez',
+      contractFilename: 'fixed_price_sale_market_tez.tz',
+      originate: originateFixedPriceMarketTez
+    });
 
     genClientConfig(config);
     genServerConfig(config);

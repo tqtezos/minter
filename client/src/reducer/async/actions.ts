@@ -3,7 +3,11 @@ import { State } from '..';
 import {
   createAssetContract,
   mintToken,
-  transferToken
+  transferToken,
+  listTokenForSale,
+  cancelTokenSale,
+  approveTokenOperator,
+  buyToken
 } from '../../lib/nfts/actions';
 // import {getNftAssetContract} from '../../lib/nfts/queries'
 import { ErrorKind, RejectValue } from './errors';
@@ -220,6 +224,89 @@ export const transferTokenAction = createAsyncThunk<
     return rejectWithValue({
       kind: ErrorKind.TransferTokenFailed,
       message: 'Transfer token failed'
+    });
+  }
+});
+
+export const listTokenAction = createAsyncThunk<
+  { contract: string; tokenId: number, salePrice: number },
+  { contract: string; tokenId: number, salePrice: number },
+  Options
+>('actions/listTokenForSale', async (args, api) => {
+  const { getState, rejectWithValue } = api;
+  const { contract, tokenId, salePrice } = args;
+  const { system } = getState();
+  const marketplaceContract = system.config.contracts.marketplace.fixedPrice.tez;
+  if (system.status !== 'WalletConnected') {
+    return rejectWithValue({
+      kind: ErrorKind.WalletNotConnected,
+      message: 'Could not list token: no wallet connected'
+    });
+  }
+  try {
+    const op1 = await approveTokenOperator(system, contract, tokenId, marketplaceContract);
+    await op1.confirmation();
+    const op2 = await listTokenForSale(system, marketplaceContract, contract, tokenId, salePrice);
+    await op2.confirmation();
+    return { contract: contract, tokenId: tokenId, salePrice: salePrice };
+  } catch (e) {
+    return rejectWithValue({
+      kind: ErrorKind.ListTokenFailed,
+      message: 'List token failed'
+    });
+  }
+});
+
+export const cancelTokenSaleAction = createAsyncThunk<
+  { contract: string; tokenId: number },
+  { contract: string; tokenId: number },
+  Options
+>('actions/cancelTokenSale', async (args, api) => {
+  const { getState, rejectWithValue } = api;
+  const { contract, tokenId } = args;
+  const { system } = getState();
+  const marketplaceContract = system.config.contracts.marketplace.fixedPrice.tez;
+  if (system.status !== 'WalletConnected') {
+    return rejectWithValue({
+      kind: ErrorKind.WalletNotConnected,
+      message: 'Could not list token: no wallet connected'
+    });
+  }
+  try {
+    const op = await cancelTokenSale(system, marketplaceContract, contract, tokenId);
+    await op.confirmation();
+    return { contract: contract, tokenId: tokenId };
+  } catch (e) {
+    return rejectWithValue({
+      kind: ErrorKind.CancelTokenSaleFailed,
+      message: 'Cancel token sale failed'
+    });
+  }
+});
+
+export const buyTokenAction = createAsyncThunk<
+  { contract: string; tokenId: number },
+  { contract: string; tokenId: number, tokenSeller: string; salePrice: number },
+  Options
+>('actions/buyToken', async (args, api) => {
+  const { getState, rejectWithValue } = api;
+  const { contract, tokenId, tokenSeller, salePrice } = args;
+  const { system } = getState();
+  const marketplaceContract = system.config.contracts.marketplace.fixedPrice.tez;
+  if (system.status !== 'WalletConnected') {
+    return rejectWithValue({
+      kind: ErrorKind.WalletNotConnected,
+      message: 'Could not list token: no wallet connected'
+    });
+  }
+  try {
+    const op = await buyToken(system, marketplaceContract, contract, tokenId, tokenSeller, salePrice);
+    await op.confirmation();
+    return { contract: contract, tokenId: tokenId };
+  } catch (e) {
+    return rejectWithValue({
+      kind: ErrorKind.BuyTokenFailed,
+      message: 'Purchase token failed'
     });
   }
 });
