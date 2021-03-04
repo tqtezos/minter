@@ -138,7 +138,7 @@ export async function cancelTokenSale(
 ) {
   const contractM = await system.toolkit.wallet.at(marketplaceContract);
   const contractT = await system.toolkit.wallet.at(tokenContract);
-  const batch = await system.toolkit.wallet.batch([])
+  const batch = await system.toolkit.wallet.batch()
     .withContractCall(contractM.methods.cancel(system.tzPublicKey, tokenContract, tokenId))
     .withContractCall(contractT.methods.update_operators([
       { remove_operator: { owner: system.tzPublicKey, operator: marketplaceContract, token_id: tokenId }}
