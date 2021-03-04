@@ -1,6 +1,6 @@
 ![OpenMinter header](/docs/assets/minterhead.png)
 
-[![](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE) [![](https://img.shields.io/badge/Docker-20.10.x-blue)](https://www.docker.com/) [![](https://img.shields.io/badge/version-v0.2.0-orange)](https://github.com/tqtezos/minter)
+[![](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE) [![](https://img.shields.io/badge/Docker-20.10.x-blue)](https://www.docker.com/) [![](https://img.shields.io/badge/version-v0.2.1-orange)](https://github.com/tqtezos/minter)
 
 ## Notice
 
@@ -77,7 +77,7 @@ type Config = {
   },
   pinata?: {
     apiKey: string,
-    secretKey: string
+    apiSecret: string
   },
   contracts?: {
     nftFaucet?: string
@@ -91,11 +91,11 @@ administrator during contract origination:
 
 ```json
 {
-	"rpc": "http://localhost:8732",
-	"admin": {
-		"address": "tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU",
-		"secret": "edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx"
-	}
+  "rpc": "http://localhost:8732",
+  "admin": {
+    "address": "tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU",
+    "secret": "edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx"
+  }
 }
 ```
 
