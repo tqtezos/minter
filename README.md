@@ -1,6 +1,6 @@
 ![OpenMinter header](/docs/assets/minterhead.png)
 
-[![](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE) [![](https://img.shields.io/badge/Docker-20.10.x-blue)](https://www.docker.com/) [![](https://img.shields.io/badge/version-v0.1.2-orange)](https://github.com/tqtezos/minter)
+[![](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE) [![](https://img.shields.io/badge/Docker-20.10.x-blue)](https://www.docker.com/) [![](https://img.shields.io/badge/version-v0.2.0-orange)](https://github.com/tqtezos/minter)
 
 ## Notice
 
@@ -17,11 +17,11 @@ contracts, see their NFTs across contracts, and enable marketplace
 capabilities to trade them.
 
 OpenMinter supports the following networks and software components:
-#### 🌐 Mainnet and Edonet networks
+#### 🌐 Mainnet and Edonet
 #### 📦 Sandboxed development via [Flextesa][flextesa]
-#### 🎨 Creating multimedia NFTs
+#### 🎨 Multimedia NFTs powered by [TZIP-21](https://tzip.tezosagora.org/proposal/tzip-21/)
 #### 👛 Various wallets via [Beacon](https://www.walletbeacon.io/)
-#### 📖 Reading blockchain data via [Better Call Dev][bcdhub]
+#### 📖 Indexing via [Better Call Dev][bcdhub]
 #### ⚙️ The latest [FA2](https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md) specification
 #### 🚀 [IPFS](https://ipfs.io/) via a local node or [Pinata](https://pinata.cloud/)
 
@@ -77,7 +77,7 @@ type Config = {
   },
   pinata?: {
     apiKey: string,
-    secretKey: string
+    apiSecret: string
   },
   contracts?: {
     nftFaucet?: string
@@ -91,11 +91,11 @@ administrator during contract origination:
 
 ```json
 {
-	"rpc": "http://localhost:8732",
-	"admin": {
-		"address": "tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU",
-		"secret": "edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx"
-	}
+  "rpc": "http://localhost:8732",
+  "admin": {
+    "address": "tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU",
+    "secret": "edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx"
+  }
 }
 ```
 
