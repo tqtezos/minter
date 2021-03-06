@@ -228,9 +228,7 @@ export async function connectWallet(
   system: SystemWithToolkit,
   eventHandlers?: DAppClientOptions['eventHandlers']
 ): Promise<SystemWithWallet> {
-  console.log('connectWallet - initWallet');
   await initWallet(system, true, eventHandlers);
-  console.log('connectWallet - createSystemWithWallet');
   return await createSystemWithWallet(system);
 }
 
