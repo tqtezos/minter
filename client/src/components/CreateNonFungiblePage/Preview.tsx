@@ -18,9 +18,9 @@ export default function Preview() {
       boxShadow="0px 0px 0px 4px rgba(211, 222, 245, 0.3)"
     >
       <Flex
-        width="100"
         justify="center"
         align="center"
+        width="300px"
         height="300px"
         overflow="hidden"
       >
