@@ -170,15 +170,21 @@ async function initWallet(
 
   if (!activeAccount) {
     if (forceConnect) {
-      await wallet.requestPermissions({
-        network: {
-          type:
-            system.config.network === 'edo2net'
-              ? (system.config.network as NetworkType)
-              : network,
-          rpcUrl: system.config.rpc
-        }
-      });
+      try {
+        await wallet.requestPermissions({
+          network: {
+            type:
+              system.config.network === 'edo2net'
+                ? (system.config.network as NetworkType)
+                : network,
+            rpcUrl: system.config.rpc
+          }
+        });
+      } catch (error) {
+        // requestPermissions failed - reset wallet selection
+        wallet.clearActiveAccount();
+        throw error;
+      }
     } else {
       return false;
     }
@@ -222,7 +228,9 @@ export async function connectWallet(
   system: SystemWithToolkit,
   eventHandlers?: DAppClientOptions['eventHandlers']
 ): Promise<SystemWithWallet> {
+  console.log('connectWallet - initWallet');
   await initWallet(system, true, eventHandlers);
+  console.log('connectWallet - createSystemWithWallet');
   return await createSystemWithWallet(system);
 }
 
