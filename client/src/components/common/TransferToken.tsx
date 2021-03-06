@@ -1,4 +1,4 @@
-import React, { useState, MutableRefObject } from 'react';
+import React, { useState, MutableRefObject, useEffect } from 'react';
 import {
   Box,
   Flex,
@@ -65,7 +65,7 @@ interface TransferTokenButtonProps {
 }
 
 export function TransferTokenButton(props: TransferTokenButtonProps) {
-  const { status } = useSelector(s => s.status.transferToken);
+  const { status, error } = useSelector(s => s.status.transferToken);
   const dispatch = useDispatch();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -87,6 +87,11 @@ export function TransferTokenButton(props: TransferTokenButtonProps) {
       onClose();
     }
   };
+
+  useEffect(() => {
+    // Close the modal (standard error modal is shown)
+    onClose();
+  }, [error]);
 
   return (
     <>
