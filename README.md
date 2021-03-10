@@ -82,6 +82,7 @@ type Config = {
   fleek?: {
     apiKey: string,
     apiSecret: string,
+    keyPrefix?: string,
     bucket?: string
   },
   contracts?: {

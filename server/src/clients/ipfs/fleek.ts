@@ -8,6 +8,7 @@ import { IpfsClient, IpfsClientUploadResult } from '.';
 export interface FleekConfig {
   apiKey: string;
   apiSecret: string;
+  keyPrefix?: string;
   bucket?: string;
   gatewayUrl?: string;
 }
@@ -49,7 +50,7 @@ export class FleekIpfsClient implements IpfsClient {
       apiKey: this.config.apiKey,
       apiSecret: this.config.apiSecret,
       data: bufferData,
-      key: sha1(bufferData),
+      key: (this.config.keyPrefix || "") + sha1(bufferData),
       bucket: this.config.bucket
     };
 
