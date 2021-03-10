@@ -8,16 +8,12 @@ import {
   Image,
   Menu,
   MenuList,
-  Text
+  Text,
+  useDisclosure
 } from '@chakra-ui/react';
-import {
-  ChevronLeft,
-  HelpCircle,
-  MoreHorizontal,
-  Star
-} from 'react-feather';
-import { MinterButton, MinterMenuButton } from '../../common';
-import { TransferMenuItem } from '../../common/TransferToken';
+import { ChevronLeft, HelpCircle, MoreHorizontal, Star } from 'react-feather';
+import { MinterButton, MinterMenuButton, MinterMenuItem } from '../../common';
+import { TransferTokenModal } from '../../common/TransferToken';
 import { SellTokenButton, CancelTokenSaleButton } from '../../common/SellToken';
 import { BuyTokenButton } from '../../common/BuyToken';
 import { ipfsUriToGatewayUrl, uriToCid } from '../../../lib/util/ipfs';
@@ -129,6 +125,7 @@ interface TokenDetailProps {
 function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
   const [, setLocation] = useLocation();
   const { system, collections: state } = useSelector(s => s);
+  const disclosure = useDisclosure();
   const dispatch = useDispatch();
   const collection = state.collections[contractAddress];
 
@@ -209,8 +206,9 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             mb={10}
             pos="relative"
           >
-
-            {system.tzPublicKey && (system.tzPublicKey === token.owner || system.tzPublicKey === token.sale?.seller) ? (
+            {system.tzPublicKey &&
+            (system.tzPublicKey === token.owner ||
+              system.tzPublicKey === token.sale?.seller) ? (
               <Box pos="absolute" top={6} right={6}>
                 <Menu>
                   <MinterMenuButton variant="primary">
@@ -222,16 +220,25 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                     py={2}
                     px={2}
                   >
-                    <TransferMenuItem
-                      contractAddress={contractAddress}
-                      tokenId={tokenId}
-                    />
+                    <MinterMenuItem
+                      variant="primary"
+                      onClick={disclosure.onOpen}
+                    >
+                      Transfer
+                    </MinterMenuItem>
                   </MenuList>
                 </Menu>
+                <TransferTokenModal
+                  contractAddress={contractAddress}
+                  tokenId={tokenId}
+                  disclosure={disclosure}
+                />
               </Box>
             ) : null}
 
-            {system.tzPublicKey && (system.tzPublicKey === token.owner || system.tzPublicKey === token.sale?.seller) ? (
+            {system.tzPublicKey &&
+            (system.tzPublicKey === token.owner ||
+              system.tzPublicKey === token.sale?.seller) ? (
               <Flex>
                 <Flex
                   py={1}
@@ -317,9 +324,13 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   Market status
                 </Heading>
                 {token.sale ? (
-                  <Text color="black" fontSize="lg">For sale</Text>
+                  <Text color="black" fontSize="lg">
+                    For sale
+                  </Text>
                 ) : (
-                  <Text color="black" fontSize="lg">Not for sale</Text>
+                  <Text color="black" fontSize="lg">
+                    Not for sale
+                  </Text>
                 )}
               </Box>
               {token.sale ? (
@@ -332,10 +343,14 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   >
                     Price
                   </Heading>
-                  <Text color="black" fontSize="lg">ꜩ {token.sale.price}</Text>
+                  <Text color="black" fontSize="lg">
+                    ꜩ {token.sale.price}
+                  </Text>
                 </Box>
               ) : null}
-              {system.tzPublicKey && (system.tzPublicKey === token.owner || system.tzPublicKey === token.sale?.seller) ? (
+              {system.tzPublicKey &&
+              (system.tzPublicKey === token.owner ||
+                system.tzPublicKey === token.sale?.seller) ? (
                 <Box>
                   {token.sale ? (
                     <CancelTokenSaleButton
@@ -349,15 +364,11 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                     />
                   )}
                 </Box>
-              ) : (token.sale ? (
-                <BuyTokenButton
-                  contract={contractAddress}
-                  token={token}
-                />
-              ) : null )}
+              ) : token.sale ? (
+                <BuyTokenButton contract={contractAddress} token={token} />
+              ) : null}
             </Flex>
           </Box>
-
         </Flex>
       </Flex>
     </Flex>

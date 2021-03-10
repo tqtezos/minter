@@ -19,7 +19,7 @@ import {
 } from '../../reducer/slices/createNft';
 import { mintTokenAction } from '../../reducer/async/actions';
 import { validateCreateNftStep } from '../../reducer/validators/createNft';
-import { setStatus } from '../../reducer/slices/status';
+import { clearError, setStatus } from '../../reducer/slices/status';
 
 function ProgressIndicator({ state }: { state: CreateNftState }) {
   const stepIdx = steps.indexOf(state.step);
@@ -153,7 +153,16 @@ export default function CreateNonFungiblePage() {
                 dispatch(setStatus({ method: 'mintToken', status: 'ready' }));
                 dispatch(clearForm());
               }}
-              status={status.status}
+              onRetry={() => {
+                dispatch(clearError({ method: 'mintToken' }));
+                dispatch(mintTokenAction());
+              }}
+              onCancel={() => {
+                onClose();
+                dispatch(clearError({ method: 'mintToken' }));
+                dispatch(setStatus({ method: 'mintToken', status: 'ready' }));
+              }}
+              status={status}
             />
           </Flex>
         </Flex>
