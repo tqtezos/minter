@@ -18,6 +18,7 @@ import {
   uploadIPFSImageWithThumbnail
 } from '../../lib/util/ipfs';
 import { SelectedFile } from '../slices/createNft';
+import { connectWallet } from './wallet';
 
 type Options = {
   state: State;
@@ -190,7 +191,7 @@ export const mintTokenAction = createAsyncThunk<
 
   try {
     const op = await mintToken(system, address, metadata);
-    await op.confirmation();
+    await op.confirmation(2);
     dispatch(getContractNftsQuery(address));
     return { contract: address };
   } catch (e) {
@@ -217,7 +218,7 @@ export const transferTokenAction = createAsyncThunk<
   }
   try {
     const op = await transferToken(system, contract, tokenId, to);
-    await op.confirmation();
+    await op.confirmation(2);
     dispatch(getContractNftsQuery(contract));
     return { contract: '', tokenId: 0 };
   } catch (e) {
@@ -232,8 +233,8 @@ export const listTokenAction = createAsyncThunk<
   { contract: string; tokenId: number, salePrice: number },
   { contract: string; tokenId: number, salePrice: number },
   Options
->('actions/listTokenForSale', async (args, api) => {
-  const { getState, rejectWithValue } = api;
+>('actions/listToken', async (args, api) => {
+  const { getState, rejectWithValue, dispatch } = api;
   const { contract, tokenId, salePrice } = args;
   const { system } = getState();
   const marketplaceContract = system.config.contracts.marketplace.fixedPrice.tez;
@@ -247,7 +248,8 @@ export const listTokenAction = createAsyncThunk<
     const op1 = await approveTokenOperator(system, contract, tokenId, marketplaceContract);
     await op1.confirmation();
     const op2 = await listTokenForSale(system, marketplaceContract, contract, tokenId, salePrice);
-    await op2.confirmation();
+    await op2.confirmation(2);
+    dispatch(getContractNftsQuery(contract));
     return { contract: contract, tokenId: tokenId, salePrice: salePrice };
   } catch (e) {
     return rejectWithValue({
@@ -262,7 +264,7 @@ export const cancelTokenSaleAction = createAsyncThunk<
   { contract: string; tokenId: number },
   Options
 >('actions/cancelTokenSale', async (args, api) => {
-  const { getState, rejectWithValue } = api;
+  const { getState, rejectWithValue, dispatch } = api;
   const { contract, tokenId } = args;
   const { system } = getState();
   const marketplaceContract = system.config.contracts.marketplace.fixedPrice.tez;
@@ -274,7 +276,8 @@ export const cancelTokenSaleAction = createAsyncThunk<
   }
   try {
     const op = await cancelTokenSale(system, marketplaceContract, contract, tokenId);
-    await op.confirmation();
+    await op.confirmation(2);
+    dispatch(getContractNftsQuery(contract));
     return { contract: contract, tokenId: tokenId };
   } catch (e) {
     return rejectWithValue({
@@ -289,19 +292,24 @@ export const buyTokenAction = createAsyncThunk<
   { contract: string; tokenId: number, tokenSeller: string; salePrice: number },
   Options
 >('actions/buyToken', async (args, api) => {
-  const { getState, rejectWithValue } = api;
+  const { getState, rejectWithValue, dispatch } = api;
   const { contract, tokenId, tokenSeller, salePrice } = args;
-  const { system } = getState();
+  let { system } = getState();
   const marketplaceContract = system.config.contracts.marketplace.fixedPrice.tez;
   if (system.status !== 'WalletConnected') {
-    return rejectWithValue({
-      kind: ErrorKind.WalletNotConnected,
-      message: 'Could not list token: no wallet connected'
-    });
+    const res = await dispatch(connectWallet());
+    if (!res.payload || !("wallet" in res.payload)) {
+      return rejectWithValue({
+        kind: ErrorKind.WalletNotConnected,
+        message: 'Could not list token: no wallet connected'
+      });
+    }
+    system = res.payload;
   }
   try {
     const op = await buyToken(system, marketplaceContract, contract, tokenId, tokenSeller, salePrice);
-    await op.confirmation();
+    await op.confirmation(2);
+    dispatch(getContractNftsQuery(contract));
     return { contract: contract, tokenId: tokenId };
   } catch (e) {
     return rejectWithValue({
