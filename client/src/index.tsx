@@ -112,6 +112,19 @@ const Button = {
         bg: 'brand.red',
         color: 'white'
       }
+    },
+    tertiaryAction: {
+      bg: 'gray.200',
+      color: 'gray.500',
+      borderRadius: '2px',
+      _hover: {
+        bg: 'gray.100',
+        color: 'gray.400'
+      },
+      _active: {
+        bg: 'gray.100',
+        color: 'gray.400'
+      }
     }
   }
 };
@@ -202,6 +215,26 @@ const theme = extendTheme({
           borderRadius: '1px',
           _focus: {
             boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.1)'
+          }
+        }
+      }
+    },
+    MenuButton: {
+      variants: {
+        primary: {
+          color: 'gray.300',
+          _hover: { color: "brand.blue" },
+          _expanded: { color: "brand.blue" },
+          _focus: { color: "brand.blue" }
+        }
+      }
+    },
+    MenuItem: {
+      variants: {
+        primary: {
+          _focus: {
+            bg: "brand.lightBlue",
+            color: "brand.blue"
           }
         }
       }
