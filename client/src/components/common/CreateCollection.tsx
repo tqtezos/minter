@@ -1,4 +1,9 @@
-import React, { useState, MutableRefObject } from 'react';
+import React, {
+  useState,
+  MutableRefObject,
+  SetStateAction,
+  Dispatch
+} from 'react';
 import {
   Box,
   Text,
@@ -17,20 +22,25 @@ import {
   Flex,
   Heading
 } from '@chakra-ui/react';
-import { CheckCircle, Plus } from 'react-feather';
+import { CheckCircle, Plus, AlertCircle, X } from 'react-feather';
 import { MinterButton } from '../common';
-
 import { useSelector, useDispatch } from '../../reducer';
 import { createAssetContractAction } from '../../reducer/async/actions';
-import { setStatus } from '../../reducer/slices/status';
+import { clearError, setStatus, Status } from '../../reducer/slices/status';
 
 interface FormProps {
   initialRef: MutableRefObject<null>;
   onSubmit: (form: { contractName: string }) => void;
+  contractName: string;
+  setContractName: Dispatch<SetStateAction<string>>;
 }
 
-function Form({ initialRef, onSubmit }: FormProps) {
-  const [contractName, setContractName] = useState('');
+function Form({
+  initialRef,
+  onSubmit,
+  contractName,
+  setContractName
+}: FormProps) {
   return (
     <>
       <ModalHeader>New Collection</ModalHeader>
@@ -60,18 +70,88 @@ function Form({ initialRef, onSubmit }: FormProps) {
   );
 }
 
+interface ContentProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onRetry: () => void;
+  onCancel: () => void;
+  status: Status;
+}
+
+function Content({ status, onClose, onRetry, onCancel }: ContentProps) {
+  if (status.error) {
+    return (
+      <Flex flexDir="column" align="center" px={4} py={10}>
+        <Box color="brand.blue" mb={6}>
+          <AlertCircle size="70px" />
+        </Box>
+        <Heading size="lg" textAlign="center" color="gray.500" mb={6}>
+          Error Creating Collection
+        </Heading>
+        <Flex flexDir="row" justify="center">
+          <MinterButton variant="primaryAction" onClick={() => onRetry()}>
+            Retry
+          </MinterButton>
+          <MinterButton
+            variant="tertiaryAction"
+            onClick={() => onCancel()}
+            display="flex"
+            alignItems="center"
+            ml={4}
+          >
+            <Box color="currentcolor">
+              <X size={16} strokeWidth="3" />
+            </Box>
+            <Text fontSize={16} ml={1} fontWeight="600">
+              Close
+            </Text>
+          </MinterButton>
+        </Flex>
+      </Flex>
+    );
+  }
+  if (status.status === 'in_transit') {
+    return (
+      <Flex flexDir="column" align="center" px={4} py={10}>
+        <Spinner size="xl" mb={6} color="gray.300" />
+        <Heading size="lg" textAlign="center" color="gray.500">
+          Creating collection...
+        </Heading>
+      </Flex>
+    );
+  }
+  if (status.status === 'complete') {
+    return (
+      <Flex flexDir="column" align="center" px={4} py={10}>
+        <Box color="brand.blue" mb={6}>
+          <CheckCircle size="70px" />
+        </Box>
+        <Heading size="lg" textAlign="center" color="gray.500" mb={6}>
+          Collection created
+        </Heading>
+        <MinterButton variant="primaryAction" onClick={() => onClose()}>
+          Close
+        </MinterButton>
+      </Flex>
+    );
+  }
+  return null;
+}
+
 export function CreateCollectionButton() {
-  const { status } = useSelector(s => s.status.createAssetContract);
+  const status = useSelector(s => s.status.createAssetContract);
   const dispatch = useDispatch();
+  const [contractName, setContractName] = useState('');
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const initialRef = React.useRef(null);
 
-  const onSubmit = async (form: { contractName: string }) => {
-    dispatch(createAssetContractAction(form.contractName));
+  const onSubmit = async () => {
+    dispatch(createAssetContractAction(contractName));
   };
 
   const close = () => {
-    if (status !== 'in_transit') {
+    if (status.status !== 'in_transit') {
       dispatch(setStatus({ method: 'createAssetContract', status: 'ready' }));
       onClose();
     }
@@ -97,30 +177,31 @@ export function CreateCollectionButton() {
       >
         <ModalOverlay />
         <ModalContent mt={40}>
-          {status === 'ready' ? (
-            <Form initialRef={initialRef} onSubmit={onSubmit} />
-          ) : null}
-          {status === 'in_transit' ? (
-            <Flex flexDir="column" align="center" px={4} py={10}>
-              <Spinner size="xl" mb={6} color="gray.300" />
-              <Heading size="lg" textAlign="center" color="gray.500">
-                Creating new collection...
-              </Heading>
-            </Flex>
-          ) : null}
-          {status === 'complete' ? (
-            <Flex flexDir="column" align="center" px={4} py={10}>
-              <Box color="brand.blue" mb={6}>
-                <CheckCircle size="70px" />
-              </Box>
-              <Heading size="lg" textAlign="center" color="gray.500" mb={6}>
-                Collection created
-              </Heading>
-              <MinterButton variant="primaryAction" onClick={() => close()}>
-                Close
-              </MinterButton>
-            </Flex>
-          ) : null}
+          {status.status === 'ready' ? (
+            <Form
+              initialRef={initialRef}
+              onSubmit={onSubmit}
+              contractName={contractName}
+              setContractName={setContractName}
+            />
+          ) : (
+            <Content
+              isOpen={isOpen}
+              status={status}
+              onClose={() => close()}
+              onCancel={() => {
+                onClose();
+                dispatch(clearError({ method: 'createAssetContract' }));
+                dispatch(
+                  setStatus({ method: 'createAssetContract', status: 'ready' })
+                );
+              }}
+              onRetry={() => {
+                dispatch(clearError({ method: 'createAssetContract' }));
+                onSubmit();
+              }}
+            />
+          )}
         </ModalContent>
       </Modal>
     </>

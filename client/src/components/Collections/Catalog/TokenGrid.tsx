@@ -141,7 +141,7 @@ export default function TokenGrid({ state, walletAddress }: TokenGridProps) {
   }
 
   const tokens = collection.tokens.filter(
-    ({ owner }) => owner === walletAddress
+    ({ owner, sale }) => owner === walletAddress || sale?.seller === walletAddress
   );
 
   if (tokens.length === 0) {

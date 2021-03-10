@@ -11,7 +11,7 @@ import {
 export function FilePreview({ file }: { file: SelectedFile }) {
   const dispatch = useDispatch();
   if (/^image\/.*/.test(file.type)) {
-    return <Image src={file.objectUrl} />;
+    return <Image src={file.objectUrl} width="100%" height="100%" objectFit='contain' />;
   }
   if (/^video\/.*/.test(file.type)) {
     const canvasRef = createRef<HTMLCanvasElement>();
@@ -101,8 +101,16 @@ export default function FileUpload() {
       >
         <Box as="input" {...getInputProps()} />
         {state.selectedFile?.objectUrl ? (
-          <Box p={4} maxWidth="400px" maxHeight="400px">
-            <FilePreview file={state.selectedFile} />
+          <Box p={4}>
+            <Flex
+              justify="center"
+              align="center"
+              maxWidth="400px"
+              maxHeight="400px"
+              overflow="hidden"
+            >
+              <FilePreview file={state.selectedFile} />
+            </Flex>
           </Box>
         ) : (
           <Flex

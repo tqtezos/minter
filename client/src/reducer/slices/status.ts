@@ -2,7 +2,10 @@ import { createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit';
 import {
   createAssetContractAction,
   mintTokenAction,
-  transferTokenAction
+  transferTokenAction,
+  listTokenAction,
+  cancelTokenSaleAction,
+  buyTokenAction
 } from '../async/actions';
 import {
   getContractNftsQuery,
@@ -13,7 +16,7 @@ import { ErrorKind, RejectValue } from '../async/errors';
 
 export type StatusKey = 'ready' | 'in_transit' | 'complete';
 
-interface Status {
+export interface Status {
   status: StatusKey;
   error: {
     rejectValue: RejectValue;
@@ -25,6 +28,9 @@ export interface StatusState {
   createAssetContract: Status;
   mintToken: Status;
   transferToken: Status;
+  listToken: Status;
+  cancelTokenSale: Status;
+  buyToken: Status;
   getContractNfts: Status;
   getNftAssetContract: Status;
   getWalletAssetContracts: Status;
@@ -38,6 +44,9 @@ const initialState: StatusState = {
   createAssetContract: defaultStatus,
   mintToken: defaultStatus,
   transferToken: defaultStatus,
+  listToken: defaultStatus,
+  cancelTokenSale: defaultStatus,
+  buyToken: defaultStatus,
   getContractNfts: defaultStatus,
   getNftAssetContract: defaultStatus,
   getWalletAssetContracts: defaultStatus
@@ -66,6 +75,9 @@ const slice = createSlice({
       methodMap('createAssetContract', createAssetContractAction),
       methodMap('mintToken', mintTokenAction),
       methodMap('transferToken', transferTokenAction),
+      methodMap('listToken', listTokenAction),
+      methodMap('cancelTokenSale', cancelTokenSaleAction),
+      methodMap('buyToken', buyTokenAction),
       methodMap('getContractNfts', getContractNftsQuery),
       methodMap('getNftAssetContract', getNftAssetContractQuery),
       methodMap('getWalletAssetContracts', getWalletAssetContractsQuery)
@@ -77,17 +89,14 @@ const slice = createSlice({
         state[method].status = 'complete';
       });
       addCase(action.rejected, (state, action) => {
-        if (action.payload) {
-          state[method].error = {
-            rejectValue: action.payload,
-            serialized: action.error
-          };
-        }
+        const rejectValue = action.payload
+          ? action.payload
+          : {
+              kind: ErrorKind.UknownError,
+              message: 'Unknown error'
+            };
         state[method].error = {
-          rejectValue: {
-            kind: ErrorKind.UknownError,
-            message: 'Unknown error'
-          },
+          rejectValue,
           serialized: action.error
         };
       });
