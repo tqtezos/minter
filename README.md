@@ -79,6 +79,11 @@ type Config = {
     apiKey: string,
     apiSecret: string
   },
+  fleek?: {
+    apiKey: string,
+    apiSecret: string,
+    bucket?: string
+  },
   contracts?: {
     nftFaucet?: string
   }

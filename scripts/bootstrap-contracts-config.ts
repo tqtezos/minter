@@ -23,7 +23,7 @@ function genClientConfig(rootConfig: Configstore) {
 function genServerConfig(rootConfig: Configstore) {
   const configPath = path.join(__dirname, `../server/src/config.json`);
   const serverConfig = new Configstore('server', {}, { configPath });
-  const serverConfigKeys = ['pinata'];
+  const serverConfigKeys = ['pinata', 'fleek'];
 
   for (let key of serverConfigKeys) {
     serverConfig.set(key, rootConfig.get(key));

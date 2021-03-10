@@ -1,18 +1,9 @@
 import { Request, Response } from 'express';
-import {
-  PinataConfig,
-  uploadFileToPinata,
-  uploadImageWithThumbnailToPinata,
-  uploadJSONToPinata
-} from './helpers/pinata';
-import {
-  uploadImageWithThumbnailToIpfs,
-  uploadDataToIpfs
-} from './helpers/ipfs';
 import fs from 'fs';
+import { IpfsProvider } from './providers/ipfs';
 
 export async function handleIpfsFileUpload(
-  pinataConfig: PinataConfig | null,
+  ipfsProvider: IpfsProvider,
   req: Request,
   res: Response
 ) {
@@ -24,13 +15,7 @@ export async function handleIpfsFileUpload(
   }
 
   try {
-    if (pinataConfig) {
-      const content = await uploadFileToPinata(pinataConfig, file.tempFilePath);
-      return res.status(200).json(content);
-    }
-    const content = await uploadDataToIpfs(
-      fs.createReadStream(file.tempFilePath)
-    );
+    const content = await ipfsProvider.uploadFile(file.tempFilePath);
     return res.status(200).json(content);
   } catch (e) {
     console.log(e);
@@ -39,7 +24,7 @@ export async function handleIpfsFileUpload(
 }
 
 export async function handleIpfsImageWithThumbnailUpload(
-  pinataConfig: PinataConfig | null,
+  ipfsProvider: IpfsProvider,
   req: Request,
   res: Response
 ) {
@@ -51,14 +36,7 @@ export async function handleIpfsImageWithThumbnailUpload(
   }
 
   try {
-    if (pinataConfig) {
-      const content = await uploadImageWithThumbnailToPinata(
-        pinataConfig,
-        file.tempFilePath
-      );
-      return res.status(200).json(content);
-    }
-    const content = await uploadImageWithThumbnailToIpfs(file.tempFilePath);
+    const content = await ipfsProvider.uploadImageWithThumbnail(file.tempFilePath);
     return res.status(200).json(content);
   } catch (e) {
     console.log(e);
@@ -67,7 +45,7 @@ export async function handleIpfsImageWithThumbnailUpload(
 }
 
 export async function handleIpfsJSONUpload(
-  pinataConfig: PinataConfig | null,
+  ipfsProvider: IpfsProvider,
   req: Request,
   res: Response
 ) {
@@ -78,12 +56,7 @@ export async function handleIpfsJSONUpload(
   }
 
   try {
-    if (pinataConfig) {
-      const content = await uploadJSONToPinata(pinataConfig, req.body);
-      return res.status(200).json(content);
-    }
-
-    const content = await uploadDataToIpfs(JSON.stringify(req.body));
+    const content = await ipfsProvider.uploadJSON(req.body);
     return res.status(200).json(content);
   } catch (e) {
     return res.status(500).json({

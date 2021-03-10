@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import fileUpload from 'express-fileupload';
 import http from 'http';
 import fs from 'fs';
-import { getPinataConfig } from './helpers/pinata';
+import { getProvider } from './helpers/ipfs';
 import {
   handleIpfsFileUpload,
   handleIpfsImageWithThumbnailUpload,
@@ -24,18 +24,18 @@ async function createHttpServer(app: Express) {
     })
   );
 
-  const pinataConfig = await getPinataConfig();
+  const ipfsProvider = await getProvider();
 
   app.post('/ipfs-file-upload', (req, res) => {
-    return handleIpfsFileUpload(pinataConfig, req, res);
+    return handleIpfsFileUpload(ipfsProvider, req, res);
   });
 
   app.post('/ipfs-image-with-thumbnail-upload', (req, res) => {
-    return handleIpfsImageWithThumbnailUpload(pinataConfig, req, res);
+    return handleIpfsImageWithThumbnailUpload(ipfsProvider, req, res);
   });
 
   app.post('/ipfs-json-upload', (req, res) => {
-    return handleIpfsJSONUpload(pinataConfig, req, res);
+    return handleIpfsJSONUpload(ipfsProvider, req, res);
   });
 
   const httpServer = http.createServer(app);
