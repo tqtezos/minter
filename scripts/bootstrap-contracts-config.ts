@@ -6,7 +6,28 @@ import retry from 'async-retry';
 import Configstore from 'configstore';
 import { MichelsonMap, TezosToolkit } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
+import { OriginateParams } from '@taquito/taquito/dist/types/operations/types';
 import { OriginationOperation } from '@taquito/taquito/dist/types/operations/origination-operation';
+import { ContractAbstraction } from '@taquito/taquito/dist/types/contract';
+import { ContractProvider } from '@taquito/taquito/dist/types/contract/interface';
+
+type Contract = ContractAbstraction<ContractProvider>;
+
+interface BoostrapStorageCallback {
+  (): object
+}
+
+interface BootstrapContractParams {
+  configKey: string;
+  contractFilename: string;
+  contractAlias: string;
+  initStorage: BoostrapStorageCallback;
+}
+
+interface ContractCodeResponse {
+  code: string;
+  url: string;
+}
 
 // Client & Server Config Generation
 
@@ -34,10 +55,7 @@ function toHexString(input: string) {
   return Buffer.from(input).toString('hex');
 }
 
-export async function originateNftFaucet(
-  toolkit: TezosToolkit,
-  code: string
-): Promise<OriginationOperation> {
+export function initStorageNftFaucet() {
   const metadata = new MichelsonMap<string, string>();
   const contents = {
     name: 'Minter',
@@ -47,43 +65,35 @@ export async function originateNftFaucet(
   };
   metadata.set('', toHexString('tezos-storage:contents'));
   metadata.set('contents', toHexString(JSON.stringify(contents)));
-  return await toolkit.contract.originate({
-    code: code,
-    storage: {
-      assets: {
-        ledger: new MichelsonMap(),
-        next_token_id: 0,
-        operators: new MichelsonMap(),
-        token_metadata: new MichelsonMap()
-      },
-      metadata: metadata
-    }
-  });
+  return {
+    assets: {
+      ledger: new MichelsonMap(),
+      next_token_id: 0,
+      operators: new MichelsonMap(),
+      token_metadata: new MichelsonMap()
+    },
+    metadata: metadata
+  };
 }
 
-async function exitOnExistingBootstrap(
+async function getContractAddress(
   config: Configstore,
   toolkit: TezosToolkit,
   configKey: string
-): Promise<void> {
-  const address = config.get(configKey);
-  if (!address) return;
+): Promise<string> {
+  const existingAddress = config.get(configKey);
+  if (!existingAddress) return "";
 
-  try {
-    await toolkit.contract.at(address);
-    $log.info(
-      `Contract already exists at address ${address}. Skipping origination`
-    );
-    process.exit(0);
-  } catch (e) {
-    return;
-  }
+  return toolkit.contract
+    .at(existingAddress)
+    .then(() => existingAddress)
+    .catch(() => "");
 }
 
-async function fetchFaucetContractCode() {
+async function fetchContractCode(contractFilename: string): Promise<ContractCodeResponse> {
   const rawRepoUrl = 'https://raw.githubusercontent.com/tqtezos/minter-sdk';
   const gitHash = '8f67bb8c2abc12b8e6f8e529e1412262972deab3';
-  const contractCodeUrl = `${rawRepoUrl}/${gitHash}/contracts/bin/fa2_multi_nft_faucet.tz`;
+  const contractCodeUrl = `${rawRepoUrl}/${gitHash}/contracts/bin/${contractFilename}`;
   const response = await axios.get(contractCodeUrl);
   return { code: response.data, url: contractCodeUrl };
 }
@@ -122,6 +132,45 @@ function readEnv(): string {
   return env;
 }
 
+async function bootstrapContract(
+  config: Configstore,
+  toolkit: TezosToolkit,
+  params: BootstrapContractParams
+): Promise<void> {
+  const address = await getContractAddress(config, toolkit, params.configKey);
+  if (address) {
+    $log.info(
+      `${params.contractAlias} contract already exists at address ${address}. Skipping origination.`
+    );
+    return;
+  }
+
+  let contract;
+  try {
+    const { code, url: contractCodeUrl } = await fetchContractCode(params.contractFilename);
+
+    $log.info(`Originating ${params.contractAlias} contract from ${contractCodeUrl} ...`);
+
+    const storage = params.initStorage();
+    const origOp = await toolkit.contract.originate({
+      code: code,
+      storage: storage
+    });
+  
+    contract = await origOp.contract();
+
+    $log.info(`Originated ${params.contractAlias} contract at address ${contract.address}`);
+    $log.info(`  Consumed gas: ${origOp.consumedGas}`);
+  } catch (error) {
+    const jsonError = JSON.stringify(error, null, 2);
+    $log.error(`${params.contractAlias} origination error ${jsonError}`);
+    process.exit(1);
+  }
+
+  config.set(params.configKey, contract.address);
+  $log.info(`Updated configuration`);
+}
+
 async function bootstrap(env: string) {
   $log.info(`Bootstrapping ${env} environment config...`);
   const configKey = 'contracts.nftFaucet';
@@ -132,40 +181,31 @@ async function bootstrap(env: string) {
   await waitForNetwork(toolkit);
   $log.info('Connected');
 
-  // Exit the script if the contract address defined in the configuration
-  // already exists on chain
-  await exitOnExistingBootstrap(config, toolkit, configKey);
+  // bootstrap NFT faucet
+  await bootstrapContract(config, toolkit, {
+    configKey: 'contracts.nftFaucet',
+    contractAlias: 'nftFaucet',
+    contractFilename: 'fa2_multi_nft_faucet.tz',
+    initStorage: initStorageNftFaucet
+  });
 
-  let contract;
-  try {
-    const { code, url: contractCodeUrl } = await fetchFaucetContractCode();
-
-    $log.info(`Originating contract from ${contractCodeUrl} ...`);
-
-    const origOp = await originateNftFaucet(toolkit, code);
-    contract = await origOp.contract();
-
-    $log.info(`Originated nftFaucet contract at address ${contract.address}`);
-    $log.info(`  Consumed gas: ${origOp.consumedGas}`);
-  } catch (error) {
-    const jsonError = JSON.stringify(error, null, 2);
-    $log.error(`nftFaucet origination error ${jsonError}`);
-    process.exit(1);
-  }
-
-  config.set(configKey, contract.address);
-  $log.info(`Updated configuration`);
+  // bootstrap marketplace fixed price (tez)
+  await bootstrapContract(config, toolkit, {
+    configKey: 'contracts.marketplace.fixedPrice.tez',
+    contractAlias: 'fixedPriceMarketTez',
+    contractFilename: 'fixed_price_sale_market_tez.tz',
+    initStorage: (() => new MichelsonMap())
+  });
 
   genClientConfig(config);
   genServerConfig(config);
-
-  process.exit(0);
 }
 
 async function main() {
   const env = readEnv();
   try {
     await bootstrap(env);
+    process.exit(0);
   } catch (err) {
     $log.error(`Error while bootstrapping environment ${env}`);
     $log.error(err);

@@ -12,6 +12,13 @@ function fromHexString(input: string) {
   return input;
 }
 
+interface NftSale {
+  seller: string;
+  price: number;
+  mutez: number;
+  type: string;
+}
+
 export interface Nft {
   id: number;
   title: string;
@@ -19,6 +26,7 @@ export interface Nft {
   description: string;
   artifactUri: string;
   metadata: Record<string, string>;
+  sale?: NftSale;
 }
 
 export async function getContractNfts(
@@ -49,6 +57,10 @@ export async function getContractNfts(
 
   if (!tokens) return [];
 
+  // get tokens listed for sale
+  const fixedPriceStorage = await system.betterCallDev.getContractStorage(system.config.contracts.marketplace.fixedPrice.tez);
+  const fixedPriceSales = await system.betterCallDev.getBigMapKeys(fixedPriceStorage.value);
+
   return Promise.all(
     tokens.map(
       async (token: any): Promise<Nft> => {
@@ -66,13 +78,29 @@ export async function getContractNfts(
         const entry = ledger.filter((v: any) => v.data.key.value === tokenId);
         const owner = select(entry, { type: 'address' })?.value;
 
+        const saleData = fixedPriceSales.filter((v: any) => {
+          return select(v, { name: 'token_for_sale_address' })?.value === address &&
+            select(v, { name: 'token_for_sale_token_id' })?.value === tokenId
+        });
+
+        let sale = undefined;
+        if (saleData.length > 0 && saleData[0].data.value) {
+          sale = {
+            seller: select(saleData, { name: 'sale_seller' })?.value,
+            price: Number.parseInt(saleData[0].data.value.value, 10) / 1000000,
+            mutez: Number.parseInt(saleData[0].data.value.value, 10),
+            type: 'fixedPrice'
+          };
+        }
+
         return {
           id: parseInt(tokenId, 10),
           title: metadata.name,
           owner,
           description: metadata.description,
           artifactUri: metadata.artifactUri,
-          metadata: metadata
+          metadata: metadata,
+          sale: sale
         };
       }
     )

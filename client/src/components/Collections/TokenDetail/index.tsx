@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import { AspectRatio, Box, Flex, Heading, Image, Text } from '@chakra-ui/react';
 import {
-  ChevronLeft,
-  HelpCircle,
-  /* MoreHorizontal, */ Star
-} from 'react-feather';
-import { MinterButton } from '../../common';
-import { TransferTokenButton } from '../../common/TransferToken';
+  AspectRatio,
+  Box,
+  Flex,
+  Heading,
+  Image,
+  Menu,
+  MenuList,
+  Text,
+  useDisclosure
+} from '@chakra-ui/react';
+import { ChevronLeft, HelpCircle, MoreHorizontal, Star } from 'react-feather';
+import { MinterButton, MinterMenuButton, MinterMenuItem } from '../../common';
+import { TransferTokenModal } from '../../common/TransferToken';
+import { SellTokenButton, CancelTokenSaleButton } from '../../common/SellToken';
+import { BuyTokenButton } from '../../common/BuyToken';
 import { ipfsUriToGatewayUrl, uriToCid } from '../../../lib/util/ipfs';
 import { useSelector, useDispatch } from '../../../reducer';
 import {
@@ -117,6 +125,7 @@ interface TokenDetailProps {
 function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
   const [, setLocation] = useLocation();
   const { system, collections: state } = useSelector(s => s);
+  const disclosure = useDisclosure();
   const dispatch = useDispatch();
   const collection = state.collections[contractAddress];
 
@@ -195,8 +204,41 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             borderRadius="3px"
             py={6}
             mb={10}
+            pos="relative"
           >
-            {system.tzPublicKey && system.tzPublicKey === token.owner ? (
+            {system.tzPublicKey &&
+            (system.tzPublicKey === token.owner ||
+              system.tzPublicKey === token.sale?.seller) ? (
+              <Box pos="absolute" top={6} right={6}>
+                <Menu>
+                  <MinterMenuButton variant="primary">
+                    <MoreHorizontal />
+                  </MinterMenuButton>
+                  <MenuList
+                    borderColor="brand.lightBlue"
+                    borderRadius="2px"
+                    py={2}
+                    px={2}
+                  >
+                    <MinterMenuItem
+                      variant="primary"
+                      onClick={disclosure.onOpen}
+                    >
+                      Transfer
+                    </MinterMenuItem>
+                  </MenuList>
+                </Menu>
+                <TransferTokenModal
+                  contractAddress={contractAddress}
+                  tokenId={tokenId}
+                  disclosure={disclosure}
+                />
+              </Box>
+            ) : null}
+
+            {system.tzPublicKey &&
+            (system.tzPublicKey === token.owner ||
+              system.tzPublicKey === token.sale?.seller) ? (
               <Flex>
                 <Flex
                   py={1}
@@ -215,6 +257,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 </Flex>
               </Flex>
             ) : null}
+
             <Flex
               justify="space-between"
               align="center"
@@ -232,10 +275,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   {token.title}
                 </Heading>
               </Flex>
-              {/* TODO: Add dropdown menu that contains transfer/share links */}
-              {/* <Box color="gray.300"> */}
-              {/*   <MoreHorizontal /> */}
-              {/* </Box> */}
             </Flex>
             <Flex
               px={8}
@@ -264,22 +303,72 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               <Text>{uriToCid(token.artifactUri) || 'No IPFS Hash'}</Text>
             </Flex>
           </Flex>
-          {system.status === 'WalletConnected' ? (
-            <Flex
-              w="100%"
-              bg="white"
-              border="1px solid"
-              borderColor="brand.lightBlue"
-              borderRadius="3px"
-              py={6}
-              px={8}
-            >
-              <TransferTokenButton
-                contractAddress={contractAddress}
-                tokenId={tokenId}
-              />
+
+          <Box
+            w="100%"
+            bg="white"
+            border="1px solid"
+            borderColor="brand.lightBlue"
+            borderRadius="3px"
+            py={6}
+            px={8}
+          >
+            <Flex>
+              <Box flex="1">
+                <Heading
+                  pb={2}
+                  fontSize="xs"
+                  color="brand.gray"
+                  textTransform="uppercase"
+                >
+                  Market status
+                </Heading>
+                {token.sale ? (
+                  <Text color="black" fontSize="lg">
+                    For sale
+                  </Text>
+                ) : (
+                  <Text color="black" fontSize="lg">
+                    Not for sale
+                  </Text>
+                )}
+              </Box>
+              {token.sale ? (
+                <Box flex="1">
+                  <Heading
+                    pb={2}
+                    fontSize="xs"
+                    color="brand.gray"
+                    textTransform="uppercase"
+                  >
+                    Price
+                  </Heading>
+                  <Text color="black" fontSize="lg">
+                    ꜩ {token.sale.price}
+                  </Text>
+                </Box>
+              ) : null}
+              {system.tzPublicKey &&
+              (system.tzPublicKey === token.owner ||
+                system.tzPublicKey === token.sale?.seller) ? (
+                <Box>
+                  {token.sale ? (
+                    <CancelTokenSaleButton
+                      contract={contractAddress}
+                      tokenId={tokenId}
+                    />
+                  ) : (
+                    <SellTokenButton
+                      contract={contractAddress}
+                      tokenId={tokenId}
+                    />
+                  )}
+                </Box>
+              ) : token.sale ? (
+                <BuyTokenButton contract={contractAddress} token={token} />
+              ) : null}
             </Flex>
-          ) : null}
+          </Box>
         </Flex>
       </Flex>
     </Flex>

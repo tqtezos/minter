@@ -87,6 +87,11 @@ type Config = {
   },
   contracts?: {
     nftFaucet?: string
+    marketplace?: {
+      fixedPrice: {
+        tez: string;
+      }
+    }
   }
 }
 ```
