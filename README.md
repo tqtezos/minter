@@ -1,6 +1,6 @@
 ![OpenMinter header](/docs/assets/minterhead.png)
 
-[![](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE) [![](https://img.shields.io/badge/Docker-20.10.x-blue)](https://www.docker.com/) [![](https://img.shields.io/badge/version-v0.2.1-orange)](https://github.com/tqtezos/minter)
+[![](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE) [![](https://img.shields.io/badge/Docker-20.10.x-blue)](https://www.docker.com/) [![](https://img.shields.io/badge/version-v0.3.0-orange)](https://github.com/tqtezos/minter)
 
 ## Notice
 
