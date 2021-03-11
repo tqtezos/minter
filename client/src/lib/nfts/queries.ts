@@ -49,17 +49,22 @@ export async function getContractNfts(
 
   if (tokensBigMapId === undefined || ledgerBigMapId === null) return [];
 
-  const ledger = await system.betterCallDev.getBigMapKeys(ledgerBigMapId);
+  const ledger = await system.betterCallDev.getBigMapKeys(ledgerBigMapId, 100);
 
   if (!ledger) return [];
 
-  const tokens = await system.betterCallDev.getBigMapKeys(tokensBigMapId);
+  const tokens = await system.betterCallDev.getBigMapKeys(tokensBigMapId, 100);
 
   if (!tokens) return [];
 
   // get tokens listed for sale
-  const fixedPriceStorage = await system.betterCallDev.getContractStorage(system.config.contracts.marketplace.fixedPrice.tez);
-  const fixedPriceSales = await system.betterCallDev.getBigMapKeys(fixedPriceStorage.value);
+  const fixedPriceStorage = await system.betterCallDev.getContractStorage(
+    system.config.contracts.marketplace.fixedPrice.tez
+  );
+  const fixedPriceSales = await system.betterCallDev.getBigMapKeys(
+    fixedPriceStorage.value,
+    100
+  );
 
   return Promise.all(
     tokens.map(
@@ -79,8 +84,10 @@ export async function getContractNfts(
         const owner = select(entry, { type: 'address' })?.value;
 
         const saleData = fixedPriceSales.filter((v: any) => {
-          return select(v, { name: 'token_for_sale_address' })?.value === address &&
+          return (
+            select(v, { name: 'token_for_sale_address' })?.value === address &&
             select(v, { name: 'token_for_sale_token_id' })?.value === tokenId
+          );
         });
 
         let sale = undefined;
@@ -128,7 +135,10 @@ export async function getNftAssetContract(
     name: 'metadata'
   })?.value;
 
-  const metaBigMap = await system.betterCallDev.getBigMapKeys(metadataBigMapId);
+  const metaBigMap = await system.betterCallDev.getBigMapKeys(
+    metadataBigMapId,
+    100
+  );
   const metaUri = select(metaBigMap, { key_string: '' })?.value.value;
   const { metadata } = await system.resolveMetadata(metaUri);
 

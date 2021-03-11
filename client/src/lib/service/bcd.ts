@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { Config } from '../system';
 
-export async function getBigMapKeys(config: Config, id: number) {
-  const uri = `${config.bcd.api}/v1/bigmap/${config.network}/${id}/keys`;
+export async function getBigMapKeys(config: Config, id: number, limit = 10) {
+  const uri = `${config.bcd.api}/v1/bigmap/${config.network}/${id}/keys?size=${limit}`;
   const response = await axios.get(uri);
   return response.data;
 }
@@ -49,8 +49,8 @@ export class BetterCallDev {
     this.config = config;
   }
 
-  getBigMapKeys(id: number) {
-    return getBigMapKeys(this.config, id);
+  getBigMapKeys(id: number, limit?: number) {
+    return getBigMapKeys(this.config, id, limit);
   }
 
   getContract(address: string) {
