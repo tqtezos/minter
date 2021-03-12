@@ -30,7 +30,7 @@ Or with NPM:
 
 ```
 npm install
-npm started
+npm start
 ```
 
 ## Support
