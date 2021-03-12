@@ -29,28 +29,6 @@ interface ContractCodeResponse {
   url: string;
 }
 
-// Client & Server Config Generation
-
-function genClientConfig(rootConfig: Configstore) {
-  const configPath = path.join(__dirname, `../client/src/config.json`);
-  const clientConfig = new Configstore('client', {}, { configPath });
-  const clientConfigKeys = ['rpc', 'network', 'bcd', 'ipfs', 'contracts'];
-
-  for (let key of clientConfigKeys) {
-    clientConfig.set(key, rootConfig.get(key));
-  }
-}
-
-function genServerConfig(rootConfig: Configstore) {
-  const configPath = path.join(__dirname, `../server/src/config.json`);
-  const serverConfig = new Configstore('server', {}, { configPath });
-  const serverConfigKeys = ['pinata', 'fleek'];
-
-  for (let key of serverConfigKeys) {
-    serverConfig.set(key, rootConfig.get(key));
-  }
-}
-
 function toHexString(input: string) {
   return Buffer.from(input).toString('hex');
 }
@@ -196,9 +174,6 @@ async function bootstrap(env: string) {
     contractFilename: 'fixed_price_sale_market_tez.tz',
     initStorage: (() => new MichelsonMap())
   });
-
-  genClientConfig(config);
-  genServerConfig(config);
 }
 
 async function main() {
