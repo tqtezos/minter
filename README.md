@@ -47,10 +47,10 @@ OpenMinter supports the following networks and software components:
 
 The following dependencies are required to run OpenMinter.
 
-| Dependency | Version|
+| Dependency | Version | Environments
 |-|-|
-| [Docker][docker] | `v20.10.*` or above |
-| [Yarn][yarn] | `v1.22.*` or above |
+| [Yarn][yarn] | `v1.22.*` or above | All
+| [Docker][docker] | `v20.10.*` or above | Sandbox
 
 [bcdhub]: https://github.com/baking-bad/bcdhub
 [flextesa]: https://gitlab.com/tezos/flextesa
