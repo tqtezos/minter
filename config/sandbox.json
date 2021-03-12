@@ -1,0 +1,17 @@
+{
+  "rpc": "http://localhost:8732",
+  "network": "sandboxnet",
+  "bcd": {
+    "api": "http://localhost:42000",
+    "gui": "http://localhost:8009"
+  },
+  "contracts": {
+    "nftFaucet": "<SANDBOX_NFT_FAUCET_ADDRESS>",
+    "marketplace": {
+      "fixedPrice": {
+        "tez": "<SANDBOX_FIXED_PRICE_ADDRESS>"
+      }
+    }
+  },
+  "ipfsApi": "https://localhost:9000"
+}
