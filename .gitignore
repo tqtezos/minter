@@ -57,7 +57,7 @@ build/Release
 /coverage
 
 # production
-/client/build
+build
 config/minter.mainnet.json
 config/minter.testnet.json
 client/src/config.json
@@ -66,16 +66,9 @@ server/src/config.json
 # misc
 **/.DS_Store
 **/.vscode
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
 nginx.vars
-
-**/*.pp.mligo
-**/*.pp.ligo
