@@ -14,7 +14,7 @@ export async function createFaucetContract(
   name: string
 ) {
   const metadataMap = new MichelsonMap<string, string>();
-  const resp = await uploadIPFSJSON({
+  const resp = await uploadIPFSJSON(system.config.ipfsApi, {
     name,
     description: 'An OpenMinter base collection contract.',
     interfaces: ['TZIP-012', 'TZIP-016', 'TZIP-020'],
@@ -42,7 +42,7 @@ export async function createAssetContract(
   metadata: Record<string, string>
 ) {
   const metadataMap = new MichelsonMap<string, string>();
-  const resp = await uploadIPFSJSON({
+  const resp = await uploadIPFSJSON(system.config.ipfsApi, {
     description: 'An OpenMinter assets contract.',
     interfaces: ['TZIP-012', 'TZIP-016', 'TZIP-020'],
     tokenCategory: 'collectibles',
@@ -80,7 +80,7 @@ export async function mintToken(
 
   const token_id = storage.assets.next_token_id;
   const token_info = new MichelsonMap<string, string>();
-  const resp = await uploadIPFSJSON({
+  const resp = await uploadIPFSJSON(system.config.ipfsApi, {
     ...metadata,
     decimals: 0,
     booleanAmount: true
@@ -125,9 +125,7 @@ export async function listTokenForSale(
   salePrice: number
 ) {
   const contract = await system.toolkit.wallet.at(marketplaceContract);
-  return contract.methods
-    .sell(salePrice, tokenContract, tokenId)
-    .send();
+  return contract.methods.sell(salePrice, tokenContract, tokenId).send();
 }
 
 export async function cancelTokenSale(
@@ -138,11 +136,22 @@ export async function cancelTokenSale(
 ) {
   const contractM = await system.toolkit.wallet.at(marketplaceContract);
   const contractT = await system.toolkit.wallet.at(tokenContract);
-  const batch = await system.toolkit.wallet.batch()
-    .withContractCall(contractM.methods.cancel(system.tzPublicKey, tokenContract, tokenId))
-    .withContractCall(contractT.methods.update_operators([
-      { remove_operator: { owner: system.tzPublicKey, operator: marketplaceContract, token_id: tokenId }}
-    ]));
+  const batch = await system.toolkit.wallet
+    .batch()
+    .withContractCall(
+      contractM.methods.cancel(system.tzPublicKey, tokenContract, tokenId)
+    )
+    .withContractCall(
+      contractT.methods.update_operators([
+        {
+          remove_operator: {
+            owner: system.tzPublicKey,
+            operator: marketplaceContract,
+            token_id: tokenId
+          }
+        }
+      ])
+    );
   return batch.send();
 }
 
@@ -155,7 +164,13 @@ export async function approveTokenOperator(
   const contract = await system.toolkit.wallet.at(contractAddress);
   return contract.methods
     .update_operators([
-      { add_operator: { owner: system.tzPublicKey, operator: operatorAddress, token_id: tokenId }}
+      {
+        add_operator: {
+          owner: system.tzPublicKey,
+          operator: operatorAddress,
+          token_id: tokenId
+        }
+      }
     ])
     .send();
 }
@@ -169,7 +184,13 @@ export async function removeTokenOperator(
   const contract = await system.toolkit.wallet.at(contractAddress);
   return contract.methods
     .update_operators([
-      { remove_operator: { owner: system.tzPublicKey, operator: operatorAddress, token_id: tokenId }}
+      {
+        remove_operator: {
+          owner: system.tzPublicKey,
+          operator: operatorAddress,
+          token_id: tokenId
+        }
+      }
     ])
     .send();
 }

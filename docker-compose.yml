@@ -1,0 +1,98 @@
+version: '3.7'
+
+services:
+  api:
+    image: bakingbad/bcdhub-api:3.4
+    environment:
+      - BCD_ENV=sandbox
+      - GIN_MODE=debug
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=bcd
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+      - SANDBOX_NODE_URI=http://sandbox:20000 # Optional key to point to sandbox
+    depends_on:
+      - elastic
+      - db
+      - mq
+    ports:
+      - 42000:14000
+    logging:
+      options:
+        max-size: 10m
+        max-file: '5'
+
+  indexer:
+    image: bakingbad/bcdhub-indexer:3.4
+    environment:
+      - BCD_ENV=sandbox
+      - GIN_MODE=release
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=bcd
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+      - SANDBOX_NODE_URI=http://sandbox:20000 # Optional key to point to sandbox
+    depends_on:
+      - elastic
+      - mq
+    logging:
+      options:
+        max-size: 10m
+        max-file: '5'
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: bcd
+    ports:
+      - 5432:5432
+
+  mq:
+    image: rabbitmq:latest
+    volumes:
+      - mqdata:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    logging:
+      options:
+        max-size: 10m
+        max-file: '5'
+
+  elastic:
+    image: bakingbad/bcdhub-elastic:3.4
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    environment:
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+    logging:
+      options:
+        max-size: 10m
+        max-file: '5'
+
+  # Flextesa is included only to support running this docker-compose file with
+  # a sandbox node
+  sandbox:
+    image: registry.gitlab.com/tezos/flextesa:56f651af-run
+    environment:
+      block_time: 5
+      flextesa_node_cors_origin: "*"
+    command: "edobox start --keep-root --genesis-block-hash random"
+    ports:
+      - 8732:20000
+
+
+volumes:
+  esdata:
+  mqdata:
+
+networks:
+  default:
+    driver: overlay
+    attachable: true

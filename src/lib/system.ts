@@ -18,9 +18,10 @@ export interface Config {
     marketplace: {
       fixedPrice: {
         tez: string;
-      }
-    }
+      };
+    };
   };
+  ipfsApi: string;
 }
 
 export enum Status {

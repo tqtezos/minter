@@ -12,21 +12,21 @@ export interface IpfsResponse extends IpfsContent {
   thumbnail: IpfsContent;
 }
 
-export async function uploadIPFSJSON(data: any) {
-  return axios.post<IpfsResponse>('/ipfs-json-upload', data);
+export async function uploadIPFSJSON(api: string, data: any) {
+  return axios.post<IpfsResponse>(`${api}/ipfs-json-upload`, data);
 }
 
-export async function uploadIPFSFile(file: File) {
+export async function uploadIPFSFile(api: string, file: File) {
   const formData = new FormData();
   formData.append('file', file);
-  return axios.post<IpfsResponse>('/ipfs-file-upload', formData);
+  return axios.post<IpfsResponse>(`${api}/ipfs-file-upload`, formData);
 }
 
-export async function uploadIPFSImageWithThumbnail(file: File) {
+export async function uploadIPFSImageWithThumbnail(api: string, file: File) {
   const formData = new FormData();
   formData.append('file', file);
   return axios.post<IpfsResponse>(
-    '/ipfs-image-with-thumbnail-upload',
+    `${api}/ipfs-image-with-thumbnail-upload`,
     formData
   );
 }
