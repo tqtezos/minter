@@ -17,5 +17,5 @@
       }
     }
   },
-  "ipfsApi": "https://minter-api.tqhosted.com"
+  "ipfsApi": "http://localhost:3300"
 }

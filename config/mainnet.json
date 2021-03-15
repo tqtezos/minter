@@ -6,10 +6,10 @@
     "gui": "https://better-call.dev"
   },
   "contracts": {
-    "nftFaucet": "<MAINNET_NFT_FAUCET_ADDRESS>",
+    "nftFaucet": "KT1QcxwB4QyPKfmSwjH1VRxa6kquUjeDWeEy",
     "marketplace": {
       "fixedPrice": {
-        "tez": "<MAINNET_FIXED_PRICE_ADDRESS>"
+        "tez": "KT1E8Qzgx3C5AAE4iGuXvqSQjdd21LK2aXAk"
       }
     }
   },

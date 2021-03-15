@@ -83,6 +83,20 @@ services:
     ports:
       - 8732:20000
 
+  ipfs:
+    image: ipfs/go-ipfs
+    ports:
+      - 8080:8080
+      - 4001:4001
+      - 5001:5001
+
+  minter-api:
+    image: tqtezos/minter-api:latest
+    ports:
+      - 3300:3300
+    volumes:
+      - ./config/minter-api.sandbox.json:/usr/src/app/server/config.json
+
 volumes:
   esdata:
   mqdata:

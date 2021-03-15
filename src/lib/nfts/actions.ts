@@ -137,7 +137,7 @@ export async function cancelTokenSale(
   const contractM = await system.toolkit.wallet.at(marketplaceContract);
   const contractT = await system.toolkit.wallet.at(tokenContract);
   const batch = await system.toolkit.wallet
-    .batch()
+    .batch([])
     .withContractCall(
       contractM.methods.cancel(system.tzPublicKey, tokenContract, tokenId)
     )
