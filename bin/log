@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-SERVICE_MATCH="$1"
-
-SERVICE_NAME="$(docker service ls --format "{{.Name}}" | grep "_$SERVICE_MATCH" | head -1)"
-
-shift
-
-docker service logs "$SERVICE_NAME" ${@:-$(echo "--follow" "--raw")}

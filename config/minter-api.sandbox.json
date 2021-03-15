@@ -1,0 +1,13 @@
+{
+  "provider": "sandbox",
+  "pinata": {
+    "apiKey": "",
+    "apiSecret": ""
+  },
+  "fleek": {
+    "apiKey": "",
+    "apiSecret": "",
+    "keyPrefix": "",
+    "bucket": ""
+  }
+}

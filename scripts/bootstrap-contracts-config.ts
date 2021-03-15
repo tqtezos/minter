@@ -6,15 +6,9 @@ import retry from 'async-retry';
 import Configstore from 'configstore';
 import { MichelsonMap, TezosToolkit } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
-import { OriginateParams } from '@taquito/taquito/dist/types/operations/types';
-import { OriginationOperation } from '@taquito/taquito/dist/types/operations/origination-operation';
-import { ContractAbstraction } from '@taquito/taquito/dist/types/contract';
-import { ContractProvider } from '@taquito/taquito/dist/types/contract/interface';
-
-type Contract = ContractAbstraction<ContractProvider>;
 
 interface BoostrapStorageCallback {
-  (): object
+  (): object;
 }
 
 interface BootstrapContractParams {
@@ -27,28 +21,6 @@ interface BootstrapContractParams {
 interface ContractCodeResponse {
   code: string;
   url: string;
-}
-
-// Client & Server Config Generation
-
-function genClientConfig(rootConfig: Configstore) {
-  const configPath = path.join(__dirname, `../client/src/config.json`);
-  const clientConfig = new Configstore('client', {}, { configPath });
-  const clientConfigKeys = ['rpc', 'network', 'bcd', 'ipfs', 'contracts'];
-
-  for (let key of clientConfigKeys) {
-    clientConfig.set(key, rootConfig.get(key));
-  }
-}
-
-function genServerConfig(rootConfig: Configstore) {
-  const configPath = path.join(__dirname, `../server/src/config.json`);
-  const serverConfig = new Configstore('server', {}, { configPath });
-  const serverConfigKeys = ['pinata'];
-
-  for (let key of serverConfigKeys) {
-    serverConfig.set(key, rootConfig.get(key));
-  }
 }
 
 function toHexString(input: string) {
@@ -82,15 +54,17 @@ async function getContractAddress(
   configKey: string
 ): Promise<string> {
   const existingAddress = config.get(configKey);
-  if (!existingAddress) return "";
+  if (!existingAddress) return '';
 
   return toolkit.contract
     .at(existingAddress)
     .then(() => existingAddress)
-    .catch(() => "");
+    .catch(() => '');
 }
 
-async function fetchContractCode(contractFilename: string): Promise<ContractCodeResponse> {
+async function fetchContractCode(
+  contractFilename: string
+): Promise<ContractCodeResponse> {
   const rawRepoUrl = 'https://raw.githubusercontent.com/tqtezos/minter-sdk';
   const gitHash = '8f67bb8c2abc12b8e6f8e529e1412262972deab3';
   const contractCodeUrl = `${rawRepoUrl}/${gitHash}/contracts/bin/${contractFilename}`;
@@ -115,11 +89,19 @@ async function createToolkit(config: Configstore): Promise<TezosToolkit> {
 }
 
 function readConfig(env: string): Configstore {
-  const configFileName = path.join(__dirname, `../config/minter.${env}.json`);
+  const configFileName = path.join(__dirname, `../config/${env}.json`);
   if (!fs.existsSync(configFileName)) {
     $log.error(`Environment config file ${configFileName} does not exist`);
     process.exit(1);
   }
+  return new Configstore('minter', {}, { configPath: configFileName });
+}
+
+function readBootstrappedConfig(env: string): Configstore {
+  const configFileName = path.join(
+    __dirname,
+    `../config/${env}-bootstrapped.json`
+  );
   return new Configstore('minter', {}, { configPath: configFileName });
 }
 
@@ -147,19 +129,25 @@ async function bootstrapContract(
 
   let contract;
   try {
-    const { code, url: contractCodeUrl } = await fetchContractCode(params.contractFilename);
+    const { code, url: contractCodeUrl } = await fetchContractCode(
+      params.contractFilename
+    );
 
-    $log.info(`Originating ${params.contractAlias} contract from ${contractCodeUrl} ...`);
+    $log.info(
+      `Originating ${params.contractAlias} contract from ${contractCodeUrl} ...`
+    );
 
     const storage = params.initStorage();
     const origOp = await toolkit.contract.originate({
       code: code,
       storage: storage
     });
-  
+
     contract = await origOp.contract();
 
-    $log.info(`Originated ${params.contractAlias} contract at address ${contract.address}`);
+    $log.info(
+      `Originated ${params.contractAlias} contract at address ${contract.address}`
+    );
     $log.info(`  Consumed gas: ${origOp.consumedGas}`);
   } catch (error) {
     const jsonError = JSON.stringify(error, null, 2);
@@ -173,8 +161,9 @@ async function bootstrapContract(
 
 async function bootstrap(env: string) {
   $log.info(`Bootstrapping ${env} environment config...`);
-  const configKey = 'contracts.nftFaucet';
   const config = readConfig(env);
+  const bootstrappedConfig = readBootstrappedConfig(env);
+  bootstrappedConfig.all = config.all;
   const toolkit = await createToolkit(config);
 
   $log.info('Connecting to network...');
@@ -182,7 +171,7 @@ async function bootstrap(env: string) {
   $log.info('Connected');
 
   // bootstrap NFT faucet
-  await bootstrapContract(config, toolkit, {
+  await bootstrapContract(bootstrappedConfig, toolkit, {
     configKey: 'contracts.nftFaucet',
     contractAlias: 'nftFaucet',
     contractFilename: 'fa2_multi_nft_faucet.tz',
@@ -190,19 +179,23 @@ async function bootstrap(env: string) {
   });
 
   // bootstrap marketplace fixed price (tez)
-  await bootstrapContract(config, toolkit, {
+  await bootstrapContract(bootstrappedConfig, toolkit, {
     configKey: 'contracts.marketplace.fixedPrice.tez',
     contractAlias: 'fixedPriceMarketTez',
     contractFilename: 'fixed_price_sale_market_tez.tz',
-    initStorage: (() => new MichelsonMap())
+    initStorage: () => new MichelsonMap()
   });
-
-  genClientConfig(config);
-  genServerConfig(config);
 }
 
 async function main() {
-  const env = readEnv();
+  console.log(process.argv[2]);
+  const envArg = process.argv[2];
+  let env;
+  if (['mainnet', 'testnet', 'sandbox'].includes(envArg)) {
+    env = envArg;
+  } else {
+    env = readEnv();
+  }
   try {
     await bootstrap(env);
     process.exit(0);

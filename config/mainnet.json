@@ -1,0 +1,17 @@
+{
+  "rpc": "https://mainnet-tezos.giganode.io",
+  "network": "mainnet",
+  "bcd": {
+    "api": "https://api.better-call.dev",
+    "gui": "https://better-call.dev"
+  },
+  "contracts": {
+    "nftFaucet": "KT1QcxwB4QyPKfmSwjH1VRxa6kquUjeDWeEy",
+    "marketplace": {
+      "fixedPrice": {
+        "tez": "KT1E8Qzgx3C5AAE4iGuXvqSQjdd21LK2aXAk"
+      }
+    }
+  },
+  "ipfsApi": "https://minter-api.tqhosted.com"
+}
