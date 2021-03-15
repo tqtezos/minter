@@ -48,7 +48,7 @@ OpenMinter supports the following networks and software components:
 The following dependencies are required to run OpenMinter.
 
 | Dependency | Version | Environments
-|-|-|
+|-|-|-|
 | [Yarn][yarn] | `v1.22.*` or above | All
 | [Docker][docker] | `v20.10.*` or above | Sandbox
 
