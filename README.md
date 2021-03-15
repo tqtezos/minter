@@ -18,8 +18,8 @@ use this software at your own risk.
 
 ### Quickstart
 
-To start a local OpenMinter instance, make sure you have [yarn][yarn] installed
-(`v1.22.*` or above), and run:
+To start an OpenMinter instance on `testnet`, make sure you have [yarn][yarn]
+installed (`v1.22.*` or above), and run:
 
 ```
 yarn install
@@ -77,10 +77,6 @@ type Config = {
     api: string,
     gui: string
   },
-  admin: {
-    address: string,
-    secret: string
-  },
   contracts?: {
     nftFaucet?: string
     marketplace?: {
@@ -105,14 +101,45 @@ the `minter-ui-dev` and `minter-api-dev` Docker images.
 
 ### Running
 
-To start and stop OpenMinter, run:
+To start OpenMinter on `tesnet`, run:
 
 ```sh
-yarn start
-# or
-yarn stop
+yarn start # or yarn start:testnet
 ```
 
-## Sandboxed Development
+To run OpenMinter configured for `mainnet`, run:
 
-TODO: Write up local development documentation
+```sh
+yarn start:mainnet
+```
+
+## Sandboxed Mode
+
+Sandboxed mode is available for OpenMinter for local testing purposes. Make sure
+[Docker][docker] is installed on your system to run the local services.
+
+> **NOTE**: All data in sandboxed mode is ephemeral. Restarts will _not_ persist
+> any blockchain or indexer data.
+
+### Setup and Starting
+
+To start local sandbox services and create the required default contracts, run:
+
+```sh
+yarn bootstrap:sandbox
+```
+
+Finally, to run the OpenMinter UI, run:
+
+```sh
+yarn start:sandbox
+```
+
+### Stopping
+
+Pressing `Ctrl-C` (or `Command-C` on MacOS) after starting the OpenMinter UI
+will quit the React Scripts process. To teardown the Docker compose system, run:
+
+```sh
+yarn teardown:sandbox
+```

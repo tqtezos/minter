@@ -58,10 +58,10 @@ build/Release
 
 # production
 build
-config/minter.mainnet.json
-config/minter.testnet.json
-client/src/config.json
-server/src/config.json
+
+# configs
+config/sandbox-bootstrapped.json
+src/config.json
 
 # misc
 **/.DS_Store

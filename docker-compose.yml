@@ -27,7 +27,7 @@ services:
     image: bakingbad/bcdhub-indexer:3.4
     environment:
       - BCD_ENV=sandbox
-      - GIN_MODE=release
+      - GIN_MODE=debug
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=bcd
@@ -53,8 +53,6 @@ services:
 
   mq:
     image: rabbitmq:latest
-    volumes:
-      - mqdata:/var/lib/rabbitmq
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
@@ -65,8 +63,6 @@ services:
 
   elastic:
     image: bakingbad/bcdhub-elastic:3.4
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
     environment:
       - bootstrap.memory_lock=true
       - discovery.type=single-node
@@ -87,12 +83,6 @@ services:
     ports:
       - 8732:20000
 
-
 volumes:
   esdata:
   mqdata:
-
-networks:
-  default:
-    driver: overlay
-    attachable: true
