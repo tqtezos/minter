@@ -1,7 +1,0 @@
-version: '3.7'
-
-services:
-  api-server:
-    image: minter-ui-api
-    ports:
-      - 3300:3300

@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-set -e
-
-source ${BASH_SOURCE%/*}/setup-env
-
-docker stack rm $STACK_NAME
