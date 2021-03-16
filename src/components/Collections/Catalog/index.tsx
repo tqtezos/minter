@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { Box, Flex, Heading, Text } from '@chakra-ui/react';
+import { Box, Flex, Heading, Text, Link } from '@chakra-ui/react';
 import { useLocation } from 'wouter';
-import { RefreshCw } from 'react-feather';
+import { RefreshCw, ExternalLink } from 'react-feather';
 import { MinterButton } from '../../common';
 import Sidebar from './Sidebar';
 import TokenGrid from './TokenGrid';
@@ -68,9 +68,14 @@ export default function Catalog() {
         <Flex w="100%" pb={6} justify="space-between" align="center">
           <Flex flexDir="column">
             <Heading size="lg">{collection.metadata.name || ''}</Heading>
-            <Text fontFamily="mono" color="brand.lightGray">
-              {collection.address}
-            </Text>
+            <Flex align="center">
+              <Text fontFamily="mono" color="brand.lightGray">
+                {collection.address}
+              </Text>
+              <Link href={system.config.bcd.gui+"/"+collection.address} color="brand.darkGray" isExternal ml={2}>
+                <ExternalLink size={16} />
+              </Link>
+            </Flex>
           </Flex>
           <MinterButton
             variant="primaryActionInverted"
