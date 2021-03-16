@@ -151,7 +151,7 @@ export function Header() {
             <Box color="brand.lightGray">
               <Share2 size={16} strokeWidth="3" />
             </Box>
-            <Text ml={2}>Edonet</Text>
+            <Text ml={2}>{system.config.network}</Text>
           </HeaderBadge>
         ) : null}
 
