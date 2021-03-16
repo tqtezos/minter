@@ -1,7 +1,6 @@
 import { Buffer } from 'buffer';
 import Joi from 'joi';
 import { SystemWithToolkit, SystemWithWallet } from '../system';
-import { hash as nftAssetHash } from './code/fa2_tzip16_compat_multi_nft_asset';
 import select from '../util/selectObjectByKeys';
 import { ipfsUriToCid } from '../util/ipfs';
 
@@ -149,7 +148,12 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
   const bcd = system.betterCallDev;
   const response = await bcd.getWalletContracts(system.tzPublicKey);
   const assetContracts = response.items.filter(
-    (i: any) => i.body.hash === nftAssetHash
+    (i: any) => "tags" in Object.keys(i.body) &&
+                "fa2" in i.body.tags &&
+                "balance_of" in i.body.entrypoints &&
+                "mint" in i.body.entrypoints &&
+                "transfer" in i.body.entrypoints &&
+                "update_operators" in i.body.entrypoints
   );
 
   const results = [];
