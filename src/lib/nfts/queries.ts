@@ -73,7 +73,10 @@ export async function getContractNfts(
           return { ...acc, [next.name]: fromHexString(next.value) };
         }, {});
 
-        if (ipfsUriToCid(metadata[''])) {
+        if (ipfsUriToCid(metadata['""'])) {
+          const resolvedMetadata = await system.resolveMetadata(metadata['""']);
+          metadata = { ...metadata, ...resolvedMetadata.metadata };
+        } else if (ipfsUriToCid(metadata[''])) {
           const resolvedMetadata = await system.resolveMetadata(metadata['']);
           metadata = { ...metadata, ...resolvedMetadata.metadata };
         }
