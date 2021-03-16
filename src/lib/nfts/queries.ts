@@ -59,7 +59,10 @@ export async function getContractNfts(
 
   // get tokens listed for sale
   const fixedPriceStorage = await system.betterCallDev.getContractStorage(system.config.contracts.marketplace.fixedPrice.tez);
-  const fixedPriceSales = await system.betterCallDev.getBigMapKeys(fixedPriceStorage.value);
+  const fixedPriceBigMapId = select(fixedPriceStorage, {
+    type: 'big_map'
+  })?.value;
+  const fixedPriceSales = await system.betterCallDev.getBigMapKeys(fixedPriceBigMapId);
 
   return Promise.all(
     tokens.map(
