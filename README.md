@@ -101,7 +101,7 @@ the `minter-ui-dev` and `minter-api-dev` Docker images.
 
 ### Running
 
-To start OpenMinter on `tesnet`, run:
+To start OpenMinter on `testnet`, run:
 
 ```sh
 yarn start # or yarn start:testnet
