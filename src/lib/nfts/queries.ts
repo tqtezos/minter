@@ -59,7 +59,10 @@ export async function getContractNfts(
 
   // get tokens listed for sale
   const fixedPriceStorage = await system.betterCallDev.getContractStorage(system.config.contracts.marketplace.fixedPrice.tez);
-  const fixedPriceSales = await system.betterCallDev.getBigMapKeys(fixedPriceStorage.value);
+  const fixedPriceBigMapId = select(fixedPriceStorage, {
+    type: 'big_map'
+  })?.value;
+  const fixedPriceSales = await system.betterCallDev.getBigMapKeys(fixedPriceBigMapId);
 
   return Promise.all(
     tokens.map(
@@ -70,7 +73,10 @@ export async function getContractNfts(
           return { ...acc, [next.name]: fromHexString(next.value) };
         }, {});
 
-        if (ipfsUriToCid(metadata[''])) {
+        if (ipfsUriToCid(metadata['""'])) {
+          const resolvedMetadata = await system.resolveMetadata(metadata['""']);
+          metadata = { ...metadata, ...resolvedMetadata.metadata };
+        } else if (ipfsUriToCid(metadata[''])) {
           const resolvedMetadata = await system.resolveMetadata(metadata['']);
           metadata = { ...metadata, ...resolvedMetadata.metadata };
         }

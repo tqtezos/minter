@@ -1,5 +1,5 @@
 {
-  "rpc": "https://mainnet-tezos.giganode.io",
+  "rpc": "https://rpc.tzbeta.net",
   "network": "mainnet",
   "bcd": {
     "api": "https://api.better-call.dev",

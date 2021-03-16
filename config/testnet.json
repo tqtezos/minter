@@ -1,5 +1,5 @@
 {
-  "rpc": "https://edonet-tezos.giganode.io",
+  "rpc": "https://rpctest.tzbeta.net",
   "network": "edonet",
   "bcd": {
     "api": "https://api.better-call.dev",
