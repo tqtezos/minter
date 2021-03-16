@@ -11,7 +11,7 @@ import {
   MenuList,
   MenuItem
 } from '@chakra-ui/react';
-import { ChevronDown, Package, Plus } from 'react-feather';
+import { ChevronDown, Package, Plus, Share2 } from 'react-feather';
 import headerLogo from './assets/header-logo.svg';
 import { useSelector, useDispatch } from '../../reducer';
 import { disconnectWallet } from '../../reducer/async/wallet';
@@ -50,6 +50,26 @@ function HeaderLink(props: HeaderLinkProps) {
     >
       {props.children}
     </Link>
+  );
+}
+
+function HeaderBadge(props: { children: React.ReactNode }) {
+  return (
+    <Box
+      textDecor="none"
+      borderRadius="10px"
+      alignItems="center"
+      fontWeight="600"
+      px={3}
+      py={2}
+      ml={4}
+      bg="blue.900"
+      color="brand.lightGray"
+      display="flex"
+      transition="none"
+    >
+      {props.children}
+    </Box>
   );
 }
 
@@ -99,6 +119,7 @@ function WalletDisplay() {
 
 export function Header() {
   const [location, setLocation] = useLocation();
+  const system = useSelector(s => s.system);
   if (location === '/' || location === '') {
     return null;
   }
@@ -124,6 +145,16 @@ export function Header() {
         cursor="pointer"
       />
       <Flex flex="1" justify="flex-end">
+
+        {system.config.network !== "mainnet" ? (
+          <HeaderBadge>
+            <Box color="brand.lightGray">
+              <Share2 size={16} strokeWidth="3" />
+            </Box>
+            <Text ml={2}>Edonet</Text>
+          </HeaderBadge>
+        ) : null}
+
         <HeaderLink to="/collections">
           <Box color="brand.turquoise">
             <Package size={16} strokeWidth="3" />
