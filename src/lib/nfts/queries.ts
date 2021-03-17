@@ -135,7 +135,7 @@ export async function getNftAssetContract(
 
   const metaBigMap = await system.betterCallDev.getBigMapKeys(metadataBigMapId);
   const metaUri = select(metaBigMap, { key_string: '' })?.value.value;
-  const { metadata } = await system.resolveMetadata(metaUri);
+  const { metadata } = await system.resolveMetadata(fromHexString(metaUri));
 
   const { error } = metadataSchema.validate(metadata, { allowUnknown: true });
   if (error) {
@@ -148,12 +148,13 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
   const bcd = system.betterCallDev;
   const response = await bcd.getWalletContracts(system.tzPublicKey);
   const assetContracts = response.items.filter(
-    (i: any) => "tags" in Object.keys(i.body) &&
-                "fa2" in i.body.tags &&
-                "balance_of" in i.body.entrypoints &&
-                "mint" in i.body.entrypoints &&
-                "transfer" in i.body.entrypoints &&
-                "update_operators" in i.body.entrypoints
+    (i: any) => Object.keys(i.body).includes("tags") &&
+                i.body.tags.includes("fa2") &&
+                Object.keys(i.body).includes("entrypoints") &&
+                i.body.entrypoints.includes("balance_of") &&
+                i.body.entrypoints.includes("mint") &&
+                i.body.entrypoints.includes("transfer") &&
+                i.body.entrypoints.includes("update_operators")
   );
 
   const results = [];
