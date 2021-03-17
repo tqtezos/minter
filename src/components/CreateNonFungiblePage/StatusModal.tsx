@@ -16,12 +16,13 @@ import { Status } from '../../reducer/slices/status';
 interface StatusModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onToggle: () => void;
   onRetry: () => void;
   onCancel: () => void;
   status: Status;
 }
 
-function Content({ status, onClose, onRetry, onCancel }: StatusModalProps) {
+function Content({ status, onClose, onRetry, onCancel, onToggle, isOpen }: StatusModalProps) {
   if (status.error) {
     return (
       <Flex flexDir="column" align="center" px={4} py={10}>
@@ -60,10 +61,15 @@ function Content({ status, onClose, onRetry, onCancel }: StatusModalProps) {
         <Heading size="lg" textAlign="center" color="gray.500">
           Creating token...
         </Heading>
+        <br/>
+        <Text size="xs" textAlign="center" color="gray.500">
+         <span role="img" aria-label="lightbulb">🌱</span> Minting on Tezos produces 1,500,000 times less CO2 emissions than Ethereum.
+        </Text>
       </Flex>
     );
   }
   if (status.status === 'complete') {
+    if(!isOpen) {onToggle();}
     return (
       <Flex flexDir="column" align="center" px={4} py={10}>
         <Box color="brand.blue" mb={6}>
@@ -82,12 +88,14 @@ function Content({ status, onClose, onRetry, onCancel }: StatusModalProps) {
 }
 
 export default function StatusModal(props: StatusModalProps) {
-  const { isOpen, onClose, status } = props;
+  const { isOpen, onClose, onToggle, status } = props;
   const initialRef = React.useRef(null);
 
   const close = () => {
     if (status.status === 'complete') {
       onClose();
+    } else if(status.status === 'in_transit') {
+      onToggle();
     }
   };
 
