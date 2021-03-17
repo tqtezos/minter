@@ -1,7 +1,6 @@
 import { Buffer } from 'buffer';
 import Joi from 'joi';
 import { SystemWithToolkit, SystemWithWallet } from '../system';
-import { hash as nftAssetHash } from './code/fa2_tzip16_compat_multi_nft_asset';
 import select from '../util/selectObjectByKeys';
 import { ipfsUriToCid } from '../util/ipfs';
 
@@ -136,7 +135,7 @@ export async function getNftAssetContract(
 
   const metaBigMap = await system.betterCallDev.getBigMapKeys(metadataBigMapId);
   const metaUri = select(metaBigMap, { key_string: '' })?.value.value;
-  const { metadata } = await system.resolveMetadata(metaUri);
+  const { metadata } = await system.resolveMetadata(fromHexString(metaUri));
 
   const { error } = metadataSchema.validate(metadata, { allowUnknown: true });
   if (error) {
@@ -149,7 +148,13 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
   const bcd = system.betterCallDev;
   const response = await bcd.getWalletContracts(system.tzPublicKey);
   const assetContracts = response.items.filter(
-    (i: any) => i.body.hash === nftAssetHash
+    (i: any) => Object.keys(i.body).includes("tags") &&
+                i.body.tags.includes("fa2") &&
+                Object.keys(i.body).includes("entrypoints") &&
+                i.body.entrypoints.includes("balance_of") &&
+                i.body.entrypoints.includes("mint") &&
+                i.body.entrypoints.includes("transfer") &&
+                i.body.entrypoints.includes("update_operators")
   );
 
   const results = [];
