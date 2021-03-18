@@ -66,7 +66,7 @@ export default function CreateNonFungiblePage() {
   const status = useSelector(s => s.status.mintToken);
   const dispatch = useDispatch();
   const [, setLocation] = useLocation();
-  const { isOpen, onClose, onOpen } = useDisclosure();
+  const { isOpen, onClose, onOpen, onToggle } = useDisclosure();
   useEffect(() => {
     if (system.status !== 'WalletConnected') {
       setLocation('/');
@@ -161,6 +161,10 @@ export default function CreateNonFungiblePage() {
                 onClose();
                 dispatch(clearError({ method: 'mintToken' }));
                 dispatch(setStatus({ method: 'mintToken', status: 'ready' }));
+              }}
+              onToggle={() => {
+                onToggle();
+                setLocation('/collections');
               }}
               status={status}
             />
