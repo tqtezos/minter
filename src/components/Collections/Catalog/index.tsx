@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Flex, Heading, Text } from '@chakra-ui/react';
 import { useLocation } from 'wouter';
 import { RefreshCw } from 'react-feather';
@@ -17,19 +17,40 @@ export default function Catalog() {
   const [, setLocation] = useLocation();
   const { system, collections: state } = useSelector(s => s);
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [lastRequest, setLastRequest] = useState([{}]);
+
+  let currentCollection = useRef(state.collections[state.globalCollection]);
+
+  useEffect(() => {
+    if (state.selectedCollection)
+      currentCollection.current = state.collections[state.selectedCollection];
+    else currentCollection.current = state.collections[state.globalCollection];
+  }, [state.selectedCollection, state.collections, state.globalCollection]);
 
   useEffect(() => {
     const selectedCollection = state.selectedCollection;
-    if (selectedCollection === null) {
-      dispatch(selectCollection(state.globalCollection));
-    } else {
-      dispatch(getContractNftsQuery(selectedCollection));
+
+    if (!currentCollection.current.tokens) {
+      if (selectedCollection === null) {
+        dispatch(selectCollection(state.globalCollection));
+      } else if (state.selectedCollection !== state.globalCollection) {
+        dispatch(
+          getContractNftsQuery({
+            collection: currentCollection.current,
+            purge: false
+          })
+        ).then(({ payload }) => {
+          if (payload && 'tokens' in payload) setLastRequest(payload.tokens);
+        });
+      }
     }
   }, [
     system.status,
     state.selectedCollection,
     state.globalCollection,
-    dispatch
+    dispatch,
+    currentCollection
   ]);
 
   useEffect(() => {
@@ -64,6 +85,27 @@ export default function Catalog() {
         borderLeftColor="brand.lightBlue"
         overflowY="scroll"
         justify="start"
+        onScroll={e => {
+          const overflowY =
+            e.currentTarget.scrollHeight - window.innerHeight - 10;
+          if (
+            e.currentTarget.scrollTop >= overflowY &&
+            !loading &&
+            lastRequest.length > 0
+          ) {
+            dispatch(
+              getContractNftsQuery({
+                collection: currentCollection.current,
+                purge: false
+              })
+            ).then(({ payload }) => {
+              if (payload && 'tokens' in payload)
+                setLastRequest(payload.tokens);
+              setLoading(false);
+            });
+            setLoading(true);
+          }
+        }}
       >
         <Flex w="100%" pb={6} justify="space-between" align="center">
           <Flex flexDir="column">
@@ -77,7 +119,12 @@ export default function Catalog() {
             onClick={() => {
               const selectedCollection = state.selectedCollection;
               if (selectedCollection !== null) {
-                dispatch(getContractNftsQuery(selectedCollection));
+                dispatch(
+                  getContractNftsQuery({
+                    collection: currentCollection.current,
+                    purge: true
+                  })
+                );
               }
             }}
           >

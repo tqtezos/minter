@@ -19,6 +19,8 @@ import {
 } from '../../lib/util/ipfs';
 import { SelectedFile } from '../slices/createNft';
 import { connectWallet } from './wallet';
+import { AssetContract } from '../../lib/nfts/queries';
+import { Collection, CollectionsState } from '../slices/collections';
 
 type Options = {
   state: State;
@@ -107,110 +109,118 @@ function appendStateMetadata(
 }
 
 export const mintTokenAction = createAsyncThunk<
-  { contract: string },
-  undefined,
+  { contract: Collection },
+  { collections: CollectionsState },
   Options
->('actions/mintToken', async (_, { getState, rejectWithValue, dispatch }) => {
-  const { system, createNft: state } = getState();
-  if (state.selectedFile === null) {
-    return rejectWithValue({
-      kind: ErrorKind.UknownError,
-      message: 'Could not mint token: no file selected'
-    });
-  } else if (system.status !== 'WalletConnected') {
-    return rejectWithValue({
-      kind: ErrorKind.WalletNotConnected,
-      message: 'Could not mint token: no wallet connected'
-    });
-  } else if (!validateCreateNftForm(state)) {
-    return rejectWithValue({
-      kind: ErrorKind.CreateNftFormInvalid,
-      message: 'Could not mint token: form validation failed'
-    });
-  }
-
-  let file: File;
-  try {
-    const { objectUrl, name, type } = state.selectedFile;
-    const fetched = await fetch(objectUrl);
-    const blob = await fetched.blob();
-    file = new File([blob], name, { type });
-  } catch (e) {
-    return rejectWithValue({
-      kind: ErrorKind.UknownError,
-      message: 'Could not mint token: selected file not found'
-    });
-  }
-
-  let ipfsMetadata: Record<string, string> = {};
-  try {
-    if (/^image\/.*/.test(file.type)) {
-      const imageResponse = await uploadIPFSImageWithThumbnail(
-        system.config.ipfsApi,
-        file
-      );
-      ipfsMetadata.artifactUri = imageResponse.data.ipfsUri;
-      ipfsMetadata.displayUri = imageResponse.data.ipfsUri;
-      ipfsMetadata.thumbnailUri = imageResponse.data.thumbnail.ipfsUri;
-    } else if (/^video\/.*/.test(file.type)) {
-      if (state.displayImageFile === null) {
-        return rejectWithValue({
-          kind: ErrorKind.IPFSUploadFailed,
-          message: 'Ipfs upload failed: Video display file not found'
-        });
-      }
-      let displayFile: File;
-      try {
-        const { objectUrl, name, type } = state.displayImageFile;
-        const fetched = await fetch(objectUrl);
-        const blob = await fetched.blob();
-        displayFile = new File([blob], name, { type });
-      } catch (e) {
-        return rejectWithValue({
-          kind: ErrorKind.UknownError,
-          message: 'Could not mint token: video display file not found'
-        });
-      }
-      const fileResponse = await uploadIPFSFile(system.config.ipfsApi, file);
-      const imageResponse = await uploadIPFSImageWithThumbnail(
-        system.config.ipfsApi,
-        displayFile
-      );
-      ipfsMetadata.artifactUri = fileResponse.data.ipfsUri;
-      ipfsMetadata.displayUri = imageResponse.data.ipfsUri;
-      ipfsMetadata.thumbnailUri = imageResponse.data.thumbnail.ipfsUri;
-    } else {
+>(
+  'actions/mintToken',
+  async ({ collections }, { getState, rejectWithValue, dispatch }) => {
+    const { system, createNft: state } = getState();
+    if (state.selectedFile === null) {
       return rejectWithValue({
-        kind: ErrorKind.IPFSUploadFailed,
-        message: 'IPFS upload failed: unknown file type'
+        kind: ErrorKind.UknownError,
+        message: 'Could not mint token: no file selected'
+      });
+    } else if (system.status !== 'WalletConnected') {
+      return rejectWithValue({
+        kind: ErrorKind.WalletNotConnected,
+        message: 'Could not mint token: no wallet connected'
+      });
+    } else if (!validateCreateNftForm(state)) {
+      return rejectWithValue({
+        kind: ErrorKind.CreateNftFormInvalid,
+        message: 'Could not mint token: form validation failed'
       });
     }
-  } catch (e) {
-    return rejectWithValue({
-      kind: ErrorKind.IPFSUploadFailed,
-      message: 'IPFS upload failed'
-    });
-  }
 
-  const address = state.collectionAddress as string;
-  const metadata = appendStateMetadata(state, ipfsMetadata);
+    let file: File;
+    try {
+      const { objectUrl, name, type } = state.selectedFile;
+      const fetched = await fetch(objectUrl);
+      const blob = await fetched.blob();
+      file = new File([blob], name, { type });
+    } catch (e) {
+      return rejectWithValue({
+        kind: ErrorKind.UknownError,
+        message: 'Could not mint token: selected file not found'
+      });
+    }
 
-  try {
-    const op = await mintToken(system, address, metadata);
-    await op.confirmation(2);
-    dispatch(getContractNftsQuery(address));
-    return { contract: address };
-  } catch (e) {
-    return rejectWithValue({
-      kind: ErrorKind.MintTokenFailed,
-      message: 'Mint token failed'
-    });
+    let ipfsMetadata: Record<string, string> = {};
+    try {
+      if (/^image\/.*/.test(file.type)) {
+        const imageResponse = await uploadIPFSImageWithThumbnail(
+          system.config.ipfsApi,
+          file
+        );
+        ipfsMetadata.artifactUri = imageResponse.data.ipfsUri;
+        ipfsMetadata.displayUri = imageResponse.data.ipfsUri;
+        ipfsMetadata.thumbnailUri = imageResponse.data.thumbnail.ipfsUri;
+      } else if (/^video\/.*/.test(file.type)) {
+        if (state.displayImageFile === null) {
+          return rejectWithValue({
+            kind: ErrorKind.IPFSUploadFailed,
+            message: 'Ipfs upload failed: Video display file not found'
+          });
+        }
+        let displayFile: File;
+        try {
+          const { objectUrl, name, type } = state.displayImageFile;
+          const fetched = await fetch(objectUrl);
+          const blob = await fetched.blob();
+          displayFile = new File([blob], name, { type });
+        } catch (e) {
+          return rejectWithValue({
+            kind: ErrorKind.UknownError,
+            message: 'Could not mint token: video display file not found'
+          });
+        }
+        const fileResponse = await uploadIPFSFile(system.config.ipfsApi, file);
+        const imageResponse = await uploadIPFSImageWithThumbnail(
+          system.config.ipfsApi,
+          displayFile
+        );
+        ipfsMetadata.artifactUri = fileResponse.data.ipfsUri;
+        ipfsMetadata.displayUri = imageResponse.data.ipfsUri;
+        ipfsMetadata.thumbnailUri = imageResponse.data.thumbnail.ipfsUri;
+      } else {
+        return rejectWithValue({
+          kind: ErrorKind.IPFSUploadFailed,
+          message: 'IPFS upload failed: unknown file type'
+        });
+      }
+    } catch (e) {
+      return rejectWithValue({
+        kind: ErrorKind.IPFSUploadFailed,
+        message: 'IPFS upload failed'
+      });
+    }
+    const address = state.collectionAddress as string;
+
+    const metadata = appendStateMetadata(state, ipfsMetadata);
+
+    try {
+      const op = await mintToken(system, address, metadata);
+      await op.confirmation(2);
+      dispatch(
+        getContractNftsQuery({
+          collection: collections.collections[address],
+          purge: true
+        })
+      );
+      return { contract: collections.collections[address] };
+    } catch (e) {
+      return rejectWithValue({
+        kind: ErrorKind.MintTokenFailed,
+        message: 'Mint token failed'
+      });
+    }
   }
-});
+);
 
 export const transferTokenAction = createAsyncThunk<
-  { contract: string; tokenId: number },
-  { contract: string; tokenId: number; to: string },
+  { contract: Collection; tokenId: number },
+  { contract: Collection; tokenId: number; to: string },
   Options
 >('actions/transferToken', async (args, api) => {
   const { getState, rejectWithValue, dispatch } = api;
@@ -223,10 +233,19 @@ export const transferTokenAction = createAsyncThunk<
     });
   }
   try {
-    const op = await transferToken(system, contract, tokenId, to);
+    const op = await transferToken(system, contract.address, tokenId, to);
     await op.confirmation(2);
-    dispatch(getContractNftsQuery(contract));
-    return { contract: '', tokenId: 0 };
+    dispatch(getContractNftsQuery({ collection: contract, purge: true }));
+    return {
+      contract: {
+        address: '',
+        tokensId: 0,
+        ledgerId: 0,
+        metadata: {},
+        tokens: []
+      },
+      tokenId: 0
+    };
   } catch (e) {
     return rejectWithValue({
       kind: ErrorKind.TransferTokenFailed,
@@ -236,8 +255,8 @@ export const transferTokenAction = createAsyncThunk<
 });
 
 export const listTokenAction = createAsyncThunk<
-  { contract: string; tokenId: number; salePrice: number },
-  { contract: string; tokenId: number; salePrice: number },
+  { contract: AssetContract; tokenId: number; salePrice: number },
+  { contract: AssetContract; tokenId: number; salePrice: number },
   Options
 >('actions/listToken', async (args, api) => {
   const { getState, rejectWithValue, dispatch } = api;
@@ -254,7 +273,7 @@ export const listTokenAction = createAsyncThunk<
   try {
     const op1 = await approveTokenOperator(
       system,
-      contract,
+      contract.address,
       tokenId,
       marketplaceContract
     );
@@ -262,12 +281,12 @@ export const listTokenAction = createAsyncThunk<
     const op2 = await listTokenForSale(
       system,
       marketplaceContract,
-      contract,
+      contract.address,
       tokenId,
       salePrice
     );
     await op2.confirmation(2);
-    dispatch(getContractNftsQuery(contract));
+    dispatch(getContractNftsQuery({ collection: contract, purge: true }));
     return { contract: contract, tokenId: tokenId, salePrice: salePrice };
   } catch (e) {
     return rejectWithValue({
@@ -278,8 +297,8 @@ export const listTokenAction = createAsyncThunk<
 });
 
 export const cancelTokenSaleAction = createAsyncThunk<
-  { contract: string; tokenId: number },
-  { contract: string; tokenId: number },
+  { contract: AssetContract; tokenId: number },
+  { contract: AssetContract; tokenId: number },
   Options
 >('actions/cancelTokenSale', async (args, api) => {
   const { getState, rejectWithValue, dispatch } = api;
@@ -297,11 +316,11 @@ export const cancelTokenSaleAction = createAsyncThunk<
     const op = await cancelTokenSale(
       system,
       marketplaceContract,
-      contract,
+      contract.address,
       tokenId
     );
     await op.confirmation(2);
-    dispatch(getContractNftsQuery(contract));
+    dispatch(getContractNftsQuery({ collection: contract, purge: true }));
     return { contract: contract, tokenId: tokenId };
   } catch (e) {
     return rejectWithValue({
@@ -312,8 +331,13 @@ export const cancelTokenSaleAction = createAsyncThunk<
 });
 
 export const buyTokenAction = createAsyncThunk<
-  { contract: string; tokenId: number },
-  { contract: string; tokenId: number; tokenSeller: string; salePrice: number },
+  { contract: AssetContract; tokenId: number },
+  {
+    contract: AssetContract;
+    tokenId: number;
+    tokenSeller: string;
+    salePrice: number;
+  },
   Options
 >('actions/buyToken', async (args, api) => {
   const { getState, rejectWithValue, dispatch } = api;
@@ -335,13 +359,13 @@ export const buyTokenAction = createAsyncThunk<
     const op = await buyToken(
       system,
       marketplaceContract,
-      contract,
+      contract.address,
       tokenId,
       tokenSeller,
       salePrice
     );
     await op.confirmation(2);
-    dispatch(getContractNftsQuery(contract));
+    dispatch(getContractNftsQuery({ collection: contract, purge: true }));
     return { contract: contract, tokenId: tokenId };
   } catch (e) {
     return rejectWithValue({

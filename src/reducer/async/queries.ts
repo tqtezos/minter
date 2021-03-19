@@ -8,6 +8,7 @@ import {
   getWalletNftAssetContracts
 } from '../../lib/nfts/queries';
 import { ErrorKind, RejectValue } from './errors';
+import { Collection } from '../slices/collections';
 
 type Opts = { state: State; rejectValue: RejectValue };
 
@@ -29,21 +30,24 @@ export const getNftAssetContractQuery = createAsyncThunk<
 });
 
 export const getContractNftsQuery = createAsyncThunk<
-  { address: string; tokens: Nft[] },
-  string,
+  { collection: Collection | AssetContract; tokens: Nft[] },
+  { collection: Collection | AssetContract; purge: boolean },
   Opts
->('query/getContractNfts', async (address, { getState, rejectWithValue }) => {
-  const { system } = getState();
-  try {
-    const tokens = await getContractNfts(system, address);
-    return { address, tokens };
-  } catch (e) {
-    return rejectWithValue({
-      kind: ErrorKind.GetContractNftsFailed,
-      message: `Failed to retrieve contract nfts from: ${address}`
-    });
+>(
+  'query/getContractNfts',
+  async ({ collection, purge }, { getState, rejectWithValue }) => {
+    const { system } = getState();
+    try {
+      const tokens = await getContractNfts(system, collection, purge);
+      return { collection, tokens };
+    } catch (e) {
+      return rejectWithValue({
+        kind: ErrorKind.GetContractNftsFailed,
+        message: `Failed to retrieve contract nfts from: ${collection}`
+      });
+    }
   }
-});
+);
 
 export const getWalletAssetContractsQuery = createAsyncThunk<
   AssetContract[],

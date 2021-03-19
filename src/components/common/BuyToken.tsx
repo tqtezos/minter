@@ -20,10 +20,10 @@ import { MinterButton } from '../common';
 import { useSelector, useDispatch } from '../../reducer';
 import { buyTokenAction } from '../../reducer/async/actions';
 import { setStatus } from '../../reducer/slices/status';
-import { Nft } from '../../lib/nfts/queries';
+import { AssetContract, Nft } from '../../lib/nfts/queries';
 
 interface BuyTokenButtonProps {
-  contract: string;
+  contract: AssetContract;
   token: Nft;
 }
 
@@ -39,7 +39,7 @@ export function BuyTokenButton(props: BuyTokenButtonProps) {
       buyTokenAction({
         contract: props.contract,
         tokenId: props.token.id,
-        tokenSeller: props.token.sale?.seller || "",
+        tokenSeller: props.token.sale?.seller || '',
         salePrice: props.token.sale?.price || 0
       })
     );
@@ -54,7 +54,9 @@ export function BuyTokenButton(props: BuyTokenButtonProps) {
 
   return (
     <>
-      <MinterButton variant="primaryAction" onClick={onOpen}>Buy now</MinterButton>
+      <MinterButton variant="primaryAction" onClick={onOpen}>
+        Buy now
+      </MinterButton>
 
       <Modal
         isOpen={isOpen}
@@ -70,18 +72,26 @@ export function BuyTokenButton(props: BuyTokenButtonProps) {
         <ModalContent mt={40}>
           {status === 'ready' ? (
             <>
-            <ModalHeader>Checkout</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>
-                You are about to purchase<Box as="span" fontWeight="bold"> {props.token.title} (ꜩ {props.token.sale?.price})</Box>
-              </Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button variant="primaryAction" onClick={onSubmit} isFullWidth={true}>
-                Buy now
-              </Button>
-            </ModalFooter>
+              <ModalHeader>Checkout</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Text>
+                  You are about to purchase
+                  <Box as="span" fontWeight="bold">
+                    {' '}
+                    {props.token.title} (ꜩ {props.token.sale?.price})
+                  </Box>
+                </Text>
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  variant="primaryAction"
+                  onClick={onSubmit}
+                  isFullWidth={true}
+                >
+                  Buy now
+                </Button>
+              </ModalFooter>
             </>
           ) : null}
           {status === 'in_transit' ? (

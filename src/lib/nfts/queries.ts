@@ -3,6 +3,7 @@ import Joi from 'joi';
 import { SystemWithToolkit, SystemWithWallet } from '../system';
 import select from '../util/selectObjectByKeys';
 import { ipfsUriToCid } from '../util/ipfs';
+import { Collection } from '../../reducer/slices/collections';
 
 function fromHexString(input: string) {
   if (/^([A-Fa-f0-9]{2})*$/.test(input)) {
@@ -30,40 +31,42 @@ export interface Nft {
 
 export async function getContractNfts(
   system: SystemWithToolkit | SystemWithWallet,
-  address: string
+  collection: Collection | AssetContract,
+  purge: boolean = false
 ): Promise<Nft[]> {
-  const storage = await system.betterCallDev.getContractStorage(address);
-
-  const ledgerBigMapId = select(storage, {
-    type: 'big_map',
-    name: 'ledger'
-  })?.value;
+  const ledgerBigMapId = collection.ledgerId;
 
   if (ledgerBigMapId === undefined || ledgerBigMapId === null) return [];
 
-  const tokensBigMapId = select(storage, {
-    type: 'big_map',
-    name: 'token_metadata'
-  })?.value;
+  const tokensBigMapId = collection.tokensId;
 
   if (tokensBigMapId === undefined || ledgerBigMapId === null) return [];
 
-  const ledger = await system.betterCallDev.getBigMapKeys(ledgerBigMapId);
-
-  if (!ledger) return [];
-
-  const tokens = await system.betterCallDev.getBigMapKeys(tokensBigMapId);
-
-  if (!tokens) return [];
+  const [ledger, tokens] = await Promise.all([
+    system.betterCallDev.getBigMapKeys(
+      ledgerBigMapId,
+      purge ? 0 : 'tokens' in collection ? collection.tokens?.length : 0
+    ),
+    system.betterCallDev.getBigMapKeys(
+      tokensBigMapId,
+      purge ? 0 : 'tokens' in collection ? collection.tokens?.length : 0
+    )
+  ]);
 
   // get tokens listed for sale
-  const fixedPriceStorage = await system.betterCallDev.getContractStorage(system.config.contracts.marketplace.fixedPrice.tez);
+  const fixedPriceStorage = await system.betterCallDev.getContractStorage(
+    system.config.contracts.marketplace.fixedPrice.tez
+  );
+
   const fixedPriceBigMapId = select(fixedPriceStorage, {
     type: 'big_map'
   })?.value;
-  const fixedPriceSales = await system.betterCallDev.getBigMapKeys(fixedPriceBigMapId);
 
-  return Promise.all(
+  const fixedPriceSales = await system.betterCallDev.getBigMapKeys(
+    fixedPriceBigMapId
+  );
+
+  return Promise.all<Nft>(
     tokens.map(
       async (token: any): Promise<Nft> => {
         const tokenId = select(token, { name: 'token_id' })?.value;
@@ -84,8 +87,11 @@ export async function getContractNfts(
         const owner = select(entry, { type: 'address' })?.value;
 
         const saleData = fixedPriceSales.filter((v: any) => {
-          return select(v, { name: 'token_for_sale_address' })?.value === address &&
+          return (
+            select(v, { name: 'token_for_sale_address' })?.value ===
+              collection.address &&
             select(v, { name: 'token_for_sale_token_id' })?.value === tokenId
+          );
         });
 
         let sale = undefined;
@@ -109,12 +115,18 @@ export async function getContractNfts(
         };
       }
     )
+  ).then(tokens =>
+    'tokens' in collection
+      ? [...(purge ? [] : collection.tokens || []), ...tokens]
+      : tokens
   );
 }
 
 export interface AssetContract {
   address: string;
   metadata: Record<string, any>;
+  ledgerId: number;
+  tokensId: number;
 }
 
 const metadataSchema = Joi.object({
@@ -133,6 +145,16 @@ export async function getNftAssetContract(
     name: 'metadata'
   })?.value;
 
+  const ledgerId = select(storage, {
+    type: 'big_map',
+    name: 'ledger'
+  })?.value;
+
+  const tokensId = select(storage, {
+    type: 'big_map',
+    name: 'token_metadata'
+  })?.value;
+
   const metaBigMap = await system.betterCallDev.getBigMapKeys(metadataBigMapId);
   const metaUri = select(metaBigMap, { key_string: '' })?.value.value;
   const { metadata } = await system.resolveMetadata(fromHexString(metaUri));
@@ -141,31 +163,33 @@ export async function getNftAssetContract(
   if (error) {
     throw Error('Metadata validation failed');
   }
-  return { address, metadata };
+  return { address, metadata, ledgerId, tokensId };
 }
 
 export async function getWalletNftAssetContracts(system: SystemWithWallet) {
   const bcd = system.betterCallDev;
-  const response = await bcd.getWalletContracts(system.tzPublicKey);
-  const assetContracts = response.items.filter(
-    (i: any) => Object.keys(i.body).includes("tags") &&
-                i.body.tags.includes("fa2") &&
-                Object.keys(i.body).includes("entrypoints") &&
-                i.body.entrypoints.includes("balance_of") &&
-                i.body.entrypoints.includes("mint") &&
-                i.body.entrypoints.includes("transfer") &&
-                i.body.entrypoints.includes("update_operators")
-  );
 
+  let response;
   const results = [];
-  for (let assetContract of assetContracts) {
-    try {
-      const result = await getNftAssetContract(system, assetContract.value);
-      results.push(result);
-    } catch (e) {
-      console.log(e);
-    }
-  }
+  do {
+    response = await bcd.getWalletContracts(system.tzPublicKey, results.length);
+    results.push(
+      ...response.items
+        .filter(
+          (i: any) =>
+            Object.keys(i.body).includes('tags') &&
+            i.body.tags.includes('fa2') &&
+            Object.keys(i.body).includes('entrypoints') &&
+            i.body.entrypoints.includes('balance_of') &&
+            i.body.entrypoints.includes('mint') &&
+            i.body.entrypoints.includes('transfer') &&
+            i.body.entrypoints.includes('update_operators')
+        )
+        .map((assetContract: any) =>
+          getNftAssetContract(system, assetContract.value).catch(console.error)
+        )
+    );
+  } while (response.count !== results.length);
 
-  return results;
+  return await Promise.all(results);
 }

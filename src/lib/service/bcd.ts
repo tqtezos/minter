@@ -1,9 +1,17 @@
 import axios from 'axios';
 import { Config } from '../system';
 
-export async function getBigMapKeys(config: Config, id: number) {
+export async function getBigMapKeys(
+  config: Config,
+  id: number,
+  offset: number
+) {
   const uri = `${config.bcd.api}/v1/bigmap/${config.network}/${id}/keys`;
-  const response = await axios.get(uri);
+  const response = await axios.get(uri, {
+    params: {
+      offset
+    }
+  });
   return response.data;
 }
 
@@ -30,9 +38,17 @@ export async function getContractOperations(
   return response.data;
 }
 
-export async function getWalletContracts(config: Config, address: string) {
+export async function getWalletContracts(
+  config: Config,
+  address: string,
+  offset: number
+) {
   const uri = `${config.bcd.api}/v1/search?q=${address}&i=contract&n=${config.network}&g=0&s=0`;
-  const response = await axios.get(uri);
+  const response = await axios.get(uri, {
+    params: {
+      o: offset
+    }
+  });
   return response.data;
 }
 
@@ -49,8 +65,8 @@ export class BetterCallDev {
     this.config = config;
   }
 
-  getBigMapKeys(id: number) {
-    return getBigMapKeys(this.config, id);
+  getBigMapKeys(id: number, offset: number = 0) {
+    return getBigMapKeys(this.config, id, offset);
   }
 
   getContract(address: string) {
@@ -65,8 +81,8 @@ export class BetterCallDev {
     return getContractOperations(this.config, address, since);
   }
 
-  getWalletContracts(address: string) {
-    return getWalletContracts(this.config, address);
+  getWalletContracts(address: string, offset: number = 0) {
+    return getWalletContracts(this.config, address, offset);
   }
 
   getAccountMetadata(address: string) {

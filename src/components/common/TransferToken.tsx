@@ -28,6 +28,7 @@ import { MinterButton } from '../common';
 import { useSelector, useDispatch } from '../../reducer';
 import { transferTokenAction } from '../../reducer/async/actions';
 import { clearError, setStatus, Status } from '../../reducer/slices/status';
+import { Collection } from '../../reducer/slices/collections';
 
 interface FormProps {
   initialRef: MutableRefObject<null>;
@@ -135,7 +136,7 @@ function Content({ status, onClose, onRetry, onCancel }: ContentProps) {
 }
 
 interface TransferTokenModalProps {
-  contractAddress: string;
+  contract: Collection;
   tokenId: number;
   disclosure: UseDisclosureReturn;
 }
@@ -151,7 +152,7 @@ export function TransferTokenModal(props: TransferTokenModalProps) {
   const onSubmit = async () => {
     dispatch(
       transferTokenAction({
-        contract: props.contractAddress,
+        contract: props.contract,
         tokenId: props.tokenId,
         to: toAddress
       })
@@ -206,7 +207,7 @@ export function TransferTokenModal(props: TransferTokenModalProps) {
 }
 
 interface TransferTokenButtonProps {
-  contractAddress: string;
+  contract: Collection;
   tokenId: number;
 }
 

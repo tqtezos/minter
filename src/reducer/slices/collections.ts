@@ -38,18 +38,23 @@ export const initialState: CollectionsState = {
       metadata: {
         name: 'Minter'
       },
-      tokens: null
+      tokens: null,
+      ledgerId: 29150,
+      tokensId: 29152
     }
   }
 };
 
 //// Reducers & Slice
 
-type PopulateCollection = Reducer<{ address: string; tokens: Token[] }>;
+type PopulateCollection = Reducer<{
+  collection: AssetContract;
+  tokens: Token[];
+}>;
 
 const populateCollectionR: PopulateCollection = (state, { payload }) => {
-  if (state.collections[payload.address]) {
-    state.collections[payload.address].tokens = payload.tokens;
+  if (state.collections[payload.collection.address]) {
+    state.collections[payload.collection.address].tokens = payload.tokens;
   }
 };
 

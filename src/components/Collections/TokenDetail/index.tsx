@@ -22,6 +22,7 @@ import {
   getContractNftsQuery,
   getNftAssetContractQuery
 } from '../../../reducer/async/queries';
+import { AssetContract } from '../../../lib/nfts/queries';
 
 function NotFound() {
   return (
@@ -135,9 +136,20 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
     if (collectionUndefined) {
       dispatch(getNftAssetContractQuery(contractAddress));
     } else {
-      dispatch(getContractNftsQuery(contractAddress));
+      dispatch(
+        getContractNftsQuery({
+          collection: state.collections[contractAddress],
+          purge: false
+        })
+      );
     }
-  }, [contractAddress, tokenId, collectionUndefined, dispatch]);
+  }, [
+    contractAddress,
+    tokenId,
+    collectionUndefined,
+    state.collections,
+    dispatch
+  ]);
 
   if (!collection?.tokens) {
     return null;
@@ -229,7 +241,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   </MenuList>
                 </Menu>
                 <TransferTokenModal
-                  contractAddress={contractAddress}
+                  contract={state.collections[contractAddress]}
                   tokenId={tokenId}
                   disclosure={disclosure}
                 />
@@ -354,18 +366,25 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 <Box>
                   {token.sale ? (
                     <CancelTokenSaleButton
-                      contract={contractAddress}
+                      contract={
+                        state.collections[contractAddress] as AssetContract
+                      }
                       tokenId={tokenId}
                     />
                   ) : (
                     <SellTokenButton
-                      contract={contractAddress}
+                      contract={
+                        state.collections[contractAddress] as AssetContract
+                      }
                       tokenId={tokenId}
                     />
                   )}
                 </Box>
               ) : token.sale ? (
-                <BuyTokenButton contract={contractAddress} token={token} />
+                <BuyTokenButton
+                  contract={state.collections[contractAddress] as AssetContract}
+                  token={token}
+                />
               ) : null}
             </Flex>
           </Box>

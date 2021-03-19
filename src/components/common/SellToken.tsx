@@ -22,8 +22,12 @@ import {
 import { Check, CheckCircle } from 'react-feather';
 import { MinterButton } from '../common';
 import { useSelector, useDispatch } from '../../reducer';
-import { listTokenAction, cancelTokenSaleAction } from '../../reducer/async/actions';
+import {
+  listTokenAction,
+  cancelTokenSaleAction
+} from '../../reducer/async/actions';
 import { setStatus } from '../../reducer/slices/status';
+import { AssetContract } from '../../lib/nfts/queries';
 
 interface FormProps {
   initialRef: MutableRefObject<null>;
@@ -31,7 +35,7 @@ interface FormProps {
 }
 
 interface SellTokenButtonProps {
-  contract: string;
+  contract: AssetContract;
   tokenId: number;
 }
 
@@ -43,31 +47,31 @@ function FormFixedPrice({ initialRef, onSubmit }: FormProps) {
       <ModalCloseButton />
       <ModalBody>
         <Flex>
-        <FormControl>
-          <InputGroup>
-            <InputLeftElement
-              pointerEvents="none"
-              color="gray.900"
-              fontSize="1.2em"
-              children="ꜩ"
-            />
-            <Input
-              autoFocus={true}
-              ref={initialRef}
-              placeholder="Enter sale amount"
-              value={salePrice}
-              onChange={e => setSalePrice(e.target.value)}
-            />
-          </InputGroup>
-        </FormControl>
-        <Box ml={2}>
-        <MinterButton
-          variant="primaryAction"
-          onClick={() => onSubmit({ salePrice })}
-        >
-          <Check />
-        </MinterButton>
-        </Box>
+          <FormControl>
+            <InputGroup>
+              <InputLeftElement
+                pointerEvents="none"
+                color="gray.900"
+                fontSize="1.2em"
+                children="ꜩ"
+              />
+              <Input
+                autoFocus={true}
+                ref={initialRef}
+                placeholder="Enter sale amount"
+                value={salePrice}
+                onChange={e => setSalePrice(e.target.value)}
+              />
+            </InputGroup>
+          </FormControl>
+          <Box ml={2}>
+            <MinterButton
+              variant="primaryAction"
+              onClick={() => onSubmit({ salePrice })}
+            >
+              <Check />
+            </MinterButton>
+          </Box>
         </Flex>
       </ModalBody>
       <ModalFooter />
@@ -104,7 +108,9 @@ export function SellTokenButton(props: SellTokenButtonProps) {
 
   return (
     <>
-      <MinterButton variant="primaryAction" onClick={onOpen}>List for sale</MinterButton>
+      <MinterButton variant="primaryAction" onClick={onOpen}>
+        List for sale
+      </MinterButton>
 
       <Modal
         isOpen={isOpen}
@@ -171,7 +177,9 @@ export function CancelTokenSaleButton(props: SellTokenButtonProps) {
 
   return (
     <>
-      <MinterButton variant="cancelAction" onClick={onOpen}>Cancel sale</MinterButton>
+      <MinterButton variant="cancelAction" onClick={onOpen}>
+        Cancel sale
+      </MinterButton>
 
       <Modal
         isOpen={isOpen}
@@ -186,17 +194,19 @@ export function CancelTokenSaleButton(props: SellTokenButtonProps) {
         <ModalContent mt={40}>
           {status === 'ready' ? (
             <>
-            <ModalHeader>Are you sure?</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>
-                Are you sure you want to cancel the sale?
-              </Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button variant="primaryAction" mr={3} onClick={onSubmit}>Yes</Button>
-              <Button variant="cancelAction" onClick={onClose}>No</Button>
-            </ModalFooter>
+              <ModalHeader>Are you sure?</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Text>Are you sure you want to cancel the sale?</Text>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="primaryAction" mr={3} onClick={onSubmit}>
+                  Yes
+                </Button>
+                <Button variant="cancelAction" onClick={onClose}>
+                  No
+                </Button>
+              </ModalFooter>
             </>
           ) : null}
           {status === 'in_transit' ? (
