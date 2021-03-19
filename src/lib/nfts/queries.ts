@@ -80,8 +80,9 @@ export async function getMarketplaceNfts(
 }
 
 export interface NftMetadata {
-  ""?: string;
+  ''?: string;
   name?: string;
+  minter?: string;
   symbol?: string;
   decimals?: number;
   rightUri?: string;
@@ -163,11 +164,15 @@ export async function getContractNfts(
   if (!tokens) return [];
 
   // get tokens listed for sale
-  const fixedPriceStorage = await system.betterCallDev.getContractStorage(system.config.contracts.marketplace.fixedPrice.tez);
+  const fixedPriceStorage = await system.betterCallDev.getContractStorage(
+    system.config.contracts.marketplace.fixedPrice.tez
+  );
   const fixedPriceBigMapId = select(fixedPriceStorage, {
     type: 'big_map'
   })?.value;
-  const fixedPriceSales = await system.betterCallDev.getBigMapKeys(fixedPriceBigMapId);
+  const fixedPriceSales = await system.betterCallDev.getBigMapKeys(
+    fixedPriceBigMapId
+  );
 
   return Promise.all(
     tokens.map(
@@ -190,8 +195,10 @@ export async function getContractNfts(
         const owner = select(entry, { type: 'address' })?.value;
 
         const saleData = fixedPriceSales.filter((v: any) => {
-          return select(v, { name: 'token_for_sale_address' })?.value === address &&
+          return (
+            select(v, { name: 'token_for_sale_address' })?.value === address &&
             select(v, { name: 'token_for_sale_token_id' })?.value === tokenId
+          );
         });
 
         let sale = undefined;
@@ -211,7 +218,7 @@ export async function getContractNfts(
           description: metadata.description,
           artifactUri: metadata.artifactUri,
           metadata: metadata,
-          sale,
+          sale
         };
       }
     )
@@ -254,13 +261,14 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
   const bcd = system.betterCallDev;
   const response = await bcd.getWalletContracts(system.tzPublicKey);
   const assetContracts = response.items.filter(
-    (i: any) => Object.keys(i.body).includes("tags") &&
-                i.body.tags.includes("fa2") &&
-                Object.keys(i.body).includes("entrypoints") &&
-                i.body.entrypoints.includes("balance_of") &&
-                i.body.entrypoints.includes("mint") &&
-                i.body.entrypoints.includes("transfer") &&
-                i.body.entrypoints.includes("update_operators")
+    (i: any) =>
+      Object.keys(i.body).includes('tags') &&
+      i.body.tags.includes('fa2') &&
+      Object.keys(i.body).includes('entrypoints') &&
+      i.body.entrypoints.includes('balance_of') &&
+      i.body.entrypoints.includes('mint') &&
+      i.body.entrypoints.includes('transfer') &&
+      i.body.entrypoints.includes('update_operators')
   );
 
   const results = [];

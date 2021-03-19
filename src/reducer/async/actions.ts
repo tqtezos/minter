@@ -90,7 +90,7 @@ export const createAssetContractAction = createAsyncThunk<
 function appendStateMetadata(
   state: State['createNft'],
   metadata: NftMetadata,
-  system: SystemWithToolkit | SystemWithWallet,
+  system: SystemWithToolkit | SystemWithWallet
 ) {
   const appendedMetadata = { ...metadata };
   appendedMetadata.name = state.fields.name as string;
@@ -101,13 +101,12 @@ function appendStateMetadata(
 
   for (let row of state.attributes) {
     if (row.name !== null && row.value !== null) {
-      if(!appendedMetadata.attributes) appendedMetadata.attributes = []
-      appendedMetadata.attributes.push({name: row.name, value: row.value});
+      if (!appendedMetadata.attributes) appendedMetadata.attributes = [];
+      appendedMetadata.attributes.push({ name: row.name, value: row.value });
     }
   }
 
-  if (!appendedMetadata.creators) appendedMetadata.creators = []
-  appendedMetadata.creators.push(system.tzPublicKey || "")
+  appendedMetadata.minter = system.tzPublicKey || '';
 
   return appendedMetadata;
 }
