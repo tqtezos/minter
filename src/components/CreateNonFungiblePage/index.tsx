@@ -20,6 +20,7 @@ import {
 import { mintTokenAction } from '../../reducer/async/actions';
 import { validateCreateNftStep } from '../../reducer/validators/createNft';
 import { clearError, setStatus } from '../../reducer/slices/status';
+import QueueModal from './QueueModal';
 
 function ProgressIndicator({ state }: { state: CreateNftState }) {
   const stepIdx = steps.indexOf(state.step);
@@ -145,7 +146,13 @@ export default function CreateNonFungiblePage() {
             >
               {state.step === 'collection_select' ? 'Create' : 'Next'}
             </MinterButton>
-            <StatusModal
+            <div style={{position: 'absolute', bottom: 0, right: 0, width: '100%', display: 'flex', flexFlow: 'column nowrap', justifyContent:'flex-end', alignItems: 'flex-end'}}>
+              <QueueModal
+               isOpen={isOpen}
+                items={status}
+             />
+            </div>
+            {/* <StatusModal
               isOpen={isOpen}
               onClose={() => {
                 onClose();
@@ -167,7 +174,7 @@ export default function CreateNonFungiblePage() {
                 setLocation('/collections');
               }}
               status={status}
-            />
+            /> */}
           </Flex>
         </Flex>
         <Box

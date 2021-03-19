@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit';
+import { AsyncThunk, createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit';
 import {
   createAssetContractAction,
   mintTokenAction,
@@ -13,7 +13,7 @@ import {
   getWalletAssetContractsQuery
 } from '../async/queries';
 import { ErrorKind, RejectValue } from '../async/errors';
-
+import { Options } from 'async-retry';
 export type StatusKey = 'ready' | 'in_transit' | 'complete';
 
 export interface Status {
@@ -22,11 +22,12 @@ export interface Status {
     rejectValue: RejectValue;
     serialized: SerializedError;
   } | null;
+  contract?: String
 }
 
 export interface StatusState {
   createAssetContract: Status;
-  mintToken: Status;
+  mintToken: Array<Status>;
   transferToken: Status;
   listToken: Status;
   cancelTokenSale: Status;
@@ -42,7 +43,7 @@ const defaultStatus: Status = { status: 'ready', error: null };
 
 const initialState: StatusState = {
   createAssetContract: defaultStatus,
-  mintToken: defaultStatus,
+  mintToken: [],
   transferToken: defaultStatus,
   listToken: defaultStatus,
   cancelTokenSale: defaultStatus,
@@ -52,11 +53,11 @@ const initialState: StatusState = {
   getWalletAssetContracts: defaultStatus
 };
 
-type SetStatusAction = PayloadAction<{ method: Method; status: StatusKey }>;
+type SetStatusAction = PayloadAction<{ method: Method; status: StatusKey, contract?: String }>;
 type ClearErrorAction = PayloadAction<{ method: Method }>;
 
-function methodMap<A>(method: keyof StatusState, action: A) {
-  return { method, action };
+function methodMap<A>(method: keyof StatusState, action: A, contract?: String) {
+  return { method, action, contract };
 }
 
 const slice = createSlice({
@@ -64,10 +65,25 @@ const slice = createSlice({
   initialState,
   reducers: {
     setStatus(state, { payload }: SetStatusAction) {
-      state[payload.method].status = payload.status;
+      console.log(payload);
+      if(payload.method === 'mintToken') {
+        console.log(payload);
+        if (!(state[payload.method] as Array<Status>).filter(c => c.contract).length) {
+          (state[payload.method] as Array<Status>).push({status: payload.status, error: null, contract: payload.contract });
+        } else {
+          state[payload.method] = (state[payload.method]).map(c => {
+            if(c.contract === payload.contract) {
+              c.status = payload.status;
+            }
+            return c;
+          }) as Array<Status>;
+        }
+      } else {
+        (state[payload.method] as any).status = payload.status;
+      }
     },
     clearError(state, { payload }: ClearErrorAction) {
-      state[payload.method].error = null;
+      (state[payload.method] as any).error = null;
     }
   },
   extraReducers: ({ addCase }) => {
@@ -82,23 +98,64 @@ const slice = createSlice({
       methodMap('getNftAssetContract', getNftAssetContractQuery),
       methodMap('getWalletAssetContracts', getWalletAssetContractsQuery)
     ].forEach(({ method, action }) => {
-      addCase(action.pending, state => {
-        state[method].status = 'in_transit';
+      addCase(action.pending, (state, a) => {
+        console.log(state);
+        console.log(a);
+        if(method === 'mintToken') {
+          if (!(state[method] as Array<Status>).filter(c => c.contract === a?.meta?.requestId).length) {
+            console.log('here');
+            (state[method] as Array<Status>).push({status: 'in_transit', error: null, contract: a?.meta?.requestId });
+          } else {
+            console.log('here12');
+            state[method] = (state[method] as Array<Status>).map(c => {
+              if(c.contract === a?.meta?.requestId) {
+                c.status = 'in_transit';
+              }
+              return c;
+            }) as Array<Status>;
+          }
+        } else {
+          (state[method] as any).status = 'in_transit';
+        }
       });
-      addCase(action.fulfilled, state => {
-        state[method].status = 'complete';
+      addCase(action.fulfilled, (state, a) => {
+        if(method === 'mintToken') {
+          console.log(a);
+          console.log(state);
+          state[method] = (state[method]).map(c => {
+            if(c.contract === a?.meta?.requestId) {
+              c.status = 'complete';
+            }
+            return c;
+          }) as Array<Status>;
+        } else {
+          (state[method] as any).status = 'complete';
+        }
       });
-      addCase(action.rejected, (state, action) => {
-        const rejectValue = action.payload
-          ? action.payload
+      addCase(action.rejected, (state, a) => {
+        const rejectValue = a.payload
+          ? a.payload
           : {
               kind: ErrorKind.UknownError,
               message: 'Unknown error'
             };
-        state[method].error = {
-          rejectValue,
-          serialized: action.error
-        };
+
+            if(method === 'mintToken') {
+              state[method] = (state[method]).map(c => {
+                if(c.contract === (action.rejected as any)?.contract) {
+                  c.error = {
+                    rejectValue,
+                    serialized: a.error
+                  };
+                }
+                return c;
+              }) as Array<Status>;
+            } else {
+              (state[method] as any).error = {
+                rejectValue,
+                serialized: a.error
+              };
+            }
       });
     });
   }
