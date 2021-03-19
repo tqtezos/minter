@@ -26,7 +26,7 @@ export interface Nft {
   owner: string;
   description: string;
   artifactUri: string;
-  metadata: Record<string, string>;
+  metadata: NftMetadata;
   sale?: NftSale;
   address?: string;
 }
@@ -77,6 +77,61 @@ export async function getMarketplaceNfts(
       }
     )
   );
+}
+
+export interface NftMetadata {
+  ""?: string;
+  name?: string;
+  symbol?: string;
+  decimals?: number;
+  rightUri?: string;
+  artifactUri?: string;
+  displayUri?: string;
+  thumbnailUri?: string;
+  externalUri?: string;
+  description?: string;
+  creators?: Array<string>;
+  contributors?: Array<string>;
+  publishers?: Array<string>;
+  date?: string;
+  blocklevel?: number;
+  type?: string;
+  tags?: Array<string>;
+  genres?: Array<string>;
+  language?: string;
+  identifier?: string;
+  rights?: string;
+  isTransferable?: boolean;
+  isBooleanAmount?: boolean;
+  shouldPreferSymbol?: boolean;
+  formats?: Array<NftMetadataFormat>;
+  attributes?: Array<NftMetadataAttribute>;
+}
+
+export interface NftMetadataFormat {
+  uri: string;
+  hash: string;
+  mimeType: string;
+  fileSize: number;
+  fileName: string;
+  duration: string;
+  dimensions: NtfMetadataFormatDimensions;
+  dataRate: NtfMetadataFormatDataRate;
+}
+
+export interface NtfMetadataFormatDataRate {
+  value: number;
+  unit: string;
+}
+export interface NtfMetadataFormatDimensions {
+  value: string;
+  unit: string;
+}
+
+export interface NftMetadataAttribute {
+  name: string | null;
+  value: string | null;
+  type?: string;
 }
 
 export async function getContractNfts(
@@ -156,7 +211,7 @@ export async function getContractNfts(
           description: metadata.description,
           artifactUri: metadata.artifactUri,
           metadata: metadata,
-          sale: sale
+          sale,
         };
       }
     )
