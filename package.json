@@ -16,6 +16,7 @@
     "@types/react": "16.9.12",
     "@types/react-dom": "16.9.0",
     "@types/react-dropzone": "5.1.0",
+    "@types/react-icons": "3.0.0",
     "@types/react-redux": "7.1.16",
     "axios-retry": "3.1.9",
     "buffer": "6.0.3",
@@ -26,7 +27,6 @@
     "react-dom": "16.13.1",
     "react-dropzone": "11.2.4",
     "react-feather": "2.0.9",
-    "react-icons": "4.2.0",
     "react-redux": "7.2.2",
     "typescript": "4.1.3",
     "wouter": "2.5.1"

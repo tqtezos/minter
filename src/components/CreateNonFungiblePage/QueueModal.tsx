@@ -1,54 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Box,
-  Flex,
-  Spinner,
-  Heading,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  Text,
   List,
   ListItem,
   ListIcon,
-  OrderedList,
-  UnorderedList,
 } from '@chakra-ui/react';
-import { CheckCircle, AlertCircle, X } from 'react-feather';
-import { MdCheckCircle } from 'react-icons/md';
+import { MdCheckCircle, MdClose } from 'react-icons/md';
 import { MinterButton } from '../common';
-import StatusModal from './StatusModal';
+import { Status } from '../../reducer/slices/status';
 
 interface QueueModalProps {
   isOpen: boolean;
-  items: Array<any>;
+  items: Array<Status>;
 }
 
-function Content({ isOpen, items }: QueueModalProps) {
+export default function QueueModal(props: QueueModalProps) {
+
+  const [items, setItems] = useState<Array<Status>>(props.items);
+  console.log(items);
+
+  function onDismiss(id: String) {
+    setItems(items.filter(r => r.contract !== id));
+  }
+
+  useEffect(() => {
+    setItems(props.items)
+  }, [props.items]);
+
   return <>
   <List spacing={3}>
     {items.map((i, idx) => (
       <ListItem key={idx}>
-        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexFlow: 'row nowrap', font: 'monospace'}}>
+        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexFlow: 'row nowrap', fontFamily: 'monospace'}}>
           <ListIcon as={MdCheckCircle} color={i?.status === 'in_transit' ? 'yellow.500' : i?.status === 'complete' ? 'green.500' : 'blue.500'}/>
-            {i?.status}
+            <span style={{minWidth: '50px'}}>{i?.status}</span>
             &nbsp;
-            {i?.contract}
+            <span style={{minWidth: '100px', paddingRight: '5px'}}>{i?.contract}</span>
+            <span style={{paddingRight: '15px'}}><ListIcon as={MdClose} color={i?.status === 'in_transit' ? 'yellow.500' : i?.status === 'complete' ? 'green.500' : 'blue.500'} onClick={() => onDismiss((i.contract as any))}/></span>
         </div>
       </ListItem>
     ))}
   </List>
   </>;
-}
-
-export default function QueueModal(props: QueueModalProps) {
-  const { isOpen, items } = props;
-  const initialRef = React.useRef(null);
-  console.log(items);
-
-  return (
-    <>
-      <Content {...props} />
-    </>
-  );
 }
