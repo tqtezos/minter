@@ -11,6 +11,7 @@ export enum ErrorKind {
   GetNftAssetContractFailed,
   GetContractNftsFailed,
   GetWalletNftAssetContractsFailed,
+  GetMarketplaceNftsFailed,
   IPFSUploadFailed,
   WalletAlreadyConnected,
   WalletPermissionRequestDenied

@@ -184,7 +184,8 @@ const theme = extendTheme({
     brand: {
       black: '#1D2227',
       background: '#1C2228',
-      darkGray: '#3B4650',
+      darkGray: '#3D464F',
+      neutralGray: '#556677',
       gray: '#AEBBC9',
       lightGray: '#ABBBCB',
       brightGray: '#F2F4F7',

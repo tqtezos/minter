@@ -87,7 +87,7 @@ export default function FileUpload() {
         textAlign="center"
         pb={4}
       >
-        JPG, PNG, GIF, WEBP, SVG. Max size 30mb
+        JPG, PNG, GIF, WEBP, SVG, MP4, WebM, Ogg. Max size 30mb
       </Text>
       <Flex
         borderStyle="dashed"

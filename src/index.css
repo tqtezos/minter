@@ -7,6 +7,25 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+::-webkit-scrollbar-track {
+  border-radius: 4px;
+  background-color: #DADADA;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: #888;
+}
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+  background-color: #DADADA;
+}
+
+.bg-dropdown-arrow {
+  background-origin: content-box;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
