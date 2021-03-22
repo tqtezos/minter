@@ -5,6 +5,7 @@ import {
   ListIcon,
 } from '@chakra-ui/react';
 import { MdCheckCircle, MdClose } from 'react-icons/md';
+import { MinterButton } from '../common';
 import { Status } from '../../reducer/slices/status';
 
 interface QueueModalProps {
@@ -15,6 +16,7 @@ interface QueueModalProps {
 export default function QueueModal(props: QueueModalProps) {
 
   const [items, setItems] = useState<Array<Status>>(props.items);
+  console.log(items);
 
   function onDismiss(id: String) {
     setItems(items.filter(r => r.contract !== id));

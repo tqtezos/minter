@@ -6,6 +6,7 @@ import Form from './Form';
 import FileUpload from './FileUpload';
 import CollectionSelect from './CollectionSelect';
 import Preview from './Preview';
+import StatusModal from './StatusModal';
 import { ChevronLeft, X } from 'react-feather';
 
 import { useSelector, useDispatch } from '../../reducer';
@@ -18,6 +19,7 @@ import {
 } from '../../reducer/slices/createNft';
 import { mintTokenAction } from '../../reducer/async/actions';
 import { validateCreateNftStep } from '../../reducer/validators/createNft';
+import { clearError, setStatus } from '../../reducer/slices/status';
 import QueueModal from './QueueModal';
 
 function ProgressIndicator({ state }: { state: CreateNftState }) {
@@ -65,7 +67,7 @@ export default function CreateNonFungiblePage() {
   const status = useSelector(s => s.status.mintToken);
   const dispatch = useDispatch();
   const [, setLocation] = useLocation();
-  const { isOpen, onOpen } = useDisclosure();
+  const { isOpen, onClose, onOpen, onToggle } = useDisclosure();
   useEffect(() => {
     if (system.status !== 'WalletConnected') {
       setLocation('/');
@@ -144,12 +146,35 @@ export default function CreateNonFungiblePage() {
             >
               {state.step === 'collection_select' ? 'Create' : 'Next'}
             </MinterButton>
-            <div style={{position: 'absolute', bottom: 0, right: 0, width: 'auto', display: 'flex', flexFlow: 'column nowrap', justifyContent:'flex-end', alignItems: 'flex-end', borderTopRightRadius: '5px', boxShadow: '-2px -2px 20px #3333', padding: '5px 0 0 5px'}}>
+            <div style={{position: 'absolute', bottom: 0, right: 0, width: '100%', display: 'flex', flexFlow: 'column nowrap', justifyContent:'flex-end', alignItems: 'flex-end'}}>
               <QueueModal
                isOpen={isOpen}
                 items={status}
              />
             </div>
+            {/* <StatusModal
+              isOpen={isOpen}
+              onClose={() => {
+                onClose();
+                setLocation('/collections');
+                dispatch(setStatus({ method: 'mintToken', status: 'ready' }));
+                dispatch(clearForm());
+              }}
+              onRetry={() => {
+                dispatch(clearError({ method: 'mintToken' }));
+                dispatch(mintTokenAction());
+              }}
+              onCancel={() => {
+                onClose();
+                dispatch(clearError({ method: 'mintToken' }));
+                dispatch(setStatus({ method: 'mintToken', status: 'ready' }));
+              }}
+              onToggle={() => {
+                onToggle();
+                setLocation('/collections');
+              }}
+              status={status}
+            /> */}
           </Flex>
         </Flex>
         <Box
