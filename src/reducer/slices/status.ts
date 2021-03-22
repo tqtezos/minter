@@ -1,4 +1,4 @@
-import { AsyncThunk, createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit';
 import {
   createAssetContractAction,
   mintTokenAction,
