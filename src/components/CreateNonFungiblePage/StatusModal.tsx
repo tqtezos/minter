@@ -62,7 +62,7 @@ function Content({ status, onClose, onRetry, onCancel }: StatusModalProps) {
         </Heading>
         <br/>
         <Text size="xs" textAlign="center" color="gray.500">
-         <span role="img" aria-label="lightbulb">🌱</span> Tezos minting produces 1,500,000 times less CO2 emissions than Ethereum.
+         <span role="img" aria-label="lightbulb">🌱</span> Minting on Tezos produces 1,500,000 times less CO2 emissions than Ethereum.
         </Text>
       </Flex>
     );
