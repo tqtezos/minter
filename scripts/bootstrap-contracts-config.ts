@@ -131,7 +131,8 @@ async function bootstrapContract(
   let contract;
   try {
     const { code, url: contractCodeUrl } = await fetchContractCode(
-      params.contractFilename, params.contractGitHash
+      params.contractFilename,
+      params.contractGitHash
     );
 
     $log.info(
