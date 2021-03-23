@@ -14,6 +14,7 @@ interface BoostrapStorageCallback {
 interface BootstrapContractParams {
   configKey: string;
   contractFilename: string;
+  contractGitHash: string;
   contractAlias: string;
   initStorage: BoostrapStorageCallback;
 }
@@ -63,11 +64,11 @@ async function getContractAddress(
 }
 
 async function fetchContractCode(
-  contractFilename: string
+  contractFilename: string,
+  contractGitHash: string
 ): Promise<ContractCodeResponse> {
   const rawRepoUrl = 'https://raw.githubusercontent.com/tqtezos/minter-sdk';
-  const gitHash = '8f67bb8c2abc12b8e6f8e529e1412262972deab3';
-  const contractCodeUrl = `${rawRepoUrl}/${gitHash}/contracts/bin/${contractFilename}`;
+  const contractCodeUrl = `${rawRepoUrl}/${contractGitHash}/contracts/bin/${contractFilename}`;
   const response = await axios.get(contractCodeUrl);
   return { code: response.data, url: contractCodeUrl };
 }
@@ -130,7 +131,8 @@ async function bootstrapContract(
   let contract;
   try {
     const { code, url: contractCodeUrl } = await fetchContractCode(
-      params.contractFilename
+      params.contractFilename,
+      params.contractGitHash
     );
 
     $log.info(
@@ -175,6 +177,7 @@ async function bootstrap(env: string) {
     configKey: 'contracts.nftFaucet',
     contractAlias: 'nftFaucet',
     contractFilename: 'fa2_multi_nft_faucet.tz',
+    contractGitHash: 'aec441412d53653fa0048fee7c12c1eb1365909b',
     initStorage: initStorageNftFaucet
   });
 
@@ -183,6 +186,7 @@ async function bootstrap(env: string) {
     configKey: 'contracts.marketplace.fixedPrice.tez',
     contractAlias: 'fixedPriceMarketTez',
     contractFilename: 'fixed_price_sale_market_tez.tz',
+    contractGitHash: '8f67bb8c2abc12b8e6f8e529e1412262972deab3',
     initStorage: () => new MichelsonMap()
   });
 }

@@ -68,7 +68,7 @@ export default function Form() {
       <Heading size="md" paddingBottom={6}>
         Add attributes to your asset
       </Heading>
-      {state.metadataRows.map(({ name, value }, key) => {
+      {state.attributes.map(({ name, value }, key) => {
         return (
           <Flex key={key} align="center" justify="stretch">
             <FormControl paddingBottom={6} paddingRight={2} flex="1">

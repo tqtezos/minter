@@ -1,10 +1,24 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { Config } from '../system';
 
-export async function getBigMapKeys(config: Config, id: number) {
+export async function getBigMapKeys(
+  config: Config,
+  id: number
+) {
+  let response : AxiosResponse;
+  let result = [];
+  let offset = 0;
   const uri = `${config.bcd.api}/v1/bigmap/${config.network}/${id}/keys`;
-  const response = await axios.get(uri);
-  return response.data;
+  do {
+    response = await axios.get(uri, {
+      params: {
+        offset
+      }
+    });
+    result.push(...response.data);
+    offset += 10;
+  } while (response.data.length === 10);
+  return result;
 }
 
 export async function getContract(config: Config, address: string) {

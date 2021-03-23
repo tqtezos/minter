@@ -8,9 +8,11 @@ import createNftSlice from './slices/createNft';
 import systemSlice from './slices/system';
 import statusSlice from './slices/status';
 import notificationsSlice from './slices/notifications';
+import marketplaceSlice from './slices/marketplace';
 
 export const reducer = combineReducers({
   collections: collectionsSlice.reducer,
+  marketplace: marketplaceSlice.reducer,
   createNft: createNftSlice.reducer,
   system: systemSlice.reducer,
   status: statusSlice.reducer,
