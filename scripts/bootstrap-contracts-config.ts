@@ -66,7 +66,7 @@ async function fetchContractCode(
   contractFilename: string
 ): Promise<ContractCodeResponse> {
   const rawRepoUrl = 'https://raw.githubusercontent.com/tqtezos/minter-sdk';
-  const gitHash = '8f67bb8c2abc12b8e6f8e529e1412262972deab3';
+  const gitHash = 'aec441412d53653fa0048fee7c12c1eb1365909b';
   const contractCodeUrl = `${rawRepoUrl}/${gitHash}/contracts/bin/${contractFilename}`;
   const response = await axios.get(contractCodeUrl);
   return { code: response.data, url: contractCodeUrl };
