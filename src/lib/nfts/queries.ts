@@ -79,7 +79,13 @@ export async function getMarketplaceNfts(
   );
 }
 
-export interface NftMetadata {
+export class NftMetadata {
+  [index: string]:
+    | string
+    | undefined
+    | number
+    | Array<String | NftMetadataFormat | NftMetadataAttribute>
+    | boolean;
   ''?: string;
   name?: string;
   minter?: string;
@@ -107,6 +113,64 @@ export interface NftMetadata {
   shouldPreferSymbol?: boolean;
   formats?: Array<NftMetadataFormat>;
   attributes?: Array<NftMetadataAttribute>;
+
+  constructor(
+    root?: string,
+    name?: string,
+    minter?: string,
+    symbol?: string,
+    decimals?: number,
+    rightUri?: string,
+    artifactUri?: string,
+    displayUri?: string,
+    thumbnailUri?: string,
+    externalUri?: string,
+    description?: string,
+    creators?: Array<string>,
+    contributors?: Array<string>,
+    publishers?: Array<string>,
+    date?: string,
+    blocklevel?: number,
+    type?: string,
+    tags?: Array<string>,
+    genres?: Array<string>,
+    language?: string,
+    identifier?: string,
+    rights?: string,
+    isTransferable?: boolean,
+    isBooleanAmount?: boolean,
+    shouldPreferSymbol?: boolean,
+    formats?: Array<NftMetadataFormat>,
+    attributes?: Array<NftMetadataAttribute>
+  ) {
+    this[''] = root;
+    this.name = name;
+    this.minter = minter;
+    this.symbol = symbol;
+    this.decimals = decimals;
+    this.rightUri = rightUri;
+    this.artifactUri = artifactUri;
+    this.displayUri = displayUri;
+    this.thumbnailUri = thumbnailUri;
+    this.externalUri = externalUri;
+    this.description = description;
+    this.creators = creators;
+    this.contributors = contributors;
+    this.publishers = publishers;
+    this.date = date;
+    this.blocklevel = blocklevel;
+    this.type = type;
+    this.tags = tags;
+    this.genres = genres;
+    this.language = language;
+    this.identifier = identifier;
+    this.rights = rights;
+    this.isTransferable = isTransferable;
+    this.isBooleanAmount = isBooleanAmount;
+    this.shouldPreferSymbol = shouldPreferSymbol;
+    this.formats = formats;
+    this.attributes = attributes;
+  }
 }
 
 export interface NftMetadataFormat {

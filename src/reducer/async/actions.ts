@@ -101,8 +101,13 @@ function appendStateMetadata(
 
   for (let row of state.attributes) {
     if (row.name !== null && row.value !== null) {
-      if (!appendedMetadata.attributes) appendedMetadata.attributes = [];
-      appendedMetadata.attributes.push({ name: row.name, value: row.value });
+      const keys = Object.getOwnPropertyNames(new NftMetadata());
+      if (keys.indexOf(row.name) !== -1) {
+        appendedMetadata[row.name as keyof NftMetadata] = row.value;
+      } else {
+        if (!appendedMetadata.attributes) appendedMetadata.attributes = [];
+        appendedMetadata.attributes.push({ name: row.name, value: row.value });
+      }
     }
   }
 
