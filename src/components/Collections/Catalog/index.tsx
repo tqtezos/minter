@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, Flex, Heading, Text, Link } from '@chakra-ui/react';
+import { Box, Flex, Heading, Text, Link, Spinner } from '@chakra-ui/react';
 import { useLocation } from 'wouter';
 import { RefreshCw, ExternalLink } from 'react-feather';
 import { MinterButton } from '../../common';
@@ -92,7 +92,16 @@ export default function Catalog() {
             <Text ml={2}>Refresh</Text>
           </MinterButton>
         </Flex>
-        <TokenGrid state={state} walletAddress={system.tzPublicKey} />
+        {!collection.loaded ? (
+          <Flex flexDir="column" align="center" flex="1" pt={20}>
+            <Spinner size="xl" mb={6} color="gray.300" />
+            <Heading size="lg" textAlign="center" color="gray.500">
+              Loading...
+            </Heading>
+          </Flex>
+        ) : (
+          <TokenGrid state={state} walletAddress={system.tzPublicKey} />
+        )}
       </Flex>
     </Flex>
   );

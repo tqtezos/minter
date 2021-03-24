@@ -15,6 +15,7 @@ export type Token = Nft;
 
 export interface Collection extends AssetContract {
   tokens: Token[] | null;
+  loaded: boolean;
 }
 
 export interface CollectionsState {
@@ -38,7 +39,8 @@ export const initialState: CollectionsState = {
       metadata: {
         name: 'Minter'
       },
-      tokens: null
+      tokens: null,
+      loaded: false
     }
   }
 };
@@ -50,20 +52,21 @@ type PopulateCollection = Reducer<{ address: string; tokens: Token[] }>;
 const populateCollectionR: PopulateCollection = (state, { payload }) => {
   if (state.collections[payload.address]) {
     state.collections[payload.address].tokens = payload.tokens;
+    state.collections[payload.address].loaded = true;
   }
 };
 
 const updateCollectionsR: Reducer<AssetContract[]> = (state, action) => {
   for (let coll of action.payload) {
     if (!state.collections[coll.address]) {
-      state.collections[coll.address] = { ...coll, tokens: null };
+      state.collections[coll.address] = { ...coll, tokens: null, loaded: false };
     }
   }
 };
 
 const updateCollectionR: Reducer<AssetContract> = (state, { payload }) => {
   if (!state.collections[payload.address]) {
-    state.collections[payload.address] = { ...payload, tokens: null };
+    state.collections[payload.address] = { ...payload, tokens: null, loaded: false };
   }
 };
 
