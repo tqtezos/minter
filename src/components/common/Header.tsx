@@ -11,8 +11,10 @@ import {
   MenuList,
   MenuItem
 } from '@chakra-ui/react';
-import { ChevronDown, Package, Plus, Share2 } from 'react-feather';
+import { ChevronDown, Plus } from 'react-feather';
 import { RiStore2Line } from 'react-icons/ri';
+import { IoCubeOutline } from 'react-icons/io5';
+import { MdCollections } from 'react-icons/md';
 import headerLogo from './assets/header-logo.svg';
 import { useSelector, useDispatch } from '../../reducer';
 import { disconnectWallet } from '../../reducer/async/wallet';
@@ -149,7 +151,7 @@ export function Header() {
         {system.config.network !== "mainnet" ? (
           <HeaderBadge>
             <Box color="brand.lightGray">
-              <Share2 size={16} strokeWidth="3" />
+              <IoCubeOutline size={16} strokeWidth="3" />
             </Box>
             <Text ml={2}>{system.config.network}</Text>
           </HeaderBadge>
@@ -162,7 +164,7 @@ export function Header() {
         </HeaderLink>
         <HeaderLink to="/collections">
           <Box color="brand.turquoise">
-            <Package size={16} strokeWidth="3" />
+            <MdCollections size={16} />
           </Box>
           <Text ml={2}>Collections</Text>
         </HeaderLink>
