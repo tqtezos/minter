@@ -74,17 +74,17 @@ export default function Catalog() {
             </Flex>
             ) : (
               <>
-              <SimpleGrid columns={{sm: 1, md: 2, lg: 3, xl: 4}} gap={8} pb={8}>
-              {tokens.slice(1).map(token => {
-                return (
-                  <TokenCard
-                    key={`${token.address}-${token.id}`}
-                    network={system.config.network}
-                    {...token}
-                  />
-                );
-              })}
-              </SimpleGrid>
+                <SimpleGrid columns={{sm: 1, md: 2, lg: 3, xl: 4}} gap={8} pb={8}>
+                  {tokens.slice(1).map(token => {
+                    return (
+                      <TokenCard
+                        key={`${token.address}-${token.id}`}
+                        network={system.config.network}
+                        {...token}
+                      />
+                    );
+                  })}
+                </SimpleGrid>
               </>
           )}
         </Flex>
