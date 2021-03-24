@@ -18,6 +18,7 @@ import {
   ModalCloseButton,
   ModalContent,
   ModalOverlay,
+  ResponsiveValue,
   Text,
   useDisclosure
 } from '@chakra-ui/react';
@@ -84,7 +85,13 @@ function MediaNotFound() {
   );
 }
 
-function TokenImage(props: { src: string }) {
+function TokenImage(props: {
+  src: string;
+  width?: string;
+  maxWidth?: string;
+  height?: string;
+  objectFit?: ResponsiveValue<any>;
+}) {
   const [errored, setErrored] = useState(false);
   const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
   useEffect(() => {
@@ -112,8 +119,10 @@ function TokenImage(props: { src: string }) {
       <Image
         key={0}
         src={props.src}
-        objectFit="contain"
-        flex={1}
+        objectFit={props.objectFit}
+        width={props.width}
+        height={props.height}
+        maxWidth={props.maxWidth}
         onError={() => setErrored(true)}
       />
     );
@@ -176,10 +185,17 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
         scrollBehavior="inside"
       >
         <ModalOverlay />
-        <ModalContent>
-          <ModalCloseButton />
+        <ModalContent
+          overflow="auto"
+          m="1rem"
+          maxHeight="calc(100vh - 2rem)"
+          display="unset"
+        >
+          <ModalCloseButton left="0.75rem" />
           <TokenImage
             src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
+            maxWidth="unset"
+            objectFit="none"
           />
         </ModalContent>
       </Modal>
@@ -204,10 +220,12 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
         px={[4, 16]}
         mx="auto"
         width={['90%', '70%']}
+        maxHeight="70vh"
         flexDir="column"
       >
         <TokenImage
           src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
+          height="100%"
         />{' '}
         <Flex align="center" justify="space-evenly" width={['100%']} mt="4">
           {isOwner ? (
