@@ -30,9 +30,6 @@ export default function Catalog() {
       justify="start"
       flexDir="column"
     >
-      <Flex w="100%" pb={6} justify="space-between" flexDir="column">
-        <Heading size="lg">Marketplace</Heading>
-      </Flex>
       {state.marketplace.loaded && tokens.length > 0 ? (
         <Box>
           <FeaturedToken network={system.config.network} {...tokens[0]} />
