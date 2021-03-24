@@ -262,10 +262,10 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 <BuyTokenButton contract={contractAddress} token={token} />
               </Flex>
             )
+          ) : isOwner ? (
+            <SellTokenButton contract={contractAddress} tokenId={tokenId} />
           ) : (
-            <>
-              <SellTokenButton contract={contractAddress} tokenId={tokenId} />
-            </>
+            <></>
           )}
           <Button onClick={onOpen}>
             <Maximize2 size={16} strokeWidth="3" />
