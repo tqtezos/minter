@@ -3,6 +3,8 @@ import Joi from 'joi';
 import { SystemWithToolkit, SystemWithWallet } from '../system';
 import select from '../util/selectObjectByKeys';
 import { ipfsUriToCid } from '../util/ipfs';
+import { ContractAbstraction } from '@taquito/taquito';
+import { tzip12 } from '@taquito/tzip12';
 
 function fromHexString(input: string) {
   if (/^([A-Fa-f0-9]{2})*$/.test(input)) {
@@ -26,6 +28,52 @@ export interface Nft {
   artifactUri: string;
   metadata: Record<string, string>;
   sale?: NftSale;
+  address?: string;
+}
+
+const contractCache: Record<string, any> = {};
+
+export async function getMarketplaceNfts(
+  system: SystemWithToolkit | SystemWithWallet,
+  address: string
+): Promise<Nft[]> {
+  const storage = await system.betterCallDev.getContractStorage(address);
+  const bigMapId = select(storage, {
+    type: 'big_map'
+  })?.value;
+  const tokenSales = await system.betterCallDev.getBigMapKeys(bigMapId);
+
+  return Promise.all(
+    tokenSales.map(
+      async (tokenSale: any): Promise<Nft> => {
+        const saleAddress = select(tokenSale, { name: 'token_for_sale_address' })?.value;
+        const tokenId = parseInt(select(tokenSale, { name: 'token_for_sale_token_id' })?.value, 10);
+        const sale = {
+          seller: select(tokenSale, { name: 'sale_seller' })?.value,
+          price: Number.parseInt(tokenSale.data.value?.value || 0, 10) / 1000000,
+          mutez: Number.parseInt(tokenSale.data.value?.value || 0, 10),
+          type: 'fixedPrice'
+        };
+
+        if (!(contractCache[saleAddress] instanceof ContractAbstraction)) {
+          contractCache[saleAddress] = await system.toolkit.contract.at(saleAddress, tzip12);
+        }
+
+        const metadata = await contractCache[saleAddress].tzip12().getTokenMetadata(tokenId);
+
+        return {
+          address: saleAddress,
+          id: tokenId,
+          title: metadata.name,
+          owner: sale.seller,
+          description: metadata.description,
+          artifactUri: metadata.artifactUri,
+          metadata: metadata,
+          sale: sale
+        };
+      }
+    )
+  );
 }
 
 export async function getContractNfts(

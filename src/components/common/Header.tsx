@@ -12,6 +12,7 @@ import {
   MenuItem
 } from '@chakra-ui/react';
 import { ChevronDown, Package, Plus, Share2 } from 'react-feather';
+import { RiStore2Line } from 'react-icons/ri';
 import headerLogo from './assets/header-logo.svg';
 import { useSelector, useDispatch } from '../../reducer';
 import { disconnectWallet } from '../../reducer/async/wallet';
@@ -145,7 +146,6 @@ export function Header() {
         cursor="pointer"
       />
       <Flex flex="1" justify="flex-end">
-
         {system.config.network !== "mainnet" ? (
           <HeaderBadge>
             <Box color="brand.lightGray">
@@ -154,7 +154,12 @@ export function Header() {
             <Text ml={2}>{system.config.network}</Text>
           </HeaderBadge>
         ) : null}
-
+        <HeaderLink to="/marketplace">
+          <Box color="brand.turquoise">
+            <RiStore2Line size={16} />
+          </Box>
+          <Text ml={2}>Marketplace</Text>
+        </HeaderLink>
         <HeaderLink to="/collections">
           <Box color="brand.turquoise">
             <Package size={16} strokeWidth="3" />
