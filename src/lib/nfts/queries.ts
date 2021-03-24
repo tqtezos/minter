@@ -42,9 +42,12 @@ export async function getMarketplaceNfts(
     type: 'big_map'
   })?.value;
   const tokenSales = await system.betterCallDev.getBigMapKeys(bigMapId);
+  const activeSales = tokenSales.filter((v: any) => {
+    return v.data.value;
+  });
 
   return Promise.all(
-    tokenSales.map(
+    activeSales.map(
       async (tokenSale: any): Promise<Nft> => {
         const saleAddress = select(tokenSale, { name: 'token_for_sale_address' })?.value;
         const tokenId = parseInt(select(tokenSale, { name: 'token_for_sale_token_id' })?.value, 10);
