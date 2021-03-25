@@ -18,6 +18,7 @@ import headerLogo from './assets/header-logo.svg';
 import { useSelector, useDispatch } from '../../reducer';
 import { disconnectWallet } from '../../reducer/async/wallet';
 import { MinterButton } from '.';
+import logo from './assets/splash-logo.svg';
 
 interface HeaderLinkProps {
   to: string;
@@ -122,6 +123,24 @@ export function Header() {
       justifyContent="space-between"
     >
       <Image
+        display={{
+          base: 'none',
+          md: 'block'
+        }}
+        maxH="28px"
+        marginTop="4px"
+        src={logo}
+        onClick={e => {
+          e.preventDefault();
+          setLocation('/collections');
+        }}
+        cursor="pointer"
+      />
+      <Image
+        display={{
+          base: 'block',
+          md: 'none'
+        }}
         maxW="38px"
         src={headerLogo}
         onClick={e => {
