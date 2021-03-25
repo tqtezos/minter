@@ -183,7 +183,7 @@ async function bootstrap(env: string) {
     configKey: 'contracts.marketplace.fixedPrice.tez',
     contractAlias: 'fixedPriceMarketTez',
     contractFilename: 'fixed_price_sale_market_tez.tz',
-    initStorage: () => new MichelsonMap()
+    initStorage: () => ({ sales: new MichelsonMap() })
   });
 }
 
