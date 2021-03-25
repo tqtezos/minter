@@ -124,8 +124,25 @@ export async function listTokenForSale(
   tokenId: number,
   salePrice: number
 ) {
-  const contract = await system.toolkit.wallet.at(marketplaceContract);
-  return contract.methods.sell(salePrice, tokenContract, tokenId).send();
+  const contractM = await system.toolkit.wallet.at(marketplaceContract);
+  const contractT = await system.toolkit.wallet.at(tokenContract);
+  const batch = await system.toolkit.wallet
+    .batch([])
+    .withContractCall(
+      contractT.methods.update_operators([
+        {
+          add_operator: {
+            owner: system.tzPublicKey,
+            operator: marketplaceContract,
+            token_id: tokenId
+          }
+        }
+      ])
+    )
+    .withContractCall(
+      contractM.methods.sell(salePrice, tokenContract, tokenId)
+    );
+  return batch.send();
 }
 
 export async function cancelTokenSale(
