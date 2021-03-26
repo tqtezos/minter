@@ -8,16 +8,17 @@ import {
   Text,
   Menu,
   MenuButton,
-  MenuList,
-  MenuItem
+  MenuList
 } from '@chakra-ui/react';
-import { ChevronDown, Plus } from 'react-feather';
+import { Plus, Settings } from 'react-feather';
 import { RiStore2Line } from 'react-icons/ri';
-import { IoCubeOutline } from 'react-icons/io5';
+// import { IoCubeOutline } from 'react-icons/io5';
 import { MdCollections } from 'react-icons/md';
 import headerLogo from './assets/header-logo.svg';
 import { useSelector, useDispatch } from '../../reducer';
 import { disconnectWallet } from '../../reducer/async/wallet';
+import { MinterButton } from '.';
+import logo from './assets/splash-logo.svg';
 
 interface HeaderLinkProps {
   to: string;
@@ -56,38 +57,18 @@ function HeaderLink(props: HeaderLinkProps) {
   );
 }
 
-function HeaderBadge(props: { children: React.ReactNode }) {
-  return (
-    <Box
-      textDecor="none"
-      borderRadius="10px"
-      alignItems="center"
-      fontWeight="600"
-      px={3}
-      py={2}
-      ml={4}
-      bg="blue.900"
-      color="brand.lightGray"
-      display="flex"
-      transition="none"
-    >
-      {props.children}
-    </Box>
-  );
-}
-
 function WalletInfo(props: { tzPublicKey: string }) {
   return (
-    <>
+    <Flex flexDir="row" align="center" my={4}>
       <Box borderRadius="100%" width={10} height={10} bg="brand.darkGray" p={1}>
         <Image
           src={`https://services.tzkt.io/v1/avatars2/${props.tzPublicKey}`}
         />
       </Box>
-      <Text fontFamily="mono" ml={4} mr={2}>
+      <Text fontFamily="mono" ml={2}>
         {props.tzPublicKey}
       </Text>
-    </>
+    </Flex>
   );
 }
 
@@ -100,20 +81,27 @@ function WalletDisplay() {
   }
   return (
     <>
-      <WalletInfo tzPublicKey={system.tzPublicKey} />
-      <Menu placement="bottom-start">
+      <Menu placement="bottom-end" offset={[4, 24]}>
         <MenuButton>
-          <ChevronDown />
+          <Settings />
         </MenuButton>
         <MenuList color="brand.black">
-          <MenuItem
-            onClick={async () => {
-              await dispatch(disconnectWallet());
-              setLocation('/');
-            }}
-          >
-            Disconnect
-          </MenuItem>
+          <Flex flexDir="column" px={4} py={2}>
+            <Text fontSize={16} fontWeight="600">
+              Network: {system.config.network}
+            </Text>
+            <WalletInfo tzPublicKey={system.tzPublicKey} />
+            <MinterButton
+              alignSelf="flex-start"
+              variant="cancelAction"
+              onClick={async () => {
+                await dispatch(disconnectWallet());
+                setLocation('/');
+              }}
+            >
+              Disconnect
+            </MinterButton>
+          </Flex>
         </MenuList>
       </Menu>
     </>
@@ -122,7 +110,6 @@ function WalletDisplay() {
 
 export function Header() {
   const [location, setLocation] = useLocation();
-  const system = useSelector(s => s.system);
   if (location === '/' || location === '') {
     return null;
   }
@@ -135,10 +122,25 @@ export function Header() {
       alignItems="center"
       justifyContent="space-between"
     >
-      <Flex flex="1" alignItems="center" color="brand.lightGray">
-        <WalletDisplay />
-      </Flex>
       <Image
+        display={{
+          base: 'none',
+          md: 'block'
+        }}
+        maxH="28px"
+        marginTop="4px"
+        src={logo}
+        onClick={e => {
+          e.preventDefault();
+          setLocation('/collections');
+        }}
+        cursor="pointer"
+      />
+      <Image
+        display={{
+          base: 'block',
+          md: 'none'
+        }}
         maxW="38px"
         src={headerLogo}
         onClick={e => {
@@ -148,14 +150,6 @@ export function Header() {
         cursor="pointer"
       />
       <Flex flex="1" justify="flex-end">
-        {system.config.network !== "mainnet" ? (
-          <HeaderBadge>
-            <Box color="brand.lightGray">
-              <IoCubeOutline size={16} strokeWidth="3" />
-            </Box>
-            <Text ml={2}>{system.config.network}</Text>
-          </HeaderBadge>
-        ) : null}
         <HeaderLink to="/marketplace">
           <Box color="brand.turquoise">
             <RiStore2Line size={16} />
@@ -174,6 +168,16 @@ export function Header() {
           </Box>
           <Text ml={2}>New Asset</Text>
         </HeaderLink>
+        <Flex
+          alignItems="center"
+          color="brand.gray"
+          paddingLeft={4}
+          marginLeft={4}
+          borderLeft="2px solid"
+          borderColor="brand.darkGray"
+        >
+          <WalletDisplay />
+        </Flex>
       </Flex>
     </Flex>
   );
