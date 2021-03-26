@@ -6,7 +6,6 @@ import {
   transferToken,
   listTokenForSale,
   cancelTokenSale,
-  approveTokenOperator,
   buyToken
 } from '../../lib/nfts/actions';
 // import {getNftAssetContract} from '../../lib/nfts/queries'
@@ -252,21 +251,14 @@ export const listTokenAction = createAsyncThunk<
     });
   }
   try {
-    const op1 = await approveTokenOperator(
-      system,
-      contract,
-      tokenId,
-      marketplaceContract
-    );
-    await op1.confirmation();
-    const op2 = await listTokenForSale(
+    const op = await listTokenForSale(
       system,
       marketplaceContract,
       contract,
       tokenId,
       salePrice
     );
-    await op2.confirmation(2);
+    await op.confirmation(2);
     dispatch(getContractNftsQuery(contract));
     return { contract: contract, tokenId: tokenId, salePrice: salePrice };
   } catch (e) {

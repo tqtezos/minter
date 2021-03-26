@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Flex, Text, Heading, Image, Link } from '@chakra-ui/react';
 import { MinterButton /* , MinterLink */ } from '../common';
-import logo from './logo.svg';
+import logo from '../common/assets/splash-logo.svg';
 import { useSelector, useDispatch } from '../../reducer';
 import { connectWallet } from '../../reducer/async/wallet';
 
@@ -51,18 +51,6 @@ export default function SplashPage() {
           >
             Connect your wallet
           </MinterButton>
-          {/* <MinterLink */}
-          {/*   variant="primaryAction" */}
-          {/*   marginLeft={4} */}
-          {/*   flex="1" */}
-          {/*   href="/create-non-fungible" */}
-          {/*   onClick={e => { */}
-          {/*     e.preventDefault(); */}
-          {/*     setLocation('/create-non-fungible'); */}
-          {/*   }} */}
-          {/* > */}
-          {/*   Create */}
-          {/* </MinterLink> */}
         </Flex>
       </Flex>
       <Flex
