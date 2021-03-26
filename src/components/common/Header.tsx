@@ -118,9 +118,6 @@ function WalletDisplay() {
   const [, setLocation] = useLocation();
   const system = useSelector(s => s.system);
   const dispatch = useDispatch();
-  if (system.status !== 'WalletConnected') {
-    return null;
-  }
   return (
     <>
       <Menu placement="bottom-end" offset={[4, 24]}>
@@ -128,22 +125,39 @@ function WalletDisplay() {
           <Settings />
         </MenuButton>
         <MenuList color="brand.black">
-          <Flex flexDir="column" px={4} py={2}>
-            <Text fontSize={16} fontWeight="600">
-              Network: {system.config.network}
-            </Text>
-            <WalletInfo tzPublicKey={system.tzPublicKey} />
-            <MinterButton
-              alignSelf="flex-start"
-              variant="cancelAction"
-              onClick={async () => {
-                await dispatch(disconnectWallet());
-                setLocation('/');
-              }}
-            >
-              Disconnect
-            </MinterButton>
-          </Flex>
+          {system.status === 'WalletConnected' ? (
+            <Flex flexDir="column" px={4} py={2}>
+              <Text fontSize={16} fontWeight="600">
+                Network: {system.config.network}
+              </Text>
+              <WalletInfo tzPublicKey={system.tzPublicKey} />
+              <MinterButton
+                alignSelf="flex-start"
+                variant="cancelAction"
+                onClick={async () => {
+                  await dispatch(disconnectWallet());
+                  setLocation('/');
+                }}
+              >
+                Disconnect
+              </MinterButton>
+            </Flex>
+          ) : (
+            <Flex flexDir="column" justify="center" px={4}>
+              <Text mt={2} mb={4}>
+                No wallet connected
+              </Text>
+              <MinterButton
+                variant="secondaryAction"
+                onClick={e => {
+                  e.preventDefault();
+                  dispatch(connectWallet());
+                }}
+              >
+                Connect your Wallet
+              </MinterButton>
+            </Flex>
+          )}
         </MenuList>
       </Menu>
     </>
@@ -224,7 +238,7 @@ function NavItems() {
                       }}
                       mb={4}
                     >
-                      Connect your wallet
+                      Connect your Wallet
                     </MinterButton>
                   )}
                 </Flex>
@@ -262,18 +276,18 @@ function NavItems() {
               </Box>
               <Text ml={2}>New Asset</Text>
             </DesktopHeaderLink>
-            <Flex
-              alignItems="center"
-              color="brand.gray"
-              paddingLeft={4}
-              marginLeft={4}
-              borderLeft="2px solid"
-              borderColor="brand.darkGray"
-            >
-              <WalletDisplay />
-            </Flex>
           </>
         ) : null}
+        <Flex
+          alignItems="center"
+          color="brand.gray"
+          paddingLeft={4}
+          marginLeft={4}
+          borderLeft="2px solid"
+          borderColor="brand.darkGray"
+        >
+          <WalletDisplay />
+        </Flex>
       </Flex>
     </>
   );
