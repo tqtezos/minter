@@ -36,7 +36,7 @@ export default function FeaturedToken(props: FeaturedTokenProps) {
             my={4}
             onClick={e => {
               e.preventDefault();
-              setLocation(`/collection/${props.address}/token/${props.id}`, { replace: true });
+              setLocation(`/collection/${props.address}/token/${props.id}`, { replace: false });
             }}
           >
             <Text>View</Text>
