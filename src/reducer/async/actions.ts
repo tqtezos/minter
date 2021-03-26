@@ -18,6 +18,8 @@ import {
 } from '../../lib/util/ipfs';
 import { SelectedFile } from '../slices/createNft';
 import { connectWallet } from './wallet';
+import { NftMetadata } from '../../lib/nfts/queries';
+import { SystemWithToolkit, SystemWithWallet } from '../../lib/system';
 
 type Options = {
   state: State;
@@ -87,7 +89,8 @@ export const createAssetContractAction = createAsyncThunk<
 
 function appendStateMetadata(
   state: State['createNft'],
-  metadata: Record<string, string>
+  metadata: NftMetadata,
+  system: SystemWithToolkit | SystemWithWallet
 ) {
   const appendedMetadata = { ...metadata };
   appendedMetadata.name = state.fields.name as string;
@@ -96,11 +99,19 @@ function appendStateMetadata(
     appendedMetadata.description = state.fields.description;
   }
 
-  for (let row of state.metadataRows) {
+  for (let row of state.attributes) {
     if (row.name !== null && row.value !== null) {
-      appendedMetadata[row.name] = row.value;
+      const keys = Object.getOwnPropertyNames(new NftMetadata());
+      if (keys.indexOf(row.name) !== -1) {
+        appendedMetadata[row.name as keyof NftMetadata] = row.value;
+      } else {
+        if (!appendedMetadata.attributes) appendedMetadata.attributes = [];
+        appendedMetadata.attributes.push({ name: row.name, value: row.value });
+      }
     }
   }
+
+  appendedMetadata.minter = system.tzPublicKey || '';
 
   return appendedMetadata;
 }
@@ -141,7 +152,7 @@ export const mintTokenAction = createAsyncThunk<
     });
   }
 
-  let ipfsMetadata: Record<string, string> = {};
+  let ipfsMetadata: NftMetadata = {};
   try {
     if (/^image\/.*/.test(file.type)) {
       const imageResponse = await uploadIPFSImageWithThumbnail(
@@ -192,7 +203,7 @@ export const mintTokenAction = createAsyncThunk<
   }
 
   const address = state.collectionAddress as string;
-  const metadata = appendStateMetadata(state, ipfsMetadata);
+  const metadata = appendStateMetadata(state, ipfsMetadata, system);
 
   try {
     const op = await mintToken(system, address, metadata);

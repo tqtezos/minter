@@ -61,7 +61,7 @@ will be an element to also explore in future iterations.
      - Simple name
      - Description
      - Symbol
-     - General key-value pairs
+     - Attributes (General key-value pairs)
      - URL (IPFS image)
 - Contract with standard FA2 entry points
 - Backend 
