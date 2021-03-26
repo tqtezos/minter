@@ -19,6 +19,10 @@ import {
   ModalContent,
   ModalOverlay,
   ResponsiveValue,
+  Slider,
+  SliderFilledTrack,
+  SliderThumb,
+  SliderTrack,
   Text,
   useDisclosure
 } from '@chakra-ui/react';
@@ -35,6 +39,7 @@ import {
 } from '../../../reducer/async/queries';
 
 import { Maximize2 } from 'react-feather';
+import { random } from 'lodash';
 
 function NotFound() {
   return (
@@ -86,11 +91,13 @@ function MediaNotFound() {
 }
 
 function TokenImage(props: {
+  id?: string;
   src: string;
   width?: string;
   maxWidth?: string;
   height?: string;
   objectFit?: ResponsiveValue<any>;
+  onLoad?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
 }) {
   const [errored, setErrored] = useState(false);
   const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
@@ -117,13 +124,13 @@ function TokenImage(props: {
   if (/^image\/.*/.test(obj.type)) {
     return (
       <Image
-        key={0}
+        id={props.id || 'assetImage'}
+        key={random()}
         src={props.src}
         objectFit={props.objectFit}
-        width={props.width}
-        height={props.height}
-        maxWidth={props.maxWidth}
         onError={() => setErrored(true)}
+        height={props.height}
+        onLoad={props.onLoad}
       />
     );
   }
@@ -151,6 +158,9 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
   const dispatch = useDispatch();
   const collection = state.collections[contractAddress];
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [zoom, setZoom] = useState(0);
+  const [imageHeight, setImageHeight] = useState(0);
+  const [imageWidth, setImageWidth] = useState(0);
 
   const collectionUndefined = collection === undefined;
 
@@ -176,6 +186,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
     (system.tzPublicKey === token.owner ||
       system.tzPublicKey === token.sale?.seller);
 
+  let img: HTMLImageElement;
+
   return (
     <Flex flexDir="column" bg="brand.brightGray">
       <Modal
@@ -190,12 +202,55 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           m="1rem"
           maxHeight="calc(100vh - 2rem)"
           display="unset"
+          onLoad={e => {
+            e.preventDefault();
+            if (img) {
+              img.style.maxWidth = `${imageWidth}`;
+              img.style.maxHeight = `${imageHeight}`;
+              if (imageHeight > e.currentTarget.scrollHeight) {
+                img.style.height = `calc(100% - 3rem)`;
+                img.style.margin = `auto`;
+              } else if (imageWidth > e.currentTarget.scrollWidth) {
+                img.style.width = `100%`;
+                img.style.paddingTop = `calc(25% - 3rem)`;
+              }
+              if (imageHeight > imageWidth) {
+                setZoom(e.currentTarget.scrollHeight / imageHeight);
+                img.style.width = `${zoom * imageWidth}`;
+              } else {
+                setZoom(e.currentTarget.scrollWidth / imageWidth);
+                img.style.height = `${zoom * imageHeight}`;
+              }
+            }
+          }}
         >
-          <ModalCloseButton left="0.75rem" />
+          <Flex height="3rem" alignItems="center" position="sticky" top={0}>
+            <ModalCloseButton position="relative" right={0} top={0} />
+            <Slider
+              defaultValue={zoom}
+              min={zoom}
+              max={1}
+              step={0.01}
+              width="10rem"
+              margin="auto"
+              onChange={console.log}
+            >
+              <SliderTrack>
+                <SliderFilledTrack />
+              </SliderTrack>
+              <SliderThumb />
+            </Slider>
+          </Flex>
+
           <TokenImage
+            id="fullScreenAssetView"
             src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
-            maxWidth="unset"
-            objectFit="none"
+            onLoad={e => {
+              e.preventDefault();
+              setImageHeight(e.currentTarget.height);
+              setImageWidth(e.currentTarget.width);
+              img = e.currentTarget;
+            }}
           />
         </ModalContent>
       </Modal>
