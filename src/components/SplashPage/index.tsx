@@ -31,16 +31,6 @@ export default function SplashPage() {
         <Heading color="white" size="xl" pb={8}>
           Create NFTs on Tezos
         </Heading>
-        <Heading
-          color="white"
-          size="md"
-          textAlign="center"
-          pb={12}
-          opacity=".8"
-        >
-          Create and mint a new non-fungible token by using our simple
-          interface. Just connect your Tezos account.
-        </Heading>
         <Flex minW="400px" justify="center" pb={20}>
           <MinterButton
             variant="secondaryActionLined"
