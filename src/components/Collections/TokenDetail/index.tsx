@@ -39,7 +39,6 @@ import {
 } from '../../../reducer/async/queries';
 
 import { Maximize2 } from 'react-feather';
-import { random } from 'lodash';
 
 function NotFound() {
   return (
@@ -125,7 +124,7 @@ function TokenImage(props: {
     return (
       <Image
         id={props.id || 'assetImage'}
-        key={random()}
+        key={props.id || 'assetImage'}
         src={props.src}
         objectFit={props.objectFit}
         onError={() => setErrored(true)}
@@ -172,6 +171,22 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
     }
   }, [contractAddress, tokenId, collectionUndefined, dispatch]);
 
+  useEffect(() => {
+    const img = document.getElementById('fullScreenAssetView');
+    if (img && zoom !== 0) {
+      console.log(
+        `${img.style.width}`,
+        `${imageWidth * zoom}`,
+        `${img.style.height}`,
+        `${imageHeight * zoom}`,
+        zoom
+      );
+      img.style.maxWidth = `${imageWidth}px`;
+      img.style.width = `${imageWidth * zoom}px`;
+      img.style.height = `${imageHeight * zoom}px`;
+    }
+  }, [imageHeight, imageWidth, zoom]);
+
   if (!collection?.tokens) {
     return null;
   }
@@ -185,8 +200,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
     system.tzPublicKey &&
     (system.tzPublicKey === token.owner ||
       system.tzPublicKey === token.sale?.seller);
-
-  let img: HTMLImageElement;
 
   return (
     <Flex flexDir="column" bg="brand.brightGray">
@@ -203,10 +216,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           maxHeight="calc(100vh - 2rem)"
           display="unset"
           onLoad={e => {
-            e.preventDefault();
+            const img = document.getElementById('fullScreenAssetView');
             if (img) {
-              img.style.maxWidth = `${imageWidth}`;
-              img.style.maxHeight = `${imageHeight}`;
               if (imageHeight > e.currentTarget.scrollHeight) {
                 img.style.height = `calc(100% - 3rem)`;
                 img.style.margin = `auto`;
@@ -216,10 +227,14 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               }
               if (imageHeight > imageWidth) {
                 setZoom(e.currentTarget.scrollHeight / imageHeight);
-                img.style.width = `${zoom * imageWidth}`;
+                img.style.width = `${
+                  (e.currentTarget.scrollHeight / imageHeight) * imageWidth
+                }px`;
               } else {
                 setZoom(e.currentTarget.scrollWidth / imageWidth);
-                img.style.height = `${zoom * imageHeight}`;
+                img.style.height = `${
+                  (e.currentTarget.scrollWidth / imageWidth) * imageHeight
+                }px`;
               }
             }
           }}
@@ -228,12 +243,12 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             <ModalCloseButton position="relative" right={0} top={0} />
             <Slider
               defaultValue={zoom}
-              min={zoom}
+              min={0}
               max={1}
               step={0.01}
               width="10rem"
               margin="auto"
-              onChange={console.log}
+              onChange={setZoom}
             >
               <SliderTrack>
                 <SliderFilledTrack />
@@ -246,10 +261,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             id="fullScreenAssetView"
             src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
             onLoad={e => {
-              e.preventDefault();
               setImageHeight(e.currentTarget.height);
               setImageWidth(e.currentTarget.width);
-              img = e.currentTarget;
             }}
           />
         </ModalContent>
