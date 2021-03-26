@@ -18,6 +18,7 @@ services:
       - mq
     ports:
       - 42000:14000
+    restart: on-failure
     logging:
       options:
         max-size: 10m
