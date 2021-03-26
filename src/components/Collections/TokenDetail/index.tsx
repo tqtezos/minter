@@ -97,6 +97,7 @@ function TokenImage(props: {
   height?: string;
   objectFit?: ResponsiveValue<any>;
   onLoad?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
+  onFetch?: (type: string) => void;
 }) {
   const [errored, setErrored] = useState(false);
   const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
@@ -112,8 +113,9 @@ function TokenImage(props: {
         url: URL.createObjectURL(blob),
         type: blob.type
       });
+      props.onFetch?.(blob.type);
     })();
-  }, [props.src]);
+  }, [props, props.onFetch, props.src]);
 
   if (errored) {
     return <MediaNotFound />;
@@ -136,7 +138,7 @@ function TokenImage(props: {
 
   if (/^video\/.*/.test(obj.type)) {
     return (
-      <video controls>
+      <video controls style={{ margin: 'auto', height: '100%' }}>
         <source src={obj.url} type={obj.type} />
       </video>
     );
@@ -158,8 +160,11 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
   const collection = state.collections[contractAddress];
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [zoom, setZoom] = useState(0);
+  const [initialZoom, setInitialZoom] = useState(0);
   const [imageHeight, setImageHeight] = useState(0);
   const [imageWidth, setImageWidth] = useState(0);
+  const [mediaType, setMediaType] = useState('');
+  const [shouldScroll, setShouldScroll] = useState(false);
 
   const collectionUndefined = collection === undefined;
 
@@ -174,13 +179,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
   useEffect(() => {
     const img = document.getElementById('fullScreenAssetView');
     if (img && zoom !== 0) {
-      console.log(
-        `${img.style.width}`,
-        `${imageWidth * zoom}`,
-        `${img.style.height}`,
-        `${imageHeight * zoom}`,
-        zoom
-      );
       img.style.maxWidth = `${imageWidth}px`;
       img.style.width = `${imageWidth * zoom}px`;
       img.style.height = `${imageHeight * zoom}px`;
@@ -217,53 +215,53 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           display="unset"
           onLoad={e => {
             const img = document.getElementById('fullScreenAssetView');
+
             if (img) {
+              if (!shouldScroll)
+                img.style.margin = `calc(${
+                  (e.currentTarget.scrollHeight - imageHeight) / 2
+                }px - 3rem) auto`;
               if (imageHeight > e.currentTarget.scrollHeight) {
                 img.style.height = `calc(100% - 3rem)`;
-                img.style.margin = `auto`;
+                img.style.margin = 'auto';
               } else if (imageWidth > e.currentTarget.scrollWidth) {
                 img.style.width = `100%`;
                 img.style.paddingTop = `calc(25% - 3rem)`;
               }
-              if (imageHeight > imageWidth) {
-                setZoom(e.currentTarget.scrollHeight / imageHeight);
-                img.style.width = `${
-                  (e.currentTarget.scrollHeight / imageHeight) * imageWidth
-                }px`;
-              } else {
-                setZoom(e.currentTarget.scrollWidth / imageWidth);
-                img.style.height = `${
-                  (e.currentTarget.scrollWidth / imageWidth) * imageHeight
-                }px`;
-              }
             }
           }}
         >
-          <Flex height="3rem" alignItems="center" position="sticky" top={0}>
-            <ModalCloseButton position="relative" right={0} top={0} />
-            <Slider
-              defaultValue={zoom}
-              min={0}
-              max={1}
-              step={0.01}
-              width="10rem"
-              margin="auto"
-              onChange={setZoom}
+          {/^image\/.*/.test(mediaType) ? (
+            <Flex
+              height="3rem"
+              alignItems="center"
+              position="sticky"
+              top={0}
+              right={0}
             >
-              <SliderTrack>
-                <SliderFilledTrack />
-              </SliderTrack>
-              <SliderThumb />
-            </Slider>
-          </Flex>
+              <ModalCloseButton position="relative" left={0} top={0} />
+              <Slider
+                defaultValue={initialZoom}
+                min={initialZoom}
+                max={1}
+                step={0.01}
+                width="10rem"
+                margin="auto"
+                onChange={setZoom}
+              >
+                <SliderTrack>
+                  <SliderFilledTrack />
+                </SliderTrack>
+                <SliderThumb />
+              </Slider>
+            </Flex>
+          ) : (
+            <ModalCloseButton />
+          )}
 
           <TokenImage
             id="fullScreenAssetView"
             src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
-            onLoad={e => {
-              setImageHeight(e.currentTarget.height);
-              setImageWidth(e.currentTarget.width);
-            }}
           />
         </ModalContent>
       </Modal>
@@ -294,6 +292,31 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
         <TokenImage
           src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
           height="100%"
+          onLoad={e => {
+            const iHeight = e.currentTarget.height;
+            const iWidth = e.currentTarget.width;
+            const wHeight = window.innerHeight - 80;
+            const wWidth = window.innerWidth - 32;
+
+            const isImageBiggerThanModal = iHeight > wHeight || iWidth > wWidth;
+
+            setShouldScroll(isImageBiggerThanModal);
+
+            if (isImageBiggerThanModal) {
+              if (iHeight > iWidth) {
+                const initialZoom = wHeight / iHeight;
+                setInitialZoom(initialZoom);
+              } else {
+                const initialZoom = wWidth / iWidth;
+                setInitialZoom(initialZoom);
+              }
+            } else {
+              setInitialZoom(1);
+            }
+            setImageHeight(iHeight);
+            setImageWidth(iWidth);
+          }}
+          onFetch={setMediaType}
         />{' '}
         <Flex align="center" justify="space-evenly" width={['100%']} mt="4">
           {isOwner ? (
@@ -310,7 +333,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 <MinterMenuItem
                   w={[100]}
                   variant="primary"
-                  onClick={disclosure.onOpen}
+                  disabled={!!token.sale}
+                  onClick={token.sale ? undefined : disclosure.onOpen}
                 >
                   Transfer
                 </MinterMenuItem>
@@ -325,19 +349,28 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
 
           {token.sale ? (
             isOwner ? (
-              <>
+              <Flex direction="column">
+                <Flex align="center" alignSelf="center">
+                  <Text color="black" fontSize="3xl" mr={1}>
+                    ꜩ
+                  </Text>
+                  <Text color="brand.black" fontSize="xl" fontWeight="700">
+                    {token.sale.price.toFixed(2)}
+                  </Text>
+                </Flex>
                 <CancelTokenSaleButton
                   contract={contractAddress}
                   tokenId={tokenId}
                 />
-              </>
+              </Flex>
             ) : (
               <Flex
                 flexDirection="column"
                 align="stretch"
                 width={['100%', 200]}
               >
-                <Flex align="center" alignSelf="center">
+                <Flex align="center" justify="space-between" alignSelf="center">
+                  <Flex />
                   <Text color="black" fontSize="3xl" mr={1}>
                     ꜩ
                   </Text>
