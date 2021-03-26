@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useLocation } from 'wouter';
 import {
   Box,
@@ -8,24 +8,66 @@ import {
   Text,
   Menu,
   MenuButton,
-  MenuList
+  MenuList,
+  useDisclosure,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  DrawerBody,
+  Heading
 } from '@chakra-ui/react';
-import { Plus, Settings } from 'react-feather';
+import { Plus, Settings, Menu as HamburgerIcon } from 'react-feather';
 import { RiStore2Line } from 'react-icons/ri';
 // import { IoCubeOutline } from 'react-icons/io5';
 import { MdCollections } from 'react-icons/md';
 import headerLogo from './assets/header-logo.svg';
 import { useSelector, useDispatch } from '../../reducer';
-import { disconnectWallet } from '../../reducer/async/wallet';
+import { connectWallet, disconnectWallet } from '../../reducer/async/wallet';
 import { MinterButton } from '.';
 import logo from './assets/splash-logo.svg';
 
-interface HeaderLinkProps {
+interface MobileHeaderLinkProps {
+  to: string;
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+
+function MobileHeaderLink(props: MobileHeaderLinkProps) {
+  const [location, setLocation] = useLocation();
+  const selected = location === props.to;
+  return (
+    <Link
+      href={props.to}
+      onClick={e => {
+        e.preventDefault();
+        setLocation(props.to);
+        if (props.onClick) {
+          props.onClick();
+        }
+      }}
+      textDecor="none"
+    >
+      <Heading
+        fontWeight={selected ? '600' : 'normal'}
+        color="brand.background"
+        mb={4}
+        pl={selected ? 4 : 0}
+        borderLeft={selected ? '5px solid' : 'none'}
+        borderColor="brand.blue"
+      >
+        {props.children}
+      </Heading>
+    </Link>
+  );
+}
+
+interface DesktopHeaderLinkProps {
   to: string;
   children: React.ReactNode;
 }
 
-function HeaderLink(props: HeaderLinkProps) {
+function DesktopHeaderLink(props: DesktopHeaderLinkProps) {
   const [location, setLocation] = useLocation();
   const selected = location === props.to;
   return (
@@ -76,9 +118,6 @@ function WalletDisplay() {
   const [, setLocation] = useLocation();
   const system = useSelector(s => s.system);
   const dispatch = useDispatch();
-  if (system.status !== 'WalletConnected') {
-    return null;
-  }
   return (
     <>
       <Menu placement="bottom-end" offset={[4, 24]}>
@@ -86,24 +125,170 @@ function WalletDisplay() {
           <Settings />
         </MenuButton>
         <MenuList color="brand.black">
-          <Flex flexDir="column" px={4} py={2}>
-            <Text fontSize={16} fontWeight="600">
-              Network: {system.config.network}
-            </Text>
-            <WalletInfo tzPublicKey={system.tzPublicKey} />
-            <MinterButton
-              alignSelf="flex-start"
-              variant="cancelAction"
-              onClick={async () => {
-                await dispatch(disconnectWallet());
-                setLocation('/');
-              }}
-            >
-              Disconnect
-            </MinterButton>
-          </Flex>
+          {system.status === 'WalletConnected' ? (
+            <Flex flexDir="column" px={4} py={2}>
+              <Text fontSize={16} fontWeight="600">
+                Network: {system.config.network}
+              </Text>
+              <WalletInfo tzPublicKey={system.tzPublicKey} />
+              <MinterButton
+                alignSelf="flex-start"
+                variant="cancelAction"
+                onClick={async () => {
+                  await dispatch(disconnectWallet());
+                  setLocation('/');
+                }}
+              >
+                Disconnect
+              </MinterButton>
+            </Flex>
+          ) : (
+            <Flex flexDir="column" justify="center" px={4}>
+              <Text mt={2} mb={4}>
+                No wallet connected
+              </Text>
+              <MinterButton
+                variant="secondaryAction"
+                onClick={e => {
+                  e.preventDefault();
+                  dispatch(connectWallet());
+                }}
+              >
+                Connect your Wallet
+              </MinterButton>
+            </Flex>
+          )}
         </MenuList>
       </Menu>
+    </>
+  );
+}
+
+function NavItems() {
+  const system = useSelector(s => s.system);
+  const dispatch = useDispatch();
+  const [, setLocation] = useLocation();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const btnRef = useRef(null);
+
+  return (
+    <>
+      {/* Mobile */}
+      <Flex
+        flex="1"
+        justify="flex-end"
+        display={{
+          base: 'flex',
+          md: 'none'
+        }}
+      >
+        <Box
+          color="brand.lightGray"
+          ref={btnRef}
+          cursor="pointer"
+          onClick={onOpen}
+        >
+          <HamburgerIcon />
+        </Box>
+        <Drawer
+          isOpen={isOpen}
+          onClose={onClose}
+          placement="right"
+          finalFocusRef={btnRef}
+        >
+          <DrawerOverlay>
+            <DrawerContent>
+              <DrawerCloseButton />
+              <DrawerBody mt={12}>
+                <Flex
+                  flexDir="column"
+                  justifyContent="space-between"
+                  height="100%"
+                >
+                  <Flex flexDir="column">
+                    <MobileHeaderLink to="/marketplace" onClick={onClose}>
+                      Marketplace
+                    </MobileHeaderLink>
+                    <MobileHeaderLink to="/collections" onClick={onClose}>
+                      Collections
+                    </MobileHeaderLink>
+                    {system.status === 'WalletConnected' ? (
+                      <MobileHeaderLink to="/create" onClick={onClose}>
+                        New Asset
+                      </MobileHeaderLink>
+                    ) : null}
+                  </Flex>
+                  {system.status === 'WalletConnected' ? (
+                    <MinterButton
+                      variant="cancelAction"
+                      onClick={async () => {
+                        await dispatch(disconnectWallet());
+                        setLocation('/');
+                      }}
+                      mb={4}
+                    >
+                      Disconnect Wallet
+                    </MinterButton>
+                  ) : (
+                    <MinterButton
+                      variant="secondaryAction"
+                      onClick={e => {
+                        e.preventDefault();
+                        dispatch(connectWallet());
+                      }}
+                      mb={4}
+                    >
+                      Connect your Wallet
+                    </MinterButton>
+                  )}
+                </Flex>
+              </DrawerBody>
+            </DrawerContent>
+          </DrawerOverlay>
+        </Drawer>
+      </Flex>
+      {/* Desktop */}
+      <Flex
+        flex="1"
+        justify="flex-end"
+        display={{
+          base: 'none',
+          md: 'flex'
+        }}
+      >
+        <DesktopHeaderLink to="/marketplace">
+          <Box color="brand.turquoise">
+            <RiStore2Line size={16} />
+          </Box>
+          <Text ml={2}>Marketplace</Text>
+        </DesktopHeaderLink>
+        {system.status === 'WalletConnected' ? (
+          <>
+            <DesktopHeaderLink to="/collections">
+              <Box color="brand.turquoise">
+                <MdCollections size={16} />
+              </Box>
+              <Text ml={2}>Collections</Text>
+            </DesktopHeaderLink>
+            <DesktopHeaderLink to="/create">
+              <Box color="brand.blue">
+                <Plus size={16} strokeWidth="3" />
+              </Box>
+              <Text ml={2}>New Asset</Text>
+            </DesktopHeaderLink>
+          </>
+        ) : null}
+        <Flex
+          alignItems="center"
+          color="brand.gray"
+          paddingLeft={4}
+          marginLeft={4}
+          borderLeft="2px solid"
+          borderColor="brand.darkGray"
+        >
+          <WalletDisplay />
+        </Flex>
+      </Flex>
     </>
   );
 }
@@ -149,36 +334,7 @@ export function Header() {
         }}
         cursor="pointer"
       />
-      <Flex flex="1" justify="flex-end">
-        <HeaderLink to="/marketplace">
-          <Box color="brand.turquoise">
-            <RiStore2Line size={16} />
-          </Box>
-          <Text ml={2}>Marketplace</Text>
-        </HeaderLink>
-        <HeaderLink to="/collections">
-          <Box color="brand.turquoise">
-            <MdCollections size={16} />
-          </Box>
-          <Text ml={2}>Collections</Text>
-        </HeaderLink>
-        <HeaderLink to="/create">
-          <Box color="brand.blue">
-            <Plus size={16} strokeWidth="3" />
-          </Box>
-          <Text ml={2}>New Asset</Text>
-        </HeaderLink>
-        <Flex
-          alignItems="center"
-          color="brand.gray"
-          paddingLeft={4}
-          marginLeft={4}
-          borderLeft="2px solid"
-          borderColor="brand.darkGray"
-        >
-          <WalletDisplay />
-        </Flex>
-      </Flex>
+      <NavItems />
     </Flex>
   );
 }

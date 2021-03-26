@@ -5,6 +5,7 @@ import { RefreshCw, ExternalLink } from 'react-feather';
 import { MinterButton } from '../../common';
 import Sidebar from './Sidebar';
 import TokenGrid from './TokenGrid';
+import CollectionsDropdown from './CollectionsDropdown';
 
 import { useSelector, useDispatch } from '../../../reducer';
 import {
@@ -48,8 +49,25 @@ export default function Catalog() {
   const collection = state.collections[selectedCollection];
 
   return (
-    <Flex flex="1" w="100%" minHeight="0">
-      <Flex w="250px" h="100%" flexDir="column" overflowY="scroll">
+    <Flex
+      flex="1"
+      w="100%"
+      minHeight="0"
+      flexDir={{
+        base: 'column',
+        md: 'row'
+      }}
+    >
+      <Flex
+        w="250px"
+        h="100%"
+        flexDir="column"
+        overflowY="scroll"
+        display={{
+          base: 'none',
+          md: 'flex'
+        }}
+      >
         <Sidebar />
       </Flex>
       <Flex
@@ -65,14 +83,36 @@ export default function Catalog() {
         overflowY="scroll"
         justify="start"
       >
-        <Flex w="100%" pb={6} justify="space-between" align="center">
-          <Flex flexDir="column">
-            <Heading size="lg">{collection.metadata.name || ''}</Heading>
+        <Flex
+          w="100%"
+          pb={6}
+          justify="space-between"
+          align={{
+            base: 'flex-start',
+            md: 'center'
+          }}
+          flexDir={{
+            base: 'column',
+            md: 'row'
+          }}
+        >
+          <Flex flexDir="column" width="100%">
+            <Flex justify="space-between" width="100%">
+              <Heading size="lg">{collection.metadata.name || ''}</Heading>
+              <Flex display={{ base: 'flex', md: 'none' }}>
+                <CollectionsDropdown />
+              </Flex>
+            </Flex>
             <Flex align="center">
               <Text fontFamily="mono" color="brand.lightGray">
                 {collection.address}
               </Text>
-              <Link href={system.config.bcd.gui+"/"+collection.address} color="brand.darkGray" isExternal ml={2}>
+              <Link
+                href={system.config.bcd.gui + '/' + collection.address}
+                color="brand.darkGray"
+                isExternal
+                ml={2}
+              >
                 <ExternalLink size={16} />
               </Link>
             </Flex>
@@ -84,6 +124,10 @@ export default function Catalog() {
               if (selectedCollection !== null) {
                 dispatch(getContractNftsQuery(selectedCollection));
               }
+            }}
+            mt={{
+              base: 4,
+              md: 0
             }}
           >
             <Box color="currentcolor">
