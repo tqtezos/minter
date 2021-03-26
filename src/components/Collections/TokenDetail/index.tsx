@@ -345,7 +345,9 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 disclosure={disclosure}
               />
             </Menu>
-          ) : null}
+          ) : (
+            <Flex w={[10]} />
+          )}
 
           {token.sale ? (
             isOwner ? (
@@ -370,7 +372,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 width={['100%', 200]}
               >
                 <Flex align="center" justify="space-between" alignSelf="center">
-                  <Flex />
                   <Text color="black" fontSize="3xl" mr={1}>
                     ꜩ
                   </Text>
