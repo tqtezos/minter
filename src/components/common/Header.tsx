@@ -248,28 +248,32 @@ function NavItems() {
           </Box>
           <Text ml={2}>Marketplace</Text>
         </DesktopHeaderLink>
-        <DesktopHeaderLink to="/collections">
-          <Box color="brand.turquoise">
-            <MdCollections size={16} />
-          </Box>
-          <Text ml={2}>Collections</Text>
-        </DesktopHeaderLink>
-        <DesktopHeaderLink to="/create">
-          <Box color="brand.blue">
-            <Plus size={16} strokeWidth="3" />
-          </Box>
-          <Text ml={2}>New Asset</Text>
-        </DesktopHeaderLink>
-        <Flex
-          alignItems="center"
-          color="brand.gray"
-          paddingLeft={4}
-          marginLeft={4}
-          borderLeft="2px solid"
-          borderColor="brand.darkGray"
-        >
-          <WalletDisplay />
-        </Flex>
+        {system.status === 'WalletConnected' ? (
+          <>
+            <DesktopHeaderLink to="/collections">
+              <Box color="brand.turquoise">
+                <MdCollections size={16} />
+              </Box>
+              <Text ml={2}>Collections</Text>
+            </DesktopHeaderLink>
+            <DesktopHeaderLink to="/create">
+              <Box color="brand.blue">
+                <Plus size={16} strokeWidth="3" />
+              </Box>
+              <Text ml={2}>New Asset</Text>
+            </DesktopHeaderLink>
+            <Flex
+              alignItems="center"
+              color="brand.gray"
+              paddingLeft={4}
+              marginLeft={4}
+              borderLeft="2px solid"
+              borderColor="brand.darkGray"
+            >
+              <WalletDisplay />
+            </Flex>
+          </>
+        ) : null}
       </Flex>
     </>
   );
