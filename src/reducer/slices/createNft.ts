@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { NftMetadataAttribute } from '../../lib/nfts/queries';
 import { readFileAsDataUrlAction } from '../async/actions';
 
 // State
@@ -40,7 +41,7 @@ export interface CreateNftState {
   displayImageFile: SelectedFile | null;
   uploadedArtifact: UploadedArtifact | null;
   fields: Fields;
-  metadataRows: { name: string | null; value: string | null }[];
+  attributes: Array<NftMetadataAttribute>;
   collectionAddress: string | null;
   createStatus: CreateStatus;
 }
@@ -54,7 +55,7 @@ export const initialState: CreateNftState = {
     name: null,
     description: null
   },
-  metadataRows: [],
+  attributes: [],
   collectionAddress: null,
   createStatus: CreateStatus.Ready
 };
@@ -99,20 +100,20 @@ const slice = createSlice({
       state.displayImageFile = null;
     },
     addMetadataRow(state) {
-      state.metadataRows.push({ name: null, value: null });
+      state.attributes.push({ name: null, value: null });
     },
     updateMetadataRowName(state, action: UpdateRowNameAction) {
-      if (state.metadataRows[action.payload.key]) {
-        state.metadataRows[action.payload.key].name = action.payload.name;
+      if (state.attributes[action.payload.key]) {
+        state.attributes[action.payload.key].name = action.payload.name;
       }
     },
     updateMetadataRowValue(state, action: UpdateRowValueAction) {
-      if (state.metadataRows[action.payload.key]) {
-        state.metadataRows[action.payload.key].value = action.payload.value;
+      if (state.attributes[action.payload.key]) {
+        state.attributes[action.payload.key].value = action.payload.value;
       }
     },
     deleteMetadataRow(state, action: PayloadAction<{ key: number }>) {
-      state.metadataRows.splice(action.payload.key, 1);
+      state.attributes.splice(action.payload.key, 1);
     },
     selectCollection(state, action: PayloadAction<string>) {
       state.collectionAddress = action.payload;

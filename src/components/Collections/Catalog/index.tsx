@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { Box, Flex, Heading, Text } from '@chakra-ui/react';
+import { Box, Flex, Heading, Text, Link, Spinner } from '@chakra-ui/react';
 import { useLocation } from 'wouter';
-import { RefreshCw } from 'react-feather';
+import { RefreshCw, ExternalLink } from 'react-feather';
 import { MinterButton } from '../../common';
 import Sidebar from './Sidebar';
 import TokenGrid from './TokenGrid';
+import CollectionsDropdown from './CollectionsDropdown';
 
 import { useSelector, useDispatch } from '../../../reducer';
 import {
@@ -48,8 +49,25 @@ export default function Catalog() {
   const collection = state.collections[selectedCollection];
 
   return (
-    <Flex flex="1" w="100%" minHeight="0">
-      <Flex w="250px" h="100%" flexDir="column" overflowY="scroll">
+    <Flex
+      flex="1"
+      w="100%"
+      minHeight="0"
+      flexDir={{
+        base: 'column',
+        md: 'row'
+      }}
+    >
+      <Flex
+        w="250px"
+        h="100%"
+        flexDir="column"
+        overflowY="scroll"
+        display={{
+          base: 'none',
+          md: 'flex'
+        }}
+      >
         <Sidebar />
       </Flex>
       <Flex
@@ -65,12 +83,39 @@ export default function Catalog() {
         overflowY="scroll"
         justify="start"
       >
-        <Flex w="100%" pb={6} justify="space-between" align="center">
-          <Flex flexDir="column">
-            <Heading size="lg">{collection.metadata.name || ''}</Heading>
-            <Text fontFamily="mono" color="brand.lightGray">
-              {collection.address}
-            </Text>
+        <Flex
+          w="100%"
+          pb={6}
+          justify="space-between"
+          align={{
+            base: 'flex-start',
+            md: 'center'
+          }}
+          flexDir={{
+            base: 'column',
+            md: 'row'
+          }}
+        >
+          <Flex flexDir="column" width="100%">
+            <Flex justify="space-between" width="100%">
+              <Heading size="lg">{collection.metadata.name || ''}</Heading>
+              <Flex display={{ base: 'flex', md: 'none' }}>
+                <CollectionsDropdown />
+              </Flex>
+            </Flex>
+            <Flex align="center">
+              <Text fontFamily="mono" color="brand.lightGray">
+                {collection.address}
+              </Text>
+              <Link
+                href={system.config.bcd.gui + '/' + collection.address}
+                color="brand.darkGray"
+                isExternal
+                ml={2}
+              >
+                <ExternalLink size={16} />
+              </Link>
+            </Flex>
           </Flex>
           <MinterButton
             variant="primaryActionInverted"
@@ -80,6 +125,10 @@ export default function Catalog() {
                 dispatch(getContractNftsQuery(selectedCollection));
               }
             }}
+            mt={{
+              base: 4,
+              md: 0
+            }}
           >
             <Box color="currentcolor">
               <RefreshCw size={16} strokeWidth="3" />
@@ -87,7 +136,16 @@ export default function Catalog() {
             <Text ml={2}>Refresh</Text>
           </MinterButton>
         </Flex>
-        <TokenGrid state={state} walletAddress={system.tzPublicKey} />
+        {!collection.loaded ? (
+          <Flex flexDir="column" align="center" flex="1" pt={20}>
+            <Spinner size="xl" mb={6} color="gray.300" />
+            <Heading size="lg" textAlign="center" color="gray.500">
+              Loading...
+            </Heading>
+          </Flex>
+        ) : (
+          <TokenGrid state={state} walletAddress={system.tzPublicKey} />
+        )}
       </Flex>
     </Flex>
   );

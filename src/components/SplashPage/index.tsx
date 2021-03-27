@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Flex, Text, Heading, Image, Link } from '@chakra-ui/react';
 import { MinterButton /* , MinterLink */ } from '../common';
-import logo from './logo.svg';
+import logo from '../common/assets/splash-logo.svg';
 import { useSelector, useDispatch } from '../../reducer';
 import { connectWallet } from '../../reducer/async/wallet';
 
@@ -31,16 +31,6 @@ export default function SplashPage() {
         <Heading color="white" size="xl" pb={8}>
           Create NFTs on Tezos
         </Heading>
-        <Heading
-          color="white"
-          size="md"
-          textAlign="center"
-          pb={12}
-          opacity=".8"
-        >
-          Create and mint a new non-fungible token by using our simple
-          interface. Just connect your Tezos account.
-        </Heading>
         <Flex minW="400px" justify="center" pb={20}>
           <MinterButton
             variant="secondaryActionLined"
@@ -51,18 +41,6 @@ export default function SplashPage() {
           >
             Connect your wallet
           </MinterButton>
-          {/* <MinterLink */}
-          {/*   variant="primaryAction" */}
-          {/*   marginLeft={4} */}
-          {/*   flex="1" */}
-          {/*   href="/create-non-fungible" */}
-          {/*   onClick={e => { */}
-          {/*     e.preventDefault(); */}
-          {/*     setLocation('/create-non-fungible'); */}
-          {/*   }} */}
-          {/* > */}
-          {/*   Create */}
-          {/* </MinterLink> */}
         </Flex>
       </Flex>
       <Flex

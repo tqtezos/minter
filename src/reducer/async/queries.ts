@@ -4,6 +4,7 @@ import {
   getNftAssetContract,
   AssetContract,
   getContractNfts,
+  getMarketplaceNfts,
   Nft,
   getWalletNftAssetContracts
 } from '../../lib/nfts/queries';
@@ -70,3 +71,20 @@ export const getWalletAssetContractsQuery = createAsyncThunk<
     }
   }
 );
+
+export const getMarketplaceNftsQuery = createAsyncThunk<
+  { tokens: Nft[] },
+  string,
+  Opts
+>('query/getMarketplaceNfts', async (address, { getState, rejectWithValue }) => {
+  const { system } = getState();
+  try {
+    const tokens = await getMarketplaceNfts(system, address);
+    return { tokens };
+  } catch (e) {
+    return rejectWithValue({
+      kind: ErrorKind.GetMarketplaceNftsFailed,
+      message: `Failed to retrieve marketplace nfts from: ${address}`
+    });
+  }
+});

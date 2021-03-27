@@ -4,6 +4,7 @@ import SplashPage from '../SplashPage';
 import CreateNonFungiblePage from '../CreateNonFungiblePage';
 import CollectionsCatalog from '../Collections/Catalog';
 import CollectionsTokenDetail from '../Collections/TokenDetail';
+import MarketplaceCatalog from '../Marketplace/Catalog';
 import Header from '../common/Header';
 import { Flex } from '@chakra-ui/react';
 import Notifications from '../common/Notifications';
@@ -39,6 +40,9 @@ export default function App() {
           </Route>
           <Route path="/collections">
             <CollectionsCatalog />
+          </Route>
+          <Route path="/marketplace">
+            <MarketplaceCatalog />
           </Route>
           <Route path="/collection/:contractAddress/token/:tokenId">
             {({ contractAddress, tokenId }) => (

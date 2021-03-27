@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import { AspectRatio, Box, Flex, Grid, Image, Text } from '@chakra-ui/react';
+import { AspectRatio, Box, Flex, SimpleGrid, Image, Text } from '@chakra-ui/react';
 import { Wind, HelpCircle } from 'react-feather';
 import { Token, CollectionsState } from '../../../reducer/slices/collections';
 import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
@@ -169,7 +169,7 @@ export default function TokenGrid({ state, walletAddress }: TokenGridProps) {
   }
 
   return (
-    <Grid templateColumns="repeat(4, 1fr)" gap={8} pb={8}>
+    <SimpleGrid columns={{sm: 1, md: 2, lg: 3, xl: 4}} gap={8} pb={8}>
       {tokens.map(token => {
         return (
           <TokenTile
@@ -180,6 +180,6 @@ export default function TokenGrid({ state, walletAddress }: TokenGridProps) {
           />
         );
       })}
-    </Grid>
+    </SimpleGrid>
   );
 }

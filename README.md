@@ -1,6 +1,6 @@
 ![OpenMinter header](/docs/assets/minterhead.png)
 
-[![](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE) [![](https://img.shields.io/badge/version-v0.4.2-orange)](https://github.com/tqtezos/minter)
+[![](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE) [![](https://img.shields.io/github/v/release/tqtezos/minter)](https://github.com/tqtezos/minter)
 
 ## OpenMinter
 
