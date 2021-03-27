@@ -465,7 +465,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               {token.title}
             </Heading>
             <Heading color="brand.darkGray" size="md" mt={[2, 4]}>
-              Minter: {token.metadata?.minter || 'Unkown'}
+              Minter: {token.metadata?.minter || 'Unknown'}
             </Heading>
             <Text
               fontSize="md"
