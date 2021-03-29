@@ -138,7 +138,10 @@ function TokenImage(props: {
 
   if (/^video\/.*/.test(obj.type)) {
     return (
-      <video controls style={{ margin: 'auto', height: '100%' }}>
+      <video
+        controls
+        style={{ margin: 'auto', height: props.height || '100%' }}
+      >
         <source src={obj.url} type={obj.type} />
       </video>
     );
