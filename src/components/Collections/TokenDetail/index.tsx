@@ -391,7 +391,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                     ꜩ
                   </Text>
                   <Text color="brand.black" fontSize="xl" fontWeight="700">
-                    {token.sale.price.toFixed(2)}
+                    {token.sale.price}
                   </Text>
                 </Flex>
                 <CancelTokenSaleButton
