@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'wouter';
 import {
   Accordion,
   AccordionButton,
@@ -138,7 +137,10 @@ function TokenImage(props: {
 
   if (/^video\/.*/.test(obj.type)) {
     return (
-      <video controls style={{ margin: 'auto', height: '100%' }}>
+      <video
+        controls
+        style={{ margin: 'auto', height: props.height || '100%' }}
+      >
         <source src={obj.url} type={obj.type} />
       </video>
     );
@@ -153,7 +155,6 @@ interface TokenDetailProps {
 }
 
 function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
-  const [, setLocation] = useLocation();
   const { system, collections: state } = useSelector(s => s);
   const disclosure = useDisclosure();
   const dispatch = useDispatch();
@@ -294,13 +295,12 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           variant="primaryActionInverted"
           onClick={e => {
             e.preventDefault();
-            setLocation('/collections', { replace: true });
+            window.history.back();
           }}
         >
           <Box color="currentcolor">
             <ChevronLeft size={16} strokeWidth="3" />
           </Box>
-          <Text ml={2}>Collections</Text>
         </MinterButton>
       </Flex>
       <Flex
