@@ -98,19 +98,13 @@ export default function CreateNonFungiblePage() {
 
   return (
     <Flex flex="1" width="100%" minHeight="0">
-      <Flex
-        w="100%"
-        h="100%"
-        flexDir="column"
-        overflowY="scroll"
-        align="center"
-      >
+      <Flex w="100%" h="100%" flexDir="column" align="center">
         <Flex
           w="100%"
           px={8}
           py={4}
           justify="space-between"
-          align="end"
+          align="center"
           borderBottomWidth="1px"
           borderBottomColor="brand.brightGray"
         >
@@ -200,7 +194,7 @@ export default function CreateNonFungiblePage() {
             base: 6,
             md: 28
           }}
-          overflowY="scroll"
+          overflowY="auto"
           minHeight="0px"
           flex="1"
           flexDir="column"
