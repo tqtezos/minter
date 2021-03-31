@@ -5,7 +5,7 @@ import { MinterButton } from '../common';
 import Form from './Form';
 import FileUpload from './FileUpload';
 import CollectionSelect from './CollectionSelect';
-import Preview from './Preview';
+// import Preview from './Preview';
 import StatusModal from './StatusModal';
 import { ChevronLeft, X } from 'react-feather';
 
