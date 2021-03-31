@@ -55,7 +55,7 @@ function TokenImage(props: { src: string }) {
     return (
       <Image
         src={props.src}
-        objectFit="contain"
+        objectFit="scale-down"
         flex="1"
         onError={() => setErrored(true)}
       />
