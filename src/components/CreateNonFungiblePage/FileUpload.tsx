@@ -11,7 +11,14 @@ import {
 export function FilePreview({ file }: { file: SelectedFile }) {
   const dispatch = useDispatch();
   if (/^image\/.*/.test(file.type)) {
-    return <Image src={file.objectUrl} width="100%" height="100%" objectFit='contain' />;
+    return (
+      <Image
+        src={file.objectUrl}
+        width="100%"
+        height="100%"
+        objectFit="contain"
+      />
+    );
   }
   if (/^video\/.*/.test(file.type)) {
     const canvasRef = createRef<HTMLCanvasElement>();
@@ -76,7 +83,7 @@ export default function FileUpload() {
   });
 
   return (
-    <Flex align="center" flexDir="column" width="100%" flex="1" pt={28}>
+    <Flex align="center" flexDir="column" width="100%" flex="1" pt={12}>
       <Heading size="lg" paddingBottom={8} textAlign="center">
         Upload your file
       </Heading>
