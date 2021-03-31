@@ -74,7 +74,7 @@ function LeftContent() {
     case 'collection_select':
       return (
         <Box w="100%" maxWidth="800px">
-          <CollectionSelect />;
+          <CollectionSelect />
         </Box>
       );
     default:
