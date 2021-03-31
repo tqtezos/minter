@@ -59,11 +59,24 @@ function LeftContent() {
   const step = useSelector(s => s.createNft.step);
   switch (step) {
     case 'file_upload':
-      return <FileUpload />;
+      return (
+        <Box w="100%" maxWidth="1200px">
+          <FileUpload />
+        </Box>
+      );
+
     case 'asset_details':
-      return <Form />;
+      return (
+        <Box w="100%" maxWidth="800px">
+          <Form />
+        </Box>
+      );
     case 'collection_select':
-      return <CollectionSelect />;
+      return (
+        <Box w="100%" maxWidth="800px">
+          <CollectionSelect />;
+        </Box>
+      );
     default:
       return null;
   }
@@ -185,7 +198,7 @@ export default function CreateNonFungiblePage() {
           pt={10}
           px={{
             base: 6,
-            lg: 28
+            md: 28
           }}
           overflowY="scroll"
           minHeight="0px"
@@ -193,9 +206,7 @@ export default function CreateNonFungiblePage() {
           flexDir="column"
           align="center"
         >
-          <Box w="100%" maxWidth="1200px">
-            <LeftContent />
-          </Box>
+          <LeftContent />
           <Box pb={10} w="100%" />
         </Flex>
       </Flex>
