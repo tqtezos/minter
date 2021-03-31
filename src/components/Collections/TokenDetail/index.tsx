@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'wouter';
 import {
   Accordion,
   AccordionButton,
@@ -138,7 +137,10 @@ function TokenImage(props: {
 
   if (/^video\/.*/.test(obj.type)) {
     return (
-      <video controls style={{ margin: 'auto', height: '100%' }}>
+      <video
+        controls
+        style={{ margin: 'auto', height: props.height || '100%' }}
+      >
         <source src={obj.url} type={obj.type} />
       </video>
     );
@@ -153,7 +155,6 @@ interface TokenDetailProps {
 }
 
 function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
-  const [, setLocation] = useLocation();
   const { system, collections: state } = useSelector(s => s);
   const disclosure = useDisclosure();
   const dispatch = useDispatch();
@@ -178,12 +179,21 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
 
   useEffect(() => {
     const img = document.getElementById('fullScreenAssetView');
-    if (img && zoom !== 0) {
+    const wHeight = window.innerHeight;
+    const wWidth = window.innerWidth;
+    const isPortrait = wHeight > wWidth;
+
+    if (img && zoom !== 0 && zoom !== initialZoom) {
       img.style.maxWidth = `${imageWidth}px`;
       img.style.width = `${imageWidth * zoom}px`;
       img.style.height = `${imageHeight * zoom}px`;
+      if (isPortrait && imageHeight > imageWidth) {
+        img.style.margin = `calc((((${
+          imageHeight - wHeight
+        }px) / 2) * ${initialZoom} - 80px) * ${1 - zoom}) auto`;
+      }
     }
-  }, [imageHeight, imageWidth, zoom]);
+  }, [imageHeight, imageWidth, initialZoom, zoom]);
 
   if (!collection?.tokens) {
     return null;
@@ -200,7 +210,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       system.tzPublicKey === token.sale?.seller);
 
   return (
-    <Flex flexDir="column" bg="brand.brightGray">
+    <Flex flexDir="column" bg="brand.brightGray" flexGrow={1}>
       <Modal
         isOpen={isOpen}
         onClose={onClose}
@@ -215,18 +225,33 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           display="unset"
           onLoad={e => {
             const img = document.getElementById('fullScreenAssetView');
+            const wHeight = window.innerHeight - 80;
+            const wWidth = window.innerWidth - 32;
+            const isLandscape = wHeight < wWidth;
+            const isPortrait = wHeight > wWidth;
 
             if (img) {
-              if (!shouldScroll)
+              if (!shouldScroll) {
                 img.style.margin = `calc(${
                   (e.currentTarget.scrollHeight - imageHeight) / 2
                 }px - 3rem) auto`;
-              if (imageHeight > e.currentTarget.scrollHeight) {
-                img.style.height = `calc(100% - 3rem)`;
-                img.style.margin = 'auto';
-              } else if (imageWidth > e.currentTarget.scrollWidth) {
-                img.style.width = `100%`;
-                img.style.paddingTop = `calc(25% - 3rem)`;
+              }
+              if (isLandscape) {
+                if (imageHeight > e.currentTarget.scrollHeight) {
+                  img.style.height = `calc(100% - 3rem)`;
+                  img.style.margin = 'auto';
+                } else if (imageWidth > e.currentTarget.scrollWidth) {
+                  img.style.width = `100%`;
+                  img.style.paddingTop = `calc(25% - 3rem)`;
+                }
+              } else if (isPortrait) {
+                if (imageHeight > e.currentTarget.scrollHeight) {
+                  img.style.margin = `calc(((${
+                    imageHeight - e.currentTarget.scrollHeight
+                  }px) / 2) * ${initialZoom} - 80px) auto`;
+                } else if (imageWidth > e.currentTarget.scrollWidth) {
+                  img.style.paddingTop = `calc(25% - 3rem)`;
+                }
               }
             }
           }}
@@ -237,7 +262,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               alignItems="center"
               position="sticky"
               top={0}
-              right={0}
+              left={0}
             >
               <ModalCloseButton position="relative" left={0} top={0} />
               <Slider
@@ -270,13 +295,12 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           variant="primaryActionInverted"
           onClick={e => {
             e.preventDefault();
-            setLocation('/collections', { replace: true });
+            window.history.back();
           }}
         >
           <Box color="currentcolor">
             <ChevronLeft size={16} strokeWidth="3" />
           </Box>
-          <Text ml={2}>Collections</Text>
         </MinterButton>
       </Flex>
       <Flex
@@ -291,22 +315,29 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       >
         <TokenImage
           src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
-          height="100%"
+          height="85%"
           onLoad={e => {
             const iHeight = e.currentTarget.height;
             const iWidth = e.currentTarget.width;
             const wHeight = window.innerHeight - 80;
             const wWidth = window.innerWidth - 32;
+            const isLandscape = wHeight < wWidth;
+            const isPortrait = wWidth < wHeight;
 
             const isImageBiggerThanModal = iHeight > wHeight || iWidth > wWidth;
 
             setShouldScroll(isImageBiggerThanModal);
 
             if (isImageBiggerThanModal) {
-              if (iHeight > iWidth) {
-                const initialZoom = wHeight / iHeight;
-                setInitialZoom(initialZoom);
-              } else {
+              if (isLandscape) {
+                if (iHeight > iWidth) {
+                  const initialZoom = wHeight / iHeight;
+                  setInitialZoom(initialZoom);
+                } else {
+                  const initialZoom = wWidth / iWidth;
+                  setInitialZoom(initialZoom);
+                }
+              } else if (isPortrait) {
                 const initialZoom = wWidth / iWidth;
                 setInitialZoom(initialZoom);
               }
@@ -330,14 +361,17 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 p={0}
                 minWidth={[100]}
               >
-                <MinterMenuItem
-                  w={[100]}
-                  variant="primary"
-                  disabled={!!token.sale}
-                  onClick={token.sale ? undefined : disclosure.onOpen}
-                >
-                  Transfer
-                </MinterMenuItem>
+                {token.sale ? (
+                  <></>
+                ) : (
+                  <MinterMenuItem
+                    w={[100]}
+                    variant="primary"
+                    onClick={disclosure.onOpen}
+                  >
+                    Transfer
+                  </MinterMenuItem>
+                )}
               </MenuList>
               <TransferTokenModal
                 contractAddress={contractAddress}
@@ -392,7 +426,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           </Button>
         </Flex>
       </Flex>
-      <Flex width={['100%']} bg="white" flexDir="column">
+      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1}>
         <Flex
           width={['90%', '70%']}
           mx="auto"
@@ -431,7 +465,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               {token.title}
             </Heading>
             <Heading color="brand.darkGray" size="md" mt={[2, 4]}>
-              Minter: {token.metadata?.minter || 'Unkown'}
+              Minter: {token.metadata?.minter || 'Unknown'}
             </Heading>
             <Text
               fontSize="md"
