@@ -7,6 +7,7 @@ import FileUpload from './FileUpload';
 import CollectionSelect from './CollectionSelect';
 // import Preview from './Preview';
 import StatusModal from './StatusModal';
+import Confirmation from './Confirmation';
 import { ChevronLeft, X } from 'react-feather';
 
 import { useSelector, useDispatch } from '../../reducer';
@@ -64,7 +65,6 @@ function LeftContent() {
           <FileUpload />
         </Box>
       );
-
     case 'asset_details':
       return (
         <Box w="100%" maxWidth="800px">
@@ -75,6 +75,12 @@ function LeftContent() {
       return (
         <Box w="100%" maxWidth="800px">
           <CollectionSelect />
+        </Box>
+      );
+    case 'confirm':
+      return (
+        <Box w="100%" maxWidth="800px">
+          <Confirmation />
         </Box>
       );
     default:
@@ -157,6 +163,9 @@ export default function CreateNonFungiblePage() {
                     return dispatch(incrementStep());
                   }
                   case 'collection_select': {
+                    return dispatch(incrementStep());
+                  }
+                  case 'confirm': {
                     onOpen();
                     return dispatch(mintTokenAction());
                   }
@@ -164,7 +173,7 @@ export default function CreateNonFungiblePage() {
               }}
               ml={4}
             >
-              {state.step === 'collection_select' ? 'Create' : 'Next'}
+              {state.step === 'confirm' ? 'Create' : 'Next'}
             </MinterButton>
             <StatusModal
               isOpen={isOpen}
