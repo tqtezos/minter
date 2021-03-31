@@ -162,9 +162,6 @@ export default function CreateNonFungiblePage() {
                   case 'asset_details': {
                     return dispatch(incrementStep());
                   }
-                  case 'collection_select': {
-                    return dispatch(incrementStep());
-                  }
                   case 'confirm': {
                     onOpen();
                     return dispatch(mintTokenAction());
@@ -213,35 +210,6 @@ export default function CreateNonFungiblePage() {
           <Box pb={10} w="100%" />
         </Flex>
       </Flex>
-      {/* {state.step === 'file_upload' && state.selectedFile === null ? ( */}
-      {/*   <Flex */}
-      {/*     bg="brand.darkGray" */}
-      {/*     borderLeftWidth="1px" */}
-      {/*     borderLeftColor="brand.lightBlue" */}
-      {/*     w="50%" */}
-      {/*     h="100%" */}
-      {/*     flexDir="column" */}
-      {/*     align="center" */}
-      {/*     justify="center" */}
-      {/*   > */}
-      {/*     <Text color="brand.lightGray">(Artwork TBD)</Text> */}
-      {/*   </Flex> */}
-      {/* ) : ( */}
-      {/*   <Flex */}
-      {/*     bg="brand.brightGray" */}
-      {/*     borderLeftWidth="1px" */}
-      {/*     borderLeftColor="brand.lightBlue" */}
-      {/*     w="50%" */}
-      {/*     h="100%" */}
-      {/*     flexDir="column" */}
-      {/*     align="center" */}
-      {/*     overflowY="scroll" */}
-      {/*     px={28} */}
-      {/*     pt={16} */}
-      {/*   > */}
-      {/*     <Preview /> */}
-      {/*   </Flex> */}
-      {/* )} */}
     </Flex>
   );
 }

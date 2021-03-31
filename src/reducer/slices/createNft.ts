@@ -6,12 +6,7 @@ import { readFileAsDataUrlAction } from '../async/actions';
 
 type Step = 'file_upload' | 'asset_details' | 'collection_select' | 'confirm';
 
-export const steps: Step[] = [
-  'file_upload',
-  'asset_details',
-  'collection_select',
-  'confirm'
-];
+export const steps: Step[] = ['file_upload', 'asset_details', 'confirm'];
 
 interface Fields {
   name: string | null;

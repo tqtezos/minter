@@ -23,8 +23,10 @@ function Label(props: { children: React.ReactNode }) {
 
 export default function Confirmation() {
   const selectedFile = useSelector(s => s.createNft.selectedFile);
+  const collections = useSelector(s => s.collections.collections);
   const fields = useSelector(s => s.createNft.fields);
   const attributes = useSelector(s => s.createNft.attributes);
+  const collectionAddress = useSelector(s => s.createNft.collectionAddress);
 
   return (
     <Box>
@@ -34,6 +36,10 @@ export default function Confirmation() {
       <Flex w="100%" justify="center" mb={8}>
         <FilePreview file={selectedFile!} />
       </Flex>
+      <Label>Collection</Label>
+      <Text fontSize="md" mb={[2, 4]}>
+        {collections[collectionAddress!]?.metadata?.name}
+      </Text>
       <Label>Name</Label>
       <Text fontSize="md" mb={[2, 4]}>
         {fields.name}
