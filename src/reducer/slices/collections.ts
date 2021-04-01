@@ -6,7 +6,7 @@ import {
 } from '../async/queries';
 import { Nft, AssetContract } from '../../lib/nfts/queries';
 import config from '../../config.json';
-
+const cobj = (config as {[key: string]: any})[`${process.env.REACT_APP_NETWORK}`];
 //// State
 
 // Types
@@ -27,7 +27,7 @@ type Reducer<A> = CaseReducer<CollectionsState, PayloadAction<A>>;
 
 // Data
 
-const globalCollectionAddress = config.contracts.nftFaucet;
+const globalCollectionAddress = cobj.contracts.nftFaucet;
 
 export const initialState: CollectionsState = {
   selectedCollection: null,

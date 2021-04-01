@@ -2,8 +2,9 @@ import { Minter, SystemWithToolkit, SystemWithWallet } from '../../lib/system';
 import { createSlice } from '@reduxjs/toolkit';
 import config from '../../config.json';
 import { connectWallet, disconnectWallet, reconnectWallet } from '../async/wallet';
+const cobj = (config as {[key: string]: any})[`${process.env.REACT_APP_NETWORK}`];
 
-const initialState = Minter.connectToolkit(Minter.configure(config)) as
+const initialState = Minter.connectToolkit(Minter.configure(cobj)) as
   | SystemWithToolkit
   | SystemWithWallet;
 
