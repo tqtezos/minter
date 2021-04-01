@@ -48,6 +48,7 @@ export function TokenMedia(props: { src: string }) {
         src={props.src}
         objectFit="scale-down"
         flex="1"
+        height="100%"
         onError={() => setErrored(true)}
       />
     );

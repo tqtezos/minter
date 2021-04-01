@@ -56,6 +56,7 @@ function TokenImage(props: { src: string }) {
       <Image
         src={props.src}
         objectFit="scale-down"
+        height="100%"
         flex="1"
         onError={() => setErrored(true)}
       />
