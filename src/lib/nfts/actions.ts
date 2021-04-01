@@ -4,6 +4,7 @@ import { SystemWithWallet } from '../system';
 import faucetCode from './code/fa2_tzip16_compat_multi_nft_faucet';
 import assetCode from './code/fa2_tzip16_compat_multi_nft_asset';
 import { uploadIPFSJSON } from '../util/ipfs';
+import { NftMetadata } from './queries';
 
 function toHexString(input: string) {
   return Buffer.from(input).toString('hex');
@@ -73,7 +74,7 @@ export async function createAssetContract(
 export async function mintToken(
   system: SystemWithWallet,
   address: string,
-  metadata: Record<string, string>
+  metadata: NftMetadata
 ) {
   const contract = await system.toolkit.wallet.at(address);
   const storage = await contract.storage<any>();
@@ -124,8 +125,25 @@ export async function listTokenForSale(
   tokenId: number,
   salePrice: number
 ) {
-  const contract = await system.toolkit.wallet.at(marketplaceContract);
-  return contract.methods.sell(salePrice, tokenContract, tokenId).send();
+  const contractM = await system.toolkit.wallet.at(marketplaceContract);
+  const contractT = await system.toolkit.wallet.at(tokenContract);
+  const batch = await system.toolkit.wallet
+    .batch([])
+    .withContractCall(
+      contractT.methods.update_operators([
+        {
+          add_operator: {
+            owner: system.tzPublicKey,
+            operator: marketplaceContract,
+            token_id: tokenId
+          }
+        }
+      ])
+    )
+    .withContractCall(
+      contractM.methods.sell(salePrice, tokenContract, tokenId)
+    );
+  return batch.send();
 }
 
 export async function cancelTokenSale(

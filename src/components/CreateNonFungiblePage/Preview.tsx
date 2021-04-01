@@ -27,7 +27,7 @@ export default function Preview() {
         {selectedFile ? <FilePreview file={selectedFile} /> : null}
       </Flex>
       <Heading size="md" color={name ? 'black' : 'gray.200'} px={8} py={6}>
-        {name ? name : 'Asset name...'}
+        {name ? name : ''}
       </Heading>
       <Divider borderColor="brand.lightBlue" opacity="1" />
       <Text
@@ -36,7 +36,7 @@ export default function Preview() {
         color={description ? 'black' : 'gray.200'}
         fontFamily="mono"
       >
-        {description ? description : 'Asset description...'}
+        {description ? description : ''}
       </Text>
       <Divider borderColor="brand.lightBlue" opacity="1" />
       {/* TODO: Render metadata in preview */}

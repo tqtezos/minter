@@ -12,7 +12,7 @@ capabilities to trade them.
 
 ### Notice
 
-This software is in beta. At the moment, the smart contracts
+This software is in beta. At the moment, the [smart contracts](https://github.com/tqtezos/minter-sdk)
 that OpenMinter uses have **not** been formally audited. Please
 use this software at your own risk.
 
@@ -40,9 +40,9 @@ OpenMinter supports the following networks and software components:
 #### 🌐 Mainnet and Edonet
 #### 📦 Sandboxed development via [Flextesa][flextesa]
 #### 🎨 Multimedia NFTs powered by [TZIP-21](https://tzip.tezosagora.org/proposal/tzip-21/)
-#### 👛 Various wallets via [Beacon](https://www.walletbeacon.io/)
+#### ⚙️ Smart contracts based on [minter-sdk](https://github.com/tqtezos/minter-sdk)
+#### 👛 Wallets compatible with [Beacon](https://www.walletbeacon.io/)
 #### 📖 Indexing via [Better Call Dev][bcdhub]
-#### ⚙️ The latest [FA2](https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-12/tzip-12.md) specification
 #### 🚀 [IPFS](https://ipfs.io/) via a local node or [Pinata](https://pinata.cloud/)
 
 The following dependencies are required to run OpenMinter.

@@ -21,6 +21,7 @@ import {
   updateMetadataRowName,
   updateMetadataRowValue
 } from '../../reducer/slices/createNft';
+import CollectionSelect from './CollectionSelect';
 
 const DESCRIPTION_PLACEHOLDER =
   'e.g. “This is an exclusive japanese comic illustration. Once you purchase it you will be able to get the t-shirt”';
@@ -31,8 +32,9 @@ export default function Form() {
   const { name, description } = state.fields;
   return (
     <>
+      <CollectionSelect />
       <Heading size="md" paddingBottom={6}>
-        What properties would you like to give your assets?
+        What properties would you like to give your asset?
       </Heading>
       <FormControl paddingBottom={6}>
         <FormLabel fontFamily="mono">Asset Name</FormLabel>
@@ -68,7 +70,7 @@ export default function Form() {
       <Heading size="md" paddingBottom={6}>
         Add attributes to your asset
       </Heading>
-      {state.metadataRows.map(({ name, value }, key) => {
+      {state.attributes.map(({ name, value }, key) => {
         return (
           <Flex key={key} align="center" justify="stretch">
             <FormControl paddingBottom={6} paddingRight={2} flex="1">
