@@ -4,13 +4,9 @@ import { readFileAsDataUrlAction } from '../async/actions';
 
 // State
 
-type Step = 'file_upload' | 'asset_details' | 'collection_select';
+type Step = 'file_upload' | 'asset_details' | 'collection_select' | 'confirm';
 
-export const steps: Step[] = [
-  'file_upload',
-  'asset_details',
-  'collection_select'
-];
+export const steps: Step[] = ['file_upload', 'asset_details', 'confirm'];
 
 interface Fields {
   name: string | null;

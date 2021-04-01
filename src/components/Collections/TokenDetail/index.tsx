@@ -391,7 +391,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                     ꜩ
                   </Text>
                   <Text color="brand.black" fontSize="xl" fontWeight="700">
-                    {token.sale.price.toFixed(2)}
+                    {token.sale.price}
                   </Text>
                 </Flex>
                 <CancelTokenSaleButton
@@ -477,7 +477,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             </Text>
             <Flex mt={[4, 8]}>
               <Flex flexDir="column" width={['100%', 'auto']}>
-                <Text color="brand.neutralGray">Owner</Text>
+                <Text color="brand.neutralGray">Collection</Text>
                 <Text color="brand.darkGray" fontWeight="bold" mt={[2, 4]}>
                   {token.owner}
                 </Text>
