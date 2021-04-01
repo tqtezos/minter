@@ -34,7 +34,7 @@ export default function Form() {
     <>
       <CollectionSelect />
       <Heading size="md" paddingBottom={6}>
-        What properties would you like to give your assets?
+        What properties would you like to give your asset?
       </Heading>
       <FormControl paddingBottom={6}>
         <FormLabel fontFamily="mono">Asset Name</FormLabel>
