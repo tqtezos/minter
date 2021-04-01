@@ -2404,6 +2404,11 @@
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-7.1.2.tgz#3a71bb8a45a1e08b71a54c9efcee9927f3895e80"
   integrity sha512-lDyCVxxgX5lrgCa75ELCfWcdEDyfisjqoDIM3YsghQ+lyViIac/qT67qabQ/HmoVxyikFKovjKwWdn3b/oKhZA==
 
+"@tqtezos/minter-contracts@1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@tqtezos/minter-contracts/-/minter-contracts-1.0.3.tgz#e46e6706f72d5a200c2be96585d67aa211ee048d"
+  integrity sha512-FmOlwRSCR38o41Kcnlxs0D27K2/D/yHt9iUJ+mfPOVAvAut/Lq4IWfRpZIbdQ4oWTY/Wb2//XjsZ9ptzOB+4Aw==
+
 "@tsed/logger@5.5.2":
   version "5.5.2"
   resolved "https://registry.yarnpkg.com/@tsed/logger/-/logger-5.5.2.tgz#6a9d3f2de2cf9d53be6a4dccfeedd905d05a3ad2"
