@@ -10,13 +10,14 @@ import { Flex } from '@chakra-ui/react';
 import Notifications from '../common/Notifications';
 import { useSelector, useDispatch } from '../../reducer';
 import { reconnectWallet } from '../../reducer/async/wallet';
+import QueueModal from '../CreateNonFungiblePage/QueueModal';
 
 export default function App() {
   const dispatch = useDispatch();
   const walletReconnectAttempted = useSelector(
     s => s.system.walletReconnectAttempted
   );
-
+  const status = useSelector(s => s.status.mintToken);
   useEffect(() => {
     if (!walletReconnectAttempted) {
       dispatch(reconnectWallet());
@@ -54,6 +55,12 @@ export default function App() {
           </Route>
         </Switch>
         <Notifications />
+        <div style={{position: 'absolute', bottom: 0, right: 0, width: 'auto', display: 'flex', backgroundColor: 'white', flexFlow: 'column nowrap', justifyContent:'flex-end', alignItems: 'flex-end', borderTopRightRadius: '5px', boxShadow: '-2px -2px 20px #3333', padding: '5px 0 0 5px'}}>
+              <QueueModal
+               isOpen={true}
+                items={status}
+             />
+        </div>
       </Flex>
     </Flex>
   );

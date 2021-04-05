@@ -5,7 +5,6 @@ import { MinterButton } from '../common';
 import Form from './Form';
 import FileUpload from './FileUpload';
 import CollectionSelect from './CollectionSelect';
-import Preview from './Preview';
 import { ChevronLeft, X } from 'react-feather';
 
 import { useSelector, useDispatch } from '../../reducer';
@@ -18,7 +17,7 @@ import {
 } from '../../reducer/slices/createNft';
 import { mintTokenAction } from '../../reducer/async/actions';
 import { validateCreateNftStep } from '../../reducer/validators/createNft';
-import QueueModal from './QueueModal';
+import Confirmation from './Confirmation';
 
 function ProgressIndicator({ state }: { state: CreateNftState }) {
   const stepIdx = steps.indexOf(state.step);
@@ -88,10 +87,9 @@ function LeftContent() {
 
 export default function CreateNonFungiblePage() {
   const { system, createNft: state } = useSelector(s => s);
-  const status = useSelector(s => s.status.mintToken);
   const dispatch = useDispatch();
   const [, setLocation] = useLocation();
-  const { isOpen, onOpen } = useDisclosure();
+  const { onOpen } = useDisclosure();
   useEffect(() => {
     if (system.status !== 'WalletConnected') {
       setLocation('/collections');
@@ -162,7 +160,8 @@ export default function CreateNonFungiblePage() {
                   }
                   case 'confirm': {
                     onOpen();
-                    return dispatch(mintTokenAction());
+                    dispatch(mintTokenAction());
+                    return setLocation('collections')
                   }
                 }
               }}
@@ -170,12 +169,6 @@ export default function CreateNonFungiblePage() {
             >
               {state.step === 'confirm' ? 'Create' : 'Next'}
             </MinterButton>
-            <div style={{position: 'absolute', bottom: 0, right: 0, width: 'auto', display: 'flex', flexFlow: 'column nowrap', justifyContent:'flex-end', alignItems: 'flex-end', borderTopRightRadius: '5px', boxShadow: '-2px -2px 20px #3333', padding: '5px 0 0 5px'}}>
-              <QueueModal
-               isOpen={isOpen}
-                items={status}
-             />
-            </div>
           </Flex>
         </Flex>
         <Flex
