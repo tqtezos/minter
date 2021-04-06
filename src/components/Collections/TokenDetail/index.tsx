@@ -27,9 +27,10 @@ import {
 } from '@chakra-ui/react';
 import { ChevronLeft, HelpCircle, MoreHorizontal, Star } from 'react-feather';
 import { MinterButton, MinterMenuButton, MinterMenuItem } from '../../common';
-import { TransferTokenModal } from '../../common/TransferToken';
-import { SellTokenButton, CancelTokenSaleButton } from '../../common/SellToken';
-import { BuyTokenButton } from '../../common/BuyToken';
+import { TransferTokenModal } from '../../common/modals/TransferToken';
+import { SellTokenButton } from '../../common/modals/SellToken';
+import { CancelTokenSaleButton } from '../../common/modals/CancelTokenSale';
+import { BuyTokenButton } from '../../common/modals/BuyToken';
 import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 import { useSelector, useDispatch } from '../../../reducer';
 import {

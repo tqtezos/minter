@@ -23,10 +23,10 @@ import {
   Heading
 } from '@chakra-ui/react';
 import { CheckCircle, Plus, AlertCircle, X } from 'react-feather';
-import { MinterButton } from '../common';
-import { useSelector, useDispatch } from '../../reducer';
-import { createAssetContractAction } from '../../reducer/async/actions';
-import { clearError, setStatus, Status } from '../../reducer/slices/status';
+import { MinterButton } from '../../common';
+import { useSelector, useDispatch } from '../../../reducer';
+import { createAssetContractAction } from '../../../reducer/async/actions';
+import { clearError, setStatus, Status } from '../../../reducer/slices/status';
 
 interface FormProps {
   initialRef: MutableRefObject<null>;
