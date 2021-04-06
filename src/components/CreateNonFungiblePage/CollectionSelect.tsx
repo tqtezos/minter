@@ -10,7 +10,7 @@ import {
   MenuOptionGroup,
   MenuItemOption
 } from '@chakra-ui/react';
-import { CreateCollectionButton } from '../common/CreateCollection';
+import { CreateCollectionButton } from '../common/modals/CreateCollection';
 import { useSelector, useDispatch } from '../../reducer';
 import { selectCollection } from '../../reducer/slices/createNft';
 import { getWalletAssetContractsQuery } from '../../reducer/async/queries';
