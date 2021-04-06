@@ -161,7 +161,10 @@ export default function CreateNonFungiblePage() {
                   case 'confirm': {
                     onOpen();
                     dispatch(mintTokenAction());
-                    return setLocation('collections')
+                    dispatch(decrementStep());
+                    dispatch(decrementStep());
+                    dispatch(clearForm());
+                    return;
                   }
                 }
               }}

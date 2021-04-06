@@ -30,7 +30,7 @@ export default function QueueModal(props: QueueModalProps) {
       <ListItem key={idx}>
         <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexFlow: 'row nowrap', fontFamily: 'monospace'}}>
           <ListIcon as={MdCheckCircle} color={i?.status === 'in_transit' ? 'yellow.500' : i?.status === 'complete' ? 'green.500' : 'blue.500'}/>
-            <span style={{minWidth: '50px'}}>{i?.status}</span>
+            <span style={{minWidth: '50px'}}>{i?.status === 'in_transit' ? 'Minting Token' : i?.status}</span>
             &nbsp;
             <span style={{minWidth: '100px', paddingRight: '5px'}}>{i?.contract}</span>
             <span style={{paddingRight: '15px'}}><ListIcon as={MdClose} color={i?.status === 'in_transit' ? 'yellow.500' : i?.status === 'complete' ? 'green.500' : 'blue.500'} onClick={() => onDismiss((i.contract as any))}/></span>
