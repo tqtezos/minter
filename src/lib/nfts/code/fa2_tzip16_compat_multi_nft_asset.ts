@@ -1,6 +1,3 @@
-export const hash =
-  'e9bbe91c225615ac062cc8bd6c577e7bd32a5e3ed92fd8b91252925cee17289e0c91beb071d957b178d2dc21a9223d7a6b300d9875e534f076475780116d04a8';
-
 const code = `
 { parameter
     (or (or (or %admin (or (unit %confirm_admin) (bool %pause)) (address %set_admin))
@@ -19,15 +16,22 @@ const code = `
            (pair (pair %token_metadata (nat %token_id) (map %token_info string bytes))
                  (address %owner)))) ;
   storage
-    (pair (pair (pair %admin (pair (address %admin) (bool %paused)) (option %pending_admin address))
+    (pair (pair (option %admin
+                   (pair (pair (address %admin) (bool %paused)) (option %pending_admin address)))
                 (pair %assets
                    (pair (big_map %ledger nat address) (nat %next_token_id))
                    (pair (big_map %operators (pair address (pair address nat)) unit)
                          (big_map %token_metadata nat (pair (nat %token_id) (map %token_info string bytes))))))
           (big_map %metadata string bytes)) ;
-  code { PUSH string "FA2_INSUFFICIENT_BALANCE" ;
+  code { PUSH string "FA2_TOKEN_UNDEFINED" ;
+         PUSH string "FA2_INSUFFICIENT_BALANCE" ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         SWAP ;
+         PAIR ;
          LAMBDA
-           (pair string
+           (pair (pair string string)
                  (pair (pair (list (pair (option address) (list (pair (option address) (pair nat nat)))))
                              (lambda
                                 (pair (pair address address) (pair nat (big_map (pair address (pair address nat)) unit)))
@@ -39,57 +43,35 @@ const code = `
                  (pair (pair (big_map nat address) nat)
                        (pair (big_map (pair address (pair address nat)) unit)
                              (big_map nat (pair nat (map string bytes))))))
-           { DUP ;
-             CDR ;
-             SWAP ;
-             CAR ;
-             SWAP ;
-             DUP ;
-             CDR ;
-             DUP ;
+           { UNPAIR ;
+             UNPAIR ;
+             DIG 2 ;
+             UNPAIR ;
+             UNPAIR ;
+             DUP 3 ;
              CAR ;
              CAR ;
-             SWAP ;
-             DUP ;
-             DUG 2 ;
+             DUP 4 ;
              CDR ;
              CAR ;
              PAIR ;
-             DIG 2 ;
+             DUG 2 ;
              DUP ;
              DUG 3 ;
-             CAR ;
-             CDR ;
-             DIG 3 ;
-             CAR ;
-             CAR ;
-             PAIR ;
-             PAIR ;
-             DUP ;
-             CDR ;
-             CDR ;
+             DIG 2 ;
+             UNPAIR ;
              SWAP ;
-             DUP ;
-             DUG 2 ;
-             CAR ;
-             CAR ;
+             DIG 2 ;
              ITER { DUP ;
                     DUG 2 ;
                     CDR ;
-                    ITER { DIG 2 ;
-                           DUP ;
-                           DUG 3 ;
+                    ITER { SWAP ;
+                           DUP 3 ;
                            CAR ;
                            IF_NONE
                              { UNIT }
-                             { DIG 4 ;
-                               DUP ;
-                               DUG 5 ;
-                               CDR ;
-                               CAR ;
-                               DIG 2 ;
-                               DUP ;
-                               DUG 3 ;
+                             { DUP 5 ;
+                               DUP 4 ;
                                CDR ;
                                CAR ;
                                PAIR ;
@@ -97,67 +79,46 @@ const code = `
                                DIG 2 ;
                                PAIR ;
                                PAIR ;
-                               DIG 4 ;
-                               DUP ;
-                               DUG 5 ;
-                               CAR ;
-                               CDR ;
+                               DUP 6 ;
                                SWAP ;
                                EXEC } ;
                            DROP ;
                            PUSH nat 1 ;
-                           SWAP ;
-                           DUP ;
-                           DUG 2 ;
+                           DUP 3 ;
                            CDR ;
                            CDR ;
                            COMPARE ;
                            GT ;
-                           IF { DROP 2 ; DIG 3 ; DUP ; DUG 4 ; FAILWITH }
+                           IF { DROP 2 ; DUP 6 ; FAILWITH }
                               { PUSH nat 0 ;
-                                SWAP ;
-                                DUP ;
-                                DUG 2 ;
+                                DUP 3 ;
                                 CDR ;
                                 CDR ;
                                 COMPARE ;
                                 EQ ;
-                                IF { DROP }
-                                   { DUP ;
-                                     DUG 2 ;
-                                     CDR ;
-                                     CAR ;
-                                     DIG 3 ;
-                                     DUP ;
-                                     DUG 4 ;
-                                     CAR ;
-                                     PAIR ;
-                                     PAIR ;
-                                     DUP ;
-                                     CDR ;
-                                     SWAP ;
-                                     DUP ;
-                                     DUG 2 ;
-                                     CAR ;
-                                     CDR ;
+                                IF { DUP ;
                                      DIG 2 ;
+                                     CDR ;
                                      CAR ;
+                                     GET ;
+                                     IF_NONE { DROP ; DUP 7 ; FAILWITH } { DROP } }
+                                   { SWAP ;
+                                     DUP ;
+                                     DUG 2 ;
+                                     CDR ;
+                                     CAR ;
+                                     DUP 4 ;
                                      CAR ;
                                      IF_NONE
                                        { DROP }
-                                       { DIG 2 ;
-                                         DUP ;
-                                         DUG 3 ;
-                                         DIG 2 ;
-                                         DUP ;
-                                         DUG 3 ;
+                                       { DUP 3 ;
+                                         DUP 3 ;
                                          GET ;
                                          IF_NONE
-                                           { DROP 3 ; DIG 4 ; DUP ; DUG 5 ; FAILWITH }
+                                           { DROP 3 ; DUP 8 ; FAILWITH }
                                            { COMPARE ;
                                              EQ ;
-                                             IF { NONE address ; SWAP ; UPDATE }
-                                                { DROP 2 ; DIG 4 ; DUP ; DUG 5 ; FAILWITH } } } ;
+                                             IF { NONE address ; SWAP ; UPDATE } { DROP 2 ; DUP 7 ; FAILWITH } } } ;
                                      SWAP ;
                                      DUP ;
                                      DUG 2 ;
@@ -165,56 +126,49 @@ const code = `
                                      CAR ;
                                      DIG 2 ;
                                      CAR ;
-                                     PAIR ;
-                                     PAIR ;
-                                     DUP ;
-                                     CDR ;
-                                     SWAP ;
-                                     DUP ;
-                                     DUG 2 ;
-                                     CAR ;
-                                     CAR ;
-                                     IF_NONE
-                                       { SWAP ; DROP }
-                                       { DIG 2 ; CAR ; CDR ; SWAP ; SOME ; SWAP ; UPDATE } } } } ;
+                                     IF_NONE { DROP } { DIG 2 ; SWAP ; DIG 2 ; SWAP ; SOME ; SWAP ; UPDATE } } } } ;
                     SWAP ;
                     DROP } ;
              SWAP ;
              DROP ;
-             DIG 2 ;
-             DROP ;
              SWAP ;
-             DUP ;
-             DUG 2 ;
+             DROP ;
+             DIG 3 ;
+             DROP ;
+             DIG 3 ;
+             DROP ;
+             DUP 3 ;
              CDR ;
-             DIG 2 ;
+             DUP 4 ;
              CAR ;
              CDR ;
              DIG 2 ;
              PAIR ;
              PAIR ;
+             DUG 2 ;
+             DROP 2 ;
              NIL operation ;
              PAIR } ;
          SWAP ;
          APPLY ;
          LAMBDA
-           (pair (pair address bool) (option address))
+           (option (pair (pair address bool) (option address)))
            unit
-           { CAR ;
-             CAR ;
-             SENDER ;
-             COMPARE ;
-             NEQ ;
-             IF { PUSH string "NOT_AN_ADMIN" ; FAILWITH } { UNIT } } ;
-         DIG 2 ;
-         DUP ;
-         DUG 3 ;
-         CDR ;
+           { IF_NONE
+               { UNIT }
+               { CAR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string "NOT_AN_ADMIN" ; FAILWITH } { UNIT } } } ;
          DIG 3 ;
-         CAR ;
+         UNPAIR ;
          IF_LEFT
            { IF_LEFT
                { DIG 3 ;
+                 DROP ;
+                 DIG 3 ;
                  DROP ;
                  SWAP ;
                  DUP ;
@@ -227,15 +181,17 @@ const code = `
                        { DROP ;
                          DIG 2 ;
                          DROP ;
-                         DUP ;
-                         CDR ;
                          IF_NONE
-                           { DROP ; PUSH string "NO_PENDING_ADMIN" ; FAILWITH }
-                           { SENDER ;
-                             COMPARE ;
-                             EQ ;
-                             IF { NONE address ; SWAP ; CAR ; CDR ; SENDER ; PAIR ; PAIR }
-                                { DROP ; PUSH string "NOT_A_PENDING_ADMIN" ; FAILWITH } } ;
+                           { PUSH string "NO_ADMIN_CAPABILITIES_CONFIGURED" ; FAILWITH }
+                           { DUP ;
+                             CDR ;
+                             IF_NONE
+                               { DROP ; PUSH string "NO_PENDING_ADMIN" ; FAILWITH }
+                               { SENDER ;
+                                 COMPARE ;
+                                 EQ ;
+                                 IF { NONE address ; SWAP ; CAR ; CDR ; SENDER ; PAIR ; PAIR ; SOME }
+                                    { DROP ; PUSH string "NOT_A_PENDING_ADMIN" ; FAILWITH } } } ;
                          NIL operation ;
                          PAIR }
                        { SWAP ;
@@ -245,18 +201,10 @@ const code = `
                          SWAP ;
                          EXEC ;
                          DROP ;
-                         PAIR ;
-                         DUP ;
-                         CDR ;
-                         DUP ;
-                         CDR ;
-                         DIG 2 ;
-                         CAR ;
-                         DIG 2 ;
-                         CAR ;
-                         CAR ;
-                         PAIR ;
-                         PAIR ;
+                         SWAP ;
+                         IF_NONE
+                           { DROP ; PUSH string "NO_ADMIN_CAPABILITIES_CONFIGURED" ; FAILWITH }
+                           { DUP ; CDR ; DUG 2 ; CAR ; CAR ; PAIR ; PAIR ; SOME } ;
                          NIL operation ;
                          PAIR } }
                    { SWAP ;
@@ -266,31 +214,22 @@ const code = `
                      SWAP ;
                      EXEC ;
                      DROP ;
-                     PAIR ;
-                     DUP ;
-                     CAR ;
-                     SOME ;
                      SWAP ;
-                     CDR ;
-                     CAR ;
-                     PAIR ;
+                     IF_NONE
+                       { DROP ; PUSH string "NO_ADMIN_CAPABILITIES_CONFIGURED" ; FAILWITH }
+                       { SWAP ; SOME ; SWAP ; CAR ; PAIR ; SOME } ;
                      NIL operation ;
                      PAIR } ;
-                 SWAP ;
-                 DUP ;
-                 DUG 2 ;
+                 UNPAIR ;
+                 DUP 3 ;
                  CDR ;
-                 DIG 2 ;
+                 DIG 3 ;
                  CAR ;
                  CDR ;
-                 DIG 2 ;
-                 DUP ;
-                 DUG 3 ;
-                 CDR ;
+                 DIG 3 ;
                  PAIR ;
                  PAIR ;
                  SWAP ;
-                 CAR ;
                  PAIR }
                { DIG 2 ;
                  DROP ;
@@ -299,9 +238,10 @@ const code = `
                  DUG 2 ;
                  CAR ;
                  CAR ;
-                 CAR ;
-                 CDR ;
-                 IF { PUSH string "PAUSED" ; FAILWITH } {} ;
+                 IF_NONE
+                   { UNIT }
+                   { CAR ; CDR ; IF { PUSH string "PAUSED" ; FAILWITH } { UNIT } } ;
+                 DROP ;
                  SWAP ;
                  DUP ;
                  DUG 2 ;
@@ -318,22 +258,16 @@ const code = `
                          CAR ;
                          CAR ;
                          SWAP ;
-                         PAIR ;
                          DUP ;
                          CAR ;
-                         DUP ;
-                         CAR ;
-                         MAP { DIG 2 ;
-                               DUP ;
-                               DUG 3 ;
-                               CDR ;
+                         MAP { DUP 3 ;
                                SWAP ;
                                DUP ;
                                DUG 2 ;
                                CDR ;
                                GET ;
                                IF_NONE
-                                 { DROP ; PUSH string "FA2_TOKEN_UNDEFINED" ; FAILWITH }
+                                 { DROP ; DUP 5 ; FAILWITH }
                                  { SWAP ;
                                    DUP ;
                                    DUG 2 ;
@@ -346,6 +280,8 @@ const code = `
                                    PAIR } } ;
                          DIG 2 ;
                          DROP ;
+                         DIG 4 ;
+                         DROP ;
                          SWAP ;
                          CDR ;
                          PUSH mutez 0 ;
@@ -356,7 +292,9 @@ const code = `
                          DIG 2 ;
                          CONS ;
                          PAIR }
-                       { MAP { DUP ;
+                       { DIG 4 ;
+                         DROP ;
+                         MAP { DUP ;
                                CDR ;
                                MAP { DUP ;
                                      CDR ;
@@ -379,30 +317,16 @@ const code = `
                          LAMBDA
                            (pair (pair address address) (pair nat (big_map (pair address (pair address nat)) unit)))
                            unit
-                           { DUP ;
-                             CAR ;
-                             CAR ;
-                             SWAP ;
-                             DUP ;
-                             DUG 2 ;
-                             CAR ;
-                             CDR ;
-                             DUP ;
+                           { UNPAIR ;
+                             UNPAIR ;
                              DIG 2 ;
-                             DUP ;
-                             DUG 3 ;
+                             UNPAIR ;
+                             DUP 4 ;
+                             DUP 4 ;
                              COMPARE ;
                              EQ ;
-                             IF { DROP 3 ; UNIT }
-                                { DIG 2 ;
-                                  DUP ;
-                                  DUG 3 ;
-                                  CDR ;
-                                  CDR ;
-                                  DIG 3 ;
-                                  CDR ;
-                                  CAR ;
-                                  DIG 2 ;
+                             IF { DROP 4 ; UNIT }
+                                { DIG 3 ;
                                   PAIR ;
                                   DIG 2 ;
                                   PAIR ;
@@ -416,50 +340,33 @@ const code = `
                          EXEC } }
                    { DIG 3 ;
                      DROP ;
+                     DIG 3 ;
+                     DROP ;
                      SWAP ;
                      DUP ;
                      DUG 2 ;
                      CDR ;
                      CAR ;
                      SWAP ;
-                     PAIR ;
                      SENDER ;
-                     SWAP ;
-                     DUP ;
                      DUG 2 ;
-                     CDR ;
-                     DIG 2 ;
-                     CAR ;
                      ITER { SWAP ;
-                            PAIR ;
-                            DUP ;
-                            CDR ;
-                            DIG 2 ;
-                            DUP ;
-                            DUG 3 ;
-                            SWAP ;
-                            DUP ;
-                            DUG 2 ;
+                            DUP 3 ;
+                            DUP 3 ;
                             IF_LEFT {} {} ;
                             CAR ;
                             COMPARE ;
                             EQ ;
                             IF {} { PUSH string "FA2_NOT_OWNER" ; FAILWITH } ;
                             SWAP ;
-                            CAR ;
-                            SWAP ;
                             IF_LEFT
                               { SWAP ;
                                 UNIT ;
                                 SOME ;
-                                DIG 2 ;
-                                DUP ;
-                                DUG 3 ;
+                                DUP 3 ;
                                 CDR ;
                                 CDR ;
-                                DIG 3 ;
-                                DUP ;
-                                DUG 4 ;
+                                DUP 4 ;
                                 CDR ;
                                 CAR ;
                                 PAIR ;
@@ -471,9 +378,7 @@ const code = `
                                 DUG 2 ;
                                 CDR ;
                                 CDR ;
-                                DIG 2 ;
-                                DUP ;
-                                DUG 3 ;
+                                DUP 3 ;
                                 CDR ;
                                 CAR ;
                                 PAIR ;
@@ -497,23 +402,20 @@ const code = `
                      PAIR ;
                      NIL operation ;
                      PAIR } ;
-                 SWAP ;
-                 DUP ;
-                 DUG 2 ;
+                 UNPAIR ;
+                 DUP 3 ;
                  CDR ;
-                 SWAP ;
-                 DUP ;
-                 DUG 2 ;
-                 CDR ;
+                 DIG 2 ;
                  DIG 3 ;
                  CAR ;
                  CAR ;
                  PAIR ;
                  PAIR ;
                  SWAP ;
-                 CAR ;
                  PAIR } }
-           { SWAP ;
+           { DIG 4 ;
+             DROP ;
+             SWAP ;
              DUP ;
              DUG 2 ;
              CAR ;
@@ -527,20 +429,16 @@ const code = `
              DUG 2 ;
              CAR ;
              CDR ;
-             SWAP ;
-             PAIR ;
-             DUP ;
-             CDR ;
              NIL (pair (option address) (pair nat nat)) ;
              PAIR ;
              SWAP ;
-             CAR ;
              ITER { DUP ;
+                    DUG 2 ;
                     CAR ;
                     CAR ;
-                    DIG 2 ;
+                    SWAP ;
                     DUP ;
-                    DUG 3 ;
+                    DUG 2 ;
                     CDR ;
                     CAR ;
                     CDR ;
@@ -550,23 +448,17 @@ const code = `
                     COMPARE ;
                     LT ;
                     IF { DROP 3 ; PUSH string "FA2_INVALID_TOKEN_ID" ; FAILWITH }
-                       { DIG 2 ;
+                       { SWAP ;
                          DUP ;
-                         DUG 3 ;
+                         DUG 2 ;
                          CDR ;
-                         DIG 3 ;
-                         DUP ;
-                         DUG 4 ;
+                         DUP 3 ;
                          CDR ;
                          CDR ;
                          CDR ;
-                         DIG 3 ;
-                         DUP ;
-                         DUG 4 ;
+                         DUP 5 ;
                          CAR ;
-                         DIG 3 ;
-                         DUP ;
-                         DUG 4 ;
+                         DUP 4 ;
                          SWAP ;
                          SOME ;
                          SWAP ;
@@ -583,16 +475,14 @@ const code = `
                          DUP ;
                          CDR ;
                          PUSH nat 1 ;
-                         DIG 3 ;
-                         DUP ;
-                         DUG 4 ;
+                         DUP 4 ;
                          ADD ;
                          DIG 2 ;
                          CAR ;
                          CAR ;
                          PAIR ;
                          PAIR ;
-                         DIG 3 ;
+                         DIG 2 ;
                          CAR ;
                          PUSH nat 1 ;
                          DIG 3 ;
@@ -620,23 +510,17 @@ const code = `
              DIG 2 ;
              SWAP ;
              EXEC ;
-             SWAP ;
-             DUP ;
-             DUG 2 ;
+             UNPAIR ;
+             DUP 3 ;
              CDR ;
-             SWAP ;
-             DUP ;
-             DUG 2 ;
-             CDR ;
+             DIG 2 ;
              DIG 3 ;
              CAR ;
              CAR ;
              PAIR ;
              PAIR ;
              SWAP ;
-             CAR ;
              PAIR } } }
-
 `;
 
 export default code;

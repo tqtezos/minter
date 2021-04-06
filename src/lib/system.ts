@@ -1,6 +1,7 @@
 import { TezosToolkit, Context } from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
 import { MetadataProvider, DEFAULT_HANDLERS } from '@taquito/tzip16';
+import { Tzip12Module } from '@taquito/tzip12';
 import CustomIpfsHttpHandler from './util/taquito-custom-ipfs-http-handler';
 import { BetterCallDev } from './service/bcd';
 import * as tzUtils from './util/tezosToolkit';
@@ -120,6 +121,7 @@ function createMetadataResolver(
 
 export function connectToolkit(system: SystemConfigured): SystemWithToolkit {
   const toolkit = new TezosToolkit(system.config.rpc);
+  toolkit.addExtension(new Tzip12Module());
   const faucetAddress = system.config.contracts.nftFaucet;
   return {
     ...system,
@@ -243,6 +245,7 @@ export async function disconnectWallet(
 ): Promise<SystemWithToolkit> {
   await system.wallet.disconnect();
   const toolkit = new TezosToolkit(system.config.rpc);
+  toolkit.addExtension(new Tzip12Module());
   wallet = null;
   return {
     ...system,

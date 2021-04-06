@@ -4235,7 +4235,17 @@
     rx-sandbox "^1.0.3"
     rxjs "^6.6.3"
 
-"@taquito/tzip16@8.0.6-beta.0":
+"@taquito/tzip12@8.0.6-beta.0":
+  version "8.0.6-beta.0"
+  resolved "https://registry.yarnpkg.com/@taquito/tzip12/-/tzip12-8.0.6-beta.0.tgz#4b8892c0b629710c7503c550bcc85fe672b9c6f2"
+  integrity sha512-HpHHQOabFvguHf3tufEZcxp525Ux4pWBBrl9G0gIJbnqRDRlNxgY0cxos9KgZPx8WDqEsikuBtMFMXtTdAWcRw==
+  dependencies:
+    "@taquito/michelson-encoder" "^8.0.6-beta.0"
+    "@taquito/taquito" "^8.0.6-beta.0"
+    "@taquito/tzip16" "^8.0.6-beta.0"
+    bignumber.js "^9.0.1"
+
+"@taquito/tzip16@8.0.6-beta.0", "@taquito/tzip16@^8.0.6-beta.0":
   version "8.0.6-beta.0"
   resolved "https://registry.yarnpkg.com/@taquito/tzip16/-/tzip16-8.0.6-beta.0.tgz#22bb326a38c4ef50f0a8edf61dd48ab20a7b1f6c"
   integrity sha512-X2sno857Yv0TEkC+sllQAVMcyKWRJ5hLNw8gQ8eSkgpLfSQa4szKwHfLFEPzW3mWdQvBKAVLaYLqhtq24OQBMw==
@@ -15630,6 +15640,12 @@ react-focus-lock@2.4.1:
     use-sidecar "^1.0.1"
 
 react-is@16.13.1, react-is@^16.12.0, react-is@^16.13.1, react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.4, react-is@^16.8.6:
+react-icons@4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-4.2.0.tgz#6dda80c8a8f338ff96a1851424d63083282630d0"
+  integrity sha512-rmzEDFt+AVXRzD7zDE21gcxyBizD/3NqjbX6cmViAgdqfJ2UiLer8927/QhhrXQV7dEj/1EGuOTPp7JnLYVJKQ==
+
+react-is@^16.12.0, react-is@^16.13.1, react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.4:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==

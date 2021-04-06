@@ -1,19 +1,27 @@
 import React from 'react';
 import {
   Box,
+  Button,
   Flex,
   Spinner,
   Heading,
   Modal,
   ModalOverlay,
   ModalContent,
-  Text
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Text,
+  useDisclosure
 } from '@chakra-ui/react';
 import { CheckCircle, AlertCircle, X } from 'react-feather';
-import { MinterButton } from '../common';
-import { Status } from '../../reducer/slices/status';
+import { MinterButton } from '../../common';
+import { useSelector, useDispatch } from '../../../reducer';
+import { cancelTokenSaleAction } from '../../../reducer/async/actions';
+import { clearError, setStatus, Status } from '../../../reducer/slices/status';
 
-interface StatusModalProps {
+interface ContentProps {
   isOpen: boolean;
   onClose: () => void;
   onRetry: () => void;
@@ -21,7 +29,7 @@ interface StatusModalProps {
   status: Status;
 }
 
-function Content({ status, onClose, onRetry, onCancel }: StatusModalProps) {
+function Content({ status, onClose, onRetry, onCancel }: ContentProps) {
   if (status.error) {
     return (
       <Flex flexDir="column" align="center" px={4} py={10}>
@@ -29,7 +37,7 @@ function Content({ status, onClose, onRetry, onCancel }: StatusModalProps) {
           <AlertCircle size="70px" />
         </Box>
         <Heading size="lg" textAlign="center" color="gray.500" mb={6}>
-          Error Creating Token
+          Error Transferring Token
         </Heading>
         <Flex flexDir="row" justify="center">
           <MinterButton variant="primaryAction" onClick={() => onRetry()}>
@@ -58,12 +66,8 @@ function Content({ status, onClose, onRetry, onCancel }: StatusModalProps) {
       <Flex flexDir="column" align="center" px={4} py={10}>
         <Spinner size="xl" mb={6} color="gray.300" />
         <Heading size="lg" textAlign="center" color="gray.500">
-          Creating token...
+          Canceling sale...
         </Heading>
-        <br/>
-        <Text size="xs" textAlign="center" color="gray.500">
-         <span role="img" aria-label="lightbulb">🌱</span> Minting on Tezos produces 1,500,000 times less CO2 emissions than Ethereum.
-        </Text>
       </Flex>
     );
   }
@@ -74,7 +78,7 @@ function Content({ status, onClose, onRetry, onCancel }: StatusModalProps) {
           <CheckCircle size="70px" />
         </Box>
         <Heading size="lg" textAlign="center" color="gray.500" mb={6}>
-          Token creation complete
+          Listing canceled
         </Heading>
         <MinterButton variant="primaryAction" onClick={() => onClose()}>
           Close
@@ -85,18 +89,39 @@ function Content({ status, onClose, onRetry, onCancel }: StatusModalProps) {
   return null;
 }
 
-export default function StatusModal(props: StatusModalProps) {
-  const { isOpen, onClose, status } = props;
+interface CancelTokenSaleButtonProps {
+  contract: string;
+  tokenId: number;
+}
+
+export function CancelTokenSaleButton(props: CancelTokenSaleButtonProps) {
+  const status = useSelector(s => s.status.cancelTokenSale);
+  const dispatch = useDispatch();
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const initialRef = React.useRef(null);
 
+  const onSubmit = async () => {
+    dispatch(
+      cancelTokenSaleAction({
+        ...props
+      })
+    );
+  };
+
   const close = () => {
-    if (status.status === 'complete') {
+    if (status.status !== 'in_transit') {
+      dispatch(setStatus({ method: 'cancelTokenSale', status: 'ready' }));
       onClose();
     }
   };
 
   return (
     <>
+      <MinterButton variant="cancelAction" onClick={onOpen}>
+        Cancel sale
+      </MinterButton>
+
       <Modal
         isOpen={isOpen}
         onClose={() => close()}
@@ -108,7 +133,40 @@ export default function StatusModal(props: StatusModalProps) {
       >
         <ModalOverlay />
         <ModalContent mt={40}>
-          <Content {...props} />
+          {status.status === 'ready' ? (
+            <>
+              <ModalHeader>Are you sure?</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Text>Are you sure you want to cancel the sale?</Text>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="primaryAction" mr={3} onClick={onSubmit}>
+                  Yes
+                </Button>
+                <Button variant="cancelAction" onClick={onClose}>
+                  No
+                </Button>
+              </ModalFooter>
+            </>
+          ) : (
+            <Content
+              isOpen={isOpen}
+              status={status}
+              onClose={() => close()}
+              onCancel={() => {
+                onClose();
+                dispatch(clearError({ method: 'cancelTokenSale' }));
+                dispatch(
+                  setStatus({ method: 'cancelTokenSale', status: 'ready' })
+                );
+              }}
+              onRetry={() => {
+                dispatch(clearError({ method: 'cancelTokenSale' }));
+                onSubmit();
+              }}
+            />
+          )}
         </ModalContent>
       </Modal>
     </>
