@@ -11,8 +11,8 @@
     "@taquito/beacon-wallet": "8.0.6-beta.0",
     "@taquito/signer": "8.0.6-beta.0",
     "@taquito/taquito": "8.0.6-beta.0",
-    "@taquito/tzip16": "8.0.6-beta.0",
     "@taquito/tzip12": "8.0.6-beta.0",
+    "@taquito/tzip16": "8.0.6-beta.0",
     "@types/lodash": "4.14.165",
     "@types/react": "16.9.12",
     "@types/react-dom": "16.9.0",
@@ -20,9 +20,11 @@
     "@types/react-redux": "7.1.16",
     "axios-retry": "3.1.9",
     "buffer": "6.0.3",
+    "file-loader": "6.2.0",
     "framer-motion": "3.1.4",
     "immer": "8.0.0",
     "joi": "17.3.0",
+    "next": "10.1.3",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-dropzone": "11.2.4",
@@ -30,6 +32,7 @@
     "react-icons": "4.2.0",
     "react-redux": "7.2.2",
     "typescript": "4.1.3",
+    "url-loader": "4.1.1",
     "wouter": "2.5.1"
   },
   "devDependencies": {
@@ -55,6 +58,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "dev": "next",
     "bootstrap:contracts": "ts-node -P scripts/tsconfig.json scripts/bootstrap-contracts-config.ts",
     "bootstrap:sandbox": "docker-compose down && docker-compose up -d && yarn bootstrap:contracts sandbox",
     "teardown:sandbox": "docker-compose down"

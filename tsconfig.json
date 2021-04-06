@@ -17,8 +17,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react",
-    
+    "jsx": "preserve",
     // The below makes typescript more strict about types
     // Consider changing them if you run into problems with
     // existing libraries
@@ -31,5 +30,8 @@
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }
