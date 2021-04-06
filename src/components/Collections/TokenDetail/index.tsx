@@ -128,9 +128,12 @@ function TokenImage(props: {
         id={props.id || 'assetImage'}
         key={props.id || 'assetImage'}
         src={props.src}
-        objectFit={props.objectFit}
+        objectFit="scale-down"
+        flex="1"
+        height="100%"
+        width={props.width}
+        maxWidth={props.maxWidth}
         onError={() => setErrored(true)}
-        height={props.height}
         onLoad={props.onLoad}
       />
     );
