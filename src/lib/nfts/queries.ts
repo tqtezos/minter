@@ -81,11 +81,11 @@ export async function getMarketplaceNfts(
 
 export class NftMetadata {
   [index: string]:
-    | string
-    | undefined
-    | number
-    | Array<String | NftMetadataFormat | NftMetadataAttribute>
-    | boolean;
+  | string
+  | undefined
+  | number
+  | Array<String | NftMetadataFormat | NftMetadataAttribute>
+  | boolean;
   ''?: string;
   name?: string;
   minter?: string;
@@ -247,11 +247,8 @@ export async function getContractNfts(
           return { ...acc, [next.name]: fromHexString(next.value) };
         }, {});
 
-        if (ipfsUriToCid(metadata['""'])) {
-          const resolvedMetadata = await system.resolveMetadata(metadata['""']);
-          metadata = { ...metadata, ...resolvedMetadata.metadata };
-        } else if (ipfsUriToCid(metadata[''])) {
-          const resolvedMetadata = await system.resolveMetadata(metadata['']);
+        if (ipfsUriToCid(metadata['""']) || ipfsUriToCid(metadata[''])) {
+          const resolvedMetadata = await system.resolveMetadata(metadata['""'] ?? metadata['']);
           metadata = { ...metadata, ...resolvedMetadata.metadata };
         }
 
@@ -338,12 +335,11 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
   const results = [];
   for (let assetContract of assetContracts) {
     try {
-      const result = await getNftAssetContract(system, assetContract.value);
-      results.push(result);
+      results.push(getNftAssetContract(system, assetContract.value));
     } catch (e) {
       console.log(e);
     }
   }
 
-  return results;
+  return await Promise.all(results);
 }
