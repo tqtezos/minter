@@ -246,7 +246,7 @@ export const transferTokenAction = createAsyncThunk<
   { contract: string; tokenId: number; to: string },
   Options
 >('action/transferToken', async (args, api) => {
-  const { getState, rejectWithValue, dispatch } = api;
+  const { getState, rejectWithValue, dispatch, requestId } = api;
   const { contract, tokenId, to } = args;
   const { system } = getState();
   if (system.status !== 'WalletConnected') {
@@ -257,7 +257,18 @@ export const transferTokenAction = createAsyncThunk<
   }
   try {
     const op = await transferToken(system, contract, tokenId, to);
-    await op.confirmation(2);
+    dispatch(
+      pushNotification(
+        pendingNotification(requestId, `Transferring token to ${to}`)
+      )
+    );
+    op.confirmation(2).then(() => {
+      dispatch(
+        pushNotification(
+          fulfilledNotification(requestId, `Transferred token to ${to}`)
+        )
+      );
+    });
     dispatch(getContractNftsQuery(contract));
     return args;
   } catch (e) {
@@ -273,7 +284,7 @@ export const listTokenAction = createAsyncThunk<
   { contract: string; tokenId: number; salePrice: number },
   Options
 >('action/listToken', async (args, api) => {
-  const { getState, rejectWithValue, dispatch } = api;
+  const { getState, rejectWithValue, dispatch, requestId } = api;
   const { contract, tokenId, salePrice } = args;
   const { system } = getState();
   const marketplaceContract =
@@ -292,7 +303,24 @@ export const listTokenAction = createAsyncThunk<
       tokenId,
       salePrice
     );
-    await op.confirmation(2);
+    dispatch(
+      pushNotification(
+        pendingNotification(
+          requestId,
+          `Listing token for sale for ${salePrice}`
+        )
+      )
+    );
+    op.confirmation(2).then(() => {
+      dispatch(
+        pushNotification(
+          fulfilledNotification(
+            requestId,
+            `Token listed for sale for ${salePrice}`
+          )
+        )
+      );
+    });
     dispatch(getContractNftsQuery(contract));
     return args;
   } catch (e) {
@@ -308,7 +336,7 @@ export const cancelTokenSaleAction = createAsyncThunk<
   { contract: string; tokenId: number },
   Options
 >('action/cancelTokenSale', async (args, api) => {
-  const { getState, rejectWithValue, dispatch } = api;
+  const { getState, rejectWithValue, dispatch, requestId } = api;
   const { contract, tokenId } = args;
   const { system } = getState();
   const marketplaceContract =
@@ -326,7 +354,16 @@ export const cancelTokenSaleAction = createAsyncThunk<
       contract,
       tokenId
     );
-    await op.confirmation(2);
+    dispatch(
+      pushNotification(pendingNotification(requestId, `Canceling token sale`))
+    );
+    op.confirmation(2).then(() => {
+      dispatch(
+        pushNotification(
+          fulfilledNotification(requestId, `Token sale canceled`)
+        )
+      );
+    });
     dispatch(getContractNftsQuery(contract));
     return { contract: contract, tokenId: tokenId };
   } catch (e) {
@@ -342,7 +379,7 @@ export const buyTokenAction = createAsyncThunk<
   { contract: string; tokenId: number; tokenSeller: string; salePrice: number },
   Options
 >('action/buyToken', async (args, api) => {
-  const { getState, rejectWithValue, dispatch } = api;
+  const { getState, rejectWithValue, dispatch, requestId } = api;
   const { contract, tokenId, tokenSeller, salePrice } = args;
   let { system } = getState();
   const marketplaceContract =
@@ -366,7 +403,24 @@ export const buyTokenAction = createAsyncThunk<
       tokenSeller,
       salePrice
     );
-    await op.confirmation(2);
+    dispatch(
+      pushNotification(
+        pendingNotification(
+          requestId,
+          `Buying token from ${tokenSeller} for ${salePrice}`
+        )
+      )
+    );
+    op.confirmation(2).then(() => {
+      dispatch(
+        pushNotification(
+          fulfilledNotification(
+            requestId,
+            `Bought token from ${tokenSeller} for ${salePrice}`
+          )
+        )
+      );
+    });
     dispatch(getContractNftsQuery(contract));
     return { contract: contract, tokenId: tokenId };
   } catch (e) {
