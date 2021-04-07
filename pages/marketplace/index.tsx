@@ -5,13 +5,14 @@ import { useSelector, useDispatch } from '../../src/reducer';
 import { getMarketplaceNftsQuery } from '../../src/reducer/async/queries';
 import TokenCard from '../../src/components/Marketplace/Catalog/TokenCard';
 import FeaturedToken from '../../src/components/Marketplace/Catalog/FeaturedToken';
+import { AnyAction } from 'redux';
 
 export default function Catalog() {
   const { system, marketplace: state } = useSelector(s => s);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getMarketplaceNftsQuery(state.marketplace.address));
+    dispatch(getMarketplaceNftsQuery(state.marketplace.address) as unknown as AnyAction);
   }, [ state.marketplace.address, dispatch ]);
 
   let tokens = state.marketplace.tokens;

@@ -15,6 +15,7 @@ import {
 } from '../../src/reducer/async/queries';
 import { selectCollection } from '../../src/reducer/slices/collections';
 import { Provider } from 'react-redux';
+import { AnyAction } from 'redux';
 
 export default function Catalog() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function Catalog() {
     if (selectedCollection === null) {
       dispatch(selectCollection(state.globalCollection));
     } else {
-      dispatch(getContractNftsQuery(selectedCollection));
+      dispatch(getContractNftsQuery(selectedCollection) as unknown as AnyAction);
     }
   }, [
     system.status,
@@ -39,7 +40,7 @@ export default function Catalog() {
     if (system.status !== 'WalletConnected') {
       router.push('/');
     } else {
-      dispatch(getWalletAssetContractsQuery());
+      dispatch(getWalletAssetContractsQuery() as unknown as AnyAction);
     }
   }, [system.status, dispatch, router]);
 
@@ -125,7 +126,7 @@ export default function Catalog() {
             onClick={() => {
               const selectedCollection = state.selectedCollection;
               if (selectedCollection !== null) {
-                dispatch(getContractNftsQuery(selectedCollection));
+                dispatch(getContractNftsQuery(selectedCollection) as unknown as AnyAction);
               }
             }}
             mt={{

@@ -39,6 +39,7 @@ import {
 } from '../../../reducer/async/queries';
 
 import { Maximize2 } from 'react-feather';
+import { AnyAction } from 'redux';
 
 function NotFound() {
   return (
@@ -175,9 +176,9 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
 
   useEffect(() => {
     if (collectionUndefined) {
-      dispatch(getNftAssetContractQuery(contractAddress));
+      dispatch(getNftAssetContractQuery(contractAddress) as unknown as AnyAction);
     } else {
-      dispatch(getContractNftsQuery(contractAddress));
+      dispatch(getContractNftsQuery(contractAddress) as unknown as AnyAction);
     }
   }, [contractAddress, tokenId, collectionUndefined, dispatch]);
 

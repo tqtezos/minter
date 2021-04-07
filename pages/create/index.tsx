@@ -22,6 +22,7 @@ import { validateCreateNftStep } from '../../src/reducer/validators/createNft';
 import { clearError, setStatus } from '../../src/reducer/slices/status';
 import { store } from '../../src/reducer';
 import { Provider } from 'react-redux';
+import { AnyAction } from 'redux';
 
 function ProgressIndicator({ state }: { state: CreateNftState }) {
   const stepIdx = steps.indexOf(state.step);
@@ -166,7 +167,7 @@ export default function CreateNonFungiblePage() {
                   }
                   case 'confirm': {
                     onOpen();
-                    return dispatch(mintTokenAction());
+                    return dispatch(mintTokenAction() as unknown as AnyAction);
                   }
                 }
               }}
@@ -184,7 +185,7 @@ export default function CreateNonFungiblePage() {
               }}
               onRetry={() => {
                 dispatch(clearError({ method: 'mintToken' }));
-                dispatch(mintTokenAction());
+                dispatch(mintTokenAction() as unknown as AnyAction);
               }}
               onCancel={() => {
                 onClose();
