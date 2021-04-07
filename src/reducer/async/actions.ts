@@ -137,7 +137,7 @@ function appendStateMetadata(
 
 export const mintTokenAction = createAsyncThunk<
   { contract: string; metadata: ReturnType<typeof appendStateMetadata> },
-  string | undefined | null,
+  undefined,
   Options
 >(
   'action/mintToken',
