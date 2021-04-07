@@ -1,21 +1,19 @@
 import React, { useEffect } from 'react';
 import { Box, Flex, Heading, Text, Link, Spinner } from '@chakra-ui/react';
 import { RefreshCw, ExternalLink } from 'react-feather';
-import { MinterButton } from '../../src/components/common';
-import Sidebar from '../../src/components/Collections/Catalog/Sidebar';
-import TokenGrid from '../../src/components/Collections/Catalog/TokenGrid';
-import CollectionsDropdown from '../../src/components/Collections/Catalog/CollectionsDropdown';
+import { MinterButton } from '../../components/common';
+import Sidebar from '../../components/Collections/Catalog/Sidebar';
+import TokenGrid from '../../components/Collections/Catalog/TokenGrid';
+import CollectionsDropdown from '../../components/Collections/Catalog/CollectionsDropdown';
 import { useRouter } from 'next/router';
-import { store } from '../../src/reducer';
 
-import { useSelector, useDispatch } from '../../src/reducer';
+import { useSelector, useDispatch } from '../../reducer';
 import {
   getContractNftsQuery,
   getWalletAssetContractsQuery
-} from '../../src/reducer/async/queries';
-import { selectCollection } from '../../src/reducer/slices/collections';
-import { Provider } from 'react-redux';
-import { AnyAction } from 'redux';
+} from '../../reducer/async/queries';
+import { selectCollection } from '../../reducer/slices/collections';
+import { RehydrateAction } from 'redux-persist';
 
 export default function Catalog() {
   const router = useRouter();
@@ -25,9 +23,9 @@ export default function Catalog() {
   useEffect(() => {
     const selectedCollection = state.selectedCollection;
     if (selectedCollection === null) {
-      dispatch(selectCollection(state.globalCollection));
+      dispatch(selectCollection(state.globalCollection) as unknown as RehydrateAction);
     } else {
-      dispatch(getContractNftsQuery(selectedCollection) as unknown as AnyAction);
+      dispatch(getContractNftsQuery(selectedCollection) as unknown as RehydrateAction);
     }
   }, [
     system.status,
@@ -40,7 +38,7 @@ export default function Catalog() {
     if (system.status !== 'WalletConnected') {
       router.push('/');
     } else {
-      dispatch(getWalletAssetContractsQuery() as unknown as AnyAction);
+      dispatch(getWalletAssetContractsQuery() as unknown as RehydrateAction);
     }
   }, [system.status, dispatch, router]);
 
@@ -52,7 +50,6 @@ export default function Catalog() {
   const collection = state.collections[selectedCollection];
 
   return (
-    <Provider store={store}>
     <Flex
       flex="1"
       w="100%"
@@ -126,7 +123,7 @@ export default function Catalog() {
             onClick={() => {
               const selectedCollection = state.selectedCollection;
               if (selectedCollection !== null) {
-                dispatch(getContractNftsQuery(selectedCollection) as unknown as AnyAction);
+                dispatch(getContractNftsQuery(selectedCollection) as unknown as RehydrateAction);
               }
             }}
             mt={{
@@ -152,6 +149,5 @@ export default function Catalog() {
         )}
       </Flex>
     </Flex>
-    </Provider>
   );
 }

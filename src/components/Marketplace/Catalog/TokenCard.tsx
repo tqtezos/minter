@@ -1,16 +1,16 @@
 import React from 'react';
 import { Token } from '../../../reducer/slices/collections';
-import { useLocation } from 'wouter';
 import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 import { AspectRatio, Box, Flex, Text, Heading } from '@chakra-ui/react';
 import { TokenMedia } from '../../common/TokenMedia';
+import { useRouter } from 'next/router';
 
 interface TokenCardProps extends Token {
   network: string;
 }
 
 export default function TokenCard(props: TokenCardProps) {
-  const [, setLocation] = useLocation();
+  const router = useRouter();
   return (
     <Flex
       flexDir="column"
@@ -28,7 +28,7 @@ export default function TokenCard(props: TokenCardProps) {
         boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.1)'
       }}
       onClick={() =>
-        setLocation(`/collection/${props.address}/token/${props.id}`)
+        router.push(`/collection/${props.address}/token/${props.id}`)
       }
     >
       <AspectRatio ratio={3 / 2}>

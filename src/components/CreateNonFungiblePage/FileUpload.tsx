@@ -7,6 +7,7 @@ import {
   updateDisplayImageFile,
   SelectedFile
 } from '../../reducer/slices/createNft';
+import { RehydrateAction } from 'redux-persist';
 
 export function FilePreview({ file }: { file: SelectedFile }) {
   const dispatch = useDispatch();
@@ -43,7 +44,7 @@ export function FilePreview({ file }: { file: SelectedFile }) {
                   name: 'foo',
                   size: blob.size,
                   type: blob.type
-                })
+                }) as unknown as RehydrateAction
               );
             }, type);
           }}
@@ -63,7 +64,7 @@ export default function FileUpload() {
 
   const onDrop = useCallback(
     (files: File[]) => {
-      dispatch(readFileAsDataUrlAction({ ns: 'createNft', file: files[0] }));
+      dispatch(readFileAsDataUrlAction({ ns: 'createNft', file: files[0] }) as unknown as RehydrateAction);
     },
     [dispatch]
   );

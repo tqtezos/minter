@@ -21,6 +21,7 @@ import { useSelector, useDispatch } from '../../../reducer';
 import { buyTokenAction } from '../../../reducer/async/actions';
 import { clearError, setStatus, Status } from '../../../reducer/slices/status';
 import { Nft } from '../../../lib/nfts/queries';
+import { RehydrateAction } from 'redux-persist';
 
 interface ContentProps {
   isOpen: boolean;
@@ -109,13 +110,13 @@ export function BuyTokenButton(props: BuyTokenButtonProps) {
         tokenId: props.token.id,
         tokenSeller: props.token.sale?.seller || '',
         salePrice: props.token.sale?.price || 0
-      })
+      }) as unknown as RehydrateAction
     );
   };
 
   const close = () => {
     if (status.status !== 'in_transit') {
-      dispatch(setStatus({ method: 'buyToken', status: 'ready' }));
+      dispatch(setStatus({ method: 'buyToken', status: 'ready' }) as unknown as RehydrateAction);
       onClose();
     }
   };
@@ -168,11 +169,11 @@ export function BuyTokenButton(props: BuyTokenButtonProps) {
               onClose={() => close()}
               onCancel={() => {
                 onClose();
-                dispatch(clearError({ method: 'buyToken' }));
-                dispatch(setStatus({ method: 'buyToken', status: 'ready' }));
+                dispatch(clearError({ method: 'buyToken' }) as unknown as RehydrateAction);
+                dispatch(setStatus({ method: 'buyToken', status: 'ready' }) as unknown as RehydrateAction);
               }}
               onRetry={() => {
-                dispatch(clearError({ method: 'buyToken' }));
+                dispatch(clearError({ method: 'buyToken' }) as unknown as RehydrateAction);
                 onSubmit();
               }}
             />

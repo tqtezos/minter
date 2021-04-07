@@ -20,6 +20,7 @@ import { MinterButton } from '../../common';
 import { useSelector, useDispatch } from '../../../reducer';
 import { cancelTokenSaleAction } from '../../../reducer/async/actions';
 import { clearError, setStatus, Status } from '../../../reducer/slices/status';
+import { RehydrateAction } from 'redux-persist';
 
 interface ContentProps {
   isOpen: boolean;
@@ -105,13 +106,13 @@ export function CancelTokenSaleButton(props: CancelTokenSaleButtonProps) {
     dispatch(
       cancelTokenSaleAction({
         ...props
-      })
+      }) as unknown as RehydrateAction
     );
   };
 
   const close = () => {
     if (status.status !== 'in_transit') {
-      dispatch(setStatus({ method: 'cancelTokenSale', status: 'ready' }));
+      dispatch(setStatus({ method: 'cancelTokenSale', status: 'ready' }) as unknown as RehydrateAction);
       onClose();
     }
   };
@@ -156,13 +157,13 @@ export function CancelTokenSaleButton(props: CancelTokenSaleButtonProps) {
               onClose={() => close()}
               onCancel={() => {
                 onClose();
-                dispatch(clearError({ method: 'cancelTokenSale' }));
+                dispatch(clearError({ method: 'cancelTokenSale' }) as unknown as RehydrateAction);
                 dispatch(
-                  setStatus({ method: 'cancelTokenSale', status: 'ready' })
+                  setStatus({ method: 'cancelTokenSale', status: 'ready' }) as unknown as RehydrateAction
                 );
               }}
               onRetry={() => {
-                dispatch(clearError({ method: 'cancelTokenSale' }));
+                dispatch(clearError({ method: 'cancelTokenSale' }) as unknown as RehydrateAction);
                 onSubmit();
               }}
             />

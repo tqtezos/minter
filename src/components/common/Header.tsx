@@ -26,6 +26,7 @@ import { useSelector, useDispatch } from '../../reducer';
 import { connectWallet, disconnectWallet } from '../../reducer/async/wallet';
 import { MinterButton } from '.';
 import logo from './assets/splash-logo.svg';
+import { RehydrateAction } from 'redux-persist';
 
 interface MobileHeaderLinkProps {
   to: string;
@@ -135,7 +136,7 @@ function WalletDisplay() {
                 alignSelf="flex-start"
                 variant="cancelAction"
                 onClick={async () => {
-                  await dispatch(disconnectWallet());
+                  await dispatch(disconnectWallet() as unknown as RehydrateAction);
                   setLocation('/');
                 }}
               >
@@ -151,7 +152,7 @@ function WalletDisplay() {
                 variant="secondaryAction"
                 onClick={e => {
                   e.preventDefault();
-                  dispatch(connectWallet());
+                  dispatch(connectWallet() as unknown as RehydrateAction);
                 }}
               >
                 Connect your Wallet
@@ -222,7 +223,7 @@ function NavItems() {
                     <MinterButton
                       variant="cancelAction"
                       onClick={async () => {
-                        await dispatch(disconnectWallet());
+                        await dispatch(disconnectWallet() as unknown as RehydrateAction);
                         setLocation('/');
                       }}
                       mb={4}
@@ -234,7 +235,7 @@ function NavItems() {
                       variant="secondaryAction"
                       onClick={e => {
                         e.preventDefault();
-                        dispatch(connectWallet());
+                        dispatch(connectWallet() as unknown as RehydrateAction);
                       }}
                       mb={4}
                     >

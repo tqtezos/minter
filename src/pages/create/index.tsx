@@ -1,28 +1,26 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Box, Flex, Text, useDisclosure } from '@chakra-ui/react';
-import { MinterButton } from '../../src/components/common';
-import Form from '../../src/components/CreateNonFungiblePage/Form';
-import FileUpload from '../../src/components/CreateNonFungiblePage/CollectionSelect';
-import CollectionSelect from '../../src/components/CreateNonFungiblePage/CollectionSelect';
-import StatusModal from '../../src/components/CreateNonFungiblePage/StatusModal';
-import Confirmation from '../../src/components/CreateNonFungiblePage/Confirmation';
+import { MinterButton } from '../../components/common';
+import Form from '../../components/CreateNonFungiblePage/Form';
+import FileUpload from '../../components/CreateNonFungiblePage/CollectionSelect';
+import CollectionSelect from '../../components/CreateNonFungiblePage/CollectionSelect';
+import StatusModal from '../../components/CreateNonFungiblePage/StatusModal';
+import Confirmation from '../../components/CreateNonFungiblePage/Confirmation';
 import { ChevronLeft, X } from 'react-feather';
 import { useRouter } from 'next/router';
-import { useSelector, useDispatch } from '../../src/reducer';
+import { useSelector, useDispatch } from '../../reducer';
 import {
   clearForm,
   CreateNftState,
   decrementStep,
   incrementStep,
   steps
-} from '../../src/reducer/slices/createNft';
-import { mintTokenAction } from '../../src/reducer/async/actions';
-import { validateCreateNftStep } from '../../src/reducer/validators/createNft';
-import { clearError, setStatus } from '../../src/reducer/slices/status';
-import { store } from '../../src/reducer';
-import { Provider } from 'react-redux';
-import { AnyAction } from 'redux';
+} from '../../reducer/slices/createNft';
+import { mintTokenAction } from '../../reducer/async/actions';
+import { validateCreateNftStep } from '../../reducer/validators/createNft';
+import { clearError, setStatus } from '../../reducer/slices/status';
+import { RehydrateAction } from 'redux-persist';
 
 function ProgressIndicator({ state }: { state: CreateNftState }) {
   const stepIdx = steps.indexOf(state.step);
@@ -105,7 +103,6 @@ export default function CreateNonFungiblePage() {
   const stepIsValid = validateCreateNftStep(state);
 
   return (
-    <Provider store={store}>
     <Flex flex="1" width="100%" minHeight="0">
       <Flex w="100%" h="100%" flexDir="column" align="center">
         <Flex
@@ -121,7 +118,7 @@ export default function CreateNonFungiblePage() {
             <MinterButton
               variant="cancelAction"
               onClick={() => {
-                dispatch(clearForm());
+                dispatch(clearForm() as unknown as RehydrateAction);
                 router.push('/collections');
               }}
               display="flex"
@@ -147,7 +144,7 @@ export default function CreateNonFungiblePage() {
             <MinterButton
               visibility={state.step !== 'file_upload' ? 'visible' : 'hidden'}
               variant="primaryActionInverted"
-              onClick={() => dispatch(decrementStep())}
+              onClick={() => dispatch(decrementStep() as unknown as RehydrateAction)}
             >
               <Box color="currentcolor">
                 <ChevronLeft size={16} strokeWidth="3" />
@@ -160,14 +157,14 @@ export default function CreateNonFungiblePage() {
                 if (!stepIsValid) return;
                 switch (state.step) {
                   case 'file_upload': {
-                    return dispatch(incrementStep());
+                    return dispatch(incrementStep() as unknown as RehydrateAction);
                   }
                   case 'asset_details': {
-                    return dispatch(incrementStep());
+                    return dispatch(incrementStep() as unknown as RehydrateAction);
                   }
                   case 'confirm': {
                     onOpen();
-                    return dispatch(mintTokenAction() as unknown as AnyAction);
+                    return dispatch(mintTokenAction() as unknown as RehydrateAction);
                   }
                 }
               }}
@@ -180,17 +177,17 @@ export default function CreateNonFungiblePage() {
               onClose={() => {
                 onClose();
                 router.push('/collections');
-                dispatch(setStatus({ method: 'mintToken', status: 'ready' }));
-                dispatch(clearForm());
+                dispatch(setStatus({ method: 'mintToken', status: 'ready' }) as unknown as RehydrateAction);
+                dispatch(clearForm() as unknown as RehydrateAction);
               }}
               onRetry={() => {
-                dispatch(clearError({ method: 'mintToken' }));
-                dispatch(mintTokenAction() as unknown as AnyAction);
+                dispatch(clearError({ method: 'mintToken' }) as unknown as RehydrateAction);
+                dispatch(mintTokenAction() as unknown as RehydrateAction);
               }}
               onCancel={() => {
                 onClose();
-                dispatch(clearError({ method: 'mintToken' }));
-                dispatch(setStatus({ method: 'mintToken', status: 'ready' }));
+                dispatch(clearError({ method: 'mintToken' }) as unknown as RehydrateAction);
+                dispatch(setStatus({ method: 'mintToken', status: 'ready' }) as unknown as RehydrateAction);
               }}
               status={status}
             />
@@ -214,6 +211,5 @@ export default function CreateNonFungiblePage() {
         </Flex>
       </Flex>
     </Flex>
-    </Provider>
   );
 }

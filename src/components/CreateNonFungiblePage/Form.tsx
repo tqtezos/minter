@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { Plus, X } from 'react-feather';
 import { MinterButton } from '../common';
-
+import { RehydrateAction } from 'redux-persist';
 import { useSelector, useDispatch } from '../../reducer';
 import {
   addMetadataRow,
@@ -43,7 +43,7 @@ export default function Form() {
           placeholder="Input your asset name"
           value={name || ''}
           onChange={e =>
-            dispatch(updateField({ name: 'name', value: e.target.value }))
+            dispatch(updateField({ name: 'name', value: e.target.value }) as unknown as RehydrateAction)
           }
         />
       </FormControl>
@@ -61,7 +61,7 @@ export default function Form() {
           value={description || ''}
           onChange={e =>
             dispatch(
-              updateField({ name: 'description', value: e.target.value })
+              updateField({ name: 'description', value: e.target.value }) as unknown as RehydrateAction
             )
           }
         />
@@ -79,7 +79,7 @@ export default function Form() {
                 placeholder="e.g. Country"
                 value={name || ''}
                 onChange={e =>
-                  dispatch(updateMetadataRowName({ key, name: e.target.value }))
+                  dispatch(updateMetadataRowName({ key, name: e.target.value }) as unknown as RehydrateAction)
                 }
               />
             </FormControl>
@@ -90,7 +90,7 @@ export default function Form() {
                 value={value || ''}
                 onChange={e =>
                   dispatch(
-                    updateMetadataRowValue({ key, value: e.target.value })
+                    updateMetadataRowValue({ key, value: e.target.value }) as unknown as RehydrateAction
                   )
                 }
               />
@@ -100,7 +100,7 @@ export default function Form() {
               ml={4}
               mt={1}
               cursor="pointer"
-              onClick={() => dispatch(deleteMetadataRow({ key }))}
+              onClick={() => dispatch(deleteMetadataRow({ key }) as unknown as RehydrateAction)}
               _hover={{
                 color: 'brand.red'
               }}
@@ -112,7 +112,7 @@ export default function Form() {
       })}
       <MinterButton
         variant="primaryActionInverted"
-        onClick={() => dispatch(addMetadataRow())}
+        onClick={() => dispatch(addMetadataRow() as unknown as RehydrateAction)}
         pl={3}
         pr={3}
         pt={2}

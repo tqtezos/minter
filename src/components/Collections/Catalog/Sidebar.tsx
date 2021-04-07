@@ -6,6 +6,7 @@ import {
   selectCollection,
   Collection
 } from '../../../reducer/slices/collections';
+import { RehydrateAction } from 'redux-persist'
 
 interface CollectionTabProps extends Collection {
   selected: boolean;
@@ -74,7 +75,7 @@ export default function Sidebar() {
       <CollectionTab
         key={state.globalCollection}
         selected={state.globalCollection === state.selectedCollection}
-        onSelect={address => dispatch(selectCollection(address))}
+        onSelect={address => dispatch(selectCollection(address) as unknown as RehydrateAction)}
         {...state.collections[state.globalCollection]}
       />
       <Heading
@@ -93,7 +94,7 @@ export default function Sidebar() {
           <CollectionTab
             key={address}
             selected={address === state.selectedCollection}
-            onSelect={address => dispatch(selectCollection(address))}
+            onSelect={address => dispatch(selectCollection(address) as unknown as RehydrateAction)}
             {...state.collections[address]}
           />
         ))}

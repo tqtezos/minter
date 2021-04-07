@@ -27,6 +27,7 @@ import { MinterButton } from '../../common';
 import { useSelector, useDispatch } from '../../../reducer';
 import { createAssetContractAction } from '../../../reducer/async/actions';
 import { clearError, setStatus, Status } from '../../../reducer/slices/status';
+import { RehydrateAction } from 'redux-persist';
 
 interface FormProps {
   initialRef: MutableRefObject<null>;
@@ -147,12 +148,12 @@ export function CreateCollectionButton() {
   const initialRef = React.useRef(null);
 
   const onSubmit = async () => {
-    dispatch(createAssetContractAction(contractName));
+    dispatch(createAssetContractAction(contractName)  as unknown as RehydrateAction);
   };
 
   const close = () => {
     if (status.status !== 'in_transit') {
-      dispatch(setStatus({ method: 'createAssetContract', status: 'ready' }));
+      dispatch(setStatus({ method: 'createAssetContract', status: 'ready' }) as unknown as RehydrateAction);
       onClose();
     }
   };
@@ -191,13 +192,13 @@ export function CreateCollectionButton() {
               onClose={() => close()}
               onCancel={() => {
                 onClose();
-                dispatch(clearError({ method: 'createAssetContract' }));
+                dispatch(clearError({ method: 'createAssetContract' }) as unknown as RehydrateAction);
                 dispatch(
-                  setStatus({ method: 'createAssetContract', status: 'ready' })
+                  setStatus({ method: 'createAssetContract', status: 'ready' }) as unknown as RehydrateAction
                 );
               }}
               onRetry={() => {
-                dispatch(clearError({ method: 'createAssetContract' }));
+                dispatch(clearError({ method: 'createAssetContract' }) as unknown as RehydrateAction);
                 onSubmit();
               }}
             />

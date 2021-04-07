@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
 import { Box, Container, Text, Flex, Heading, SimpleGrid, Spinner } from '@chakra-ui/react';
 import { Wind } from 'react-feather';
-import { useSelector, useDispatch } from '../../src/reducer';
-import { getMarketplaceNftsQuery } from '../../src/reducer/async/queries';
-import TokenCard from '../../src/components/Marketplace/Catalog/TokenCard';
-import FeaturedToken from '../../src/components/Marketplace/Catalog/FeaturedToken';
-import { AnyAction } from 'redux';
+import { useSelector, useDispatch } from '../../reducer';
+import { getMarketplaceNftsQuery } from '../../reducer/async/queries';
+import TokenCard from '../../components/Marketplace/Catalog/TokenCard';
+import FeaturedToken from '../../components/Marketplace/Catalog/FeaturedToken';
+import { RehydrateAction } from 'redux-persist';
 
 export default function Catalog() {
   const { system, marketplace: state } = useSelector(s => s);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getMarketplaceNftsQuery(state.marketplace.address) as unknown as AnyAction);
+    dispatch(getMarketplaceNftsQuery(state.marketplace.address) as unknown as RehydrateAction);
   }, [ state.marketplace.address, dispatch ]);
 
   let tokens = state.marketplace.tokens;

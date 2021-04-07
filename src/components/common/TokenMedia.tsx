@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Flex, Image } from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 import { FiHelpCircle } from 'react-icons/fi';
+import Image from 'next/image';
 
 function MediaNotFound() {
   return (
@@ -48,10 +49,8 @@ export function TokenMedia(props: { src: string }) {
       <Image
         src={props.src}
         objectFit="scale-down"
+        width="auto"
         height="100%"
-        flex="1"
-        style={{objectFit:"scale-down"}}
-        onError={() => setErrored(true)}
       />
     );
   }

@@ -1,9 +1,9 @@
 import './styles/globals.css';
 import React from 'react';
-import { store } from '../src/reducer'
 import { Provider } from 'react-redux';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
-
+import { store, persistor, wrapper } from '../reducer';
+import { PersistGate } from 'redux-persist/integration/react';
 
 const Button = {
   variants: {
@@ -251,13 +251,14 @@ const theme = extendTheme({
 });
 
 function MyApp({ Component, pageProps }) {
+
   return (
-    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
       <ChakraProvider theme={theme}>
-      <Component {...pageProps} />
+        <Component {...pageProps} />
       </ChakraProvider>
-  </Provider>
+      </PersistGate>
   )
 }
 
-export default MyApp
+export default wrapper.withRedux(MyApp)

@@ -13,6 +13,7 @@ import {
   getWalletAssetContractsQuery
 } from '../../../reducer/async/queries';
 import { selectCollection } from '../../../reducer/slices/collections';
+import { RehydrateAction } from 'redux-persist';
 
 export default function Catalog() {
   const [, setLocation] = useLocation();
@@ -22,9 +23,9 @@ export default function Catalog() {
   useEffect(() => {
     const selectedCollection = state.selectedCollection;
     if (selectedCollection === null) {
-      dispatch(selectCollection(state.globalCollection));
+      dispatch(selectCollection(state.globalCollection)as unknown as RehydrateAction);
     } else {
-      dispatch(getContractNftsQuery(selectedCollection));
+      dispatch(getContractNftsQuery(selectedCollection) as unknown as RehydrateAction);
     }
   }, [
     system.status,
@@ -37,7 +38,7 @@ export default function Catalog() {
     if (system.status !== 'WalletConnected') {
       setLocation('/', { replace: true });
     } else {
-      dispatch(getWalletAssetContractsQuery());
+      dispatch(getWalletAssetContractsQuery() as unknown as RehydrateAction);
     }
   }, [system.status, setLocation, dispatch]);
 
@@ -74,7 +75,7 @@ export default function Catalog() {
         flexDir="column"
         h="100%"
         w="100%"
-        px={10}
+        px={{ base: 6, md: 10 }}
         pt={6}
         flex="1"
         bg="brand.brightGray"
@@ -83,7 +84,11 @@ export default function Catalog() {
         overflowY="scroll"
         justify="start"
       >
+        <Flex display={{ base: 'flex', md: 'none' }} mb={4}>
+          <CollectionsDropdown />
+        </Flex>
         <Flex
+          display={{ base: 'none', md: 'flex' }}
           w="100%"
           pb={6}
           justify="space-between"
@@ -99,9 +104,6 @@ export default function Catalog() {
           <Flex flexDir="column" width="100%">
             <Flex justify="space-between" width="100%">
               <Heading size="lg">{collection.metadata.name || ''}</Heading>
-              <Flex display={{ base: 'flex', md: 'none' }}>
-                <CollectionsDropdown />
-              </Flex>
             </Flex>
             <Flex align="center">
               <Text fontFamily="mono" color="brand.lightGray">
@@ -122,7 +124,7 @@ export default function Catalog() {
             onClick={() => {
               const selectedCollection = state.selectedCollection;
               if (selectedCollection !== null) {
-                dispatch(getContractNftsQuery(selectedCollection));
+                dispatch(getContractNftsQuery(selectedCollection) as unknown as RehydrateAction);
               }
             }}
             mt={{

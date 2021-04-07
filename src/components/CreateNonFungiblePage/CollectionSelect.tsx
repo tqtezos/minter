@@ -15,6 +15,7 @@ import { useSelector, useDispatch } from '../../reducer';
 import { selectCollection } from '../../reducer/slices/createNft';
 import { getWalletAssetContractsQuery } from '../../reducer/async/queries';
 import { ChevronDown } from 'react-feather';
+import { RehydrateAction } from 'redux-persist';
 
 export default function CollectionSelect() {
   const collections = useSelector(s => s.collections.collections);
@@ -22,7 +23,7 @@ export default function CollectionSelect() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getWalletAssetContractsQuery());
+    dispatch(getWalletAssetContractsQuery() as unknown as RehydrateAction);
   }, [collections, dispatch]);
 
   return (
@@ -61,7 +62,7 @@ export default function CollectionSelect() {
                 key={address}
                 value={address}
                 selected={address === state.collectionAddress}
-                onClick={() => dispatch(selectCollection(address))}
+                onClick={() => dispatch(selectCollection(address) as unknown as RehydrateAction)}
               >
                 {collections[address].metadata.name}
               </MenuItemOption>

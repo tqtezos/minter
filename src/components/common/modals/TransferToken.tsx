@@ -28,6 +28,7 @@ import { MinterButton } from '../../common/index';
 import { useSelector, useDispatch } from '../../../reducer';
 import { transferTokenAction } from '../../../reducer/async/actions';
 import { clearError, setStatus, Status } from '../../../reducer/slices/status';
+import { RehydrateAction } from 'redux-persist';
 
 interface FormProps {
   initialRef: MutableRefObject<null>;
@@ -154,13 +155,13 @@ export function TransferTokenModal(props: TransferTokenModalProps) {
         contract: props.contractAddress,
         tokenId: props.tokenId,
         to: toAddress
-      })
+      }) as unknown as RehydrateAction
     );
   };
 
   const close = () => {
     if (status.status !== 'in_transit') {
-      dispatch(setStatus({ method: 'transferToken', status: 'ready' }));
+      dispatch(setStatus({ method: 'transferToken', status: 'ready' }) as unknown as RehydrateAction);
       onClose();
     }
   };
@@ -191,11 +192,11 @@ export function TransferTokenModal(props: TransferTokenModalProps) {
             onClose={() => close()}
             onCancel={() => {
               onClose();
-              dispatch(clearError({ method: 'transferToken' }));
-              dispatch(setStatus({ method: 'transferToken', status: 'ready' }));
+              dispatch(clearError({ method: 'transferToken' }) as unknown as RehydrateAction);
+              dispatch(setStatus({ method: 'transferToken', status: 'ready' }) as unknown as RehydrateAction);
             }}
             onRetry={() => {
-              dispatch(clearError({ method: 'transferToken' }));
+              dispatch(clearError({ method: 'transferToken' }) as unknown as RehydrateAction);
               onSubmit();
             }}
           />

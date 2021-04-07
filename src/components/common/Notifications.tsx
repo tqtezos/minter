@@ -6,6 +6,7 @@ import {
   readNotification
 } from '../../reducer/slices/notifications';
 import _ from 'lodash';
+import { RehydrateAction } from 'redux-persist';
 
 export default function Notifications() {
   const toast = useToast();
@@ -29,10 +30,10 @@ export default function Notifications() {
         duration: 10000,
         isClosable: true,
         onCloseComplete() {
-          dispatch(readNotification(notification.requestId));
+          dispatch(readNotification(notification.requestId) as unknown as RehydrateAction);
         }
       });
-      dispatch(deliverNotification(notification.requestId));
+      dispatch(deliverNotification(notification.requestId) as unknown as RehydrateAction);
     }
   }, [notifications, dispatch, toast]);
 

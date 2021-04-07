@@ -5,7 +5,7 @@ import { MinterButton /* , MinterLink */ } from '../common';
 import logo from '../common/assets/splash-logo.svg';
 import { useSelector, useDispatch } from '../../reducer';
 import { connectWallet } from '../../reducer/async/wallet';
-import { AnyAction } from 'redux';
+import { RehydrateAction } from 'redux-persist';
 
 export default function SplashPage() {
   const [, setLocation] = useLocation();
@@ -37,7 +37,7 @@ export default function SplashPage() {
             variant="secondaryActionLined"
             onClick={e => {
               e.preventDefault();
-              dispatch(connectWallet()as unknown as AnyAction);
+              dispatch(connectWallet() as unknown as RehydrateAction);
             }}
           >
             Connect your wallet

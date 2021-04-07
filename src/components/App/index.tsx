@@ -10,6 +10,7 @@ import { Flex } from '@chakra-ui/react';
 import Notifications from '../common/Notifications';
 import { useSelector, useDispatch } from '../../reducer';
 import { reconnectWallet } from '../../reducer/async/wallet';
+import { RehydrateAction } from 'redux-persist';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -19,7 +20,7 @@ export default function App() {
 
   useEffect(() => {
     if (!walletReconnectAttempted) {
-      dispatch(reconnectWallet());
+      dispatch(reconnectWallet() as unknown as RehydrateAction);
     }
   }, [walletReconnectAttempted, dispatch]);
 

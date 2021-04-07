@@ -9,7 +9,6 @@ import CollectionSelect from './CollectionSelect';
 import StatusModal from './StatusModal';
 import Confirmation from './Confirmation';
 import { ChevronLeft, X } from 'react-feather';
-
 import { useSelector, useDispatch } from '../../reducer';
 import {
   clearForm,
@@ -21,7 +20,7 @@ import {
 import { mintTokenAction } from '../../reducer/async/actions';
 import { validateCreateNftStep } from '../../reducer/validators/createNft';
 import { clearError, setStatus } from '../../reducer/slices/status';
-import { AnyAction } from 'redux';
+import { RehydrateAction } from 'redux-persist';
 
 function ProgressIndicator({ state }: { state: CreateNftState }) {
   const stepIdx = steps.indexOf(state.step);
@@ -119,7 +118,7 @@ export default function CreateNonFungiblePage() {
             <MinterButton
               variant="cancelAction"
               onClick={() => {
-                dispatch(clearForm());
+                dispatch(clearForm() as unknown as RehydrateAction);
                 setLocation('/collections');
               }}
               display="flex"
@@ -145,7 +144,7 @@ export default function CreateNonFungiblePage() {
             <MinterButton
               visibility={state.step !== 'file_upload' ? 'visible' : 'hidden'}
               variant="primaryActionInverted"
-              onClick={() => dispatch(decrementStep())}
+              onClick={() => dispatch(decrementStep() as unknown as RehydrateAction)}
             >
               <Box color="currentcolor">
                 <ChevronLeft size={16} strokeWidth="3" />
@@ -158,14 +157,14 @@ export default function CreateNonFungiblePage() {
                 if (!stepIsValid) return;
                 switch (state.step) {
                   case 'file_upload': {
-                    return dispatch(incrementStep());
+                    return dispatch(incrementStep() as unknown as RehydrateAction);
                   }
                   case 'asset_details': {
-                    return dispatch(incrementStep());
+                    return dispatch(incrementStep() as unknown as RehydrateAction);
                   }
                   case 'confirm': {
                     onOpen();
-                    return dispatch(mintTokenAction() as unknown as AnyAction);
+                    return dispatch(mintTokenAction() as unknown as RehydrateAction);
                   }
                 }
               }}
@@ -178,17 +177,17 @@ export default function CreateNonFungiblePage() {
               onClose={() => {
                 onClose();
                 setLocation('/collections');
-                dispatch(setStatus({ method: 'mintToken', status: 'ready' }));
-                dispatch(clearForm());
+                dispatch(setStatus({ method: 'mintToken', status: 'ready' }) as unknown as RehydrateAction);
+                dispatch(clearForm() as unknown as RehydrateAction);
               }}
               onRetry={() => {
-                dispatch(clearError({ method: 'mintToken' }));
-                dispatch(mintTokenAction() as unknown as AnyAction);
+                dispatch(clearError({ method: 'mintToken' }) as unknown as RehydrateAction);
+                dispatch(mintTokenAction() as unknown as RehydrateAction);
               }}
               onCancel={() => {
                 onClose();
-                dispatch(clearError({ method: 'mintToken' }));
-                dispatch(setStatus({ method: 'mintToken', status: 'ready' }));
+                dispatch(clearError({ method: 'mintToken' }) as unknown as RehydrateAction);
+                dispatch(setStatus({ method: 'mintToken', status: 'ready' }) as unknown as RehydrateAction);
               }}
               status={status}
             />

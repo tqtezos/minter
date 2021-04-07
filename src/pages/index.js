@@ -1,17 +1,16 @@
 import React, { useEffect } from 'react';
 import { Switch, Route } from 'wouter';
-import SplashPage from '../src/components/SplashPage';
-import CreateNonFungiblePage from '../src/components/CreateNonFungiblePage';
-import CollectionsCatalog from '../src/components/Collections/Catalog';
-import CollectionsTokenDetail from '../src/components/Collections/TokenDetail';
-import MarketplaceCatalog from '../src/components/Marketplace/Catalog';
-import Header from '../src/components/common/Header';
+import SplashPage from '../components/SplashPage';
+import CreateNonFungiblePage from '../components/CreateNonFungiblePage';
+import CollectionsCatalog from '../components/Collections/Catalog';
+import CollectionsTokenDetail from '../components/Collections/TokenDetail';
+import MarketplaceCatalog from '../components/Marketplace/Catalog';
+import Header from '../components/common/Header';
 import { Flex } from '@chakra-ui/react';
-import Notifications from '../src/components/common/Notifications';
-import { Provider, useSelector } from 'react-redux';
+import Notifications from '../components/common/Notifications';
+import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { reconnectWallet } from '../src/reducer/async/wallet';
-import { store } from '../src/reducer';
+import { reconnectWallet } from '../reducer/async/wallet';
 
 function Home() {
   const dispatch = useDispatch();
@@ -63,8 +62,6 @@ function Home() {
 export default function HomeWrapper() {
 
   return (
-    <Provider store={store}>
       <Home />
-    </Provider>
   )
 }

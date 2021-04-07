@@ -28,6 +28,7 @@ import { MinterButton } from '../../common';
 import { useSelector, useDispatch } from '../../../reducer';
 import { listTokenAction } from '../../../reducer/async/actions';
 import { clearError, setStatus, Status } from '../../../reducer/slices/status';
+import { RehydrateAction } from 'redux-persist';
 
 interface FormProps {
   initialRef: MutableRefObject<null>;
@@ -165,13 +166,13 @@ export function SellTokenButton(props: SellTokenButtonProps) {
       listTokenAction({
         ...props,
         salePrice: Number.isNaN(price) ? 0 : price
-      })
+      }) as unknown as RehydrateAction
     );
   };
 
   const close = () => {
     if (status.status !== 'in_transit') {
-      dispatch(setStatus({ method: 'listToken', status: 'ready' }));
+      dispatch(setStatus({ method: 'listToken', status: 'ready' }) as unknown as RehydrateAction);
       onClose();
     }
   };
@@ -207,11 +208,11 @@ export function SellTokenButton(props: SellTokenButtonProps) {
               onClose={() => close()}
               onCancel={() => {
                 onClose();
-                dispatch(clearError({ method: 'listToken' }));
-                dispatch(setStatus({ method: 'listToken', status: 'ready' }));
+                dispatch(clearError({ method: 'listToken' }) as unknown as RehydrateAction);
+                dispatch(setStatus({ method: 'listToken', status: 'ready' }) as unknown as RehydrateAction);
               }}
               onRetry={() => {
-                dispatch(clearError({ method: 'listToken' }));
+                dispatch(clearError({ method: 'listToken' }) as unknown as RehydrateAction);
                 onSubmit();
               }}
             />
