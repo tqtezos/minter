@@ -46,7 +46,7 @@ export function ipfsUriToGatewayUrl(network: string, uri: string) {
   const ipfsHost =
     network === 'sandboxnet'
       ? 'http://localhost:8080'
-      : 'https://gateway.ipfs.io';
+      : 'https://gateway.pinata.cloud';
   const cid = ipfsUriToCid(uri);
   return cid ? `${ipfsHost}/ipfs/${cid}` : uri;
 }
