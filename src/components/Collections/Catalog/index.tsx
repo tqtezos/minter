@@ -74,7 +74,7 @@ export default function Catalog() {
         flexDir="column"
         h="100%"
         w="100%"
-        px={10}
+        px={{ base: 6, md: 10 }}
         pt={6}
         flex="1"
         bg="brand.brightGray"
@@ -83,7 +83,11 @@ export default function Catalog() {
         overflowY="scroll"
         justify="start"
       >
+        <Flex display={{ base: 'flex', md: 'none' }} mb={4}>
+          <CollectionsDropdown />
+        </Flex>
         <Flex
+          display={{ base: 'none', md: 'flex' }}
           w="100%"
           pb={6}
           justify="space-between"
@@ -99,9 +103,6 @@ export default function Catalog() {
           <Flex flexDir="column" width="100%">
             <Flex justify="space-between" width="100%">
               <Heading size="lg">{collection.metadata.name || ''}</Heading>
-              <Flex display={{ base: 'flex', md: 'none' }}>
-                <CollectionsDropdown />
-              </Flex>
             </Flex>
             <Flex align="center">
               <Text fontFamily="mono" color="brand.lightGray">
