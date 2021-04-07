@@ -43,11 +43,14 @@ export function TokenMedia(props: { src: string }) {
   if (!obj) return null;
 
   if (/^image\/.*/.test(obj.type)) {
+    console.log(props.src)
     return (
       <Image
         src={props.src}
-        objectFit="contain"
+        objectFit="scale-down"
+        height="100%"
         flex="1"
+        style={{objectFit:"scale-down"}}
         onError={() => setErrored(true)}
       />
     );
@@ -60,6 +63,7 @@ export function TokenMedia(props: { src: string }) {
         onClick={e => e.preventDefault()}
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
+        height="100%"
       >
         <source src={obj.url} type={obj.type} />
       </video>
