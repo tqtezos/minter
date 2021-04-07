@@ -42,3 +42,11 @@ export function fulfilledNotification(
     kind: null
   };
 }
+
+export function notifyPending(requestId: string, message: string) {
+  return pushNotification(pendingNotification(requestId, message));
+}
+
+export function notifyFulfilled(requestId: string, message: string) {
+  return pushNotification(fulfilledNotification(requestId, message));
+}

@@ -20,12 +20,7 @@ import { SelectedFile } from '../slices/createNft';
 import { connectWallet } from './wallet';
 import { NftMetadata } from '../../lib/nfts/queries';
 import { SystemWithToolkit, SystemWithWallet } from '../../lib/system';
-
-import {
-  pushNotification,
-  pendingNotification,
-  fulfilledNotification
-} from '../slices/notificationsActions';
+import { notifyPending, notifyFulfilled } from '../slices/notificationsActions';
 
 type Options = {
   state: State;
@@ -79,21 +74,13 @@ export const createAssetContractAction = createAsyncThunk<
     }
     try {
       const op = await createAssetContract(system, { name });
-      dispatch(
-        pushNotification(
-          pendingNotification(requestId, `Creating new collection ${name}`)
-        )
-      );
+      const pendingMessage = `Creating new collection ${name}`;
+      dispatch(notifyPending(requestId, pendingMessage));
       await op.confirmation();
+
       const { address } = await op.contract();
-      dispatch(
-        pushNotification(
-          fulfilledNotification(
-            requestId,
-            `Created new collection ${name} (${address})`
-          )
-        )
-      );
+      const fulfilledMessage = `Created new collection ${name} (${address})`;
+      dispatch(notifyFulfilled(requestId, fulfilledMessage));
       // TODO: Poll for contract availability on indexer
       dispatch(getWalletAssetContractsQuery());
       return { name, address };
@@ -228,21 +215,12 @@ export const mintTokenAction = createAsyncThunk<
 
     try {
       const op = await mintToken(system, address, metadata);
-      dispatch(
-        pushNotification(
-          pendingNotification(requestId, `Minting new token: ${metadata.name}`)
-        )
-      );
-      op.confirmation(2).then(() => {
-        dispatch(
-          pushNotification(
-            fulfilledNotification(
-              requestId,
-              `Created new token: ${metadata.name} in ${address}`
-            )
-          )
-        );
-      });
+      const pendingMessage = `Minting new token: ${metadata.name}`;
+      dispatch(notifyPending(requestId, pendingMessage));
+      await op.confirmation(2);
+
+      const fulfilledMessage = `Created new token: ${metadata.name} in ${address}`;
+      dispatch(notifyFulfilled(requestId, fulfilledMessage));
       dispatch(getContractNftsQuery(address));
       return { contract: address, metadata };
     } catch (e) {
@@ -270,18 +248,10 @@ export const transferTokenAction = createAsyncThunk<
   }
   try {
     const op = await transferToken(system, contract, tokenId, to);
-    dispatch(
-      pushNotification(
-        pendingNotification(requestId, `Transferring token to ${to}`)
-      )
-    );
-    op.confirmation(2).then(() => {
-      dispatch(
-        pushNotification(
-          fulfilledNotification(requestId, `Transferred token to ${to}`)
-        )
-      );
-    });
+    dispatch(notifyPending(requestId, `Transferring token to ${to}`));
+    await op.confirmation(2);
+
+    dispatch(notifyFulfilled(requestId, `Transferred token to ${to}`));
     dispatch(getContractNftsQuery(contract));
     return args;
   } catch (e) {
@@ -316,24 +286,12 @@ export const listTokenAction = createAsyncThunk<
       tokenId,
       salePrice
     );
-    dispatch(
-      pushNotification(
-        pendingNotification(
-          requestId,
-          `Listing token for sale for ${salePrice}`
-        )
-      )
-    );
-    op.confirmation(2).then(() => {
-      dispatch(
-        pushNotification(
-          fulfilledNotification(
-            requestId,
-            `Token listed for sale for ${salePrice}`
-          )
-        )
-      );
-    });
+    const pendingMessage = `Listing token for sale for ${salePrice}`;
+    dispatch(notifyPending(requestId, pendingMessage));
+    await op.confirmation(2);
+
+    const fulfilledMessage = `Token listed for sale for ${salePrice}`;
+    dispatch(notifyFulfilled(requestId, fulfilledMessage));
     dispatch(getContractNftsQuery(contract));
     return args;
   } catch (e) {
@@ -367,16 +325,10 @@ export const cancelTokenSaleAction = createAsyncThunk<
       contract,
       tokenId
     );
-    dispatch(
-      pushNotification(pendingNotification(requestId, `Canceling token sale`))
-    );
-    op.confirmation(2).then(() => {
-      dispatch(
-        pushNotification(
-          fulfilledNotification(requestId, `Token sale canceled`)
-        )
-      );
-    });
+    dispatch(notifyPending(requestId, `Canceling token sale`));
+    await op.confirmation(2);
+
+    dispatch(notifyFulfilled(requestId, `Token sale canceled`));
     dispatch(getContractNftsQuery(contract));
     return { contract: contract, tokenId: tokenId };
   } catch (e) {
@@ -416,24 +368,12 @@ export const buyTokenAction = createAsyncThunk<
       tokenSeller,
       salePrice
     );
-    dispatch(
-      pushNotification(
-        pendingNotification(
-          requestId,
-          `Buying token from ${tokenSeller} for ${salePrice}`
-        )
-      )
-    );
-    op.confirmation(2).then(() => {
-      dispatch(
-        pushNotification(
-          fulfilledNotification(
-            requestId,
-            `Bought token from ${tokenSeller} for ${salePrice}`
-          )
-        )
-      );
-    });
+    const pendingMessage = `Buying token from ${tokenSeller} for ${salePrice}`;
+    dispatch(notifyPending(requestId, pendingMessage));
+    await op.confirmation(2);
+
+    const fulfilledMessage = `Bought token from ${tokenSeller} for ${salePrice}`;
+    dispatch(notifyFulfilled(requestId, fulfilledMessage));
     dispatch(getContractNftsQuery(contract));
     return { contract: contract, tokenId: tokenId };
   } catch (e) {
