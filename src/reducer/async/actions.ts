@@ -69,7 +69,7 @@ export const createAssetContractAction = createAsyncThunk<
   Options
 >(
   'action/createAssetContract',
-  async (name, { getState, rejectWithValue, dispatch }) => {
+  async (name, { getState, rejectWithValue, dispatch, requestId }) => {
     const { system } = getState();
     if (system.status !== 'WalletConnected') {
       return rejectWithValue({
@@ -79,8 +79,21 @@ export const createAssetContractAction = createAsyncThunk<
     }
     try {
       const op = await createAssetContract(system, { name });
+      dispatch(
+        pushNotification(
+          pendingNotification(requestId, `Creating new collection ${name}`)
+        )
+      );
       await op.confirmation();
       const { address } = await op.contract();
+      dispatch(
+        pushNotification(
+          fulfilledNotification(
+            requestId,
+            `Created new collection ${name} (${address})`
+          )
+        )
+      );
       // TODO: Poll for contract availability on indexer
       dispatch(getWalletAssetContractsQuery());
       return { name, address };
