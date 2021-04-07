@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from '../../reducer';
 import {
   deliverNotification,
   readNotification
-} from '../../reducer/slices/notifications';
+} from '../../reducer/slices/notificationsActions';
 import _ from 'lodash';
 
 export default function Notifications() {
