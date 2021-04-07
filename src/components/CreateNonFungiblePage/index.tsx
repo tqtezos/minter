@@ -164,7 +164,7 @@ export default function CreateNonFungiblePage() {
                   }
                   case 'confirm': {
                     onOpen();
-                    return dispatch(mintTokenAction());
+                    return dispatch(mintTokenAction(state.fields.name));
                   }
                 }
               }}
@@ -182,7 +182,7 @@ export default function CreateNonFungiblePage() {
               }}
               onRetry={() => {
                 dispatch(clearError({ method: 'mintToken' }));
-                dispatch(mintTokenAction());
+                dispatch(mintTokenAction(state.fields.name));
               }}
               onCancel={() => {
                 onClose();

@@ -117,10 +117,10 @@ function appendStateMetadata(
 }
 
 export const mintTokenAction = createAsyncThunk<
-  { contract: string },
-  undefined,
+  { contract: string; metadata: ReturnType<typeof appendStateMetadata> },
+  string | undefined | null,
   Options
->('actions/mintToken', async (_, { getState, rejectWithValue, dispatch }) => {
+>('action/mintToken', async (_, { getState, rejectWithValue, dispatch }) => {
   const { system, createNft: state } = getState();
   if (state.selectedFile === null) {
     return rejectWithValue({
@@ -209,7 +209,7 @@ export const mintTokenAction = createAsyncThunk<
     const op = await mintToken(system, address, metadata);
     await op.confirmation(2);
     dispatch(getContractNftsQuery(address));
-    return { contract: address };
+    return { contract: address, metadata };
   } catch (e) {
     return rejectWithValue({
       kind: ErrorKind.MintTokenFailed,
@@ -222,7 +222,7 @@ export const transferTokenAction = createAsyncThunk<
   { contract: string; tokenId: number },
   { contract: string; tokenId: number; to: string },
   Options
->('actions/transferToken', async (args, api) => {
+>('action/transferToken', async (args, api) => {
   const { getState, rejectWithValue, dispatch } = api;
   const { contract, tokenId, to } = args;
   const { system } = getState();
@@ -249,7 +249,7 @@ export const listTokenAction = createAsyncThunk<
   { contract: string; tokenId: number; salePrice: number },
   { contract: string; tokenId: number; salePrice: number },
   Options
->('actions/listToken', async (args, api) => {
+>('action/listToken', async (args, api) => {
   const { getState, rejectWithValue, dispatch } = api;
   const { contract, tokenId, salePrice } = args;
   const { system } = getState();
@@ -284,7 +284,7 @@ export const cancelTokenSaleAction = createAsyncThunk<
   { contract: string; tokenId: number },
   { contract: string; tokenId: number },
   Options
->('actions/cancelTokenSale', async (args, api) => {
+>('action/cancelTokenSale', async (args, api) => {
   const { getState, rejectWithValue, dispatch } = api;
   const { contract, tokenId } = args;
   const { system } = getState();
@@ -318,7 +318,7 @@ export const buyTokenAction = createAsyncThunk<
   { contract: string; tokenId: number },
   { contract: string; tokenId: number; tokenSeller: string; salePrice: number },
   Options
->('actions/buyToken', async (args, api) => {
+>('action/buyToken', async (args, api) => {
   const { getState, rejectWithValue, dispatch } = api;
   const { contract, tokenId, tokenSeller, salePrice } = args;
   let { system } = getState();
