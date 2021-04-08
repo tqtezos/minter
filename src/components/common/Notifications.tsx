@@ -13,15 +13,12 @@ export default function Notifications() {
   const notifications = useSelector(
     state =>
       state.notifications.filter(({ read, delivered }) => !read && !delivered),
-    (left, right) =>
-      _.isEqual(
-        _.uniq(_.map(left, n => n.requestId)),
-        _.uniq(_.map(right, n => n.requestId))
-      )
+    _.isEqual
   );
 
   useEffect(() => {
     for (let notification of notifications) {
+      dispatch(deliverNotification(notification.requestId));
       toast({
         title: notification.title,
         description: notification.description,
@@ -32,7 +29,6 @@ export default function Notifications() {
           dispatch(readNotification(notification.requestId));
         }
       });
-      dispatch(deliverNotification(notification.requestId));
     }
   }, [notifications, dispatch, toast]);
 

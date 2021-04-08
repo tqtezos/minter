@@ -2,7 +2,8 @@ import React, {
   useState,
   MutableRefObject,
   SetStateAction,
-  Dispatch
+  Dispatch,
+  useEffect
 } from 'react';
 import {
   Box,
@@ -138,8 +139,14 @@ function Content({ status, onClose, onRetry, onCancel }: ContentProps) {
   return null;
 }
 
-export function CreateCollectionButton() {
+export function CreateCollectionButton(props: { sync?: boolean }) {
+  const [requestId, setRequestId] = useState<string | null>(null);
   const status = useSelector(s => s.status.createAssetContract);
+  const notification = useSelector(s =>
+    s.notifications.find(
+      n => n.requestId === requestId && n.status === 'warning'
+    )
+  );
   const dispatch = useDispatch();
   const [contractName, setContractName] = useState('');
 
@@ -147,7 +154,12 @@ export function CreateCollectionButton() {
   const initialRef = React.useRef(null);
 
   const onSubmit = async () => {
-    dispatch(createAssetContractAction(contractName));
+    const result = dispatch(createAssetContractAction(contractName));
+    setRequestId(result.requestId);
+    const resolved = await result;
+    if (!props.sync && resolved.meta.requestStatus === 'fulfilled') {
+      dispatch(setStatus({ method: 'createAssetContract', status: 'ready' }));
+    }
   };
 
   const close = () => {
@@ -156,6 +168,14 @@ export function CreateCollectionButton() {
       onClose();
     }
   };
+
+  useEffect(() => {
+    if (notification && !props.sync && !status.error) {
+      return onClose();
+    } else if (!isOpen && status.error) {
+      return onOpen();
+    }
+  });
 
   return (
     <>

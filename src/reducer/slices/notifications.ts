@@ -44,21 +44,15 @@ const slice = createSlice({
     });
 
     addCase(readNotification, (state, { payload: requestId }) => {
-      for (let notification of state) {
-        if (notification.requestId === requestId) {
-          notification.read = true;
-          break;
-        }
-      }
+      return state.map(n => {
+        return n.requestId === requestId ? { ...n, read: true } : n;
+      });
     });
 
     addCase(deliverNotification, (state, { payload: requestId }) => {
-      for (let notification of state) {
-        if (notification.requestId === requestId) {
-          notification.delivered = true;
-          break;
-        }
-      }
+      return state.map(n => {
+        return n.requestId === requestId ? { ...n, delivered: true } : n;
+      });
     });
 
     // Action errors are abstracted by their payloads. This allows us to iterate

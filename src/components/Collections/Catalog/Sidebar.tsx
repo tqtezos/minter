@@ -98,7 +98,7 @@ export default function Sidebar() {
           />
         ))}
       <Flex px={2} pt={4} justify="center" pb={8}>
-        <CreateCollectionButton />
+        <CreateCollectionButton sync={false} />
       </Flex>
     </>
   );
