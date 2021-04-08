@@ -144,7 +144,7 @@ export function CreateCollectionButton(props: { sync?: boolean }) {
   const status = useSelector(s => s.status.createAssetContract);
   const notification = useSelector(s =>
     s.notifications.find(
-      n => n.requestId === requestId && n.status === 'warning'
+      n => n.requestId === requestId && n.status === 'warning' && !n.delivered
     )
   );
   const dispatch = useDispatch();
@@ -170,7 +170,7 @@ export function CreateCollectionButton(props: { sync?: boolean }) {
   };
 
   useEffect(() => {
-    if (notification && !props.sync && !status.error) {
+    if (isOpen && !status.error && notification && !props.sync) {
       return onClose();
     } else if (!isOpen && status.error) {
       return onOpen();
