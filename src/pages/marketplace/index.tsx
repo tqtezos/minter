@@ -6,6 +6,7 @@ import { getMarketplaceNftsQuery } from '../../reducer/async/queries';
 import TokenCard from '../../components/Marketplace/Catalog/TokenCard';
 import FeaturedToken from '../../components/Marketplace/Catalog/FeaturedToken';
 import { RehydrateAction } from 'redux-persist';
+import { Nft } from '../../lib/nfts/queries';
 
 export default function Catalog() {
   const { system, marketplace: state } = useSelector(s => s);
@@ -73,7 +74,7 @@ export default function Catalog() {
             ) : (
               <>
                 <SimpleGrid columns={{sm: 1, md: 2, lg: 3, xl: 4}} gap={8} pb={8}>
-                  {tokens.slice(1).map(token => {
+                  {tokens.slice(1).map((token: Nft) => {
                     return (
                       <TokenCard
                         key={`${token.address}-${token.id}`}
