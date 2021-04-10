@@ -65,11 +65,8 @@ export const store = createStore(
   persistedReducer,
   applyMiddleware(...middleware));
 export const persistor = persistStore(store);
-
-
 export type State = ReturnType<typeof reducer>;
-let dispatch = store.dispatch;
-export type Dispatch = typeof dispatch;
+export type Dispatch = typeof persistor.dispatch;
 export const useDispatch = () => baseUseDispatch<Dispatch>();
 export function useSelector<TSelect = unknown>(
   selector: (s: State) => TSelect,
@@ -78,8 +75,5 @@ export function useSelector<TSelect = unknown>(
   return baseUseSelector<State, TSelect>(selector, equalityFn);
 }
 
-// create a makeStore function
 const makeStore: MakeStore<State> = (context: Context) => createStore(persistedReducer, applyMiddleware(...middleware));
-
-// export an assembled wrapper
 export const wrapper = createWrapper<State>(makeStore, {debug: true});

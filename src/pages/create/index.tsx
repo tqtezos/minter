@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useLocation } from 'wouter';
 import { Box, Flex, Text, useDisclosure } from '@chakra-ui/react';
 import { MinterButton } from '../../components/common';
 import Form from '../../components/CreateNonFungiblePage/Form';
@@ -8,7 +7,6 @@ import CollectionSelect from '../../components/CreateNonFungiblePage/CollectionS
 import StatusModal from '../../components/CreateNonFungiblePage/StatusModal';
 import Confirmation from '../../components/CreateNonFungiblePage/Confirmation';
 import { ChevronLeft, X } from 'react-feather';
-import { useRouter } from 'next/router';
 import { useSelector, useDispatch } from '../../reducer';
 import {
   clearForm,
@@ -21,6 +19,9 @@ import { mintTokenAction } from '../../reducer/async/actions';
 import { validateCreateNftStep } from '../../reducer/validators/createNft';
 import { clearError, setStatus } from '../../reducer/slices/status';
 import { RehydrateAction } from 'redux-persist';
+import Header from '../../components/common/Header';
+import { useRouter } from 'next/router';
+import Notifications from '../../components/common/Notifications';
 
 function ProgressIndicator({ state }: { state: CreateNftState }) {
   const stepIdx = steps.indexOf(state.step);
@@ -94,17 +95,19 @@ export default function CreateNonFungiblePage() {
   const dispatch = useDispatch();
   const router = useRouter();
   const { isOpen, onClose, onOpen } = useDisclosure();
+  // const router = useRouter();
   useEffect(() => {
     if (system.status !== 'WalletConnected') {
         router.push('/');
     }
-  });
+  }, [router, system.status]);
 
   const stepIsValid = validateCreateNftStep(state);
 
   return (
     <Flex flex="1" width="100%" minHeight="0">
       <Flex w="100%" h="100%" flexDir="column" align="center">
+      <Header/>
         <Flex
           w="100%"
           px={8}
@@ -210,6 +213,7 @@ export default function CreateNonFungiblePage() {
           <Box pb={10} w="100%" />
         </Flex>
       </Flex>
+      <Notifications/>
     </Flex>
   );
 }

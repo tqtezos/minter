@@ -6,19 +6,21 @@ import Sidebar from '../../components/Collections/Catalog/Sidebar';
 import TokenGrid from '../../components/Collections/Catalog/TokenGrid';
 import CollectionsDropdown from '../../components/Collections/Catalog/CollectionsDropdown';
 import { useRouter } from 'next/router';
-
-import { useSelector, useDispatch } from '../../reducer';
+import { useSelector, useDispatch, wrapper } from '../../reducer';
 import {
   getContractNftsQuery,
   getWalletAssetContractsQuery
 } from '../../reducer/async/queries';
 import { selectCollection } from '../../reducer/slices/collections';
 import { RehydrateAction } from 'redux-persist';
+import Header from '../../components/common/Header';
+import Notifications from '../../components/common/Notifications';
+import { reconnectWallet } from '../../reducer/async/wallet';
 
-export default function Catalog() {
-  const router = useRouter();
+export default function Catalog(props: any) {
   const { system, collections: state } = useSelector(s => s);
   const dispatch = useDispatch();
+  const router = useRouter();
 
   useEffect(() => {
     const selectedCollection = state.selectedCollection;
@@ -35,12 +37,14 @@ export default function Catalog() {
   ]);
 
   useEffect(() => {
-    if (system.status !== 'WalletConnected') {
-      router.push('/');
+    if (system.status !== 'ToolkitConnected' && system.status !== 'WalletConnected') {
+      router.push('/', '/', { shallow: true });
+    } else if (system.status !== 'WalletConnected') {
+      dispatch(reconnectWallet() as unknown as RehydrateAction);
     } else {
       dispatch(getWalletAssetContractsQuery() as unknown as RehydrateAction);
     }
-  }, [system.status, dispatch, router]);
+  }, [system.status, router, dispatch]);
 
   const selectedCollection = state.selectedCollection;
   if (system.status !== 'WalletConnected' || !selectedCollection) {
@@ -58,7 +62,11 @@ export default function Catalog() {
         base: 'column',
         md: 'row'
       }}
+      flexWrap={{
+        base: 'wrap'
+      }}
     >
+      <Header />
       <Flex
         w="250px"
         h="100%"
@@ -148,6 +156,25 @@ export default function Catalog() {
           <TokenGrid state={state} walletAddress={system.tzPublicKey} />
         )}
       </Flex>
+      <Notifications />
     </Flex>
   );
 }
+
+// import { GetServerSideProps } from 'next';
+// import { SystemWithToolkit, SystemWithWallet } from '../../lib/system';
+
+// export const getServerSideProps = wrapper.getServerSideProps((ctx) => {
+//   if(!ctx.store) {
+//     return
+//   }
+//   const status = [...Object.keys(ctx.store.getState().system.status as string)];
+//   // const system = JSON.parse(JSON.stringify(systemkeys.filter((k: string) => )));
+//   console.log(status);
+//   if (status === 'ToolkitConnected') {
+//     return {
+//     };
+//   }
+//   return {
+//   };
+// });

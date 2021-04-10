@@ -44,7 +44,6 @@ export function TokenMedia(props: { src: string }) {
   if (!obj) return null;
 
   if (/^image\/.*/.test(obj.type)) {
-    console.log(props.src)
     return (
       <Image
         src={props.src}

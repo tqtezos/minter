@@ -3,7 +3,7 @@ import { BeaconWallet } from '@taquito/beacon-wallet';
 import { MetadataProvider, DEFAULT_HANDLERS } from '@taquito/tzip16';
 import { Tzip12Module } from '@taquito/tzip12';
 import CustomIpfsHttpHandler from './util/taquito-custom-ipfs-http-handler';
-import { BetterCallDev } from './service/bcd';
+import { BetterCallDev } from '../pages/api/service/bcd';
 import * as tzUtils from './util/tezosToolkit';
 import { DAppClientOptions, NetworkType } from '@airgap/beacon-sdk';
 

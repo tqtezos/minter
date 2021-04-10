@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { useLocation } from 'wouter';
+import { useRouter } from 'next/router';
 import {
   Box,
   Flex,
@@ -21,11 +21,9 @@ import { Plus, Settings, Menu as HamburgerIcon } from 'react-feather';
 import { RiStore2Line } from 'react-icons/ri';
 // import { IoCubeOutline } from 'react-icons/io5';
 import { MdCollections } from 'react-icons/md';
-import headerLogo from './assets/header-logo.svg';
 import { useSelector, useDispatch } from '../../reducer';
 import { connectWallet, disconnectWallet } from '../../reducer/async/wallet';
-import { MinterButton } from '.';
-import logo from './assets/splash-logo.svg';
+import { MinterButton } from '../common';
 import { RehydrateAction } from 'redux-persist';
 
 interface MobileHeaderLinkProps {
@@ -35,14 +33,16 @@ interface MobileHeaderLinkProps {
 }
 
 function MobileHeaderLink(props: MobileHeaderLinkProps) {
-  const [location, setLocation] = useLocation();
-  const selected = location === props.to;
+
+  const router = useRouter();
+
+  const selected = router.pathname === props.to;
   return (
     <Link
       href={props.to}
       onClick={e => {
         e.preventDefault();
-        setLocation(props.to);
+        router.push(props.to);
         if (props.onClick) {
           props.onClick();
         }
@@ -69,14 +69,16 @@ interface DesktopHeaderLinkProps {
 }
 
 function DesktopHeaderLink(props: DesktopHeaderLinkProps) {
-  const [location, setLocation] = useLocation();
-  const selected = location === props.to;
+
+  const router = useRouter();
+
+  const selected = router.pathname === props.to;
   return (
     <Link
       href={props.to}
       onClick={e => {
         e.preventDefault();
-        setLocation(props.to);
+        router.push(props.to);
       }}
       textDecor="none"
       borderRadius="10px"
@@ -116,9 +118,10 @@ function WalletInfo(props: { tzPublicKey: string }) {
 }
 
 function WalletDisplay() {
-  const [, setLocation] = useLocation();
   const system = useSelector(s => s.system);
   const dispatch = useDispatch();
+  const router = useRouter();
+
   return (
     <>
       <Menu placement="bottom-end" offset={[4, 24]}>
@@ -137,7 +140,7 @@ function WalletDisplay() {
                 variant="cancelAction"
                 onClick={async () => {
                   await dispatch(disconnectWallet() as unknown as RehydrateAction);
-                  setLocation('/');
+                  router.push('/');
                 }}
               >
                 Disconnect
@@ -168,7 +171,7 @@ function WalletDisplay() {
 function NavItems() {
   const system = useSelector(s => s.system);
   const dispatch = useDispatch();
-  const [, setLocation] = useLocation();
+  const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef(null);
 
@@ -180,7 +183,8 @@ function NavItems() {
         justify="flex-end"
         display={{
           base: 'flex',
-          md: 'none'
+          md: 'none',
+          xl: 'none'
         }}
       >
         <Box
@@ -224,7 +228,7 @@ function NavItems() {
                       variant="cancelAction"
                       onClick={async () => {
                         await dispatch(disconnectWallet() as unknown as RehydrateAction);
-                        setLocation('/');
+                        router.push('/');
                       }}
                       mb={4}
                     >
@@ -254,7 +258,8 @@ function NavItems() {
         justify="flex-end"
         display={{
           base: 'none',
-          md: 'flex'
+          md: 'flex',
+          xl: 'flex'
         }}
       >
         <DesktopHeaderLink to="/marketplace">
@@ -278,7 +283,7 @@ function NavItems() {
               <Text ml={2}>New Asset</Text>
             </DesktopHeaderLink>
           </>
-        ) : null}
+        ) : null }
         <Flex
           alignItems="center"
           color="brand.gray"
@@ -295,8 +300,10 @@ function NavItems() {
 }
 
 export function Header() {
-  const [location, setLocation] = useLocation();
-  if (location === '/' || location === '') {
+
+  const router = useRouter();
+
+  if (router.pathname === '/' || router.pathname === '') {
     return null;
   }
   return (
@@ -308,33 +315,7 @@ export function Header() {
       alignItems="center"
       justifyContent="space-between"
     >
-      <Image
-        display={{
-          base: 'none',
-          md: 'block'
-        }}
-        maxH="28px"
-        marginTop="4px"
-        src={logo}
-        onClick={e => {
-          e.preventDefault();
-          setLocation('/collections');
-        }}
-        cursor="pointer"
-      />
-      <Image
-        display={{
-          base: 'block',
-          md: 'none'
-        }}
-        maxW="38px"
-        src={headerLogo}
-        onClick={e => {
-          e.preventDefault();
-          setLocation('/collections');
-        }}
-        cursor="pointer"
-      />
+
       <NavItems />
     </Flex>
   );

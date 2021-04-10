@@ -7,6 +7,7 @@ import TokenCard from '../../components/Marketplace/Catalog/TokenCard';
 import FeaturedToken from '../../components/Marketplace/Catalog/FeaturedToken';
 import { RehydrateAction } from 'redux-persist';
 import { Nft } from '../../lib/nfts/queries';
+import Notifications from '../../components/common/Notifications';
 
 export default function Catalog() {
   const { system, marketplace: state } = useSelector(s => s);
@@ -32,10 +33,8 @@ export default function Catalog() {
       justify="start"
       flexDir="column"
     >
-      {state.marketplace.loaded && tokens.length > 0 ? (
-        <Box>
+     {state.marketplace.loaded && tokens.length > 0 ? (
           <FeaturedToken network={system.config.network} {...tokens[0]} />
-        </Box>
       ) : null}
       <Container maxW="80em">
         <Flex
@@ -88,6 +87,7 @@ export default function Catalog() {
           )}
         </Flex>
       </Container>
+      <Notifications/>
     </Flex>
   );
 }

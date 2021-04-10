@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'wouter';
+import { useRouter } from 'next/router';
 import { AspectRatio, Box, Flex, SimpleGrid, Image, Text } from '@chakra-ui/react';
 import { Wind, HelpCircle } from 'react-feather';
 import { Token, CollectionsState } from '../../../reducer/slices/collections';
@@ -80,7 +80,9 @@ function TokenImage(props: { src: string }) {
 }
 
 function TokenTile(props: TokenTileProps) {
-  const [, setLocation] = useLocation();
+
+  const router = useRouter();
+
   return (
     <Flex
       flexDir="column"
@@ -98,7 +100,7 @@ function TokenTile(props: TokenTileProps) {
         boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.1)'
       }}
       onClick={() =>
-        setLocation(`/collection/${props.selectedCollection}/token/${props.id}`)
+        router.push(`/collection/${props.selectedCollection}/token/${props.id}`)
       }
     >
       <AspectRatio ratio={3 / 2}>

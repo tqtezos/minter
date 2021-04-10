@@ -1,9 +1,10 @@
 import './styles/globals.css';
 import React from 'react';
-import { Provider } from 'react-redux';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
-import { store, persistor, wrapper } from '../reducer';
+import { persistor, wrapper } from '../reducer';
 import { PersistGate } from 'redux-persist/integration/react';
+
+// import Head from 'next/head';
 
 const Button = {
   variants: {
@@ -253,11 +254,9 @@ const theme = extendTheme({
 function MyApp({ Component, pageProps }) {
 
   return (
-      <PersistGate loading={null} persistor={persistor}>
-      <ChakraProvider theme={theme}>
-        <Component {...pageProps} />
-      </ChakraProvider>
-      </PersistGate>
+    <ChakraProvider theme={theme}>
+      <Component {...pageProps} />
+    </ChakraProvider>
   )
 }
 

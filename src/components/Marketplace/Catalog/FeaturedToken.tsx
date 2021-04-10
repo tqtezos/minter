@@ -1,6 +1,6 @@
 import React from 'react';
 import { Token } from '../../../reducer/slices/collections';
-import { useLocation } from 'wouter';
+import { useRouter } from 'next/router';
 import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 import {
   AspectRatio,
@@ -20,11 +20,13 @@ interface FeaturedTokenProps extends Token {
 }
 
 export default function FeaturedToken(props: FeaturedTokenProps) {
-  const [, setLocation] = useLocation();
+
+  const router = useRouter();
+
   return (
     <Container maxW="65em" py={10}>
-      <Stack direction={{ base: 'column', md: 'row' }} spacing="24px" mb={10}>
-        <AspectRatio maxW="400px" ratio={3 / 2} width="100%">
+      <Stack direction={{ base: 'column', md: 'row' }} spacing="24px">
+        <AspectRatio maxW="400px" width="100%" _before={{pb: '0%'}}>
           <TokenMedia
             src={ipfsUriToGatewayUrl(props.network, props.artifactUri)}
           />
@@ -54,9 +56,7 @@ export default function FeaturedToken(props: FeaturedTokenProps) {
               my={4}
               onClick={e => {
                 e.preventDefault();
-                setLocation(`/collection/${props.address}/token/${props.id}`, {
-                  replace: false
-                });
+                router.push(`/collection/${props.address}/token/${props.id}`);
               }}
             >
               <Text>View</Text>

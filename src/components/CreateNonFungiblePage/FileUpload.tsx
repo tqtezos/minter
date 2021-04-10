@@ -1,6 +1,7 @@
 import React, { createRef, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Box, Flex, Heading, Text, Image } from '@chakra-ui/react';
+import { Box, Flex, Heading, Text } from '@chakra-ui/react';
+import Image from 'next/image';
 import { useSelector, useDispatch } from '../../reducer';
 import { readFileAsDataUrlAction } from '../../reducer/async/actions';
 import {

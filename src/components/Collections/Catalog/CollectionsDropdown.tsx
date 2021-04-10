@@ -10,7 +10,7 @@ import {
   MenuItemOption,
   Text
 } from '@chakra-ui/react';
-import { useSelector, useDispatch } from '../../../reducer';
+import { useDispatch, useSelector } from '../../../reducer';
 import { selectCollection } from '../../../reducer/slices/collections';
 import { RehydrateAction } from 'redux-persist';
 import { ChevronDown, RefreshCw } from 'react-feather';
