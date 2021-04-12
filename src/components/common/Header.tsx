@@ -84,11 +84,10 @@ function DesktopHeaderLink(props: DesktopHeaderLinkProps) {
       px={3}
       py={2}
       ml={4}
-      bg={selected ? 'gray.300' : 'none'}
-      color={selected ? 'gray.800' : 'gray.800'}
+      bg={selected ? 'gray.700' : 'none'}
+      color={selected ? 'gray.400' : 'gray.200'}
       display="flex"
       transition="none"
-      borderColor="#3D464F"
       _hover={{
         textDecor: 'none',
         bg: 'gray.700',
@@ -302,14 +301,12 @@ export function Header() {
   return (
     <Flex
       width="100%"
-      bg="white"
+      bg="brand.black"
       paddingX={4}
       paddingY={3}
       alignItems="center"
       justifyContent="space-between"
       boxShadow="0px 2px 10px #3333"
-      borderBottom="2px solid #333"
-      zIndex-="200"
     >
       <Image
         display={{

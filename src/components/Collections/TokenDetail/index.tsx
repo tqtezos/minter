@@ -94,6 +94,7 @@ function TokenImage(props: {
   src: string;
   width?: string;
   maxWidth?: string;
+  maxHeight?: string;
   height?: string;
   objectFit?: ResponsiveValue<any>;
   onLoad?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
@@ -128,11 +129,12 @@ function TokenImage(props: {
         id={props.id || 'assetImage'}
         key={props.id || 'assetImage'}
         src={props.src}
-        objectFit="scale-down"
+        objectFit={props.objectFit ?? "scale-down"}
         flex="1"
-        height="100%"
+        height={props.height ?? "100%"}
         width={props.width}
         maxWidth={props.maxWidth}
+        maxHeight={props.maxHeight ?? 'unset'}
         onError={() => setErrored(true)}
         onLoad={props.onLoad}
       />
@@ -191,9 +193,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       img.style.width = `${imageWidth * zoom}px`;
       img.style.height = `${imageHeight * zoom}px`;
       if (isPortrait && imageHeight > imageWidth) {
-        img.style.margin = `calc((((${
-          imageHeight - wHeight
-        }px) / 2) * ${initialZoom} - 80px) * ${1 - zoom}) auto`;
+        img.style.margin = `calc((((${imageHeight - wHeight
+          }px) / 2) * ${initialZoom} - 80px) * ${1 - zoom}) auto`;
       }
     }
   }, [imageHeight, imageWidth, initialZoom, zoom]);
@@ -223,13 +224,14 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
         <ModalOverlay />
         <ModalContent
           m="1rem"
-          maxHeight="calc(100vh - 2rem)"
-          maxWidth="calc(100vh - 2rem)"
+          maxHeight="calc(100vh - 4rem)"
+          maxWidth="calc(100vh - 4rem)"
           display="flex"
           flexDirection="column"
           flexWrap="nowrap"
           justifyContent="center"
           alignItems="center"
+          position="relative"
         >
           {/^image\/.*/.test(mediaType) ? (
             <Flex
@@ -239,7 +241,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               top={0}
               left={0}
             >
-              <ModalCloseButton position="relative" left={0} top={0} width="3rem"/>
               <Slider
                 defaultValue={initialZoom}
                 min={initialZoom}
@@ -256,13 +257,19 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               </Slider>
             </Flex>
           ) : (
-            <ModalCloseButton />
+            ''
           )}
 
           <TokenImage
             id="fullScreenAssetView"
             src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
+            width="auto"
+            height="auto"
+            maxWidth="85%"
+            maxHeight="85%"
+            objectFit="contain"
           />
+          <ModalCloseButton position="absolute" right="0 !important" bottom="0 !important" display="block !important" fontSize="18px" top="unset" borderLeft="2px solid #333" borderTop="2px solid #333" width="4rem" height="4rem" borderRight="none" borderBottom="none" borderTopEndRadius="0" borderBottomStartRadius="0" />
         </ModalContent>
       </Modal>
       <Flex pt={8} px={8}>
