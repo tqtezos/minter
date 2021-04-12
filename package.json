@@ -49,7 +49,7 @@
   },
   "scripts": {
     "start": "yarn start:testnet",
-    "start:testnet": "react-scripts start",
+    "start:testnet": "cp ./config/testnet.json src/config.json && react-scripts start",
     "start:sandbox": "cp ./config/sandbox-bootstrapped.json src/config.json && react-scripts start",
     "start:mainnet": "cp ./config/mainnet.json src/config.json && react-scripts start",
     "build": "react-scripts build",
