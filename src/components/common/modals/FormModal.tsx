@@ -99,12 +99,14 @@ type AsyncThunkActionResult = { requestId: string } & Promise<{
 }>;
 
 interface FormModalProps {
+  // Required Props
   disclosure: UseDisclosureReturn;
   method: Method;
-  button?: (onOpen: () => void) => React.ReactNode;
   form: (onSubmit: () => Promise<void>) => React.ReactNode;
-  initialRef?: React.MutableRefObject<null>;
   submit: () => AsyncThunkActionResult;
+  // Optional Props
+  initialRef?: React.MutableRefObject<null>;
+  button?: (onOpen: () => void) => React.ReactNode;
   cleanup?: () => void;
   sync?: boolean;
   pendingMessage?: string;
@@ -115,16 +117,17 @@ export default function FormModal(props: FormModalProps) {
   const { isOpen, onOpen, onClose } = props.disclosure;
   const [requestId, setRequestId] = useState<string | null>(null);
   const status = useSelector(s => s.status[props.method]);
+  const dispatch = useDispatch();
   const notification = useSelector(s =>
     s.notifications.find(
       n => n.requestId === requestId && n.status === 'warning' && !n.delivered
     )
   );
-  const dispatch = useDispatch();
 
   const onSubmit = async () => {
     const result = props.submit();
     setRequestId(result.requestId);
+    dispatch(setStatus({ method: props.method, status: 'in_transit' }));
     const requestStatus = (await result).meta.requestStatus;
     if (requestStatus === 'fulfilled') {
       dispatch(

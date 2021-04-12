@@ -25,6 +25,7 @@ export default function Notifications() {
         status: notification.status,
         duration: 10000,
         isClosable: true,
+        position: 'bottom-right',
         onCloseComplete() {
           dispatch(readNotification(notification.requestId));
         }
