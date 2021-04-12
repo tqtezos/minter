@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  MutableRefObject,
-  SetStateAction,
-  Dispatch
-} from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   FormControl,
@@ -14,51 +9,13 @@ import {
   ModalBody,
   ModalCloseButton,
   Text,
-  useDisclosure,
-  UseDisclosureReturn
+  useDisclosure
 } from '@chakra-ui/react';
 import { Plus } from 'react-feather';
 import { MinterButton } from '../../common/index';
 import { useDispatch } from '../../../reducer';
 import { transferTokenAction } from '../../../reducer/async/actions';
 import FormModal, { BaseModalProps, BaseModalButtonProps } from './FormModal';
-
-interface FormProps {
-  initialRef: MutableRefObject<null>;
-  onSubmit: (form: { toAddress: string }) => void;
-  toAddress: string;
-  setToAddress: Dispatch<SetStateAction<string>>;
-}
-
-function Form({ initialRef, onSubmit, toAddress, setToAddress }: FormProps) {
-  return (
-    <>
-      <ModalHeader>Transfer Token</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        <FormControl>
-          <FormLabel fontFamily="mono">To Address</FormLabel>
-          <Input
-            autoFocus={true}
-            ref={initialRef}
-            placeholder="Input token recipient"
-            value={toAddress}
-            onChange={e => setToAddress(e.target.value)}
-          />
-        </FormControl>
-      </ModalBody>
-
-      <ModalFooter>
-        <MinterButton
-          variant="primaryAction"
-          onClick={() => onSubmit({ toAddress })}
-        >
-          Transfer
-        </MinterButton>
-      </ModalFooter>
-    </>
-  );
-}
 
 interface TransferTokenModalProps extends BaseModalProps {
   contractAddress: string;
@@ -74,7 +31,7 @@ export function TransferTokenModal(props: TransferTokenModalProps) {
       disclosure={props.disclosure}
       sync={props.sync}
       method="transferToken"
-      submit={() =>
+      dispatchThunk={() =>
         dispatch(
           transferTokenAction({
             contract: props.contractAddress,
@@ -88,12 +45,28 @@ export function TransferTokenModal(props: TransferTokenModalProps) {
       pendingMessage="Transferring token..."
       completeMessage="Transfer complete"
       form={onSubmit => (
-        <Form
-          initialRef={initialRef}
-          onSubmit={onSubmit}
-          toAddress={toAddress}
-          setToAddress={setToAddress}
-        />
+        <>
+          <ModalHeader>Transfer Token</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel fontFamily="mono">To Address</FormLabel>
+              <Input
+                autoFocus={true}
+                ref={initialRef}
+                placeholder="Input token recipient"
+                value={toAddress}
+                onChange={e => setToAddress(e.target.value)}
+              />
+            </FormControl>
+          </ModalBody>
+
+          <ModalFooter>
+            <MinterButton variant="primaryAction" onClick={() => onSubmit()}>
+              Transfer
+            </MinterButton>
+          </ModalFooter>
+        </>
       )}
     />
   );

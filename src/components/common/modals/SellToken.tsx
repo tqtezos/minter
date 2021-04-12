@@ -23,49 +23,6 @@ import { useDispatch } from '../../../reducer';
 import { listTokenAction } from '../../../reducer/async/actions';
 import FormModal, { BaseModalProps, BaseModalButtonProps } from './FormModal';
 
-interface FormProps {
-  initialRef: MutableRefObject<null>;
-  onSubmit: () => void;
-  salePrice: string;
-  setSalePrice: Dispatch<SetStateAction<string>>;
-}
-
-function Form({ initialRef, onSubmit, salePrice, setSalePrice }: FormProps) {
-  return (
-    <>
-      <ModalHeader>Set your price</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        <Flex>
-          <FormControl>
-            <InputGroup>
-              <InputLeftElement
-                pointerEvents="none"
-                color="gray.900"
-                fontSize="1.2em"
-                children="ꜩ"
-              />
-              <Input
-                autoFocus={true}
-                ref={initialRef}
-                placeholder="Enter sale amount"
-                value={salePrice}
-                onChange={e => setSalePrice(e.target.value)}
-              />
-            </InputGroup>
-          </FormControl>
-          <Box ml={2}>
-            <MinterButton variant="primaryAction" onClick={() => onSubmit()}>
-              <Check />
-            </MinterButton>
-          </Box>
-        </Flex>
-      </ModalBody>
-      <ModalFooter />
-    </>
-  );
-}
-
 interface SellTokenModalProps extends BaseModalProps {
   contract: string;
   tokenId: number;
@@ -79,7 +36,7 @@ export function SellTokenModal(props: SellTokenModalProps) {
     <FormModal
       disclosure={props.disclosure}
       method="listToken"
-      submit={() => {
+      dispatchThunk={() => {
         const price = Math.floor(Number(salePrice) * 1000000);
         const validPrice = Number.isNaN(price) ? 0 : price;
         return dispatch(listTokenAction({ ...props, salePrice: validPrice }));
@@ -89,12 +46,40 @@ export function SellTokenModal(props: SellTokenModalProps) {
       pendingMessage="Listing token for sale..."
       completeMessage="Token listed for sale"
       form={onSubmit => (
-        <Form
-          initialRef={initialRef}
-          onSubmit={onSubmit}
-          salePrice={salePrice}
-          setSalePrice={setSalePrice}
-        />
+        <>
+          <ModalHeader>Set your price</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Flex>
+              <FormControl>
+                <InputGroup>
+                  <InputLeftElement
+                    pointerEvents="none"
+                    color="gray.900"
+                    fontSize="1.2em"
+                    children="ꜩ"
+                  />
+                  <Input
+                    autoFocus={true}
+                    ref={initialRef}
+                    placeholder="Enter sale amount"
+                    value={salePrice}
+                    onChange={e => setSalePrice(e.target.value)}
+                  />
+                </InputGroup>
+              </FormControl>
+              <Box ml={2}>
+                <MinterButton
+                  variant="primaryAction"
+                  onClick={() => onSubmit()}
+                >
+                  <Check />
+                </MinterButton>
+              </Box>
+            </Flex>
+          </ModalBody>
+          <ModalFooter />
+        </>
       )}
     />
   );

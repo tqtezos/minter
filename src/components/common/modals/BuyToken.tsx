@@ -15,38 +15,6 @@ import { buyTokenAction } from '../../../reducer/async/actions';
 import { Nft } from '../../../lib/nfts/queries';
 import FormModal, { BaseModalProps, BaseModalButtonProps } from './FormModal';
 
-interface FormProps {
-  onSubmit: () => void;
-  token: Nft;
-}
-
-function Form(props: FormProps) {
-  return (
-    <>
-      <ModalHeader>Checkout</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        <Text>
-          You are about to purchase
-          <Box as="span" fontWeight="bold">
-            {' '}
-            {props.token.title} (ꜩ {props.token.sale?.price})
-          </Box>
-        </Text>
-      </ModalBody>
-      <ModalFooter>
-        <Button
-          variant="primaryAction"
-          onClick={props.onSubmit}
-          isFullWidth={true}
-        >
-          Buy now
-        </Button>
-      </ModalFooter>
-    </>
-  );
-}
-
 interface BuyTokenModalProps extends BaseModalProps {
   contract: string;
   token: Nft;
@@ -60,7 +28,7 @@ export function BuyTokenModal(props: BuyTokenModalProps) {
       disclosure={props.disclosure}
       sync={props.sync}
       method="buyToken"
-      submit={() =>
+      dispatchThunk={() =>
         dispatch(
           buyTokenAction({
             contract: props.contract,
@@ -73,7 +41,30 @@ export function BuyTokenModal(props: BuyTokenModalProps) {
       initialRef={initialRef}
       pendingMessage="Purchasing token..."
       completeMessage="Token purchased"
-      form={onSubmit => <Form onSubmit={onSubmit} token={props.token} />}
+      form={onSubmit => (
+        <>
+          <ModalHeader>Checkout</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>
+              You are about to purchase
+              <Box as="span" fontWeight="bold">
+                {' '}
+                {props.token.title} (ꜩ {props.token.sale?.price})
+              </Box>
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="primaryAction"
+              onClick={() => onSubmit()}
+              isFullWidth={true}
+            >
+              Buy now
+            </Button>
+          </ModalFooter>
+        </>
+      )}
     />
   );
 }

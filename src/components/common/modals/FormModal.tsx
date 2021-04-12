@@ -103,7 +103,7 @@ interface FormModalProps {
   disclosure: UseDisclosureReturn;
   method: Method;
   form: (onSubmit: () => Promise<void>) => React.ReactNode;
-  submit: () => AsyncThunkActionResult;
+  dispatchThunk: () => AsyncThunkActionResult;
   // Optional Props
   initialRef?: React.MutableRefObject<null>;
   button?: (onOpen: () => void) => React.ReactNode;
@@ -125,7 +125,7 @@ export default function FormModal(props: FormModalProps) {
   );
 
   const onSubmit = async () => {
-    const result = props.submit();
+    const result = props.dispatchThunk();
     setRequestId(result.requestId);
     dispatch(setStatus({ method: props.method, status: 'in_transit' }));
     const requestStatus = (await result).meta.requestStatus;

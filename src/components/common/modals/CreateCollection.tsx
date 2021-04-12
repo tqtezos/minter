@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  MutableRefObject,
-  SetStateAction,
-  Dispatch
-} from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Text,
@@ -22,47 +17,6 @@ import { useDispatch } from '../../../reducer';
 import { createAssetContractAction } from '../../../reducer/async/actions';
 import FormModal, { BaseModalProps, BaseModalButtonProps } from './FormModal';
 
-interface FormProps {
-  initialRef: MutableRefObject<null>;
-  onSubmit: (form: { contractName: string }) => void;
-  contractName: string;
-  setContractName: Dispatch<SetStateAction<string>>;
-}
-
-function Form({
-  initialRef,
-  onSubmit,
-  contractName,
-  setContractName
-}: FormProps) {
-  return (
-    <>
-      <ModalHeader>New Collection</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        <FormControl>
-          <FormLabel fontFamily="mono">Collection Name</FormLabel>
-          <Input
-            autoFocus={true}
-            ref={initialRef}
-            placeholder="Input your collection name"
-            value={contractName}
-            onChange={e => setContractName(e.target.value)}
-          />
-        </FormControl>
-      </ModalBody>
-      <ModalFooter>
-        <MinterButton
-          variant="primaryAction"
-          onClick={() => onSubmit({ contractName })}
-        >
-          Create Collection
-        </MinterButton>
-      </ModalFooter>
-    </>
-  );
-}
-
 interface CreateCollectionModalProps extends BaseModalProps {}
 
 function CreateCollectionModal(props: CreateCollectionModalProps) {
@@ -74,18 +28,33 @@ function CreateCollectionModal(props: CreateCollectionModalProps) {
       disclosure={props.disclosure}
       sync={props.sync}
       method="createAssetContract"
-      submit={() => dispatch(createAssetContractAction(contractName))}
+      dispatchThunk={() => dispatch(createAssetContractAction(contractName))}
       cleanup={() => setContractName('')}
       initialRef={initialRef}
       pendingMessage="Creating collection..."
       completeMessage="Collection created"
       form={onSubmit => (
-        <Form
-          initialRef={initialRef}
-          onSubmit={onSubmit}
-          contractName={contractName}
-          setContractName={setContractName}
-        />
+        <>
+          <ModalHeader>New Collection</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel fontFamily="mono">Collection Name</FormLabel>
+              <Input
+                autoFocus={true}
+                ref={initialRef}
+                placeholder="Input your collection name"
+                value={contractName}
+                onChange={e => setContractName(e.target.value)}
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <MinterButton variant="primaryAction" onClick={() => onSubmit()}>
+              Create Collection
+            </MinterButton>
+          </ModalFooter>
+        </>
       )}
     />
   );
