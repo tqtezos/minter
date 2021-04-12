@@ -62,7 +62,10 @@ export default function Catalog() {
         w="250px"
         h="100%"
         flexDir="column"
-        overflowY="scroll"
+        overflowY="auto"
+        borderRight="2px solid #3D464F"
+        box-shadow="2px 0px 10px #3333"
+        zIndex="100"
         display={{
           base: 'none',
           md: 'flex'

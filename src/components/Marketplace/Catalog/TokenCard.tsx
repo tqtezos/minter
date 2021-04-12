@@ -17,11 +17,11 @@ export default function TokenCard(props: TokenCardProps) {
       ratio={1}
       w="100%"
       bg="white"
-      border="1px solid"
-      borderColor="brand.lightBlue"
+      border="2px solid"
+      borderColor="#3D464F"
       borderRadius="3px"
       overflow="hidden"
-      boxShadow="0px 0px 0px 4px rgba(15, 97, 255, 0)"
+      boxShadow="0px 0px 10px #3333"
       transition="all linear 50ms"
       _hover={{
         cursor: 'pointer',

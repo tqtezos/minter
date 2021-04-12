@@ -24,18 +24,17 @@ export default function Catalog() {
       w="100%"
       h="100%"
       bg="brand.brightGray"
-      px={10}
       pt={6}
       overflowY="scroll"
       justify="start"
       flexDir="column"
     >
       {state.marketplace.loaded && tokens.length > 0 ? (
-        <Box>
+        <Box borderBottom="2px solid #333" marginBottom="2.5rem">
           <FeaturedToken network={system.config.network} {...tokens[0]} />
         </Box>
       ) : null}
-      <Container maxW="80em">
+      <Container maxW="100%">
         <Flex
           flex="1"
           w="100%"

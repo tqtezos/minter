@@ -87,11 +87,11 @@ function TokenTile(props: TokenTileProps) {
       ratio={1}
       w="100%"
       bg="white"
-      border="1px solid"
-      borderColor="brand.lightBlue"
-      borderRadius="3px"
+      border="2px solid"
+      borderColor="666"
+      borderRadius="0px"
       overflow="hidden"
-      boxShadow="0px 0px 0px 4px rgba(15, 97, 255, 0)"
+      boxShadow="0px 0px 10px #3333"
       transition="all linear 50ms"
       _hover={{
         cursor: 'pointer',

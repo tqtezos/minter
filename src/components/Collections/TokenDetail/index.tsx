@@ -165,11 +165,10 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
   const collection = state.collections[contractAddress];
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [zoom, setZoom] = useState(0);
-  const [initialZoom, setInitialZoom] = useState(0);
-  const [imageHeight, setImageHeight] = useState(0);
-  const [imageWidth, setImageWidth] = useState(0);
-  const [mediaType, setMediaType] = useState('');
-  const [shouldScroll, setShouldScroll] = useState(false);
+  const [initialZoom] = useState(0);
+  const [imageHeight] = useState(0);
+  const [imageWidth] = useState(0);
+  const [mediaType] = useState('');
 
   const collectionUndefined = collection === undefined;
 
@@ -223,42 +222,14 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       >
         <ModalOverlay />
         <ModalContent
-          overflow="auto"
           m="1rem"
           maxHeight="calc(100vh - 2rem)"
-          display="unset"
-          onLoad={e => {
-            const img = document.getElementById('fullScreenAssetView');
-            const wHeight = window.innerHeight - 80;
-            const wWidth = window.innerWidth - 32;
-            const isLandscape = wHeight < wWidth;
-            const isPortrait = wHeight > wWidth;
-
-            if (img) {
-              if (!shouldScroll) {
-                img.style.margin = `calc(${
-                  (e.currentTarget.scrollHeight - imageHeight) / 2
-                }px - 3rem) auto`;
-              }
-              if (isLandscape) {
-                if (imageHeight > e.currentTarget.scrollHeight) {
-                  img.style.height = `calc(100% - 3rem)`;
-                  img.style.margin = 'auto';
-                } else if (imageWidth > e.currentTarget.scrollWidth) {
-                  img.style.width = `100%`;
-                  img.style.paddingTop = `calc(25% - 3rem)`;
-                }
-              } else if (isPortrait) {
-                if (imageHeight > e.currentTarget.scrollHeight) {
-                  img.style.margin = `calc(((${
-                    imageHeight - e.currentTarget.scrollHeight
-                  }px) / 2) * ${initialZoom} - 80px) auto`;
-                } else if (imageWidth > e.currentTarget.scrollWidth) {
-                  img.style.paddingTop = `calc(25% - 3rem)`;
-                }
-              }
-            }
-          }}
+          maxWidth="calc(100vh - 2rem)"
+          display="flex"
+          flexDirection="column"
+          flexWrap="nowrap"
+          justifyContent="center"
+          alignItems="center"
         >
           {/^image\/.*/.test(mediaType) ? (
             <Flex
@@ -268,7 +239,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               top={0}
               left={0}
             >
-              <ModalCloseButton position="relative" left={0} top={0} />
+              <ModalCloseButton position="relative" left={0} top={0} width="3rem"/>
               <Slider
                 defaultValue={initialZoom}
                 min={initialZoom}
@@ -319,39 +290,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       >
         <TokenImage
           src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
-          height="85%"
-          onLoad={e => {
-            const iHeight = e.currentTarget.height;
-            const iWidth = e.currentTarget.width;
-            const wHeight = window.innerHeight - 80;
-            const wWidth = window.innerWidth - 32;
-            const isLandscape = wHeight < wWidth;
-            const isPortrait = wWidth < wHeight;
-
-            const isImageBiggerThanModal = iHeight > wHeight || iWidth > wWidth;
-
-            setShouldScroll(isImageBiggerThanModal);
-
-            if (isImageBiggerThanModal) {
-              if (isLandscape) {
-                if (iHeight > iWidth) {
-                  const initialZoom = wHeight / iHeight;
-                  setInitialZoom(initialZoom);
-                } else {
-                  const initialZoom = wWidth / iWidth;
-                  setInitialZoom(initialZoom);
-                }
-              } else if (isPortrait) {
-                const initialZoom = wWidth / iWidth;
-                setInitialZoom(initialZoom);
-              }
-            } else {
-              setInitialZoom(1);
-            }
-            setImageHeight(iHeight);
-            setImageWidth(iWidth);
-          }}
-          onFetch={setMediaType}
+          height="75%"
+          width="auto"
         />{' '}
         <Flex align="center" justify="space-evenly" width={['100%']} mt="4">
           {isOwner ? (
@@ -430,7 +370,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           </Button>
         </Flex>
       </Flex>
-      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1}>
+      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1} borderTop="2px solid #3D464F">
         <Flex
           width={['90%', '70%']}
           mx="auto"

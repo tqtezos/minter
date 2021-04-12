@@ -22,9 +22,9 @@ interface FeaturedTokenProps extends Token {
 export default function FeaturedToken(props: FeaturedTokenProps) {
   const [, setLocation] = useLocation();
   return (
-    <Container maxW="65em" py={10}>
-      <Stack direction={{ base: 'column', md: 'row' }} spacing="24px" mb={10}>
-        <AspectRatio maxW="400px" ratio={3 / 2} width="100%">
+    <Container maxW="100%" py={10}>
+      <Stack width="100%" direction={{ base: 'column', md: 'row' }} spacing="24px" mb={10} display="flex" flexDir="row" flexWrap="wrap" justifyContent="center" align-alignItems="center">
+        <AspectRatio maxW="650px" width="100%">
           <TokenMedia
             src={ipfsUriToGatewayUrl(props.network, props.artifactUri)}
           />
