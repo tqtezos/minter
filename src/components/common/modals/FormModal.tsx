@@ -195,3 +195,12 @@ export default function FormModal(props: FormModalProps) {
     </>
   );
 }
+
+export interface BaseModalProps {
+  disclosure: UseDisclosureReturn;
+  sync?: boolean;
+}
+
+export interface BaseModalButtonProps {
+  sync?: boolean;
+}

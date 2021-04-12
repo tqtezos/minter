@@ -378,7 +378,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 )}
               </MenuList>
               <TransferTokenModal
-                sync={false}
                 contractAddress={contractAddress}
                 tokenId={tokenId}
                 disclosure={disclosure}

@@ -7,14 +7,13 @@ import {
   ModalBody,
   ModalCloseButton,
   Text,
-  useDisclosure,
-  UseDisclosureReturn
+  useDisclosure
 } from '@chakra-ui/react';
 import { MinterButton } from '../../common';
 import { useDispatch } from '../../../reducer';
 import { buyTokenAction } from '../../../reducer/async/actions';
 import { Nft } from '../../../lib/nfts/queries';
-import FormModal from './FormModal';
+import FormModal, { BaseModalProps, BaseModalButtonProps } from './FormModal';
 
 interface FormProps {
   onSubmit: () => void;
@@ -48,9 +47,7 @@ function Form(props: FormProps) {
   );
 }
 
-interface BuyTokenModalProps {
-  disclosure: UseDisclosureReturn;
-  sync: boolean;
+interface BuyTokenModalProps extends BaseModalProps {
   contract: string;
   token: Nft;
 }
@@ -74,12 +71,14 @@ export function BuyTokenModal(props: BuyTokenModalProps) {
         )
       }
       initialRef={initialRef}
+      pendingMessage="Purchasing token..."
+      completeMessage="Token purchased"
       form={onSubmit => <Form onSubmit={onSubmit} token={props.token} />}
     />
   );
 }
 
-interface BuyTokenButtonProps {
+interface BuyTokenButtonProps extends BaseModalButtonProps {
   contract: string;
   token: Nft;
 }
@@ -92,7 +91,7 @@ export function BuyTokenButton(props: BuyTokenButtonProps) {
         Buy now
       </MinterButton>
 
-      <BuyTokenModal {...props} disclosure={disclosure} sync={false} />
+      <BuyTokenModal {...props} disclosure={disclosure} sync={props.sync} />
     </>
   );
 }

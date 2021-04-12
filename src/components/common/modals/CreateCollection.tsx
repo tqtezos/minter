@@ -14,14 +14,13 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  useDisclosure,
-  UseDisclosureReturn
+  useDisclosure
 } from '@chakra-ui/react';
 import { Plus } from 'react-feather';
 import { MinterButton } from '../../common';
 import { useDispatch } from '../../../reducer';
 import { createAssetContractAction } from '../../../reducer/async/actions';
-import FormModal from './FormModal';
+import FormModal, { BaseModalProps, BaseModalButtonProps } from './FormModal';
 
 interface FormProps {
   initialRef: MutableRefObject<null>;
@@ -64,10 +63,9 @@ function Form({
   );
 }
 
-function CreateCollectionModal(props: {
-  sync: boolean;
-  disclosure: UseDisclosureReturn;
-}) {
+interface CreateCollectionModalProps extends BaseModalProps {}
+
+function CreateCollectionModal(props: CreateCollectionModalProps) {
   const [contractName, setContractName] = useState('');
   const dispatch = useDispatch();
   const initialRef = React.useRef(null);
@@ -93,7 +91,9 @@ function CreateCollectionModal(props: {
   );
 }
 
-export function CreateCollectionButton({ sync = false }) {
+interface CreateCollectionButtonProps extends BaseModalButtonProps {}
+
+export function CreateCollectionButton(props: CreateCollectionButtonProps) {
   const disclosure = useDisclosure();
   return (
     <>
@@ -103,7 +103,7 @@ export function CreateCollectionButton({ sync = false }) {
         </Box>
         <Text ml={2}>New Collection</Text>
       </MinterButton>
-      <CreateCollectionModal disclosure={disclosure} sync={sync} />
+      <CreateCollectionModal disclosure={disclosure} sync={props.sync} />
     </>
   );
 }

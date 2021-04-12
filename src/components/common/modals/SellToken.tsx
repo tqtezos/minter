@@ -21,7 +21,7 @@ import { Check } from 'react-feather';
 import { MinterButton } from '../../common';
 import { useDispatch } from '../../../reducer';
 import { listTokenAction } from '../../../reducer/async/actions';
-import FormModal from './FormModal';
+import FormModal, { BaseModalProps, BaseModalButtonProps } from './FormModal';
 
 interface FormProps {
   initialRef: MutableRefObject<null>;
@@ -66,43 +66,53 @@ function Form({ initialRef, onSubmit, salePrice, setSalePrice }: FormProps) {
   );
 }
 
-interface SellTokenButtonProps {
+interface SellTokenModalProps extends BaseModalProps {
+  contract: string;
+  tokenId: number;
+}
+
+export function SellTokenModal(props: SellTokenModalProps) {
+  const [salePrice, setSalePrice] = useState('');
+  const dispatch = useDispatch();
+  const initialRef = React.useRef(null);
+  return (
+    <FormModal
+      disclosure={props.disclosure}
+      method="listToken"
+      submit={() => {
+        const price = Math.floor(Number(salePrice) * 1000000);
+        const validPrice = Number.isNaN(price) ? 0 : price;
+        return dispatch(listTokenAction({ ...props, salePrice: validPrice }));
+      }}
+      cleanup={() => setSalePrice('')}
+      initialRef={initialRef}
+      pendingMessage="Listing token for sale..."
+      completeMessage="Token listed for sale"
+      form={onSubmit => (
+        <Form
+          initialRef={initialRef}
+          onSubmit={onSubmit}
+          salePrice={salePrice}
+          setSalePrice={setSalePrice}
+        />
+      )}
+    />
+  );
+}
+
+interface SellTokenButtonProps extends BaseModalButtonProps {
   contract: string;
   tokenId: number;
 }
 
 export function SellTokenButton(props: SellTokenButtonProps) {
   const disclosure = useDisclosure();
-  const [salePrice, setSalePrice] = useState('');
-  const dispatch = useDispatch();
-  const initialRef = React.useRef(null);
   return (
     <>
       <MinterButton variant="primaryAction" onClick={disclosure.onOpen}>
         List for sale
       </MinterButton>
-
-      <FormModal
-        disclosure={disclosure}
-        method="listToken"
-        submit={() => {
-          const price = Math.floor(Number(salePrice) * 1000000);
-          const validPrice = Number.isNaN(price) ? 0 : price;
-          return dispatch(listTokenAction({ ...props, salePrice: validPrice }));
-        }}
-        cleanup={() => setSalePrice('')}
-        initialRef={initialRef}
-        pendingMessage="Creating collection..."
-        completeMessage="Collection created"
-        form={onSubmit => (
-          <Form
-            initialRef={initialRef}
-            onSubmit={onSubmit}
-            salePrice={salePrice}
-            setSalePrice={setSalePrice}
-          />
-        )}
-      />
+      <SellTokenModal {...props} disclosure={disclosure} sync={props.sync} />
     </>
   );
 }

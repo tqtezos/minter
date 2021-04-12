@@ -12,7 +12,7 @@ import {
 import { MinterButton } from '../../common';
 import { useDispatch } from '../../../reducer';
 import { cancelTokenSaleAction } from '../../../reducer/async/actions';
-import FormModal from './FormModal';
+import FormModal, { BaseModalProps, BaseModalButtonProps } from './FormModal';
 
 interface FormProps {
   onSubmit: () => void;
@@ -39,9 +39,7 @@ function Form(props: FormProps) {
   );
 }
 
-interface CancelTokenSaleModalProps {
-  disclosure: UseDisclosureReturn;
-  sync: boolean;
+interface CancelTokenSaleModalProps extends BaseModalProps {
   contract: string;
   tokenId: number;
 }
@@ -56,6 +54,8 @@ export function CancelTokenSaleModal(props: CancelTokenSaleModalProps) {
       method="cancelTokenSale"
       submit={() => dispatch(cancelTokenSaleAction({ ...props }))}
       initialRef={initialRef}
+      pendingMessage="Canceling token sale..."
+      completeMessage="Token sale canceled"
       form={onSubmit => (
         <Form onSubmit={onSubmit} onClose={props.disclosure.onClose} />
       )}
@@ -63,7 +63,7 @@ export function CancelTokenSaleModal(props: CancelTokenSaleModalProps) {
   );
 }
 
-interface CancelTokenSaleButtonProps {
+interface CancelTokenSaleButtonProps extends BaseModalButtonProps {
   contract: string;
   tokenId: number;
 }
@@ -76,7 +76,11 @@ export function CancelTokenSaleButton(props: CancelTokenSaleButtonProps) {
         Cancel sale
       </MinterButton>
 
-      <CancelTokenSaleModal {...props} disclosure={disclosure} sync={false} />
+      <CancelTokenSaleModal
+        {...props}
+        disclosure={disclosure}
+        sync={props.sync}
+      />
     </>
   );
 }

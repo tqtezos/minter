@@ -21,7 +21,7 @@ import { Plus } from 'react-feather';
 import { MinterButton } from '../../common/index';
 import { useDispatch } from '../../../reducer';
 import { transferTokenAction } from '../../../reducer/async/actions';
-import FormModal from './FormModal';
+import FormModal, { BaseModalProps, BaseModalButtonProps } from './FormModal';
 
 interface FormProps {
   initialRef: MutableRefObject<null>;
@@ -60,11 +60,9 @@ function Form({ initialRef, onSubmit, toAddress, setToAddress }: FormProps) {
   );
 }
 
-interface TransferTokenModalProps {
+interface TransferTokenModalProps extends BaseModalProps {
   contractAddress: string;
   tokenId: number;
-  sync: boolean;
-  disclosure: UseDisclosureReturn;
 }
 
 export function TransferTokenModal(props: TransferTokenModalProps) {
@@ -87,6 +85,8 @@ export function TransferTokenModal(props: TransferTokenModalProps) {
       }
       cleanup={() => setToAddress('')}
       initialRef={initialRef}
+      pendingMessage="Transferring token..."
+      completeMessage="Transfer complete"
       form={onSubmit => (
         <Form
           initialRef={initialRef}
@@ -99,7 +99,7 @@ export function TransferTokenModal(props: TransferTokenModalProps) {
   );
 }
 
-interface TransferTokenButtonProps {
+interface TransferTokenButtonProps extends BaseModalButtonProps {
   contractAddress: string;
   tokenId: number;
 }
@@ -114,7 +114,11 @@ export function TransferTokenButton(props: TransferTokenButtonProps) {
         </Box>
         <Text ml={2}>Transfer Token</Text>
       </MinterButton>
-      <TransferTokenModal {...props} disclosure={disclosure} sync={false} />
+      <TransferTokenModal
+        {...props}
+        disclosure={disclosure}
+        sync={props.sync}
+      />
     </>
   );
 }
