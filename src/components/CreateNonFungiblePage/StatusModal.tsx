@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Flex,
@@ -15,6 +15,7 @@ import { Status } from '../../reducer/slices/status';
 
 interface StatusModalProps {
   isOpen: boolean;
+  onOpen: () => void;
   onClose: () => void;
   onRetry: () => void;
   onCancel: () => void;
@@ -60,9 +61,13 @@ function Content({ status, onClose, onRetry, onCancel }: StatusModalProps) {
         <Heading size="lg" textAlign="center" color="gray.500">
           Creating token...
         </Heading>
-        <br/>
+        <br />
         <Text size="xs" textAlign="center" color="gray.500">
-         <span role="img" aria-label="lightbulb">🌱</span> Minting on Tezos produces 1,500,000 times less CO2 emissions than Ethereum.
+          <span role="img" aria-label="lightbulb">
+            🌱
+          </span>{' '}
+          Minting on Tezos produces 1,500,000 times less CO2 emissions than
+          Ethereum.
         </Text>
       </Flex>
     );
@@ -86,7 +91,7 @@ function Content({ status, onClose, onRetry, onCancel }: StatusModalProps) {
 }
 
 export default function StatusModal(props: StatusModalProps) {
-  const { isOpen, onClose, status } = props;
+  const { isOpen, onClose, onOpen, status } = props;
   const initialRef = React.useRef(null);
 
   const close = () => {
@@ -94,6 +99,14 @@ export default function StatusModal(props: StatusModalProps) {
       onClose();
     }
   };
+
+  useEffect(() => {
+    if (isOpen && !status.error) {
+      return onClose();
+    } else if (!isOpen && status.error) {
+      return onOpen();
+    }
+  });
 
   return (
     <>

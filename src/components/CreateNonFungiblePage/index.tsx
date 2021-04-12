@@ -174,6 +174,7 @@ export default function CreateNonFungiblePage() {
             </MinterButton>
             <StatusModal
               isOpen={isOpen}
+              onOpen={onOpen}
               onClose={() => {
                 onClose();
                 setLocation('/collections');
