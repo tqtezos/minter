@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Text,
@@ -104,7 +104,7 @@ interface FormModalProps {
   disclosure: UseDisclosureReturn;
   method: Method;
   form: (onSubmit: () => Promise<void>) => React.ReactNode;
-  dispatchThunk: AsyncThunkActionResult | (() => AsyncThunkActionResult);
+  dispatchThunk: () => AsyncThunkActionResult;
   // Optional Props
   initialRef?: React.MutableRefObject<null>;
   button?: (onOpen: () => void) => React.ReactNode;
@@ -129,11 +129,8 @@ export default function FormModal(props: FormModalProps) {
     )
   );
 
-  const onSubmit = async () => {
-    const result =
-      props.dispatchThunk instanceof Function
-        ? props.dispatchThunk()
-        : props.dispatchThunk;
+  const onSubmit = useCallback(async () => {
+    const result = props.dispatchThunk();
     setRequestId(result.requestId);
     dispatch(setStatus({ method: props.method, status: 'in_transit' }));
     const requestStatus = (await result).meta.requestStatus;
@@ -146,7 +143,7 @@ export default function FormModal(props: FormModalProps) {
       );
       props.cleanup?.call(null);
     }
-  };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const hasError = status.error !== null;
 
@@ -154,7 +151,7 @@ export default function FormModal(props: FormModalProps) {
     if (isOpen && submitOnOpen && !hasError) {
       onSubmit();
     }
-  }, [isOpen, submitOnOpen, hasError]);
+  }, [isOpen, submitOnOpen, hasError, onSubmit]);
 
   const close = () => {
     if (status.status !== 'in_transit' || status.error) {
