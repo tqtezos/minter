@@ -145,7 +145,12 @@ function TokenImage(props: {
     return (
       <video
         controls
-        style={{ margin: 'auto', height: props.height || '100%' }}
+        style={{
+          margin: 'auto', height: props.height || '100%',
+          width: props.width,
+          maxWidth: props.maxWidth ?? 'unset',
+          maxHeight: props.maxHeight ?? 'unset' 
+        }}
       >
         <source src={obj.url} type={obj.type} />
       </video>
