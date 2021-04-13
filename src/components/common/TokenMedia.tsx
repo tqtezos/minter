@@ -49,7 +49,7 @@ export function TokenMedia(props: { src: string, maxW?: string }) {
         src={props.src}
         height="100%"
         flex="1"
-        style={{objectFit:"scale-down", maxWidth:props.maxW ?? 'inherit'}}
+        style={{objectFit:"scale-down", maxWidth:props.maxW ?? '100%'}}
         onError={() => setErrored(true)}
       />
     );
@@ -63,7 +63,7 @@ export function TokenMedia(props: { src: string, maxW?: string }) {
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
         height="100%"
-        style={{objectFit:"scale-down", maxWidth:props.maxW ?? 'unset'}}
+        style={{objectFit:"scale-down", maxWidth:props.maxW ?? '100%'}}
       >
         <source src={obj.url} type={obj.type} />
       </video>
