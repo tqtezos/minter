@@ -269,7 +269,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             maxHeight="85%"
             objectFit="contain"
           />
-          <ModalCloseButton position="absolute" right="0 !important" bottom="0 !important" display="block !important" fontSize="18px" top="unset" borderLeft="2px solid #333" borderTop="2px solid #333" width="4rem" height="4rem" borderRight="none" borderBottom="none" borderTopEndRadius="0" borderBottomStartRadius="0" />
+          <ModalCloseButton position="absolute" right="0 !important" bottom="0 !important" display="block !important" fontSize="18px" top="unset" borderLeft="2px solid #333" borderTop="2px solid #333" width="4rem" height="4rem" borderRight="none" borderBottom="none" borderTopEndRadius="0" border="0" />
         </ModalContent>
       </Modal>
       <Flex pt={8} px={8}>
@@ -288,7 +288,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       <Flex
         align="center"
         flex="1"
-        pb={[4, 16]}
+        pb={4}
         px={[4, 16]}
         mx="auto"
         width={['90%', '70%']}

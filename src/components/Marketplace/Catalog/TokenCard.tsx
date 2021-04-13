@@ -18,7 +18,7 @@ export default function TokenCard(props: TokenCardProps) {
       w="100%"
       bg="white"
       border="2px solid"
-      borderColor="#3D464F"
+      borderColor="#666"
       borderRadius="3px"
       overflow="hidden"
       boxShadow="0px 0px 10px #3333"

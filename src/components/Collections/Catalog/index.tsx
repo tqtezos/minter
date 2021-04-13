@@ -63,7 +63,7 @@ export default function Catalog() {
         h="100%"
         flexDir="column"
         overflowY="auto"
-        borderRight="2px solid #3D464F"
+        borderRight="2px solid #666"
         box-shadow="2px 0px 10px #3333"
         zIndex="100"
         display={{
@@ -93,6 +93,8 @@ export default function Catalog() {
           display={{ base: 'none', md: 'flex' }}
           w="100%"
           pb={6}
+          mb={10}
+          borderBottom="2px solid #666"
           justify="space-between"
           align={{
             base: 'flex-start',
