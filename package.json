@@ -51,7 +51,7 @@
     "start": "yarn start:testnet",
     "start:testnet": "cp ./config/testnet.json src/config.json && react-scripts start",
     "start:sandbox": "cp ./config/sandbox-bootstrapped.json src/config.json && react-scripts start",
-    "start:mainnet": "cp ./config/mainnet.json src/config.json && react-scripts start",
+    "start:mainnet": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
