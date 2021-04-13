@@ -286,11 +286,13 @@ export const listTokenAction = createAsyncThunk<
       tokenId,
       salePrice
     );
-    const pendingMessage = `Listing token for sale for ${salePrice / 1000000}`;
+    const pendingMessage = `Listing token for sale for ${salePrice / 1000000}ꜩ`;
     dispatch(notifyPending(requestId, pendingMessage));
     await op.confirmation(2);
 
-    const fulfilledMessage = `Token listed for sale for ${salePrice / 1000000}`;
+    const fulfilledMessage = `Token listed for sale for ${
+      salePrice / 1000000
+    }ꜩ`;
     dispatch(notifyFulfilled(requestId, fulfilledMessage));
     dispatch(getContractNftsQuery(contract));
     return args;

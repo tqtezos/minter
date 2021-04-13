@@ -27,8 +27,9 @@ interface ContentProps {
   onCancel: () => void;
   status: Status;
   sync: boolean;
-  pendingMessage?: string;
-  completeMessage?: string;
+  pendingMessage?: React.ReactNode;
+  pendingAsyncMessage?: React.ReactNode;
+  completeMessage?: React.ReactNode;
 }
 
 function Content(props: ContentProps) {
@@ -69,9 +70,9 @@ function Content(props: ContentProps) {
       <Flex flexDir="column" align="center" px={4} py={10}>
         <Spinner size="xl" mb={6} color="gray.300" />
         <Heading size="lg" textAlign="center" color="gray.500">
-          {!props.sync
-            ? 'Opening wallet...'
-            : props.pendingMessage || 'Operation pending...'}
+          {props.sync
+            ? props.pendingMessage || 'Operation pending...'
+            : props.pendingAsyncMessage || 'Opening wallet...'}
         </Heading>
       </Flex>
     );
@@ -94,7 +95,7 @@ function Content(props: ContentProps) {
   return null;
 }
 
-type AsyncThunkActionResult = { requestId: string } & Promise<{
+export type AsyncThunkActionResult = { requestId: string } & Promise<{
   meta: { requestStatus: 'fulfilled' | 'rejected' };
 }>;
 
@@ -103,17 +104,21 @@ interface FormModalProps {
   disclosure: UseDisclosureReturn;
   method: Method;
   form: (onSubmit: () => Promise<void>) => React.ReactNode;
-  dispatchThunk: () => AsyncThunkActionResult;
+  dispatchThunk: AsyncThunkActionResult | (() => AsyncThunkActionResult);
   // Optional Props
   initialRef?: React.MutableRefObject<null>;
   button?: (onOpen: () => void) => React.ReactNode;
   cleanup?: () => void;
   sync?: boolean;
-  pendingMessage?: string;
-  completeMessage?: string;
+  afterClose?: () => void;
+  pendingMessage?: React.ReactNode;
+  pendingAsyncMessage?: React.ReactNode;
+  completeMessage?: React.ReactNode;
+  submitOnOpen?: boolean;
 }
 
 export default function FormModal(props: FormModalProps) {
+  const { sync = false, submitOnOpen = false } = props;
   const { isOpen, onOpen, onClose } = props.disclosure;
   const [requestId, setRequestId] = useState<string | null>(null);
   const status = useSelector(s => s.status[props.method]);
@@ -125,7 +130,10 @@ export default function FormModal(props: FormModalProps) {
   );
 
   const onSubmit = async () => {
-    const result = props.dispatchThunk();
+    const result =
+      props.dispatchThunk instanceof Function
+        ? props.dispatchThunk()
+        : props.dispatchThunk;
     setRequestId(result.requestId);
     dispatch(setStatus({ method: props.method, status: 'in_transit' }));
     const requestStatus = (await result).meta.requestStatus;
@@ -133,12 +141,20 @@ export default function FormModal(props: FormModalProps) {
       dispatch(
         setStatus({
           method: props.method,
-          status: !props.sync ? 'ready' : 'complete'
+          status: sync ? 'complete' : 'ready'
         })
       );
       props.cleanup?.call(null);
     }
   };
+
+  const hasError = status.error !== null;
+
+  useEffect(() => {
+    if (isOpen && submitOnOpen && !hasError) {
+      onSubmit();
+    }
+  }, [isOpen, submitOnOpen, hasError]);
 
   const close = () => {
     if (status.status !== 'in_transit' || status.error) {
@@ -148,10 +164,13 @@ export default function FormModal(props: FormModalProps) {
   };
 
   useEffect(() => {
-    if (!props.sync && isOpen && !status.error && notification) {
-      return onClose();
+    if (!sync && isOpen && !status.error && notification) {
+      onClose();
+      props.afterClose && props.afterClose();
+      return;
     } else if (!isOpen && status.error) {
-      return onOpen();
+      onOpen();
+      return;
     }
   });
 
@@ -173,7 +192,7 @@ export default function FormModal(props: FormModalProps) {
             props.form(onSubmit)
           ) : (
             <Content
-              sync={props.sync || false}
+              sync={sync}
               isOpen={isOpen}
               status={status}
               onClose={() => close()}
@@ -187,6 +206,7 @@ export default function FormModal(props: FormModalProps) {
                 onSubmit();
               }}
               pendingMessage={props.pendingMessage}
+              pendingAsyncMessage={props.pendingAsyncMessage}
               completeMessage={props.completeMessage}
             />
           )}

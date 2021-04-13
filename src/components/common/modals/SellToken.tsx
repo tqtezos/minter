@@ -30,6 +30,7 @@ export function SellTokenModal(props: SellTokenModalProps) {
   return (
     <FormModal
       disclosure={props.disclosure}
+      sync={props.sync}
       method="listToken"
       dispatchThunk={() => {
         const price = Math.floor(Number(salePrice) * 1000000);
