@@ -117,7 +117,7 @@ interface FormModalProps {
 }
 
 export default function FormModal(props: FormModalProps) {
-  const { sync = false, dispatchOnOpen = false } = props;
+  const { sync = false, dispatchOnOpen = false, onComplete, method } = props;
   const { isOpen, onOpen, onClose } = props.disclosure;
   const [requestId, setRequestId] = useState<string | null>(null);
   const status = useSelector(s => s.status[props.method]);
@@ -132,42 +132,41 @@ export default function FormModal(props: FormModalProps) {
   const onSubmit = async () => {
     const result = props.dispatchThunk();
     setRequestId(result.requestId);
-    dispatch(setStatus({ method: props.method, status: 'in_transit' }));
+    dispatch(setStatus({ method, status: 'in_transit' }));
     const requestStatus = (await result).meta.requestStatus;
     if (requestStatus === 'fulfilled') {
-      dispatch(
-        setStatus({
-          method: props.method,
-          status: sync ? 'complete' : 'ready'
-        })
-      );
-      props.onComplete?.call(null);
+      dispatch(setStatus({ method, status: sync ? 'complete' : 'ready' }));
+      onComplete?.call(null);
     }
   };
 
   const hasError = status.error !== null;
 
   useEffect(() => {
-    if (isOpen && dispatchOnOpen && !hasError) {
+    if (!requestId && isOpen && dispatchOnOpen && !hasError) {
       onSubmit();
     }
-  }, [isOpen, dispatchOnOpen, hasError, onSubmit]);
+  }, [isOpen, dispatchOnOpen, hasError, onSubmit, requestId]);
 
-  const close = () => {
-    if (status.status !== 'in_transit' || status.error) {
-      dispatch(setStatus({ method: props.method, status: 'ready' }));
-      onClose();
+  const closeAndReset = (withCallback = true) => {
+    onClose();
+    setRequestId(null);
+    dispatch(clearError({ method: props.method }));
+    dispatch(setStatus({ method: props.method, status: 'ready' }));
+    withCallback && props.afterClose && props.afterClose();
+  };
+
+  const closeIfReadyOrComplete = () => {
+    if (status.status !== 'in_transit' || hasError) {
+      closeAndReset();
     }
   };
 
   useEffect(() => {
-    if (!sync && isOpen && !status.error && notification) {
-      onClose();
-      props.afterClose && props.afterClose();
-      return;
-    } else if (!isOpen && status.error) {
-      onOpen();
-      return;
+    if (!sync && isOpen && !hasError && notification) {
+      return closeAndReset();
+    } else if (!isOpen && hasError) {
+      return onOpen();
     }
   });
 
@@ -175,12 +174,12 @@ export default function FormModal(props: FormModalProps) {
     <>
       <Modal
         isOpen={isOpen}
-        onClose={() => close()}
+        onClose={() => closeIfReadyOrComplete()}
         initialFocusRef={props.initialRef}
         closeOnEsc={false}
         closeOnOverlayClick={false}
-        onEsc={() => close()}
-        onOverlayClick={() => close()}
+        onEsc={() => closeIfReadyOrComplete()}
+        onOverlayClick={() => closeIfReadyOrComplete()}
       >
         <ModalOverlay />
         <ModalContent mt={40}>
@@ -193,12 +192,8 @@ export default function FormModal(props: FormModalProps) {
               sync={sync}
               isOpen={isOpen}
               status={status}
-              onClose={() => close()}
-              onCancel={() => {
-                onClose();
-                dispatch(clearError({ method: props.method }));
-                dispatch(setStatus({ method: props.method, status: 'ready' }));
-              }}
+              onClose={() => closeIfReadyOrComplete()}
+              onCancel={() => closeAndReset(false)}
               onRetry={() => {
                 dispatch(clearError({ method: props.method }));
                 onSubmit();
