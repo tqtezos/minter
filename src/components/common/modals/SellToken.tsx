@@ -35,7 +35,13 @@ export function SellTokenModal(props: SellTokenModalProps) {
       dispatchThunk={() => {
         const price = Math.floor(Number(salePrice) * 1000000);
         const validPrice = Number.isNaN(price) ? 0 : price;
-        return dispatch(listTokenAction({ ...props, salePrice: validPrice }));
+        return dispatch(
+          listTokenAction({
+            contract: props.contract,
+            tokenId: props.tokenId,
+            salePrice: validPrice
+          })
+        );
       }}
       onComplete={() => setSalePrice('')}
       initialRef={initialRef}

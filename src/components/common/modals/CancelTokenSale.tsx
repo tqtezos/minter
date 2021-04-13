@@ -26,7 +26,14 @@ export function CancelTokenSaleModal(props: CancelTokenSaleModalProps) {
       disclosure={props.disclosure}
       sync={props.sync}
       method="cancelTokenSale"
-      dispatchThunk={() => dispatch(cancelTokenSaleAction({ ...props }))}
+      dispatchThunk={() =>
+        dispatch(
+          cancelTokenSaleAction({
+            contract: props.contract,
+            tokenId: props.tokenId
+          })
+        )
+      }
       initialRef={initialRef}
       pendingMessage="Canceling token sale..."
       completeMessage="Token sale canceled"
