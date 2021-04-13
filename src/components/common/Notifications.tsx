@@ -6,6 +6,20 @@ import {
   readNotification
 } from '../../reducer/slices/notificationsActions';
 import _ from 'lodash';
+import { Notification } from '../../reducer/slices/notifications';
+
+function notificationStatus(notification: Notification) {
+  switch (notification.status) {
+    case 'pending':
+      return 'info';
+    case 'success':
+      return 'success';
+    case 'error':
+      return 'error';
+    default:
+      return 'info';
+  }
+}
 
 export default function Notifications() {
   const toast = useToast();
@@ -22,7 +36,7 @@ export default function Notifications() {
       toast({
         title: notification.title,
         description: notification.description,
-        status: notification.status,
+        status: notificationStatus(notification),
         duration: 10000,
         isClosable: true,
         position: 'bottom-right',

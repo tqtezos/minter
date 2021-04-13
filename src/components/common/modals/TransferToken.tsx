@@ -40,11 +40,11 @@ export function TransferTokenModal(props: TransferTokenModalProps) {
           })
         )
       }
-      cleanup={() => setToAddress('')}
+      onComplete={() => setToAddress('')}
       initialRef={initialRef}
       pendingMessage="Transferring token..."
       completeMessage="Transfer complete"
-      form={onSubmit => (
+      body={onSubmit => (
         <>
           <ModalHeader>Transfer Token</ModalHeader>
           <ModalCloseButton />

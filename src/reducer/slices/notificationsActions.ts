@@ -21,7 +21,7 @@ export function pendingNotification(
     requestId,
     read: false,
     delivered: false,
-    status: 'warning',
+    status: 'pending',
     title: 'Pending',
     description,
     kind: null

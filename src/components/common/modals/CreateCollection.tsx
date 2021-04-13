@@ -29,11 +29,11 @@ function CreateCollectionModal(props: CreateCollectionModalProps) {
       sync={props.sync}
       method="createAssetContract"
       dispatchThunk={() => dispatch(createAssetContractAction(contractName))}
-      cleanup={() => setContractName('')}
+      onComplete={() => setContractName('')}
       initialRef={initialRef}
       pendingMessage="Creating collection..."
       completeMessage="Collection created"
-      form={onSubmit => (
+      body={onSubmit => (
         <>
           <ModalHeader>New Collection</ModalHeader>
           <ModalCloseButton />

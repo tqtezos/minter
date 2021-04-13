@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Text,
@@ -103,33 +103,33 @@ interface FormModalProps {
   // Required Props
   disclosure: UseDisclosureReturn;
   method: Method;
-  form: (onSubmit: () => Promise<void>) => React.ReactNode;
   dispatchThunk: () => AsyncThunkActionResult;
   // Optional Props
-  initialRef?: React.MutableRefObject<null>;
-  button?: (onOpen: () => void) => React.ReactNode;
-  cleanup?: () => void;
   sync?: boolean;
+  body?: (onSubmit: () => Promise<void>) => React.ReactNode;
+  dispatchOnOpen?: boolean;
+  initialRef?: React.MutableRefObject<null>;
+  onComplete?: () => void;
   afterClose?: () => void;
   pendingMessage?: React.ReactNode;
   pendingAsyncMessage?: React.ReactNode;
   completeMessage?: React.ReactNode;
-  submitOnOpen?: boolean;
 }
 
 export default function FormModal(props: FormModalProps) {
-  const { sync = false, submitOnOpen = false } = props;
+  const { sync = false, dispatchOnOpen = false } = props;
   const { isOpen, onOpen, onClose } = props.disclosure;
   const [requestId, setRequestId] = useState<string | null>(null);
   const status = useSelector(s => s.status[props.method]);
   const dispatch = useDispatch();
   const notification = useSelector(s =>
     s.notifications.find(
-      n => n.requestId === requestId && n.status === 'warning' && !n.delivered
+      n => n.requestId === requestId && n.status === 'pending' && !n.delivered
     )
   );
 
-  const onSubmit = useCallback(async () => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const onSubmit = async () => {
     const result = props.dispatchThunk();
     setRequestId(result.requestId);
     dispatch(setStatus({ method: props.method, status: 'in_transit' }));
@@ -141,17 +141,17 @@ export default function FormModal(props: FormModalProps) {
           status: sync ? 'complete' : 'ready'
         })
       );
-      props.cleanup?.call(null);
+      props.onComplete?.call(null);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  };
 
   const hasError = status.error !== null;
 
   useEffect(() => {
-    if (isOpen && submitOnOpen && !hasError) {
+    if (isOpen && dispatchOnOpen && !hasError) {
       onSubmit();
     }
-  }, [isOpen, submitOnOpen, hasError, onSubmit]);
+  }, [isOpen, dispatchOnOpen, hasError, onSubmit]);
 
   const close = () => {
     if (status.status !== 'in_transit' || status.error) {
@@ -173,7 +173,6 @@ export default function FormModal(props: FormModalProps) {
 
   return (
     <>
-      {props.button ? props.button(onOpen) : null}
       <Modal
         isOpen={isOpen}
         onClose={() => close()}
@@ -186,7 +185,9 @@ export default function FormModal(props: FormModalProps) {
         <ModalOverlay />
         <ModalContent mt={40}>
           {status.status === 'ready' ? (
-            props.form(onSubmit)
+            props.body ? (
+              props.body(onSubmit)
+            ) : null
           ) : (
             <Content
               sync={sync}

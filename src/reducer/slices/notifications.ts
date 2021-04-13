@@ -24,7 +24,7 @@ export interface Notification {
   requestId: string;
   read: boolean;
   delivered: boolean;
-  status: 'success' | 'warning' | 'error';
+  status: 'success' | 'pending' | 'error';
   title: string;
   description: string;
   kind: ErrorKind | null;

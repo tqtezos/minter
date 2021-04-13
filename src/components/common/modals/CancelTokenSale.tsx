@@ -30,7 +30,7 @@ export function CancelTokenSaleModal(props: CancelTokenSaleModalProps) {
       initialRef={initialRef}
       pendingMessage="Canceling token sale..."
       completeMessage="Token sale canceled"
-      form={onSubmit => (
+      body={onSubmit => (
         <>
           <ModalHeader>Are you sure?</ModalHeader>
           <ModalCloseButton />

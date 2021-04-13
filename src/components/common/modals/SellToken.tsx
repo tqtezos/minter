@@ -37,11 +37,11 @@ export function SellTokenModal(props: SellTokenModalProps) {
         const validPrice = Number.isNaN(price) ? 0 : price;
         return dispatch(listTokenAction({ ...props, salePrice: validPrice }));
       }}
-      cleanup={() => setSalePrice('')}
+      onComplete={() => setSalePrice('')}
       initialRef={initialRef}
       pendingMessage="Listing token for sale..."
       completeMessage="Token listed for sale"
-      form={onSubmit => (
+      body={onSubmit => (
         <>
           <ModalHeader>Set your price</ModalHeader>
           <ModalCloseButton />

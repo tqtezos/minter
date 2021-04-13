@@ -41,7 +41,7 @@ export function BuyTokenModal(props: BuyTokenModalProps) {
       initialRef={initialRef}
       pendingMessage="Purchasing token..."
       completeMessage="Token purchased"
-      form={onSubmit => (
+      body={onSubmit => (
         <>
           <ModalHeader>Checkout</ModalHeader>
           <ModalCloseButton />
