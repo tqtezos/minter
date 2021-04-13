@@ -63,6 +63,7 @@ export function TokenMedia(props: { src: string, maxW?: string }) {
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
         height="100%"
+        style={{objectFit:"scale-down", maxWidth:props.maxW ?? 'unset'}}
       >
         <source src={obj.url} type={obj.type} />
       </video>

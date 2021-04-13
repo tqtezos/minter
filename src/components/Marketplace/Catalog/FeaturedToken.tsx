@@ -22,7 +22,7 @@ export default function FeaturedToken(props: FeaturedTokenProps) {
   const [, setLocation] = useLocation();
   return (
     <Container maxW="100%" py={10} px={0}>
-      <Stack width="100%" direction={{ base: 'column', md: 'row' }} spacing="24px" mb={10} display="flex" flexDir="row" flexWrap="wrap" justifyContent="center" align-alignItems="center">
+      <Stack width="100%" direction={{ base: 'column', md: 'row' }} spacing="24px" mb={10} display="flex" flexDir="row" flexWrap="wrap" justifyContent="center" alignItems="center">
         <Flex pr={[0, 10]} borderRight={["unset", "2px solid #666"]}>
           <TokenMedia
             src={ipfsUriToGatewayUrl(props.network, props.artifactUri)}
