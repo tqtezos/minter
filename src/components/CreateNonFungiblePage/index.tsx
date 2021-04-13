@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Box, Flex, Text, useDisclosure } from '@chakra-ui/react';
 import { MinterButton } from '../common';
@@ -19,7 +19,7 @@ import {
 } from '../../reducer/slices/createNft';
 import { mintTokenAction } from '../../reducer/async/actions';
 import { validateCreateNftStep } from '../../reducer/validators/createNft';
-import FormModal, { AsyncThunkActionResult } from '../common/modals/FormModal';
+import FormModal from '../common/modals/FormModal';
 
 function ProgressIndicator({ state }: { state: CreateNftState }) {
   const stepIdx = steps.indexOf(state.step);
@@ -93,9 +93,6 @@ export default function CreateNonFungiblePage() {
   const [, setLocation] = useLocation();
   const disclosure = useDisclosure();
   const { onOpen } = disclosure;
-  const [dispatchThunk, setDispatchThunk] = useState<
-    (() => AsyncThunkActionResult) | null
-  >(null);
 
   useEffect(() => {
     if (system.status !== 'WalletConnected') {
@@ -177,11 +174,10 @@ export default function CreateNonFungiblePage() {
             <FormModal
               disclosure={disclosure}
               method="mintToken"
-              form={() => null}
               dispatchThunk={() => dispatch(mintTokenAction())}
-              cleanup={() => dispatch(clearForm())}
+              onComplete={() => dispatch(clearForm())}
               afterClose={() => setLocation('/collections')}
-              submitOnOpen={true}
+              dispatchOnOpen={true}
               pendingAsyncMessage={
                 <>
                   Opening wallet...
