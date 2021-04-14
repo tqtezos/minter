@@ -93,7 +93,7 @@ function TokenImage(props: {
   src: string;
   width?: string;
   maxWidth?: string;
-  maxHeight?: string
+  maxHeight?: string;
   height?: string;
   objectFit?: ResponsiveValue<any>;
   onLoad?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
@@ -128,12 +128,12 @@ function TokenImage(props: {
         id={props.id || 'assetImage'}
         key={props.id || 'assetImage'}
         src={props.src}
-        objectFit="scale-down"
+        objectFit={props.objectFit ?? "scale-down"}
         flex="1"
-        height="100%"
+        height={props.height ?? "100%"}
         width={props.width}
         maxWidth={props.maxWidth}
-        maxHeight={props.maxHeight}
+        maxHeight={props.maxHeight ?? 'unset'}
         onError={() => setErrored(true)}
         onLoad={props.onLoad}
       />
@@ -144,7 +144,12 @@ function TokenImage(props: {
     return (
       <video
         controls
-        style={{ margin: 'auto', height: props.height || '100%' }}
+        style={{
+          margin: 'auto', height: props.height || '100%',
+          width: props.width,
+          maxWidth: props.maxWidth ?? 'unset',
+          maxHeight: props.maxHeight ?? 'unset' 
+        }}
       >
         <source src={obj.url} type={obj.type} />
       </video>
@@ -166,10 +171,10 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
   const collection = state.collections[contractAddress];
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [zoom, setZoom] = useState(0);
-  const [initialZoom, setInitialZoom] = useState(0);
-  const [imageHeight, setImageHeight] = useState(0);
-  const [imageWidth, setImageWidth] = useState(0);
-  const [mediaType, setMediaType] = useState('');
+  const [initialZoom] = useState(0);
+  const [imageHeight] = useState(0);
+  const [imageWidth] = useState(0);
+  const [mediaType] = useState('');
 
   const collectionUndefined = collection === undefined;
 
@@ -235,8 +240,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           margin="0 !important"
         >
           {/^image\/.*/.test(mediaType) ? (
-            ''
-          ) : (
             <Flex
               height="3rem"
               alignItems="center"
@@ -259,6 +262,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 <SliderThumb />
               </Slider>
             </Flex>
+          ) : (
+            ''
           )}
 
           <TokenImage
@@ -289,7 +294,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       <Flex
         align="center"
         flex="1"
-        pb={[4, 16]}
+        pb={4}
         px={[4, 16]}
         mx="auto"
         width={['90%', '70%']}
@@ -298,39 +303,10 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       >
         <TokenImage
           src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
-          height="85%"
-          onLoad={e => {
-            const iHeight = e.currentTarget.height;
-            const iWidth = e.currentTarget.width;
-            const wHeight = window.innerHeight - 80;
-            const wWidth = window.innerWidth - 32;
-            const isLandscape = wHeight < wWidth;
-            const isPortrait = wWidth < wHeight;
-
-            const isImageBiggerThanModal = iHeight > wHeight || iWidth > wWidth;
-
-            if (isImageBiggerThanModal) {
-              if (isLandscape) {
-                if (iHeight > iWidth) {
-                  const initialZoom = wHeight / iHeight;
-                  setInitialZoom(initialZoom);
-                } else {
-                  const initialZoom = wWidth / iWidth;
-                  setInitialZoom(initialZoom);
-                }
-              } else if (isPortrait) {
-                const initialZoom = wWidth / iWidth;
-                setInitialZoom(initialZoom);
-              }
-            } else {
-              setInitialZoom(1);
-            }
-            setImageHeight(iHeight);
-            setImageWidth(iWidth);
-          }}
-          onFetch={setMediaType}
+          height="75%"
+          width="auto"
         />{' '}
-        <Flex align="center" justify="space-between" width={['95vw']} mt="4">
+        <Flex align="center" justify="space-evenly" width={['100%']} mt="4">
           {isOwner ? (
             <Menu>
               <MinterMenuButton variant="primary">
@@ -407,7 +383,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           </Button>
         </Flex>
       </Flex>
-      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1}>
+      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1} borderTop="2px solid #3D464F">
         <Flex
           width={['90%', '70%']}
           mx="auto"
