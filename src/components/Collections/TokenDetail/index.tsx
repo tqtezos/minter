@@ -330,7 +330,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           }}
           onFetch={setMediaType}
         />{' '}
-        <Flex align="center" justify="space-evenly" width={['100%']} mt="4">
+        <Flex align="center" justify="space-between" width={['95vw']} mt="4">
           {isOwner ? (
             <Menu>
               <MinterMenuButton variant="primary">
