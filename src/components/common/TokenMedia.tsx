@@ -48,7 +48,7 @@ export function TokenMedia(props: { src: string, maxW?: string, onLoad?: Functio
         src={props.src}
         height="100%"
         flex="1"
-        style={{objectFit:"scale-down", maxWidth:props.maxW ?? '100%'}}
+        style={{objectFit:"scale-down", maxWidth:props.maxW ?? '100%', maxHeight: '100%'}}
         onError={() => setErrored(true)}
         onLoad={()=> props.onLoad ? props.onLoad(obj.url, obj.type) : ''}
       />
@@ -64,7 +64,7 @@ export function TokenMedia(props: { src: string, maxW?: string, onLoad?: Functio
         onMouseLeave={e => e.currentTarget.pause()}
         onLoadedData={()=> props.onLoad ? props.onLoad(obj.url, obj.type) : ''}
         height="100%"
-        style={{objectFit:"scale-down", maxWidth:props.maxW ?? '100%'}}
+        style={{objectFit:"scale-down", maxWidth: props.maxW ?? '100%', maxHeight: '100%'}}
       >
         <source src={obj.url} type={obj.type} />
       </video>

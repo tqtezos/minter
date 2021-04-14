@@ -102,16 +102,17 @@ export default function TokenCard(props: TokenCardProps) {
         bg="white"
         borderTop="1px solid"
         borderColor="brand.lightBlue"
-        flexDir="row"
+        flexDir="column"
         flexWrap="nowrap"
         justifyContent="space-evenly"
         alignItems="center"
         height="100%"
         borderTopRightRadius="2px"
         borderTopLeftRadius="2px"
+        filter="drop-shadow(0px 0px 10px #333)"
       >
         <Heading size="sm">{props.title}</Heading>
-        <Text fontSize="sm">Seller: {props.sale?.seller.substr(0, 5)}...{props.sale?.seller.substr(-5)}</Text>
+        <Text fontSize="sm">Seller: {props.sale?.seller}</Text>
         <Text fontSize="md" fontWeight="600">{props.sale?.price} ꜩ</Text>
       </Flex>
     </Flex>
