@@ -18,7 +18,7 @@ function MediaNotFound() {
   );
 }
 
-export function TokenMedia(props: { src: string }) {
+export function TokenMedia(props: { src: string, maxW?: string }) {
   const [errored, setErrored] = useState(false);
   const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
   useEffect(() => {
@@ -50,6 +50,7 @@ export function TokenMedia(props: { src: string }) {
         objectFit="scale-down"
         height="100%"
         flex="1"
+        maxWidth={props.maxW}
         style={{objectFit:"scale-down"}}
         onError={() => setErrored(true)}
       />
@@ -64,6 +65,7 @@ export function TokenMedia(props: { src: string }) {
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
         height="100%"
+        style={{maxWidth:props.maxW}}
       >
         <source src={obj.url} type={obj.type} />
       </video>
