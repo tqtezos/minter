@@ -162,6 +162,10 @@ export const mintTokenAction = createAsyncThunk<
       ipfsMetadata.artifactUri = imageResponse.data.ipfsUri;
       ipfsMetadata.displayUri = imageResponse.data.ipfsUri;
       ipfsMetadata.thumbnailUri = imageResponse.data.thumbnail.ipfsUri;
+      ipfsMetadata.formats = [{
+        fileSize: imageResponse.headers['content-length'],
+        mimeType: imageResponse.headers['content-type']
+      }];
     } else if (/^video\/.*/.test(file.type)) {
       if (state.displayImageFile === null) {
         return rejectWithValue({
@@ -189,11 +193,17 @@ export const mintTokenAction = createAsyncThunk<
       ipfsMetadata.artifactUri = fileResponse.data.ipfsUri;
       ipfsMetadata.displayUri = imageResponse.data.ipfsUri;
       ipfsMetadata.thumbnailUri = imageResponse.data.thumbnail.ipfsUri;
+      ipfsMetadata.formats = [{
+        fileSize: fileResponse.headers['content-length'],
+        mimeType: fileResponse.headers['content-type']
+      }];
     } else {
-      return rejectWithValue({
-        kind: ErrorKind.IPFSUploadFailed,
-        message: 'IPFS upload failed: unknown file type'
-      });
+      const fileResponse = await uploadIPFSFile(system.config.ipfsApi, file);
+      ipfsMetadata.artifactUri = fileResponse.data.ipfsUri;
+      ipfsMetadata.formats = [{
+        fileSize: fileResponse.headers['content-length'],
+        mimeType: fileResponse.headers['content-type']
+      }];
     }
   } catch (e) {
     return rejectWithValue({

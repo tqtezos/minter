@@ -174,14 +174,14 @@ export class NftMetadata {
 }
 
 export interface NftMetadataFormat {
-  uri: string;
-  hash: string;
+  uri?: string;
+  hash?: string;
   mimeType: string;
-  fileSize: number;
-  fileName: string;
-  duration: string;
-  dimensions: NtfMetadataFormatDimensions;
-  dataRate: NtfMetadataFormatDataRate;
+  fileSize?: number;
+  fileName?: string;
+  duration?: string;
+  dimensions?: NtfMetadataFormatDimensions;
+  dataRate?: NtfMetadataFormatDataRate;
 }
 
 export interface NtfMetadataFormatDataRate {
