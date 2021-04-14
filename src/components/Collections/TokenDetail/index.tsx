@@ -16,7 +16,6 @@ import {
   Modal,
   ModalCloseButton,
   ModalContent,
-  ModalOverlay,
   ResponsiveValue,
   Slider,
   SliderFilledTrack,
@@ -226,17 +225,19 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
         size="full"
         scrollBehavior="inside"
       >
-        <ModalOverlay />
         <ModalContent
-          m="1rem"
-          maxHeight="calc(100vh - 4rem)"
-          maxWidth="calc(100vh - 4rem)"
+          height="100vh"
+          maxHeight="unset"
+          width="100vw"
           display="flex"
           flexDirection="column"
           flexWrap="nowrap"
           justifyContent="center"
           alignItems="center"
           position="relative"
+          backgroundColor="#333333ee"
+          zIndex="2000"
+          margin="0 !important"
         >
           {/^image\/.*/.test(mediaType) ? (
             <Flex
@@ -274,7 +275,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             maxHeight="85%"
             objectFit="contain"
           />
-          <ModalCloseButton position="absolute" right="0 !important" bottom="0 !important" display="block !important" fontSize="18px" top="unset" borderLeft="2px solid #333" borderTop="2px solid #333" width="4rem" height="4rem" borderRight="none" borderBottom="none" borderTopEndRadius="0" border="0" />
+          <ModalCloseButton position="absolute" right="0 !important" bottom="0 !important" display="block !important" fontSize="18px" top="unset" borderLeft="2px solid #333" color="white" borderTop="2px solid #333" width="4rem" height="4rem" borderRight="none" borderBottom="none" borderTopEndRadius="0" border="0" />
         </ModalContent>
       </Modal>
       <Flex pt={8} px={8}>
