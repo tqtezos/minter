@@ -112,7 +112,6 @@ export default function TokenCard(props: TokenCardProps) {
         filter="drop-shadow(0px 0px 10px #333)"
       >
         <Heading size="sm">{props.title}</Heading>
-        <Text fontSize="sm">Seller: {props.sale?.seller}</Text>
         <Text fontSize="md" fontWeight="600">{props.sale?.price} ꜩ</Text>
       </Flex>
     </Flex>
