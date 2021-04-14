@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Token } from '../../../reducer/slices/collections';
 import { useLocation } from 'wouter';
 import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
@@ -9,14 +9,66 @@ interface TokenCardProps extends Token {
   network: string;
 }
 
+function getAverageRGB(src: string, type: string) {
+  return new Promise(resolve => {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d') as CanvasRenderingContext2D ?? {} as any;
+    let asset: HTMLImageElement | HTMLVideoElement;
+    let image = new window.Image();
+    let video = document.createElement('video');
+
+    const load = async function () {
+      let rgb = { r: 255, g: 255, b: 255 }
+      let height = canvas.height = asset.offsetHeight || asset.height || (asset as HTMLVideoElement)?.videoHeight;
+      let width = canvas.width = asset.offsetWidth || asset.width || (asset as HTMLVideoElement)?.videoWidth;
+      context.drawImage(asset, 0, 0, width, height);
+      let data;
+      try {
+        data = context.getImageData(0, 0, width, height);
+      } catch (e) {
+        console.log(e);
+        return resolve(rgb);
+      }
+      let length = data?.data.length, blockSize = 4, i = 0, count = 0;
+      if (!length) { return resolve(rgb); }
+      while ((i += blockSize * 4) < length) {
+        ++count;
+        rgb.r += data.data[i];
+        rgb.g += data.data[i + 1];
+        rgb.b += data.data[i + 2];
+      }
+      rgb.r = ~~(rgb.r / (count));
+      rgb.g = ~~(rgb.g / (count));
+      rgb.b = ~~(rgb.b / (count));
+      return resolve(rgb);
+    }
+
+    if (/^image\/.*/.test(type)) {
+      asset = image;
+      asset.onload = load;
+      asset.src = src;
+      asset.crossOrigin = "Anonymous";
+    } else if (/^video\/.*/.test(type)) {
+      asset = video;
+      asset.onloadeddata = load;
+      asset.src = src+'#t=1';
+      asset.crossOrigin = "Anonymous";
+    } else {
+      return resolve({ r: 255, g: 255, b: 255 });
+    }
+  });
+}
+
 export default function TokenCard(props: TokenCardProps) {
   const [, setLocation] = useLocation();
+  const [obj, setObj] = useState<{ r: number, g: number, b: number }>({ r: 255, g: 255, b: 255 });
+  const src = ipfsUriToGatewayUrl(props.network, props.artifactUri);
   return (
     <Flex
       flexDir="column"
       ratio={1}
       w="100%"
-      bg="white"
+      background={`rgb(${obj.r},${obj.g},${obj.b})`}
       border="2px solid"
       borderColor="#666"
       borderRadius="3px"
@@ -34,7 +86,11 @@ export default function TokenCard(props: TokenCardProps) {
       <AspectRatio ratio={3 / 2}>
         <Box>
           <TokenMedia
-            src={ipfsUriToGatewayUrl(props.network, props.artifactUri)}
+            src={src}
+            onLoad={async (url: string, type: string) => {
+              let rgb = await getAverageRGB(url, type) as any;
+              setObj(rgb);
+            }}
           />
         </Box>
       </AspectRatio>

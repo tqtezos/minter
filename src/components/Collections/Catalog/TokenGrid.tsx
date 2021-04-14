@@ -81,6 +81,7 @@ function TokenImage(props: { src: string }) {
 
 function TokenTile(props: TokenTileProps) {
   const [, setLocation] = useLocation();
+  const src = ipfsUriToGatewayUrl(props.network, props.artifactUri);
   return (
     <Flex
       flexDir="column"
@@ -104,7 +105,7 @@ function TokenTile(props: TokenTileProps) {
       <AspectRatio ratio={3 / 2}>
         <Box p={4}>
           <TokenImage
-            src={ipfsUriToGatewayUrl(props.network, props.artifactUri)}
+            src={src}
           />
         </Box>
       </AspectRatio>
@@ -170,7 +171,7 @@ export default function TokenGrid({ state, walletAddress }: TokenGridProps) {
   }
 
   return (
-    <SimpleGrid columns={{sm: 1, md: 2, lg: 3, xl: 4}} gap={8} pb={8}>
+    <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
       {tokens.map(token => {
         return (
           <TokenTile
