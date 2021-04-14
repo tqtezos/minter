@@ -59,7 +59,7 @@ export default function Sidebar() {
   const dispatch = useDispatch();
   return (
     <>
-      <Heading px={4} pt={6} pb={4} size="md" color="brand.darkGray">
+      <Heading px={4} pt={6} pb={4} mb={4} borderBottom="2px solid #666" size="md" color="brand.darkGray">
         Collections
       </Heading>
       <Heading
