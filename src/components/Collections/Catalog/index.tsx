@@ -90,6 +90,7 @@ export default function Catalog() {
           display={{ base: 'none', md: 'flex' }}
           w="100%"
           pb={6}
+          borderBottom="2px solid #666"
           justify="space-between"
           align={{
             base: 'flex-start',
