@@ -95,27 +95,23 @@ export default function TokenCard(props: TokenCardProps) {
         </Box>
       </AspectRatio>
       <Flex
-        width="100%"
+        width="calc(100% - 1rem)"
         px={4}
-        py={4}
-        bg="white"
-        borderTop="1px solid"
-        borderColor="brand.lightBlue"
-        flexDir="column"
-      >
-        <Heading size="sm">{props.title}</Heading>
-        <Text fontSize="sm">Seller: {props.sale?.seller.substr(0, 5)}...{props.sale?.seller.substr(-5)}</Text>
-      </Flex>
-      <Flex
-        px={2}
         py={4}
         mx={2}
         bg="white"
         borderTop="1px solid"
-        borderColor="brand.lightGray"
-        justify="space-between"
+        borderColor="brand.lightBlue"
+        flexDir="row"
+        flexWrap="nowrap"
+        justifyContent="space-evenly"
+        alignItems="center"
+        height="100%"
+        borderTopRightRadius="2px"
+        borderTopLeftRadius="2px"
       >
-        <Text fontSize="md">Current Price</Text>
+        <Heading size="sm">{props.title}</Heading>
+        <Text fontSize="sm">Seller: {props.sale?.seller.substr(0, 5)}...{props.sale?.seller.substr(-5)}</Text>
         <Text fontSize="md" fontWeight="600">{props.sale?.price} ꜩ</Text>
       </Flex>
     </Flex>
