@@ -91,12 +91,12 @@ export const getMarketplaceNftsQuery = createAsyncThunk<
 });
 
 export const getTransactionsByHash = createAsyncThunk<
-  {},
+  {address: string, transactions: any, metadata: any},
   string,
   Opts
 >('query/getTransactionsByHash', async (hash, { rejectWithValue }) => {
   try {
-    return {transactions: await axios.get(`https://api.mainnet.tzkt.io/v1/accounts/${hash}/operations?type=origination,transaction&limit=40&sort=1&quote=usd`).then(r => r.data), address: hash};
+    return {transactions: await axios.get(`https://api.mainnet.tzkt.io/v1/accounts/${hash}/operations?type=origination,transaction&limit=40&sort=1&quote=usd`).then(r => r.data), address: hash, metadata: null};
   } catch (e) {
     return rejectWithValue({
       kind: ErrorKind.GetMarketplaceNftsFailed,

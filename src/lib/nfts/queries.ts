@@ -292,6 +292,7 @@ export async function getContractNfts(
 export interface AssetContract {
   address: string;
   metadata: Record<string, any>;
+  payload?: {};
 }
 
 const metadataSchema = Joi.object({

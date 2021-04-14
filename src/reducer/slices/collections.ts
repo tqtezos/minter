@@ -65,7 +65,7 @@ const updateCollectionsR: Reducer<AssetContract[]> = (state, action) => {
   }
 };
 
-const updateCollectionR: Reducer<AssetContract | any> = (state, { payload }) => {
+const updateCollectionR: Reducer<AssetContract> = (state, { payload }) => {
     state.collections[payload.address] = {...state.collections[payload.address], tokens: null, loaded: false, ...payload };
     console.log(state.collections[payload.address]);
 };
