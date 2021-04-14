@@ -2,6 +2,7 @@ import { createSlice, PayloadAction, CaseReducer } from '@reduxjs/toolkit';
 import {
   getContractNftsQuery,
   getNftAssetContractQuery,
+  getTransactionsByHash,
   getWalletAssetContractsQuery
 } from '../async/queries';
 import { Nft, AssetContract } from '../../lib/nfts/queries';
@@ -64,10 +65,9 @@ const updateCollectionsR: Reducer<AssetContract[]> = (state, action) => {
   }
 };
 
-const updateCollectionR: Reducer<AssetContract> = (state, { payload }) => {
-  if (!state.collections[payload.address]) {
-    state.collections[payload.address] = { ...payload, tokens: null, loaded: false };
-  }
+const updateCollectionR: Reducer<AssetContract | any> = (state, { payload }) => {
+    state.collections[payload.address] = {...state.collections[payload.address], tokens: null, loaded: false, ...payload };
+    console.log(state.collections[payload.address]);
 };
 
 const selectCollectionR: Reducer<string> = (state, action) => {
@@ -87,6 +87,7 @@ const slice = createSlice({
     addCase(getContractNftsQuery.fulfilled, populateCollectionR);
     addCase(getNftAssetContractQuery.fulfilled, updateCollectionR);
     addCase(getWalletAssetContractsQuery.fulfilled, updateCollectionsR);
+    addCase(getTransactionsByHash.fulfilled, updateCollectionR);
   }
 });
 

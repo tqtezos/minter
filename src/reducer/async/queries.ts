@@ -9,6 +9,7 @@ import {
   getWalletNftAssetContracts
 } from '../../lib/nfts/queries';
 import { ErrorKind, RejectValue } from './errors';
+import axios from 'axios';
 
 type Opts = { state: State; rejectValue: RejectValue };
 
@@ -85,6 +86,21 @@ export const getMarketplaceNftsQuery = createAsyncThunk<
     return rejectWithValue({
       kind: ErrorKind.GetMarketplaceNftsFailed,
       message: `Failed to retrieve marketplace nfts from: ${address}`
+    });
+  }
+});
+
+export const getTransactionsByHash = createAsyncThunk<
+  {},
+  string,
+  Opts
+>('query/getTransactionsByHash', async (hash, { rejectWithValue }) => {
+  try {
+    return {transactions: await axios.get(`https://api.mainnet.tzkt.io/v1/accounts/${hash}/operations?type=origination,transaction&limit=40&sort=1&quote=usd`).then(r => r.data), address: hash};
+  } catch (e) {
+    return rejectWithValue({
+      kind: ErrorKind.GetMarketplaceNftsFailed,
+      message: `Failed to retrieve marketplace nfts from: ${hash}`
     });
   }
 });

@@ -35,7 +35,8 @@ import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 import { useSelector, useDispatch } from '../../../reducer';
 import {
   getContractNftsQuery,
-  getNftAssetContractQuery
+  getNftAssetContractQuery,
+  getTransactionsByHash
 } from '../../../reducer/async/queries';
 
 import { Maximize2 } from 'react-feather';
@@ -176,8 +177,11 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
   useEffect(() => {
     if (collectionUndefined) {
       dispatch(getNftAssetContractQuery(contractAddress));
+      dispatch(getTransactionsByHash(contractAddress));
     } else {
+      console.log(contractAddress)
       dispatch(getContractNftsQuery(contractAddress));
+      dispatch(getTransactionsByHash(contractAddress));
     }
   }, [contractAddress, tokenId, collectionUndefined, dispatch]);
 
@@ -487,6 +491,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 </Text>
               </Flex>
             </Flex>
+            {console.log(token)}
             <Accordion allowToggle>
               <AccordionItem border="none">
                 <AccordionButton mt={[4, 8]} p={0}>

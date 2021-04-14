@@ -31,7 +31,8 @@ export const store = configureStore({
         ignoredActions: [
           'wallet/connect/fulfilled',
           'wallet/reconnect/fulfilled',
-          'wallet/disconnect/fulfilled'
+          'wallet/disconnect/fulfilled',
+          'query/getTransactionsByHash/fulfilled'
         ]
       }
     })
