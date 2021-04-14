@@ -31,7 +31,7 @@ export default function FeaturedToken(props: FeaturedTokenProps) {
         </Flex>
         <Box pl={[0, 10]} marginLeft="0 !important">
           <Flex flexDir="column" h="100%" w="100%">
-            <Heading size="md" mt={4} fontSize="2.5rem">
+            <Heading size="lg" mt={4} fontSize="2.5rem">
               {props.title}
             </Heading>
             <Text fontSize="sm" fontWeight="600" color="gray.500">
