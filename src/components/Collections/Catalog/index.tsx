@@ -63,9 +63,6 @@ export default function Catalog() {
         h="100%"
         flexDir="column"
         overflowY="auto"
-        borderRight="2px solid #666"
-        box-shadow="2px 0px 10px #3333"
-        zIndex="100"
         display={{
           base: 'none',
           md: 'flex'
@@ -81,9 +78,9 @@ export default function Catalog() {
         pt={6}
         flex="1"
         bg="brand.brightGray"
-        borderLeftWidth="1px"
-        borderLeftColor="brand.lightBlue"
-        overflowY="scroll"
+        borderLeftWidth="2px"
+        borderLeftColor="#666"
+        overflowY="auto"
         justify="start"
       >
         <Flex display={{ base: 'flex', md: 'none' }} mb={4}>
@@ -93,8 +90,6 @@ export default function Catalog() {
           display={{ base: 'none', md: 'flex' }}
           w="100%"
           pb={6}
-          mb={10}
-          borderBottom="2px solid #666"
           justify="space-between"
           align={{
             base: 'flex-start',
@@ -111,7 +106,7 @@ export default function Catalog() {
             </Flex>
             <Flex align="center">
               <Text fontFamily="mono" color="brand.lightGray">
-                {collection.address}
+                {`${collection.address}`}
               </Text>
               <Link
                 href={system.config.bcd.gui + '/' + collection.address}
