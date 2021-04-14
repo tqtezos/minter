@@ -306,7 +306,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           height="75%"
           width="auto"
         />{' '}
-        <Flex align="center" justify="space-evenly" width={['90vw']} mt="4">
+        <Flex align="center" justify="space-between" width={['90vw']} mt="4">
           {isOwner ? (
             <Menu>
               <MinterMenuButton variant="primary">
