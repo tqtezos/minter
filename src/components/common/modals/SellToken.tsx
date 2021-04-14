@@ -179,7 +179,7 @@ export function SellTokenButton(props: SellTokenButtonProps) {
   return (
     <>
       <MinterButton variant="primaryAction" onClick={onOpen}>
-        List for sale
+        Sell
       </MinterButton>
 
       <Modal
