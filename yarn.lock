@@ -2276,7 +2276,7 @@
   resolved "https://registry.yarnpkg.com/@taquito/michel-codec/-/michel-codec-8.0.6-beta.0.tgz#974a84b71e146df50f958a35e57212ce6791880f"
   integrity sha512-mXEqTM1zrdB6dIjnykj3C/dgFldvWJDPfPNqw1xk56nC8i1UOMs6+Snii97KsJAfm0vfa+01VxOpIxCDMWcErQ==
 
-"@taquito/michel-codec@^8.1.1":
+"@taquito/michel-codec@^8.1.0", "@taquito/michel-codec@^8.1.1":
   version "8.1.1"
   resolved "https://registry.yarnpkg.com/@taquito/michel-codec/-/michel-codec-8.1.1.tgz#23ba8255215db72c60e0f52ff1616cf9830c6aa5"
   integrity sha512-Clp6LfFVxXuLIUTdMi0XK7lnPBhrj9p8XIismf1Gobg/nxqMCW5idWAprl4f3ickpOzlNLm8UHjCs4aUee1GiQ==
@@ -2291,7 +2291,7 @@
     bignumber.js "^9.0.1"
     fast-json-stable-stringify "^2.1.0"
 
-"@taquito/michelson-encoder@^8.1.1":
+"@taquito/michelson-encoder@^8.1.0", "@taquito/michelson-encoder@^8.1.1":
   version "8.1.1"
   resolved "https://registry.yarnpkg.com/@taquito/michelson-encoder/-/michelson-encoder-8.1.1.tgz#153e45cb90028a13aa2f18571185e93047dcb3be"
   integrity sha512-5axhQr82wkM4J1YHf1nQ8jx7gp45kJFk6D/CcfNeIWHSrGFxQCzHCYkXhYOViCnmhsgJgKrNfqB8UyPeNfFsVg==
@@ -2310,7 +2310,7 @@
     bignumber.js "^9.0.1"
     lodash "^4.17.20"
 
-"@taquito/rpc@^8.1.1":
+"@taquito/rpc@^8.1.0", "@taquito/rpc@^8.1.1":
   version "8.1.1"
   resolved "https://registry.yarnpkg.com/@taquito/rpc/-/rpc-8.1.1.tgz#cdbf9d7ba24346034bf0f02ebf634e846801811a"
   integrity sha512-NS1aoVy+co5xCe41wM67PEMZHt88RtxpsGPvsYs0TO1sJN6JFgwkZYE/ZQULRHPb6JXNxY/KOCVnYahFM+a8pg==
@@ -2333,7 +2333,21 @@
     pbkdf2 "^3.1.1"
     typedarray-to-buffer "^3.1.5"
 
-"@taquito/taquito@8.0.6-beta.0", "@taquito/taquito@^8.0.6-beta.0":
+"@taquito/taquito@8.1.0":
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/@taquito/taquito/-/taquito-8.1.0.tgz#f398e2675440f053bf3e78c55b1f70e5a103e1ea"
+  integrity sha512-a5YSS4eeN9Rh/EzH0yH3pEK/QxjXyAHptpBn6bYrg1R4BPGgoEAZWY7XjQmf4C4qxNoyIhmCs35svsnTy2xDKA==
+  dependencies:
+    "@taquito/http-utils" "^8.1.0"
+    "@taquito/michel-codec" "^8.1.0"
+    "@taquito/michelson-encoder" "^8.1.0"
+    "@taquito/rpc" "^8.1.0"
+    "@taquito/utils" "^8.1.0"
+    bignumber.js "^9.0.1"
+    rx-sandbox "^1.0.3"
+    rxjs "^6.6.3"
+
+"@taquito/taquito@^8.0.6-beta.0":
   version "8.0.6-beta.0"
   resolved "https://registry.yarnpkg.com/@taquito/taquito/-/taquito-8.0.6-beta.0.tgz#b3f4a49d647f783379fb384168f1e3255945ef4a"
   integrity sha512-Pr9k3y3l25zB9NyynreX67M/gvkn5szz4jXjiBGp5s9N9W9yWUJGoKzqT2o6RbZwwrv6wdy7nNTskXpBlwNawQ==
