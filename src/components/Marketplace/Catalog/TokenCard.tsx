@@ -99,28 +99,24 @@ export default function TokenCard(props: TokenCardProps) {
       </AspectRatio>
       <Flex
         opacity="0"
-        width="calc(100% - 1rem)"
-        px={4}
-        py={4}
-        mx={2}
-        bg="white"
+        width="100%"
+        bg="#000e"
         borderTop="1px solid"
         borderColor="brand.lightBlue"
         flexDir="column"
         flexWrap="nowrap"
         justifyContent="space-evenly"
         alignItems="center"
-        height="25%"
+        height="100%"
         bottom="0"
         borderTopRightRadius="2px"
         borderTopLeftRadius="2px"
-        filter="drop-shadow(0px 0px 10px #333)"
         _groupHover={{ opacity: 1 }}
         position="absolute"
         transition="0.25s all"
       >
-        <Heading size="sm" paddingBottom={2}>{props.title}</Heading>
-        <Text fontSize="md" fontWeight="400" textAlign="center">{props.sale?.price} ꜩ</Text>
+        <Heading size="lg" fontWeight="400" textAlign="center" color="white">{props.sale?.price} ꜩ</Heading>
+        <Text size="md" color="white">{props.title}</Text>
       </Flex>
     </Flex>
   );
