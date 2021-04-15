@@ -79,7 +79,7 @@ export default function Catalog() {
         flex="1"
         bg="brand.brightGray"
         borderLeftWidth="2px"
-        borderLeftColor="#666"
+        borderLeftColor="#aaa"
         overflowY="auto"
         justify="start"
       >
@@ -91,7 +91,7 @@ export default function Catalog() {
           w="100%"
           pb={6}
           mb={6}
-          borderBottom="2px solid #666"
+          borderBottom="2px solid #aaa"
           justify="space-between"
           align={{
             base: 'flex-start',

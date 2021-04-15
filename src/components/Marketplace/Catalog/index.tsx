@@ -30,7 +30,7 @@ export default function Catalog() {
       flexDir="column"
     >
       {state.marketplace.loaded && tokens.length > 0 ? (
-        <Box borderBottom="2px solid #333" marginBottom="2.5rem">
+        <Box borderBottom="2px solid #aaa" marginBottom="2.5rem">
           <FeaturedToken network={system.config.network} {...tokens[0]} />
         </Box>
       ) : null}

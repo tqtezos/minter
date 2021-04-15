@@ -51,7 +51,7 @@ function getAverageRGB(src: string, type: string) {
     } else if (/^video\/.*/.test(type)) {
       asset = video;
       asset.onloadeddata = load;
-      asset.src = src+'#t=1';
+      asset.src = src + '#t=1';
       asset.crossOrigin = "Anonymous";
     } else {
       return resolve({ r: 255, g: 255, b: 255 });
@@ -63,14 +63,17 @@ export default function TokenCard(props: TokenCardProps) {
   const [, setLocation] = useLocation();
   const [obj, setObj] = useState<{ r: number, g: number, b: number }>({ r: 255, g: 255, b: 255 });
   const src = ipfsUriToGatewayUrl(props.network, props.artifactUri);
+
   return (
     <Flex
+      position="relative"
+      role="group"
       flexDir="column"
       ratio={1}
       w="100%"
       background={`rgb(${obj.r},${obj.g},${obj.b})`}
       border="2px solid"
-      borderColor="#666"
+      borderColor="#aaa"
       borderRadius="3px"
       overflow="hidden"
       boxShadow="0px 0px 10px #3333"
@@ -95,6 +98,7 @@ export default function TokenCard(props: TokenCardProps) {
         </Box>
       </AspectRatio>
       <Flex
+        opacity="0"
         width="calc(100% - 1rem)"
         px={4}
         py={4}
@@ -106,13 +110,17 @@ export default function TokenCard(props: TokenCardProps) {
         flexWrap="nowrap"
         justifyContent="space-evenly"
         alignItems="center"
-        height="100%"
+        height="25%"
+        bottom="0"
         borderTopRightRadius="2px"
         borderTopLeftRadius="2px"
         filter="drop-shadow(0px 0px 10px #333)"
+        _groupHover={{ opacity: 1 }}
+        position="absolute"
+        transition="0.25s all"
       >
-        <Heading size="sm">{props.title}</Heading>
-        <Text fontSize="md" fontWeight="600">{props.sale?.price} ꜩ</Text>
+        <Heading size="sm" paddingBottom={2}>{props.title}</Heading>
+        <Text fontSize="md" fontWeight="400" textAlign="center">{props.sale?.price} ꜩ</Text>
       </Flex>
     </Flex>
   );
