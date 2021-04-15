@@ -14,16 +14,9 @@ import { reconnectWallet } from '../../reducer/async/wallet';
 
 export default function App() {
   const dispatch = useDispatch();
-  const state = useSelector(
-    s => s
+  const walletReconnectAttempted = useSelector(
+    s => s.system.walletReconnectAttempted
   );
-
-  let walletReconnectAttempted = state.system.walletReconnectAttempted;
-
-  // Immediate Marketplace load upon login
-  // useEffect(() => {
-  //   dispatch(getMarketplaceNftsQuery(state.marketplace.marketplace.address));
-  // }, [ state.marketplace.marketplace.address, dispatch ]);
 
   useEffect(() => {
     if (!walletReconnectAttempted) {
