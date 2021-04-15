@@ -86,7 +86,7 @@ export default function TokenCard(props: TokenCardProps) {
         setLocation(`/collection/${props.address}/token/${props.id}`)
       }
     >
-      <AspectRatio ratio={3 / 2}>
+      <AspectRatio ratio={3 / 2} height="100%">
         <Box>
           <TokenMedia
             src={src}
