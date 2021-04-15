@@ -73,7 +73,7 @@ export default function TokenCard(props: TokenCardProps) {
       w="100%"
       background={`rgb(${obj.r},${obj.g},${obj.b})`}
       border="2px solid"
-      borderColor="#aaa"
+      borderColor="#fff"
       borderRadius="3px"
       overflow="hidden"
       boxShadow="0px 0px 10px #3333"
@@ -102,7 +102,7 @@ export default function TokenCard(props: TokenCardProps) {
         width="100%"
         bg="#191919d9"
         borderTop="1px solid"
-        borderColor="brand.lightBlue"
+        borderColor="#fff"
         flexDir="column"
         flexWrap="nowrap"
         justifyContent="space-evenly"

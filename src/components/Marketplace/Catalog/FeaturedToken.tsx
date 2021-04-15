@@ -26,7 +26,7 @@ export default function FeaturedToken(props: FeaturedTokenProps) {
         <Flex pr={[0, 10]} borderRight={["unset", "2px solid #aaa"]} justifyContent="center">
           <TokenMedia
             src={ipfsUriToGatewayUrl(props.network, props.artifactUri)}
-            maxW="90%"
+            maxW="50%"
           />
         </Flex>
         <Box pl={[0, 10]} marginLeft="0 !important">
