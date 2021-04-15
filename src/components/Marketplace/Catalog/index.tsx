@@ -29,7 +29,7 @@ export default function Catalog() {
       flexDir="column"
     >
       {state.marketplace.loaded && tokens.length > 0 ? (
-        <Flex maxHeight="50%" width="50%" px={4} paddingBottom={8}>
+        <Flex maxHeight="50%" width="100%" px={4} paddingBottom={8} justifyContent="center">
           <TokenCard
             key={`${tokens[0].address}-${tokens[0].id}`}
             network={system.config.network}
