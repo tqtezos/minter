@@ -24,26 +24,27 @@ interface SellTokenModalProps extends BaseModalProps {
 }
 
 export function SellTokenModal(props: SellTokenModalProps) {
-  const [salePrice, setSalePrice] = useState('');
+  const [price, setPrice] = useState('');
   const dispatch = useDispatch();
   const initialRef = React.useRef(null);
+
+  const salePrice = Math.floor(Number(price) * 1000000);
+  const validPrice = !Number.isNaN(price) && salePrice > 0;
   return (
     <FormModal
       disclosure={props.disclosure}
       sync={props.sync}
       method="listToken"
-      dispatchThunk={() => {
-        const price = Math.floor(Number(salePrice) * 1000000);
-        const validPrice = Number.isNaN(price) ? 0 : price;
-        return dispatch(
+      dispatchThunk={() =>
+        dispatch(
           listTokenAction({
             contract: props.contract,
             tokenId: props.tokenId,
-            salePrice: validPrice
+            salePrice: salePrice
           })
-        );
-      }}
-      onComplete={() => setSalePrice('')}
+        )
+      }
+      onComplete={() => setPrice('')}
       initialRef={initialRef}
       pendingMessage="Listing token for sale..."
       completeMessage="Token listed for sale"
@@ -65,15 +66,17 @@ export function SellTokenModal(props: SellTokenModalProps) {
                     autoFocus={true}
                     ref={initialRef}
                     placeholder="Enter sale amount"
-                    value={salePrice}
-                    onChange={e => setSalePrice(e.target.value)}
+                    value={price}
+                    onChange={e => setPrice(e.target.value)}
                   />
                 </InputGroup>
               </FormControl>
               <Box ml={2}>
                 <MinterButton
-                  variant="primaryAction"
-                  onClick={() => onSubmit()}
+                  variant={
+                    validPrice ? 'primaryAction' : 'primaryActionInactive'
+                  }
+                  onClick={() => validPrice && onSubmit()}
                 >
                   <Check />
                 </MinterButton>
