@@ -9,7 +9,7 @@ interface TokenCardProps extends Token {
   network: string;
 }
 
-function getAverageRGB(src: string, type: string) {
+export function getAverageRGB(src: string, type: string) {
   return new Promise(resolve => {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d') as CanvasRenderingContext2D ?? {} as any;

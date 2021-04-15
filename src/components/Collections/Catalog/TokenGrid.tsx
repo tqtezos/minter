@@ -1,96 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, {useState } from 'react';
 import { useLocation } from 'wouter';
-import { AspectRatio, Box, Flex, SimpleGrid, Image, Text } from '@chakra-ui/react';
-import { Wind, HelpCircle } from 'react-feather';
+import { AspectRatio, Box, Flex, SimpleGrid, Text, Heading } from '@chakra-ui/react';
+import { Wind } from 'react-feather';
 import { Token, CollectionsState } from '../../../reducer/slices/collections';
 import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 import { useSelector } from '../../../reducer';
+import { TokenMedia } from '../../common/TokenMedia';
+import { getAverageRGB } from '../../Marketplace/Catalog/TokenCard';
 
 interface TokenTileProps extends Token {
   network: string;
   selectedCollection: string;
 }
 
-function MediaNotFound() {
-  return (
-    <Flex
-      flexDir="column"
-      align="center"
-      justify="center"
-      flex="1"
-      bg="gray.100"
-      color="gray.300"
-      height="100%"
-    >
-      <HelpCircle size="70px" />
-    </Flex>
-  );
-}
-
-function TokenImage(props: { src: string }) {
-  const [errored, setErrored] = useState(false);
-  const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
-  useEffect(() => {
-    (async () => {
-      let blob;
-      try {
-        blob = await fetch(props.src).then(r => r.blob());
-      } catch (e) {
-        return setErrored(true);
-      }
-      setObj({
-        url: URL.createObjectURL(blob),
-        type: blob.type
-      });
-    })();
-  }, [props.src]);
-
-  if (errored) {
-    return <MediaNotFound />;
-  }
-
-  if (!obj) return null;
-
-  if (/^image\/.*/.test(obj.type)) {
-    return (
-      <Image
-        src={props.src}
-        objectFit="scale-down"
-        flex="1"
-        height="100%"
-        onError={() => setErrored(true)}
-      />
-    );
-  }
-
-  if (/^video\/.*/.test(obj.type)) {
-    return (
-      <video
-        loop
-        onClick={e => e.preventDefault()}
-        onMouseEnter={e => e.currentTarget.play()}
-        onMouseLeave={e => e.currentTarget.pause()}
-      >
-        <source src={obj.url} type={obj.type} />
-      </video>
-    );
-  }
-
-  return <MediaNotFound />;
-}
-
 function TokenTile(props: TokenTileProps) {
   const [, setLocation] = useLocation();
+  const [obj, setObj] = useState<{ r: number, g: number, b: number }>({ r: 255, g: 255, b: 255 });
   const src = ipfsUriToGatewayUrl(props.network, props.artifactUri);
   return (
     <Flex
+      position="relative"
+      role="group"
       flexDir="column"
       ratio={1}
       w="100%"
-      bg="white"
+      background={`rgb(${obj.r},${obj.g},${obj.b})`}
       border="2px solid"
-      borderColor="666"
-      borderRadius="0px"
+      borderColor="#fff"
+      borderRadius="3px"
       overflow="hidden"
       boxShadow="0px 0px 10px #3333"
       transition="all linear 50ms"
@@ -99,25 +36,39 @@ function TokenTile(props: TokenTileProps) {
         boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.1)'
       }}
       onClick={() =>
-        setLocation(`/collection/${props.selectedCollection}/token/${props.id}`)
+        setLocation(`/collection/${props.address}/token/${props.id}`)
       }
     >
       <AspectRatio ratio={3 / 2}>
         <Box p={4}>
-          <TokenImage
+          <TokenMedia
             src={src}
+            onLoad={async (url: string, type: string) => {
+              let rgb = await getAverageRGB(url, type) as any;
+              setObj(rgb);
+            }}
           />
         </Box>
       </AspectRatio>
       <Flex
+        opacity="0"
         width="100%"
-        px={4}
-        py={4}
-        bg="white"
+        bg="#191919d9"
         borderTop="1px solid"
-        borderColor="brand.lightBlue"
+        borderColor="#fff"
+        flexDir="column"
+        flexWrap="nowrap"
+        justifyContent="space-evenly"
+        alignItems="center"
+        height="100%"
+        bottom="0"
+        borderTopRightRadius="2px"
+        borderTopLeftRadius="2px"
+        _groupHover={{ opacity: 1 }}
+        position="absolute"
+        transition="0.25s all"
       >
-        <Text>{props.title}</Text>
+        <Heading size="lg" color="white">{props.title}</Heading>
       </Flex>
     </Flex>
   );
