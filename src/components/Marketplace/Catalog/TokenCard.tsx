@@ -115,8 +115,8 @@ export default function TokenCard(props: TokenCardProps) {
         position="absolute"
         transition="0.25s all"
       >
-        <Heading size="1.4rem" fontWeight="400" textAlign="center" color="white">{props.sale?.price} ꜩ</Heading>
-        <Heading size="1.4rem" color="white" textAlign="center" textOverflow="ellipsis">{props.title}</Heading>
+        <Heading size="1.55rem" fontWeight="400" textAlign="center" color="white">{props.sale?.price} ꜩ</Heading>
+        <Heading size="1.55rem" color="white" textAlign="center" textOverflow="ellipsis">{props.title}</Heading>
       </Flex>
     </Flex>
   );
