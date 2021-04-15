@@ -384,7 +384,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           </Button>
         </Flex>
       </Flex>
-      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1} borderTop="2px solid #3D464F">
+      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1} borderTop="2px solid #aaa">
         <Flex
           width={['90%', '70%']}
           mx="auto"
