@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Token } from '../../../reducer/slices/collections';
 import { useLocation } from 'wouter';
 import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
-import { AspectRatio, Box, Flex, Text, Heading } from '@chakra-ui/react';
+import { AspectRatio, Box, Flex, Heading } from '@chakra-ui/react';
 import { TokenMedia } from '../../common/TokenMedia';
 
 interface TokenCardProps extends Token {

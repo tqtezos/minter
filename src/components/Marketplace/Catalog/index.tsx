@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
-import { Box, Container, Text, Flex, Heading, SimpleGrid, Spinner } from '@chakra-ui/react';
+import { Container, Text, Flex, Heading, SimpleGrid, Spinner } from '@chakra-ui/react';
 import { Wind } from 'react-feather';
 import { useSelector, useDispatch } from '../../../reducer';
 import { getMarketplaceNftsQuery } from '../../../reducer/async/queries';
 import TokenCard from './TokenCard';
-import FeaturedToken from './FeaturedToken';
 
 export default function Catalog() {
   const { system, marketplace: state } = useSelector(s => s);
@@ -30,7 +29,7 @@ export default function Catalog() {
       flexDir="column"
     >
       {state.marketplace.loaded && tokens.length > 0 ? (
-        <Flex maxHeight="50%" width="100%" px={4} paddingBottom={8}>
+        <Flex maxHeight="50%" width="50%" px={4} paddingBottom={8}>
           <TokenCard
             key={`${tokens[0].address}-${tokens[0].id}`}
             network={system.config.network}
