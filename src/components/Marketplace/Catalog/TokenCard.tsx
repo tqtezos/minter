@@ -116,7 +116,7 @@ export default function TokenCard(props: TokenCardProps) {
         transition="0.25s all"
       >
         <Heading size="lg" fontWeight="400" textAlign="center" color="white">{props.sale?.price} ꜩ</Heading>
-        <Text size="md" color="white">{props.title}</Text>
+        <Heading size="lg" color="white">{props.title}</Heading>
       </Flex>
     </Flex>
   );
