@@ -29,7 +29,7 @@ export default function CollectionSelect() {
     <Flex pb={8} flexDir="column">
       <Flex pb={4} align="center" justify="space-between">
         <Heading size="md">Select a collection</Heading>
-        <CreateCollectionButton />
+        <CreateCollectionButton sync={true} />
       </Flex>
       <Menu>
         <MenuButton

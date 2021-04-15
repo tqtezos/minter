@@ -6,7 +6,6 @@ import Form from './Form';
 import FileUpload from './FileUpload';
 import CollectionSelect from './CollectionSelect';
 // import Preview from './Preview';
-import StatusModal from './StatusModal';
 import Confirmation from './Confirmation';
 import { ChevronLeft, X } from 'react-feather';
 
@@ -20,7 +19,7 @@ import {
 } from '../../reducer/slices/createNft';
 import { mintTokenAction } from '../../reducer/async/actions';
 import { validateCreateNftStep } from '../../reducer/validators/createNft';
-import { clearError, setStatus } from '../../reducer/slices/status';
+import FormModal from '../common/modals/FormModal';
 
 function ProgressIndicator({ state }: { state: CreateNftState }) {
   const stepIdx = steps.indexOf(state.step);
@@ -90,10 +89,11 @@ function LeftContent() {
 
 export default function CreateNonFungiblePage() {
   const { system, createNft: state } = useSelector(s => s);
-  const status = useSelector(s => s.status.mintToken);
   const dispatch = useDispatch();
   const [, setLocation] = useLocation();
-  const { isOpen, onClose, onOpen } = useDisclosure();
+  const disclosure = useDisclosure();
+  const { onOpen } = disclosure;
+
   useEffect(() => {
     if (system.status !== 'WalletConnected') {
       setLocation('/');
@@ -163,8 +163,7 @@ export default function CreateNonFungiblePage() {
                     return dispatch(incrementStep());
                   }
                   case 'confirm': {
-                    onOpen();
-                    return dispatch(mintTokenAction());
+                    return onOpen();
                   }
                 }
               }}
@@ -172,24 +171,32 @@ export default function CreateNonFungiblePage() {
             >
               {state.step === 'confirm' ? 'Create' : 'Next'}
             </MinterButton>
-            <StatusModal
-              isOpen={isOpen}
-              onClose={() => {
-                onClose();
-                setLocation('/collections');
-                dispatch(setStatus({ method: 'mintToken', status: 'ready' }));
-                dispatch(clearForm());
-              }}
-              onRetry={() => {
-                dispatch(clearError({ method: 'mintToken' }));
-                dispatch(mintTokenAction());
-              }}
-              onCancel={() => {
-                onClose();
-                dispatch(clearError({ method: 'mintToken' }));
-                dispatch(setStatus({ method: 'mintToken', status: 'ready' }));
-              }}
-              status={status}
+            <FormModal
+              disclosure={disclosure}
+              method="mintToken"
+              dispatchThunk={() => dispatch(mintTokenAction())}
+              onComplete={() => dispatch(clearForm())}
+              afterClose={() => setLocation('/collections')}
+              dispatchOnOpen={true}
+              pendingAsyncMessage={
+                <>
+                  Opening wallet...
+                  <br />
+                  <Text
+                    fontSize="1rem"
+                    fontWeight="normal"
+                    marginTop={4}
+                    textAlign="center"
+                    color="gray.500"
+                  >
+                    <span role="img" aria-label="lightbulb">
+                      🌱
+                    </span>{' '}
+                    Minting on Tezos produces 1,500,000 times less CO2 emissions
+                    than Ethereum.
+                  </Text>
+                </>
+              }
             />
           </Flex>
         </Flex>
