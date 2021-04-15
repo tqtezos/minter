@@ -145,7 +145,7 @@ export default function CollectionDisplay({
   ownedOnly = true
 }: CollectionDisplayProps) {
   const collections = useSelector(s => s.collections);
-  const { config, tzPublicKey } = useSelector(s => s.system);
+  const { config, tzPublicKey, wallet } = useSelector(s => s.system);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -226,9 +226,11 @@ export default function CollectionDisplay({
       overflowY="scroll"
       justify="start"
     >
-      <Flex display={{ base: 'flex', md: 'none' }} mb={4}>
-        <CollectionsDropdown />
-      </Flex>
+      {ownedOnly && wallet !== null ? (
+        <Flex display={{ base: 'flex', md: 'none' }} mb={4}>
+          <CollectionsDropdown />
+        </Flex>
+      ) : null}
       <Flex
         display={{ base: 'none', md: 'flex' }}
         w="100%"
