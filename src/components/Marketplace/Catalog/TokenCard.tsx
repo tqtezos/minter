@@ -100,7 +100,7 @@ export default function TokenCard(props: TokenCardProps) {
       <Flex
         opacity="0"
         width="100%"
-        bg="#000e"
+        bg="#191919d9"
         borderTop="1px solid"
         borderColor="brand.lightBlue"
         flexDir="column"
