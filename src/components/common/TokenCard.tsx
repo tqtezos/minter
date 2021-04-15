@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Token } from '../../../reducer/slices/collections';
+import { Token } from '../../reducer/slices/collections';
 import { useLocation } from 'wouter';
-import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
+import { ipfsUriToGatewayUrl } from '../../lib/util/ipfs';
 import { AspectRatio, Box, Flex, Heading } from '@chakra-ui/react';
-import { TokenMedia } from '../../common/TokenMedia';
+import { TokenMedia } from './TokenMedia';
 
 interface TokenCardProps extends Token {
   network: string;
+  selectedCollection?: string;
 }
 
 export function getAverageRGB(src: string, type: string) {
@@ -63,7 +64,7 @@ export default function TokenCard(props: TokenCardProps) {
   const [, setLocation] = useLocation();
   const [obj, setObj] = useState<{ r: number, g: number, b: number }>({ r: 255, g: 255, b: 255 });
   const src = ipfsUriToGatewayUrl(props.network, props.artifactUri);
-
+console.log(props);
   return (
     <Flex
       position="relative"
@@ -105,7 +106,7 @@ export default function TokenCard(props: TokenCardProps) {
         borderColor="#fff"
         flexDir="column"
         flexWrap="nowrap"
-        justifyContent="space-evenly"
+        justifyContent="center"
         alignItems="center"
         height="100%"
         bottom="0"
@@ -115,7 +116,7 @@ export default function TokenCard(props: TokenCardProps) {
         position="absolute"
         transition="0.25s all"
       >
-        <Heading size="1.45rem !important" fontWeight="400" textAlign="center" color="white">{props.sale?.price} ꜩ</Heading>
+        {props.sale?.price ? <><Heading size="1.45rem !important" fontWeight="400" textAlign="center" color="white">{props.sale?.price} ꜩ</Heading></> : <></>}
         <Heading size="1.45rem !important" color="white" textAlign="center" textOverflow="ellipsis">{props.title}</Heading>
       </Flex>
     </Flex>

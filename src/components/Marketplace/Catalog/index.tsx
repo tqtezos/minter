@@ -3,7 +3,7 @@ import { Container, Text, Flex, Heading, SimpleGrid, Spinner } from '@chakra-ui/
 import { Wind } from 'react-feather';
 import { useSelector, useDispatch } from '../../../reducer';
 import { getMarketplaceNftsQuery } from '../../../reducer/async/queries';
-import TokenCard from './TokenCard';
+import TokenCard from '../../common/TokenCard';
 
 export default function Catalog() {
   const { system, marketplace: state } = useSelector(s => s);
