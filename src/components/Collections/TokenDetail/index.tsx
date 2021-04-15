@@ -148,7 +148,7 @@ function TokenImage(props: {
           margin: 'auto', height: props.height || '100%',
           width: props.width,
           maxWidth: props.maxWidth ?? 'unset',
-          maxHeight: props.maxHeight ?? 'unset' 
+          maxHeight: props.maxHeight ?? 'unset'
         }}
       >
         <source src={obj.url} type={obj.type} />
@@ -338,7 +338,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               />
             </Menu>
           ) : (
-            <Flex w={[10]} />
+            <></>
           )}
 
           {token.sale ? (
@@ -358,21 +358,12 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 />
               </Flex>
             ) : (
-              <Flex
-                flexDirection="column"
-                align="stretch"
-                width={['100%', 200]}
-              >
-                <Flex align="center" justify="space-between" alignSelf="center">
-                  <Text color="black" fontSize="3xl" mr={1}>
-                    ꜩ
-                  </Text>
-                  <Text color="brand.black" fontSize="xl" fontWeight="700">
-                    {token.sale.price.toFixed(2)}
-                  </Text>
-                </Flex>
+              <>
+                <Text color="black" fontSize="3xl" mr={1}>
+                {token.sale.price.toFixed(2)}ꜩ
+                </Text>
                 <BuyTokenButton contract={contractAddress} token={token} />
-              </Flex>
+              </>
             )
           ) : isOwner ? (
             <SellTokenButton contract={contractAddress} tokenId={tokenId} />
