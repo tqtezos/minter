@@ -1,4 +1,9 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+import {
+  pushNotification,
+  readNotification,
+  deliverNotification
+} from './notificationsActions';
 import {
   createAssetContractAction,
   mintTokenAction,
@@ -15,14 +20,14 @@ import {
 } from '../async/queries';
 import { ErrorKind } from '../async/errors';
 
-interface Notification {
+export interface Notification {
   requestId: string;
   read: boolean;
   delivered: boolean;
-  status: 'success' | 'warning' | 'error';
+  status: 'success' | 'pending' | 'error';
   title: string;
   description: string;
-  kind: ErrorKind;
+  kind: ErrorKind | null;
 }
 
 export type NotificationState = Notification[];
@@ -32,25 +37,27 @@ const initialState: NotificationState = [];
 const slice = createSlice({
   name: 'notifications',
   initialState,
-  reducers: {
-    readNotification(state, { payload: requestId }: PayloadAction<string>) {
-      for (let notification of state) {
-        if (notification.requestId === requestId) {
-          notification.read = true;
-          break;
-        }
-      }
-    },
-    deliverNotification(state, { payload: requestId }: PayloadAction<string>) {
-      for (let notification of state) {
-        if (notification.requestId === requestId) {
-          notification.delivered = true;
-          break;
-        }
-      }
-    }
-  },
+  reducers: {},
   extraReducers: ({ addCase }) => {
+    addCase(pushNotification, (state, { payload }) => {
+      state.push(payload);
+    });
+
+    addCase(readNotification, (state, { payload: requestId }) => {
+      return state.map(n => {
+        return n.requestId === requestId ? { ...n, read: true } : n;
+      });
+    });
+
+    addCase(deliverNotification, (state, { payload: requestId }) => {
+      return state.map(n => {
+        return n.requestId === requestId ? { ...n, delivered: true } : n;
+      });
+    });
+
+    // Action errors are abstracted by their payloads. This allows us to iterate
+    // through a list of actions and assign a notification without individually
+    // matching against each one through `addCase`
     [
       createAssetContractAction,
       mintTokenAction,
@@ -81,7 +88,5 @@ const slice = createSlice({
     });
   }
 });
-
-export const { readNotification, deliverNotification } = slice.actions;
 
 export default slice;
