@@ -79,7 +79,7 @@ export function BuyTokenButton(props: BuyTokenButtonProps) {
   return (
     <>
       <MinterButton variant="primaryAction" onClick={disclosure.onOpen}>
-        Buy now
+        Buy
       </MinterButton>
 
       <BuyTokenModal {...props} disclosure={disclosure} sync={props.sync} />

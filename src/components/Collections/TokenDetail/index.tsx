@@ -306,7 +306,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
           height="75%"
           width="auto"
-        />{' '}
+        />
         <Flex align="center" justify="space-between" width={['90vw']} mt="4">
           {isOwner ? (
             <Menu>
@@ -359,7 +359,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               </Flex>
             ) : (
               <>
-                <Text color="black" fontSize="3xl" mr={1}>
+                <Text color="black" fontSize={['sm', 'lg']} mr={1}>
                 {token.sale.price.toFixed(2)}ꜩ
                 </Text>
                 <BuyTokenButton contract={contractAddress} token={token} />
