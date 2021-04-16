@@ -22,8 +22,14 @@ export default function FeaturedToken(props: FeaturedTokenProps) {
   const [, setLocation] = useLocation();
   return (
     <Container maxW="100%" py={10} px={0}>
-      <Stack width="100%" direction={{ base: 'column', md: 'row' }} spacing="24px" mb={10} display="flex" flexDir="row" flexWrap="wrap" justifyContent="center" alignItems="center">
-        <Flex pr={[0, 10]} borderRight={["unset", "2px solid #aaa"]} justifyContent="center">
+      <Stack width="100%" direction={{ base: 'column', md: 'row' }} spacing="24px" mb={10} display="flex" flexDir="row" flexWrap="wrap" justifyContent="center" alignItems="center"
+        onClick={e => {
+          e.preventDefault();
+          setLocation(`/collection/${props.address}/token/${props.id}`, {
+            replace: false
+          });
+        }}>
+        <Flex pr={[0, 10]} borderRight={["unset", "2px solid #aaa"]} justifyContent="center" height="calc(100% - 24px)">
           <TokenMedia
             src={ipfsUriToGatewayUrl(props.network, props.artifactUri)}
             maxW="50%"
@@ -44,20 +50,6 @@ export default function FeaturedToken(props: FeaturedTokenProps) {
                 {props.sale?.price} ꜩ
               </Text>
             </Text>
-            <MinterButton
-              size="md"
-              variant="primaryAction"
-              w="150px"
-              my={4}
-              onClick={e => {
-                e.preventDefault();
-                setLocation(`/collection/${props.address}/token/${props.id}`, {
-                  replace: false
-                });
-              }}
-            >
-              <Text>View</Text>
-            </MinterButton>
           </Flex>
         </Box>
       </Stack>
