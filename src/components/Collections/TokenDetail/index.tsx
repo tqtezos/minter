@@ -27,9 +27,10 @@ import {
 } from '@chakra-ui/react';
 import { ChevronLeft, HelpCircle, MoreHorizontal, Star } from 'react-feather';
 import { MinterButton, MinterMenuButton, MinterMenuItem } from '../../common';
-import { TransferTokenModal } from '../../common/TransferToken';
-import { SellTokenButton, CancelTokenSaleButton } from '../../common/SellToken';
-import { BuyTokenButton } from '../../common/BuyToken';
+import { TransferTokenModal } from '../../common/modals/TransferToken';
+import { SellTokenButton } from '../../common/modals/SellToken';
+import { CancelTokenSaleButton } from '../../common/modals/CancelTokenSale';
+import { BuyTokenButton } from '../../common/modals/BuyToken';
 import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 import { useSelector, useDispatch } from '../../../reducer';
 import {
@@ -127,9 +128,12 @@ function TokenImage(props: {
         id={props.id || 'assetImage'}
         key={props.id || 'assetImage'}
         src={props.src}
-        objectFit={props.objectFit}
+        objectFit="scale-down"
+        flex="1"
+        height="100%"
+        width={props.width}
+        maxWidth={props.maxWidth}
         onError={() => setErrored(true)}
-        height={props.height}
         onLoad={props.onLoad}
       />
     );
@@ -479,7 +483,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               <Flex flexDir="column" width={['100%', 'auto']}>
                 <Text color="brand.neutralGray">Collection</Text>
                 <Text color="brand.darkGray" fontWeight="bold" mt={[2, 4]}>
-                  {token.owner}
+                  {contractAddress}
                 </Text>
               </Flex>
             </Flex>
