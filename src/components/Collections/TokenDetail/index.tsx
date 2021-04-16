@@ -148,7 +148,7 @@ function TokenImage(props: {
           margin: 'auto', height: props.height || '100%',
           width: props.width,
           maxWidth: props.maxWidth ?? 'unset',
-          maxHeight: props.maxHeight ?? 'unset' 
+          maxHeight: props.maxHeight ?? 'unset'
         }}
       >
         <source src={obj.url} type={obj.type} />
@@ -238,6 +238,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           backgroundColor="#333333f9"
           zIndex="2000"
           margin="0 !important"
+          borderRadius="0"
         >
           {/^image\/.*/.test(mediaType) ? (
             <Flex
@@ -275,7 +276,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             maxHeight="85%"
             objectFit="contain"
           />
-          <ModalCloseButton position="absolute" right="0 !important" bottom="0 !important" display="block !important" fontSize="18px" top="unset" borderLeft="2px solid #333" color="white" borderTop="2px solid #333" width="4rem" height="4rem" borderRight="none" borderBottom="none" borderTopEndRadius="0" border="0" />
+          <ModalCloseButton position="absolute" right="0 !important" bottom="0 !important" display="block !important" fontSize="18px" top="unset" borderLeft="2px solid #aaa" color="white" borderTop="2px solid #aaa" width="4rem" height="4rem" borderRight="none" borderBottom="none" borderBottomStartRadius="0" borderBottomEndRadius="0" borderTopEndRadius="0" border="0" />
         </ModalContent>
       </Modal>
       <Flex pt={8} px={8}>
@@ -305,7 +306,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
           height="75%"
           width="auto"
-        />{' '}
+        />
         <Flex align="center" justify="space-between" width={['90vw']} mt="4">
           {isOwner ? (
             <Menu>
@@ -337,7 +338,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               />
             </Menu>
           ) : (
-            <Flex w={[10]} />
+            <></>
           )}
 
           {token.sale ? (
@@ -357,21 +358,12 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 />
               </Flex>
             ) : (
-              <Flex
-                flexDirection="column"
-                align="stretch"
-                width={['100%', 200]}
-              >
-                <Flex align="center" justify="space-between" alignSelf="center">
-                  <Text color="black" fontSize="3xl" mr={1}>
-                    ꜩ
-                  </Text>
-                  <Text color="brand.black" fontSize="xl" fontWeight="700">
-                    {token.sale.price.toFixed(2)}
-                  </Text>
-                </Flex>
+              <>
+                <Text color="black" fontSize={['sm', 'lg']} mr={1}>
+                {token.sale.price.toFixed(2)}ꜩ
+                </Text>
                 <BuyTokenButton contract={contractAddress} token={token} />
-              </Flex>
+              </>
             )
           ) : isOwner ? (
             <SellTokenButton contract={contractAddress} tokenId={tokenId} />
@@ -383,7 +375,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           </Button>
         </Flex>
       </Flex>
-      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1} borderTop="2px solid #3D464F">
+      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1} borderTop="2px solid #aaa">
         <Flex
           width={['90%', '70%']}
           mx="auto"
