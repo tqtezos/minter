@@ -18,7 +18,7 @@ function MediaNotFound() {
   );
 }
 
-export function TokenMedia(props: { src: string, maxW?: string, onLoad?: Function }) {
+export function TokenMedia(props: { src: string, maxW?: string, onLoad?: Function, height?: string }) {
   const [errored, setErrored] = useState(false);
   const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
   useEffect(() => {
@@ -46,7 +46,7 @@ export function TokenMedia(props: { src: string, maxW?: string, onLoad?: Functio
     return (
       <Image
         src={props.src}
-        height="100%"
+        height={props.height ?? "100%"}
         flex="1"
         style={{objectFit:"scale-down", maxWidth:props.maxW ?? '100%', maxHeight: '100%'}}
         onError={() => setErrored(true)}
@@ -63,7 +63,7 @@ export function TokenMedia(props: { src: string, maxW?: string, onLoad?: Functio
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
         onLoadedData={()=> props.onLoad ? props.onLoad(obj.url, obj.type) : ''}
-        height="100%"
+        height={props.height ?? "100%"}
         style={{objectFit:"scale-down", maxWidth: props.maxW ?? '100%', maxHeight: '100%'}}
       >
         <source src={obj.url} type={obj.type} />

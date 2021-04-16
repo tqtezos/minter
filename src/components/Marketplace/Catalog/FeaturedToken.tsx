@@ -33,6 +33,7 @@ export default function FeaturedToken(props: FeaturedTokenProps) {
           <TokenMedia
             src={ipfsUriToGatewayUrl(props.network, props.artifactUri)}
             maxW="50%"
+            height="calc(100% - 24px)"
           />
         </Flex>
         <Box pl={[0, 10]} marginLeft="0 !important">
