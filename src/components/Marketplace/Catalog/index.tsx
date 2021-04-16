@@ -27,6 +27,7 @@ export default function Catalog() {
       overflowY="scroll"
       justify="start"
       flexDir="column"
+      alignItems="center"
     >
       {state.marketplace.loaded && tokens.length > 0 ? (
         <Flex maxHeight="50%" width="50%" px={4} paddingBottom={8} justifyContent="center">
