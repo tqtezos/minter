@@ -1,209 +1,78 @@
-import React, {
-  useState,
-  MutableRefObject,
-  SetStateAction,
-  Dispatch
-} from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Text,
   FormControl,
   FormLabel,
   Input,
-  Modal,
-  ModalOverlay,
-  ModalContent,
   ModalHeader,
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  useDisclosure,
-  Spinner,
-  Flex,
-  Heading
+  useDisclosure
 } from '@chakra-ui/react';
-import { CheckCircle, Plus, AlertCircle, X } from 'react-feather';
+import { Plus } from 'react-feather';
 import { MinterButton } from '../../common';
-import { useSelector, useDispatch } from '../../../reducer';
+import { useDispatch } from '../../../reducer';
 import { createAssetContractAction } from '../../../reducer/async/actions';
-import { clearError, setStatus, Status } from '../../../reducer/slices/status';
+import FormModal, { BaseModalProps, BaseModalButtonProps } from './FormModal';
 
-interface FormProps {
-  initialRef: MutableRefObject<null>;
-  onSubmit: (form: { contractName: string }) => void;
-  contractName: string;
-  setContractName: Dispatch<SetStateAction<string>>;
-}
+interface CreateCollectionModalProps extends BaseModalProps {}
 
-function Form({
-  initialRef,
-  onSubmit,
-  contractName,
-  setContractName
-}: FormProps) {
+function CreateCollectionModal(props: CreateCollectionModalProps) {
+  const [contractName, setContractName] = useState('');
+  const dispatch = useDispatch();
+  const initialRef = React.useRef(null);
   return (
-    <>
-      <ModalHeader>New Collection</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        <FormControl>
-          <FormLabel fontFamily="mono">Collection Name</FormLabel>
-          <Input
-            autoFocus={true}
-            ref={initialRef}
-            placeholder="Input your collection name"
-            value={contractName}
-            onChange={e => setContractName(e.target.value)}
-          />
-        </FormControl>
-      </ModalBody>
-
-      <ModalFooter>
-        <MinterButton
-          variant="primaryAction"
-          onClick={() => onSubmit({ contractName })}
-        >
-          Create Collection
-        </MinterButton>
-      </ModalFooter>
-    </>
+    <FormModal
+      disclosure={props.disclosure}
+      sync={props.sync}
+      method="createAssetContract"
+      dispatchThunk={() => dispatch(createAssetContractAction(contractName))}
+      onComplete={() => setContractName('')}
+      initialRef={initialRef}
+      pendingMessage="Creating collection..."
+      completeMessage="Collection created"
+      body={onSubmit => (
+        <>
+          <ModalHeader>New Collection</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel fontFamily="mono">Collection Name</FormLabel>
+              <Input
+                autoFocus={true}
+                ref={initialRef}
+                placeholder="Input your collection name"
+                value={contractName}
+                onChange={e => setContractName(e.target.value)}
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <MinterButton variant="primaryAction" onClick={() => onSubmit()}>
+              Create Collection
+            </MinterButton>
+          </ModalFooter>
+        </>
+      )}
+    />
   );
 }
 
-interface ContentProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onRetry: () => void;
-  onCancel: () => void;
-  status: Status;
-}
+interface CreateCollectionButtonProps extends BaseModalButtonProps {}
 
-function Content({ status, onClose, onRetry, onCancel }: ContentProps) {
-  if (status.error) {
-    return (
-      <Flex flexDir="column" align="center" px={4} py={10}>
-        <Box color="brand.blue" mb={6}>
-          <AlertCircle size="70px" />
-        </Box>
-        <Heading size="lg" textAlign="center" color="gray.500" mb={6}>
-          Error Creating Collection
-        </Heading>
-        <Flex flexDir="row" justify="center">
-          <MinterButton variant="primaryAction" onClick={() => onRetry()}>
-            Retry
-          </MinterButton>
-          <MinterButton
-            variant="tertiaryAction"
-            onClick={() => onCancel()}
-            display="flex"
-            alignItems="center"
-            ml={4}
-          >
-            <Box color="currentcolor">
-              <X size={16} strokeWidth="3" />
-            </Box>
-            <Text fontSize={16} ml={1} fontWeight="600">
-              Close
-            </Text>
-          </MinterButton>
-        </Flex>
-      </Flex>
-    );
-  }
-  if (status.status === 'in_transit') {
-    return (
-      <Flex flexDir="column" align="center" px={4} py={10}>
-        <Spinner size="xl" mb={6} color="gray.300" />
-        <Heading size="lg" textAlign="center" color="gray.500">
-          Creating collection...
-        </Heading>
-      </Flex>
-    );
-  }
-  if (status.status === 'complete') {
-    return (
-      <Flex flexDir="column" align="center" px={4} py={10}>
-        <Box color="brand.blue" mb={6}>
-          <CheckCircle size="70px" />
-        </Box>
-        <Heading size="lg" textAlign="center" color="gray.500" mb={6}>
-          Collection created
-        </Heading>
-        <MinterButton variant="primaryAction" onClick={() => onClose()}>
-          Close
-        </MinterButton>
-      </Flex>
-    );
-  }
-  return null;
-}
-
-export function CreateCollectionButton() {
-  const status = useSelector(s => s.status.createAssetContract);
-  const dispatch = useDispatch();
-  const [contractName, setContractName] = useState('');
-
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const initialRef = React.useRef(null);
-
-  const onSubmit = async () => {
-    dispatch(createAssetContractAction(contractName));
-  };
-
-  const close = () => {
-    if (status.status !== 'in_transit') {
-      dispatch(setStatus({ method: 'createAssetContract', status: 'ready' }));
-      onClose();
-    }
-  };
-
+export function CreateCollectionButton(props: CreateCollectionButtonProps) {
+  const disclosure = useDisclosure();
   return (
     <>
-      <MinterButton variant="primaryActionInverted" onClick={onOpen}>
+      <MinterButton variant="primaryActionInverted" onClick={disclosure.onOpen}>
         <Box color="currentcolor">
           <Plus size={16} strokeWidth="3" />
         </Box>
         <Text ml={2}>New Collection</Text>
       </MinterButton>
-
-      <Modal
-        isOpen={isOpen}
-        onClose={() => close()}
-        initialFocusRef={initialRef}
-        closeOnEsc={false}
-        closeOnOverlayClick={false}
-        onEsc={() => close()}
-        onOverlayClick={() => close()}
-      >
-        <ModalOverlay />
-        <ModalContent mt={40}>
-          {status.status === 'ready' ? (
-            <Form
-              initialRef={initialRef}
-              onSubmit={onSubmit}
-              contractName={contractName}
-              setContractName={setContractName}
-            />
-          ) : (
-            <Content
-              isOpen={isOpen}
-              status={status}
-              onClose={() => close()}
-              onCancel={() => {
-                onClose();
-                dispatch(clearError({ method: 'createAssetContract' }));
-                dispatch(
-                  setStatus({ method: 'createAssetContract', status: 'ready' })
-                );
-              }}
-              onRetry={() => {
-                dispatch(clearError({ method: 'createAssetContract' }));
-                onSubmit();
-              }}
-            />
-          )}
-        </ModalContent>
-      </Modal>
+      <CreateCollectionModal disclosure={disclosure} sync={props.sync} />
     </>
   );
 }

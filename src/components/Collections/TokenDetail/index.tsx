@@ -436,7 +436,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               <Flex flexDir="column" width={['100%', 'auto']}>
                 <Text color="brand.neutralGray">Collection</Text>
                 <Text color="brand.darkGray" fontWeight="bold" mt={[2, 4]}>
-                  {token.owner}
+                  {contractAddress}
                 </Text>
               </Flex>
             </Flex>
