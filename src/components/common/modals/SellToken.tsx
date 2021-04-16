@@ -100,7 +100,7 @@ export function SellTokenButton(props: SellTokenButtonProps) {
   return (
     <>
       <MinterButton variant="primaryAction" onClick={disclosure.onOpen}>
-        List for sale
+        Sell
       </MinterButton>
       <SellTokenModal {...props} disclosure={disclosure} sync={props.sync} />
     </>
