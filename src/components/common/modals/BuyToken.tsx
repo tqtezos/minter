@@ -78,7 +78,7 @@ export function BuyTokenButton(props: BuyTokenButtonProps) {
   const disclosure = useDisclosure();
   return (
     <>
-      <MinterButton variant="primaryAction" onClick={disclosure.onOpen}>
+      <MinterButton minWidth={32} variant="primaryAction" onClick={disclosure.onOpen}>
         Buy
       </MinterButton>
 
