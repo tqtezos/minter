@@ -27,7 +27,6 @@ export function getAverageRGB(src: string, type: string) {
       try {
         data = context.getImageData(0, 0, width, height);
       } catch (e) {
-        console.log(e);
         return resolve(rgb);
       }
       let length = data?.data.length, blockSize = 4, i = 0, count = 0;
@@ -64,7 +63,7 @@ export default function TokenCard(props: TokenCardProps) {
   const [, setLocation] = useLocation();
   const [obj, setObj] = useState<{ r: number, g: number, b: number }>({ r: 255, g: 255, b: 255 });
   const src = ipfsUriToGatewayUrl(props.network, props.artifactUri);
-console.log(props);
+
   return (
     <Flex
       position="relative"
