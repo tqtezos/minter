@@ -99,25 +99,21 @@ console.log(props);
         </Box>
       </AspectRatio>
       <Flex
-        opacity="0"
         width="100%"
         bg="#191919d9"
         borderTop="1px solid"
         borderColor="#fff"
-        flexDir="column"
+        flexDir="row"
         flexWrap="nowrap"
         justifyContent="center"
         alignItems="center"
-        height="100%"
-        bottom="0"
         borderTopRightRadius="2px"
         borderTopLeftRadius="2px"
-        _groupHover={{ opacity: 1 }}
-        position="absolute"
+        position="relative"
         transition="0.25s all"
       >
-        {props.sale?.price ? <><Heading size="1.45rem !important" fontWeight="400" textAlign="center" color="white">{props.sale?.price} ꜩ</Heading></> : <></>}
-        <Heading size="1.45rem !important" color="white" textAlign="center" textOverflow="ellipsis">{props.title}</Heading>
+        {props.sale?.price ? <><Heading size="1.45rem !important" fontWeight="400" textAlign="center" color="white" width="25%" display="flex" justifyContent="center" alignItems="center">{props.sale?.price} ꜩ</Heading></> : <></>}
+        <Heading size="1.45rem !important" color="white" textAlign="center" textOverflow="ellipsis" width="25%" display="flex" justifyContent="center" alignItems="center">{props.title}</Heading>
       </Flex>
     </Flex>
   );
