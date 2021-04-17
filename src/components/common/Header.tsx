@@ -295,9 +295,6 @@ function NavItems() {
 
 export function Header() {
   const [location, setLocation] = useLocation();
-  if (location === '/' || location === '') {
-    return null;
-  }
   return (
     <Flex
       width="100%"
