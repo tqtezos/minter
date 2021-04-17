@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Switch, Route } from 'wouter';
-import SplashPage from '../SplashPage';
 import CreateNonFungiblePage from '../CreateNonFungiblePage';
 import CollectionsCatalog from '../Collections/Catalog';
 import CollectionsTokenDetail from '../Collections/TokenDetail';
@@ -40,7 +39,7 @@ export default function App() {
         <Header />
         <Switch>
           <Route path="/">
-            <SplashPage />
+            <CollectionsCatalog />
           </Route>
           <Route path="/create">
             <CreateNonFungiblePage />
