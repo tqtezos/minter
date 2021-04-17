@@ -101,8 +101,6 @@ export default function TokenCard(props: TokenCardProps) {
         width="100%"
         opacity="0"
         bg="#191919d9"
-        borderTop="1px solid"
-        borderColor="#fff"
         flexDir="row"
         flexWrap="nowrap"
         justifyContent="center"
