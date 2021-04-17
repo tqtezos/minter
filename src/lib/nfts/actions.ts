@@ -1,8 +1,10 @@
 import { MichelsonMap } from '@taquito/taquito';
+import {
+  Fa2MultiNftAssetCode,
+  Fa2MultiNftFaucetCode
+} from '@tqtezos/minter-contracts';
 import { Buffer } from 'buffer';
 import { SystemWithWallet } from '../system';
-import faucetCode from './code/fa2_tzip16_compat_multi_nft_faucet';
-import assetCode from './code/fa2_tzip16_compat_multi_nft_asset';
 import { uploadIPFSJSON } from '../util/ipfs';
 import { NftMetadata } from './queries';
 
@@ -24,7 +26,7 @@ export async function createFaucetContract(
   metadataMap.set('', toHexString(resp.data.ipfsUri));
   return await system.toolkit.wallet
     .originate({
-      code: faucetCode,
+      code: Fa2MultiNftFaucetCode.code,
       storage: {
         assets: {
           ledger: new MichelsonMap(),
@@ -52,7 +54,7 @@ export async function createAssetContract(
   metadataMap.set('', toHexString(resp.data.ipfsUri));
   return await system.toolkit.wallet
     .originate({
-      code: assetCode,
+      code: Fa2MultiNftAssetCode.code,
       storage: {
         assets: {
           ledger: new MichelsonMap(),

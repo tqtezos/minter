@@ -48,7 +48,8 @@ export function TokenMedia(props: { src: string, maxW?: string, onLoad?: Functio
         src={props.src}
         height={props.height ?? "100%"}
         flex="1"
-        style={{objectFit:"scale-down", maxWidth:props.maxW ?? '100%', maxHeight: '100%'}}
+        maxWidth={props.maxW}
+        style={{objectFit:"scale-down"}}
         onError={() => setErrored(true)}
         onLoad={()=> props.onLoad ? props.onLoad(obj.url, obj.type) : ''}
       />

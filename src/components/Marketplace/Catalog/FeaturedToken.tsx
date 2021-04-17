@@ -11,7 +11,6 @@ import {
   Heading,
   Stack
 } from '@chakra-ui/react';
-import { MinterButton } from '../../common';
 import { TokenMedia } from '../../common/TokenMedia';
 
 interface FeaturedTokenProps extends Token {
