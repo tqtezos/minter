@@ -346,7 +346,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               <Flex direction="column">
                 <Flex align="center" alignSelf="center">
                   <Text color="black" fontSize="3xl" mr={1}>
-                    ꜩ
+                  &#42793;
                   </Text>
                   <Text color="brand.black" fontSize="xl" fontWeight="700">
                     {token.sale.price}
@@ -360,7 +360,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             ) : (
               <>
                 <Text color="black" fontSize={['sm', 'lg']} mr={1}>
-                {token.sale.price.toFixed(2)}ꜩ
+                {token.sale.price.toFixed(2)} &#42793;
                 </Text>
                 <BuyTokenButton contract={contractAddress} token={token} />
               </>

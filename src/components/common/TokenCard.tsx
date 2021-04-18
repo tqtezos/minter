@@ -114,7 +114,7 @@ export default function TokenCard(props: TokenCardProps) {
           opacity: 1
         }}
       >
-        {props.sale?.price ? <><Heading size="1.45rem !important" fontWeight="400" textAlign="center" color="white" width={props.sale?.price ? "25%" : "0%"} display="flex" justifyContent="center" alignItems="center">{props.sale?.price} ꜩ</Heading></> : <></>}
+        {props.sale?.price ? <><Heading size="1.45rem !important" fontWeight="400" textAlign="center" color="white" width={props.sale?.price ? "25%" : "0%"} display="flex" justifyContent="center" alignItems="center">{props.sale?.price} &#42793;</Heading></> : <></>}
         <Heading size="1.45rem !important" color="white" height="24px" textAlign={props.sale?.price ? "right" : "center"} textOverflow="ellipsis" width={props.sale?.price ? "75%" : "100%"} paddingRight="5%">{props.title}</Heading>
       </Flex>
     </Flex>
