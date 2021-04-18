@@ -21,7 +21,7 @@ export default function App() {
 
   useEffect(() => {
     dispatch(getMarketplaceNftsQuery(state.marketplace.marketplace.address));
-  }, [ state.marketplace.marketplace.address, dispatch ]);
+  }, [state.marketplace.marketplace.address, dispatch]);
 
   useEffect(() => {
     if (!walletReconnectAttempted) {
@@ -35,7 +35,7 @@ export default function App() {
         <Header />
         <Switch>
           <Route path="/">
-            <CollectionsCatalog />
+            <MarketplaceCatalog />
           </Route>
           <Route path="/create">
             <CreateNonFungiblePage />
