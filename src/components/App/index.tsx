@@ -35,7 +35,7 @@ export default function App() {
         <Header />
         <Switch>
           <Route path="/">
-            <CollectionsCatalog />
+            <MarketplaceCatalog />
           </Route>
           <Route path="/create">
             <CreateNonFungiblePage />
