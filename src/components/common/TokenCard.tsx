@@ -99,7 +99,7 @@ export default function TokenCard(props: TokenCardProps) {
       </AspectRatio>
       <Flex
         width="100%"
-        opacity="0"
+        opacity={[1, 0]}
         bg="#191919d9"
         flexDir="row"
         flexWrap="nowrap"
