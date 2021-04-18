@@ -34,9 +34,7 @@ export default function Catalog() {
   ]);
 
   useEffect(() => {
-    if (system.status !== 'WalletConnected') {
-      setLocation('/', { replace: true });
-    } else {
+    if (system.status === 'WalletConnected') {
       dispatch(getWalletAssetContractsQuery());
     }
   }, [system.status, setLocation, dispatch]);
