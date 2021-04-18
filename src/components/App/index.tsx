@@ -29,10 +29,6 @@ export default function App() {
     }
   }, [walletReconnectAttempted, dispatch]);
 
-  if (!walletReconnectAttempted) {
-    return null;
-  }
-
   return (
     <Flex pos="absolute" w="100%" h="100%">
       <Flex justifyContent="space-between" width="100%" flexDir="column">
