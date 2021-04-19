@@ -4,7 +4,7 @@ import { useLocation } from 'wouter';
 import { RefreshCw, ExternalLink } from 'react-feather';
 import { MinterButton } from '../../common';
 import Sidebar from './Sidebar';
-import TokenGrid from './TokenGrid';
+import TokenGrid from './TokenGrid'; 
 import CollectionsDropdown from './CollectionsDropdown';
 
 import { useSelector, useDispatch } from '../../../reducer';
