@@ -232,7 +232,6 @@ export default function CollectionDisplay({
         </Flex>
       ) : null}
       <Flex
-        display={{ base: 'none', md: 'flex' }}
         w="100%"
         pb={6}
         justify="space-between"
@@ -249,7 +248,7 @@ export default function CollectionDisplay({
           <Flex justify="space-between" width="100%">
             <Heading size="lg">{collection.metadata.name || ''}</Heading>
           </Flex>
-          <Flex align="center">
+          <Flex align="center" display={{ base: 'none', md: 'flex' }}>
             <Text fontFamily="mono" color="brand.lightGray">
               {collection.address}
             </Text>
@@ -264,6 +263,7 @@ export default function CollectionDisplay({
           </Flex>
         </Flex>
         <MinterButton
+          display={{ base: 'none', md: 'flex' }}
           variant="primaryActionInverted"
           onClick={() => {
             const selectedCollection = collections.selectedCollection;
