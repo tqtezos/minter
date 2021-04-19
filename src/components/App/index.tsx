@@ -11,12 +11,19 @@ import { Flex } from '@chakra-ui/react';
 import Notifications from '../common/Notifications';
 import { useSelector, useDispatch } from '../../reducer';
 import { reconnectWallet } from '../../reducer/async/wallet';
+import { getMarketplaceNftsQuery } from '../../reducer/async/queries';
 
 export default function App() {
   const dispatch = useDispatch();
-  const walletReconnectAttempted = useSelector(
-    s => s.system.walletReconnectAttempted
+  const state = useSelector(
+    s => s
   );
+
+  let walletReconnectAttempted = state.system.walletReconnectAttempted
+
+  useEffect(() => {
+    dispatch(getMarketplaceNftsQuery(state.marketplace.marketplace.address));
+  }, [ state.marketplace.marketplace.address, dispatch ]);
 
   useEffect(() => {
     if (!walletReconnectAttempted) {
