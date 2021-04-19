@@ -52,6 +52,7 @@ export function TokenMedia(props: { src: string, maxW?: string, onLoad?: Functio
         style={{objectFit:"scale-down"}}
         onError={() => setErrored(true)}
         onLoad={()=> props.onLoad ? props.onLoad(obj.url, obj.type) : ''}
+        loading="lazy"
       />
     );
   }
