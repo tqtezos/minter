@@ -3,6 +3,7 @@ import { Switch, Route } from 'wouter';
 import SplashPage from '../SplashPage';
 import CreateNonFungiblePage from '../CreateNonFungiblePage';
 import CollectionsCatalog from '../Collections/Catalog';
+import CollectionDisplay from '../Collections/Catalog/CollectionDisplay';
 import CollectionsTokenDetail from '../Collections/TokenDetail';
 import MarketplaceCatalog from '../Marketplace/Catalog';
 import Header from '../common/Header';
@@ -50,6 +51,11 @@ export default function App() {
           </Route>
           <Route path="/marketplace">
             <MarketplaceCatalog />
+          </Route>
+          <Route path="/collection/:contractAddress">
+            {({ contractAddress }) => (
+              <CollectionDisplay address={contractAddress} ownedOnly={false} />
+            )}
           </Route>
           <Route path="/collection/:contractAddress/token/:tokenId">
             {({ contractAddress, tokenId }) => (
