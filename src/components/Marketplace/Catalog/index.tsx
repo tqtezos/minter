@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, Container, Text, Flex, Heading, SimpleGrid, Spinner } from '@chakra-ui/react';
+import { Box, Container, Text, Flex, Heading, SimpleGrid, Image } from '@chakra-ui/react';
 import { Wind } from 'react-feather';
 import { useSelector, useDispatch } from '../../../reducer';
 import { getMarketplaceNftsQuery } from '../../../reducer/async/queries';
@@ -42,8 +42,8 @@ export default function Catalog() {
           flexDir="column"
         >
           {!state.marketplace.loaded ? (
-            <Flex flexDir="column" align="center" flex="1" pt={20}>
-              <Spinner size="xl" mb={6} color="gray.300" />
+            <Flex flexDir="column" align="center" flex="1" pt={20} justifyContent="center" alignItems="center">
+              <Image className="spinner" src="/tezos-logo.svg" />
               <Heading size="lg" textAlign="center" color="gray.500">
                 Loading...
               </Heading>
