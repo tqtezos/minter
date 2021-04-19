@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, Flex, Heading, Text, Link, Spinner, Image } from '@chakra-ui/react';
+import { Flex, Heading, Text, Link, Image } from '@chakra-ui/react';
 import { useLocation } from 'wouter';
 import Sidebar from './Sidebar';
 import CollectionDisplay from './CollectionDisplay';
@@ -8,6 +8,7 @@ import { getWalletAssetContractsQuery } from '../../../reducer/async/queries';
 import { selectCollection } from '../../../reducer/slices/collections';
 import { connectWallet } from '../../../reducer/async/wallet';
 import logo from '../../common/assets/splash-logo.svg';
+import { MinterButton } from '../../common';
 
 export default function Catalog() {
   const [, setLocation] = useLocation();
