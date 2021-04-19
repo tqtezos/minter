@@ -36,7 +36,7 @@ export interface StatusState {
   getWalletAssetContracts: Status;
 }
 
-type Method = keyof StatusState;
+export type Method = keyof StatusState;
 
 const defaultStatus: Status = { status: 'ready', error: null };
 

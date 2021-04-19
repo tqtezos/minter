@@ -1,6 +1,6 @@
 import React from 'react';
 import { Flex, Heading, Text } from '@chakra-ui/react';
-import { CreateCollectionButton } from '../../common/CreateCollection';
+import { CreateCollectionButton } from '../../common/modals/CreateCollection';
 import { useSelector, useDispatch } from '../../../reducer';
 import {
   selectCollection,

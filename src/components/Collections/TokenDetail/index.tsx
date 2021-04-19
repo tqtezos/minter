@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'wouter';
 import {
   Accordion,
   AccordionButton,
@@ -17,7 +16,6 @@ import {
   Modal,
   ModalCloseButton,
   ModalContent,
-  ModalOverlay,
   ResponsiveValue,
   Slider,
   SliderFilledTrack,
@@ -28,9 +26,10 @@ import {
 } from '@chakra-ui/react';
 import { ChevronLeft, HelpCircle, MoreHorizontal, Star } from 'react-feather';
 import { MinterButton, MinterMenuButton, MinterMenuItem } from '../../common';
-import { TransferTokenModal } from '../../common/TransferToken';
-import { SellTokenButton, CancelTokenSaleButton } from '../../common/SellToken';
-import { BuyTokenButton } from '../../common/BuyToken';
+import { TransferTokenModal } from '../../common/modals/TransferToken';
+import { SellTokenButton } from '../../common/modals/SellToken';
+import { CancelTokenSaleButton } from '../../common/modals/CancelTokenSale';
+import { BuyTokenButton } from '../../common/modals/BuyToken';
 import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 import { useSelector, useDispatch } from '../../../reducer';
 import {
@@ -94,6 +93,7 @@ function TokenImage(props: {
   src: string;
   width?: string;
   maxWidth?: string;
+  maxHeight?: string;
   height?: string;
   objectFit?: ResponsiveValue<any>;
   onLoad?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
@@ -128,9 +128,13 @@ function TokenImage(props: {
         id={props.id || 'assetImage'}
         key={props.id || 'assetImage'}
         src={props.src}
-        objectFit={props.objectFit}
+        objectFit={props.objectFit ?? "scale-down"}
+        flex="1"
+        height={props.height ?? "100%"}
+        width={props.width}
+        maxWidth={props.maxWidth}
+        maxHeight={props.maxHeight ?? 'unset'}
         onError={() => setErrored(true)}
-        height={props.height}
         onLoad={props.onLoad}
       />
     );
@@ -138,7 +142,15 @@ function TokenImage(props: {
 
   if (/^video\/.*/.test(obj.type)) {
     return (
-      <video controls style={{ margin: 'auto', height: '100%' }}>
+      <video
+        controls
+        style={{
+          margin: 'auto', height: props.height || '100%',
+          width: props.width,
+          maxWidth: props.maxWidth ?? 'unset',
+          maxHeight: props.maxHeight ?? 'unset'
+        }}
+      >
         <source src={obj.url} type={obj.type} />
       </video>
     );
@@ -153,18 +165,16 @@ interface TokenDetailProps {
 }
 
 function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
-  const [, setLocation] = useLocation();
   const { system, collections: state } = useSelector(s => s);
   const disclosure = useDisclosure();
   const dispatch = useDispatch();
   const collection = state.collections[contractAddress];
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [zoom, setZoom] = useState(0);
-  const [initialZoom, setInitialZoom] = useState(0);
-  const [imageHeight, setImageHeight] = useState(0);
-  const [imageWidth, setImageWidth] = useState(0);
-  const [mediaType, setMediaType] = useState('');
-  const [shouldScroll, setShouldScroll] = useState(false);
+  const [initialZoom] = useState(0);
+  const [imageHeight] = useState(0);
+  const [imageWidth] = useState(0);
+  const [mediaType] = useState('');
 
   const collectionUndefined = collection === undefined;
 
@@ -187,9 +197,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       img.style.width = `${imageWidth * zoom}px`;
       img.style.height = `${imageHeight * zoom}px`;
       if (isPortrait && imageHeight > imageWidth) {
-        img.style.margin = `calc((((${
-          imageHeight - wHeight
-        }px) / 2) * ${initialZoom} - 80px) * ${1 - zoom}) auto`;
+        img.style.margin = `calc((((${imageHeight - wHeight
+          }px) / 2) * ${initialZoom} - 80px) * ${1 - zoom}) auto`;
       }
     }
   }, [imageHeight, imageWidth, initialZoom, zoom]);
@@ -216,44 +225,20 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
         size="full"
         scrollBehavior="inside"
       >
-        <ModalOverlay />
         <ModalContent
-          overflow="auto"
-          m="1rem"
-          maxHeight="calc(100vh - 2rem)"
-          display="unset"
-          onLoad={e => {
-            const img = document.getElementById('fullScreenAssetView');
-            const wHeight = window.innerHeight - 80;
-            const wWidth = window.innerWidth - 32;
-            const isLandscape = wHeight < wWidth;
-            const isPortrait = wHeight > wWidth;
-
-            if (img) {
-              if (!shouldScroll) {
-                img.style.margin = `calc(${
-                  (e.currentTarget.scrollHeight - imageHeight) / 2
-                }px - 3rem) auto`;
-              }
-              if (isLandscape) {
-                if (imageHeight > e.currentTarget.scrollHeight) {
-                  img.style.height = `calc(100% - 3rem)`;
-                  img.style.margin = 'auto';
-                } else if (imageWidth > e.currentTarget.scrollWidth) {
-                  img.style.width = `100%`;
-                  img.style.paddingTop = `calc(25% - 3rem)`;
-                }
-              } else if (isPortrait) {
-                if (imageHeight > e.currentTarget.scrollHeight) {
-                  img.style.margin = `calc(((${
-                    imageHeight - e.currentTarget.scrollHeight
-                  }px) / 2) * ${initialZoom} - 80px) auto`;
-                } else if (imageWidth > e.currentTarget.scrollWidth) {
-                  img.style.paddingTop = `calc(25% - 3rem)`;
-                }
-              }
-            }
-          }}
+          height="100vh"
+          maxHeight="unset"
+          width="100vw"
+          display="flex"
+          flexDirection="column"
+          flexWrap="nowrap"
+          justifyContent="center"
+          alignItems="center"
+          position="relative"
+          backgroundColor="#333333f9"
+          zIndex="2000"
+          margin="0 !important"
+          borderRadius="0"
         >
           {/^image\/.*/.test(mediaType) ? (
             <Flex
@@ -263,7 +248,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               top={0}
               left={0}
             >
-              <ModalCloseButton position="relative" left={0} top={0} />
               <Slider
                 defaultValue={initialZoom}
                 min={initialZoom}
@@ -280,13 +264,19 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               </Slider>
             </Flex>
           ) : (
-            <ModalCloseButton />
+            ''
           )}
 
           <TokenImage
             id="fullScreenAssetView"
             src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
+            width="auto"
+            height="auto"
+            maxWidth="85%"
+            maxHeight="85%"
+            objectFit="contain"
           />
+          <ModalCloseButton position="absolute" right="0 !important" bottom="0 !important" display="block !important" fontSize="18px" top="unset" borderLeft="2px solid #aaa" color="white" borderTop="2px solid #aaa" width="4rem" height="4rem" borderRight="none" borderBottom="none" borderBottomStartRadius="0" borderBottomEndRadius="0" borderTopEndRadius="0" border="0" />
         </ModalContent>
       </Modal>
       <Flex pt={8} px={8}>
@@ -294,19 +284,18 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           variant="primaryActionInverted"
           onClick={e => {
             e.preventDefault();
-            setLocation('/collections', { replace: true });
+            window.history.back();
           }}
         >
           <Box color="currentcolor">
             <ChevronLeft size={16} strokeWidth="3" />
           </Box>
-          <Text ml={2}>Collections</Text>
         </MinterButton>
       </Flex>
       <Flex
         align="center"
         flex="1"
-        pb={[4, 16]}
+        pb={4}
         px={[4, 16]}
         mx="auto"
         width={['90%', '70%']}
@@ -315,41 +304,10 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       >
         <TokenImage
           src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
-          height="85%"
-          onLoad={e => {
-            const iHeight = e.currentTarget.height;
-            const iWidth = e.currentTarget.width;
-            const wHeight = window.innerHeight - 80;
-            const wWidth = window.innerWidth - 32;
-            const isLandscape = wHeight < wWidth;
-            const isPortrait = wWidth < wHeight;
-
-            const isImageBiggerThanModal = iHeight > wHeight || iWidth > wWidth;
-
-            setShouldScroll(isImageBiggerThanModal);
-
-            if (isImageBiggerThanModal) {
-              if (isLandscape) {
-                if (iHeight > iWidth) {
-                  const initialZoom = wHeight / iHeight;
-                  setInitialZoom(initialZoom);
-                } else {
-                  const initialZoom = wWidth / iWidth;
-                  setInitialZoom(initialZoom);
-                }
-              } else if (isPortrait) {
-                const initialZoom = wWidth / iWidth;
-                setInitialZoom(initialZoom);
-              }
-            } else {
-              setInitialZoom(1);
-            }
-            setImageHeight(iHeight);
-            setImageWidth(iWidth);
-          }}
-          onFetch={setMediaType}
-        />{' '}
-        <Flex align="center" justify="space-evenly" width={['100%']} mt="4">
+          height="75%"
+          width="auto"
+        />
+        <Flex align="center" justify="space-evenly" width={['90vw']} mt="4">
           {isOwner ? (
             <Menu>
               <MinterMenuButton variant="primary">
@@ -380,7 +338,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               />
             </Menu>
           ) : (
-            <Flex w={[10]} />
+            <></>
           )}
 
           {token.sale ? (
@@ -391,7 +349,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                     ꜩ
                   </Text>
                   <Text color="brand.black" fontSize="xl" fontWeight="700">
-                    {token.sale.price.toFixed(2)}
+                    {token.sale.price}
                   </Text>
                 </Flex>
                 <CancelTokenSaleButton
@@ -400,21 +358,12 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 />
               </Flex>
             ) : (
-              <Flex
-                flexDirection="column"
-                align="stretch"
-                width={['100%', 200]}
-              >
-                <Flex align="center" justify="space-between" alignSelf="center">
-                  <Text color="black" fontSize="3xl" mr={1}>
-                    ꜩ
-                  </Text>
-                  <Text color="brand.black" fontSize="xl" fontWeight="700">
-                    {token.sale.price.toFixed(2)}
-                  </Text>
-                </Flex>
+              <>
+                <Text color="black" fontSize={['sm', 'lg']} mr={1}>
+                {token.sale.price.toFixed(2)}ꜩ
+                </Text>
                 <BuyTokenButton contract={contractAddress} token={token} />
-              </Flex>
+              </>
             )
           ) : isOwner ? (
             <SellTokenButton contract={contractAddress} tokenId={tokenId} />
@@ -426,7 +375,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           </Button>
         </Flex>
       </Flex>
-      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1}>
+      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1} borderTop="2px solid #aaa">
         <Flex
           width={['90%', '70%']}
           mx="auto"
@@ -477,9 +426,9 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             </Text>
             <Flex mt={[4, 8]}>
               <Flex flexDir="column" width={['100%', 'auto']}>
-                <Text color="brand.neutralGray">Owner</Text>
+                <Text color="brand.neutralGray">Collection</Text>
                 <Text color="brand.darkGray" fontWeight="bold" mt={[2, 4]}>
-                  {token.owner}
+                  {contractAddress}
                 </Text>
               </Flex>
             </Flex>

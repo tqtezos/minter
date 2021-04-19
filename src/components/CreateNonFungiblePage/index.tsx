@@ -5,8 +5,8 @@ import { MinterButton } from '../common';
 import Form from './Form';
 import FileUpload from './FileUpload';
 import CollectionSelect from './CollectionSelect';
-import Preview from './Preview';
-import StatusModal from './StatusModal';
+// import Preview from './Preview';
+import Confirmation from './Confirmation';
 import { ChevronLeft, X } from 'react-feather';
 
 import { useSelector, useDispatch } from '../../reducer';
@@ -19,12 +19,20 @@ import {
 } from '../../reducer/slices/createNft';
 import { mintTokenAction } from '../../reducer/async/actions';
 import { validateCreateNftStep } from '../../reducer/validators/createNft';
-import { clearError, setStatus } from '../../reducer/slices/status';
+import FormModal from '../common/modals/FormModal';
 
 function ProgressIndicator({ state }: { state: CreateNftState }) {
   const stepIdx = steps.indexOf(state.step);
   return (
-    <Flex align="center" flexDir="column" flex="1">
+    <Flex
+      align="center"
+      flexDir="column"
+      flex="1"
+      display={{
+        base: 'none',
+        md: 'flex'
+      }}
+    >
       <Flex width="200px" justifyContent="stretch" pb={2}>
         {steps.map((step, i) => {
           const color = stepIdx >= i ? 'brand.blue' : 'brand.lightBlue';
@@ -51,11 +59,29 @@ function LeftContent() {
   const step = useSelector(s => s.createNft.step);
   switch (step) {
     case 'file_upload':
-      return <FileUpload />;
+      return (
+        <Box w="100%" maxWidth="1200px">
+          <FileUpload />
+        </Box>
+      );
     case 'asset_details':
-      return <Form />;
+      return (
+        <Box w="100%" maxWidth="800px">
+          <Form />
+        </Box>
+      );
     case 'collection_select':
-      return <CollectionSelect />;
+      return (
+        <Box w="100%" maxWidth="800px">
+          <CollectionSelect />
+        </Box>
+      );
+    case 'confirm':
+      return (
+        <Box w="100%" maxWidth="800px">
+          <Confirmation />
+        </Box>
+      );
     default:
       return null;
   }
@@ -63,10 +89,11 @@ function LeftContent() {
 
 export default function CreateNonFungiblePage() {
   const { system, createNft: state } = useSelector(s => s);
-  const status = useSelector(s => s.status.mintToken);
   const dispatch = useDispatch();
   const [, setLocation] = useLocation();
-  const { isOpen, onClose, onOpen } = useDisclosure();
+  const disclosure = useDisclosure();
+  const { onOpen } = disclosure;
+
   useEffect(() => {
     if (system.status !== 'WalletConnected') {
       setLocation('/');
@@ -77,13 +104,13 @@ export default function CreateNonFungiblePage() {
 
   return (
     <Flex flex="1" width="100%" minHeight="0">
-      <Flex w="50%" h="100%" flexDir="column" overflowY="scroll">
+      <Flex w="100%" h="100%" flexDir="column" align="center">
         <Flex
           w="100%"
           px={8}
           py={4}
           justify="space-between"
-          align="end"
+          align="center"
           borderBottomWidth="1px"
           borderBottomColor="brand.brightGray"
         >
@@ -135,78 +162,61 @@ export default function CreateNonFungiblePage() {
                   case 'asset_details': {
                     return dispatch(incrementStep());
                   }
-                  case 'collection_select': {
-                    onOpen();
-                    return dispatch(mintTokenAction());
+                  case 'confirm': {
+                    return onOpen();
                   }
                 }
               }}
               ml={4}
             >
-              {state.step === 'collection_select' ? 'Create' : 'Next'}
+              {state.step === 'confirm' ? 'Create' : 'Next'}
             </MinterButton>
-            <StatusModal
-              isOpen={isOpen}
-              onClose={() => {
-                onClose();
-                setLocation('/collections');
-                dispatch(setStatus({ method: 'mintToken', status: 'ready' }));
-                dispatch(clearForm());
-              }}
-              onRetry={() => {
-                dispatch(clearError({ method: 'mintToken' }));
-                dispatch(mintTokenAction());
-              }}
-              onCancel={() => {
-                onClose();
-                dispatch(clearError({ method: 'mintToken' }));
-                dispatch(setStatus({ method: 'mintToken', status: 'ready' }));
-              }}
-              status={status}
+            <FormModal
+              disclosure={disclosure}
+              method="mintToken"
+              dispatchThunk={() => dispatch(mintTokenAction())}
+              onComplete={() => dispatch(clearForm())}
+              afterClose={() => setLocation('/collections')}
+              dispatchOnOpen={true}
+              pendingAsyncMessage={
+                <>
+                  Opening wallet...
+                  <br />
+                  <Text
+                    fontSize="1rem"
+                    fontWeight="normal"
+                    marginTop={4}
+                    textAlign="center"
+                    color="gray.500"
+                  >
+                    <span role="img" aria-label="lightbulb">
+                      🌱
+                    </span>{' '}
+                    Minting on Tezos produces 1,500,000 times less CO2 emissions
+                    than Ethereum.
+                  </Text>
+                </>
+              }
             />
           </Flex>
         </Flex>
-        <Box
+        <Flex
           width="100%"
           pt={10}
-          px={28}
-          overflowY="scroll"
+          px={{
+            base: 6,
+            md: 28
+          }}
+          overflowY="auto"
           minHeight="0px"
           flex="1"
+          flexDir="column"
+          align="center"
         >
           <LeftContent />
           <Box pb={10} w="100%" />
-        </Box>
+        </Flex>
       </Flex>
-      {state.step === 'file_upload' && state.selectedFile === null ? (
-        <Flex
-          bg="brand.darkGray"
-          borderLeftWidth="1px"
-          borderLeftColor="brand.lightBlue"
-          w="50%"
-          h="100%"
-          flexDir="column"
-          align="center"
-          justify="center"
-        >
-          <Text color="brand.lightGray">(Artwork TBD)</Text>
-        </Flex>
-      ) : (
-        <Flex
-          bg="brand.brightGray"
-          borderLeftWidth="1px"
-          borderLeftColor="brand.lightBlue"
-          w="50%"
-          h="100%"
-          flexDir="column"
-          align="center"
-          overflowY="scroll"
-          px={28}
-          pt={16}
-        >
-          <Preview />
-        </Flex>
-      )}
     </Flex>
   );
 }

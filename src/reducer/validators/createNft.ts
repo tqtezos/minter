@@ -31,8 +31,10 @@ export function validateCreateNftStep(state: State['createNft']) {
     case 'file_upload':
       return isValid(fileUploadSchema, state);
     case 'asset_details':
-      return isValid(assetDetailsSchema, state);
+      return isValid(collectionSelectSchema, state);
     case 'collection_select':
+      return isValid(collectionSelectSchema, state);
+    case 'confirm':
       return isValid(collectionSelectSchema, state);
     default:
       return false;
