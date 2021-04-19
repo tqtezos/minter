@@ -294,10 +294,8 @@ function NavItems() {
 }
 
 export function Header() {
-  const [location, setLocation] = useLocation();
-  if (location === '/' || location === '') {
-    return null;
-  }
+  const [, setLocation] = useLocation();
+  
   return (
     <Flex
       width="100%"
@@ -306,6 +304,7 @@ export function Header() {
       paddingY={3}
       alignItems="center"
       justifyContent="space-between"
+      boxShadow="0px 2px 10px #3333"
     >
       <Image
         display={{
