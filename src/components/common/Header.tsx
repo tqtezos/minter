@@ -17,9 +17,8 @@ import {
   DrawerBody,
   Heading
 } from '@chakra-ui/react';
-import { Plus, Settings, Menu as HamburgerIcon } from 'react-feather';
+import { Plus, Menu as HamburgerIcon } from 'react-feather';
 import { RiStore2Line } from 'react-icons/ri';
-// import { IoCubeOutline } from 'react-icons/io5';
 import { MdCollections } from 'react-icons/md';
 import headerLogo from './assets/header-logo.svg';
 import { useSelector, useDispatch } from '../../reducer';
@@ -124,7 +123,7 @@ function WalletDisplay() {
       {system.status === 'WalletConnected' ? (
         <Menu placement="bottom-end" offset={[4, 24]}>
           <MenuButton>
-            <Settings />
+          <Image src={wallet_icon} width="auto" height="40%" paddingLeft={3} />
           </MenuButton>
           <MenuList color="brand.black">
 
@@ -236,7 +235,8 @@ function NavItems() {
                       }}
                       mb={4}
                     >
-                      Connect your Wallet
+                      Connect Wallet
+                      <Image src={wallet_icon} width="auto" height="40%" paddingLeft={3} />
                     </MinterButton>
                   )}
                 </Flex>
