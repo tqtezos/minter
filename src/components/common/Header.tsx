@@ -26,6 +26,7 @@ import { useSelector, useDispatch } from '../../reducer';
 import { connectWallet, disconnectWallet } from '../../reducer/async/wallet';
 import { MinterButton } from '.';
 import logo from './assets/splash-logo.svg';
+import wallet_icon from './assets/wallet.svg';
 
 interface MobileHeaderLinkProps {
   to: string;
@@ -154,6 +155,7 @@ function WalletDisplay() {
           }}
         >
           Connect Wallet
+          <Image src={wallet_icon} width="auto" height="40%" paddingLeft={3} />
         </MinterButton>
       )}
     </>
