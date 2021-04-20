@@ -153,7 +153,7 @@ function WalletDisplay() {
             dispatch(connectWallet());
           }}
         >
-          Connect your Wallet
+          Connect Wallet
         </MinterButton>
       )}
     </>
