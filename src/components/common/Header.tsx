@@ -120,12 +120,13 @@ function WalletDisplay() {
   const dispatch = useDispatch();
   return (
     <>
-      <Menu placement="bottom-end" offset={[4, 24]}>
-        <MenuButton>
-          <Settings />
-        </MenuButton>
-        <MenuList color="brand.black">
-          {system.status === 'WalletConnected' ? (
+      {system.status === 'WalletConnected' ? (
+        <Menu placement="bottom-end" offset={[4, 24]}>
+          <MenuButton>
+            <Settings />
+          </MenuButton>
+          <MenuList color="brand.black">
+
             <Flex flexDir="column" px={4} py={2}>
               <Text fontSize={16} fontWeight="600">
                 Network: {system.config.network}
@@ -142,24 +143,19 @@ function WalletDisplay() {
                 Disconnect
               </MinterButton>
             </Flex>
-          ) : (
-            <Flex flexDir="column" justify="center" px={4}>
-              <Text mt={2} mb={4}>
-                No wallet connected
-              </Text>
-              <MinterButton
-                variant="secondaryAction"
-                onClick={e => {
-                  e.preventDefault();
-                  dispatch(connectWallet());
-                }}
-              >
-                Connect your Wallet
-              </MinterButton>
-            </Flex>
-          )}
-        </MenuList>
-      </Menu>
+          </MenuList>
+        </Menu>
+      ) : (
+        <MinterButton
+          variant="secondaryAction"
+          onClick={e => {
+            e.preventDefault();
+            dispatch(connectWallet());
+          }}
+        >
+          Connect your Wallet
+        </MinterButton>
+      )}
     </>
   );
 }
@@ -295,7 +291,7 @@ function NavItems() {
 
 export function Header() {
   const [, setLocation] = useLocation();
-  
+
   return (
     <Flex
       width="100%"
