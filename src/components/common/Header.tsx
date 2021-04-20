@@ -17,15 +17,15 @@ import {
   DrawerBody,
   Heading
 } from '@chakra-ui/react';
-import { Plus, Settings, Menu as HamburgerIcon } from 'react-feather';
+import { Plus, Menu as HamburgerIcon } from 'react-feather';
 import { RiStore2Line } from 'react-icons/ri';
-// import { IoCubeOutline } from 'react-icons/io5';
 import { MdCollections } from 'react-icons/md';
 import headerLogo from './assets/header-logo.svg';
 import { useSelector, useDispatch } from '../../reducer';
 import { connectWallet, disconnectWallet } from '../../reducer/async/wallet';
 import { MinterButton } from '.';
 import logo from './assets/splash-logo.svg';
+import wallet_icon from './assets/wallet.svg';
 
 interface MobileHeaderLinkProps {
   to: string;
@@ -120,12 +120,17 @@ function WalletDisplay() {
   const dispatch = useDispatch();
   return (
     <>
-      <Menu placement="bottom-end" offset={[4, 24]}>
-        <MenuButton>
-          <Settings />
-        </MenuButton>
-        <MenuList color="brand.black">
-          {system.status === 'WalletConnected' ? (
+      {system.status === 'WalletConnected' ? (
+        <Menu placement="bottom-end" offset={[4, 24]}>
+          <MenuButton padding={2} _hover={{
+            textDecoration: 'none',
+            background: '#2D3748',
+            color: '#EDF2F7'
+          }}>
+            <Image src={wallet_icon} width={4} height="auto" style={{ filter: 'invert(1)' }} />
+          </MenuButton>
+          <MenuList color="brand.black">
+
             <Flex flexDir="column" px={4} py={2}>
               <Text fontSize={16} fontWeight="600">
                 Network: {system.config.network}
@@ -142,24 +147,20 @@ function WalletDisplay() {
                 Disconnect
               </MinterButton>
             </Flex>
-          ) : (
-            <Flex flexDir="column" justify="center" px={4}>
-              <Text mt={2} mb={4}>
-                No wallet connected
-              </Text>
-              <MinterButton
-                variant="secondaryAction"
-                onClick={e => {
-                  e.preventDefault();
-                  dispatch(connectWallet());
-                }}
-              >
-                Connect your Wallet
-              </MinterButton>
-            </Flex>
-          )}
-        </MenuList>
-      </Menu>
+          </MenuList>
+        </Menu>
+      ) : (
+        <MinterButton
+          variant="secondaryAction"
+          onClick={e => {
+            e.preventDefault();
+            dispatch(connectWallet());
+          }}
+        >
+          Connect Wallet
+          <Image src={wallet_icon} width="auto" height="40%" paddingLeft={3} />
+        </MinterButton>
+      )}
     </>
   );
 }
@@ -238,7 +239,8 @@ function NavItems() {
                       }}
                       mb={4}
                     >
-                      Connect your Wallet
+                      Connect Wallet
+                      <Image src={wallet_icon} width="auto" height="40%" paddingLeft={3} />
                     </MinterButton>
                   )}
                 </Flex>
@@ -294,10 +296,8 @@ function NavItems() {
 }
 
 export function Header() {
-  const [location, setLocation] = useLocation();
-  if (location === '/' || location === '') {
-    return null;
-  }
+  const [, setLocation] = useLocation();
+
   return (
     <Flex
       width="100%"

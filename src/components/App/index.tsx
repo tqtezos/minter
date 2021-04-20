@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Switch, Route } from 'wouter';
-import SplashPage from '../SplashPage';
 import CreateNonFungiblePage from '../CreateNonFungiblePage';
 import CollectionsCatalog from '../Collections/Catalog';
 import CollectionDisplay from '../Collections/Catalog/CollectionDisplay';
@@ -23,7 +22,7 @@ export default function App() {
 
   useEffect(() => {
     dispatch(getMarketplaceNftsQuery(state.marketplace.marketplace.address));
-  }, [ state.marketplace.marketplace.address, dispatch ]);
+  }, [state.marketplace.marketplace.address, dispatch]);
 
   useEffect(() => {
     if (!walletReconnectAttempted) {
@@ -31,17 +30,13 @@ export default function App() {
     }
   }, [walletReconnectAttempted, dispatch]);
 
-  if (!walletReconnectAttempted) {
-    return null;
-  }
-
   return (
     <Flex pos="absolute" w="100%" h="100%">
       <Flex justifyContent="space-between" width="100%" flexDir="column">
         <Header />
         <Switch>
           <Route path="/">
-            <SplashPage />
+            <MarketplaceCatalog />
           </Route>
           <Route path="/create">
             <CreateNonFungiblePage />
