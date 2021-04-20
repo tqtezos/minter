@@ -122,7 +122,11 @@ function WalletDisplay() {
     <>
       {system.status === 'WalletConnected' ? (
         <Menu placement="bottom-end" offset={[4, 24]}>
-          <MenuButton>
+          <MenuButton padding={2} _hover={{
+            textDecoration: 'none',
+            background: '#2D3748',
+            color: '#EDF2F7'
+          }}>
             <Image src={wallet_icon} width={4} height="auto" style={{ filter: 'invert(1)' }} />
           </MenuButton>
           <MenuList color="brand.black">
