@@ -34,3 +34,7 @@ code {
 model-viewer.upload-preview {
   height: 400px;
 }
+
+model-viewer.individual {
+  height: 400px;
+}
