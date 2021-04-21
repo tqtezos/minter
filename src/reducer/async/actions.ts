@@ -108,23 +108,28 @@ function appendStateMetadata(
   metadata: NftMetadata,
   system: SystemWithToolkit | SystemWithWallet
 ) {
-  const appendedMetadata: NftMetadata = {
-    ...metadata,
-    name: state.fields.name as string,
-    minter: system.tzPublicKey || undefined,
-    description: state.fields.description || undefined,
-    attributes: []
-  };
+  const appendedMetadata = { ...metadata };
+  appendedMetadata.name = state.fields.name as string;
 
-  return state.attributes.reduce((acc, row) => {
-    const keys = Object.keys(NftMetadata.props);
-    const key = keys.find(k => k === row.name) as keyof NftMetadata;
-    if (key && NftMetadata.props[key].decode(row.value)._tag === 'Right') {
-      return { ...acc, [key]: row.value };
+  if (state.fields.description) {
+    appendedMetadata.description = state.fields.description;
+  }
+
+  for (let row of state.attributes) {
+    if (row.name !== null && row.value !== null) {
+      const keys = Object.getOwnPropertyNames(new NftMetadata());
+      if (keys.indexOf(row.name) !== -1) {
+        appendedMetadata[row.name as keyof NftMetadata] = row.value;
+      } else {
+        if (!appendedMetadata.attributes) appendedMetadata.attributes = [];
+        appendedMetadata.attributes.push({ name: row.name, value: row.value });
+      }
     }
-    const attribute = { name: row.name, value: row.value };
-    return { ...acc, attributes: [...acc.attributes!, attribute] };
-  }, appendedMetadata);
+  }
+
+  appendedMetadata.minter = system.tzPublicKey || '';
+
+  return appendedMetadata;
 }
 
 export const mintTokenAction = createAsyncThunk<

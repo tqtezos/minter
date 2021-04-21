@@ -1,11 +1,7 @@
 import { Minter, SystemWithToolkit, SystemWithWallet } from '../../lib/system';
 import { createSlice } from '@reduxjs/toolkit';
 import config from '../../config.json';
-import {
-  connectWallet,
-  disconnectWallet,
-  reconnectWallet
-} from '../async/wallet';
+import { connectWallet, disconnectWallet, reconnectWallet } from '../async/wallet';
 
 const initialState = Minter.connectToolkit(Minter.configure(config)) as
   | SystemWithToolkit
