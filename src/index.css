@@ -30,3 +30,7 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+model-viewer.upload-preview {
+  height: 400px;
+}

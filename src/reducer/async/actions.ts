@@ -33,8 +33,18 @@ export const readFileAsDataUrlAction = createAsyncThunk<
 >('action/readFileAsDataUrl', async ({ ns, file }, { rejectWithValue }) => {
   const readFile = new Promise<{ ns: string; result: SelectedFile }>(
     (resolve, reject) => {
-      const { name, type, size } = file;
+      let { name, type, size } = file;
       const reader = new FileReader();
+
+      if (!type) {
+        if (name.substr(-4) === '.glb') {
+          type = 'model/gltf-binary';
+        }
+        if (name.substr(-5) === '.gltf') {
+          type = 'model/gltf+json';
+        }
+      }
+
       reader.onload = e => {
         const buffer = e.target?.result;
         if (!buffer || !(buffer instanceof ArrayBuffer)) {
@@ -201,8 +211,8 @@ export const mintTokenAction = createAsyncThunk<
       const fileResponse = await uploadIPFSFile(system.config.ipfsApi, file);
       ipfsMetadata.artifactUri = fileResponse.data.ipfsUri;
       ipfsMetadata.formats = [{
-        fileSize: fileResponse.headers['content-length'],
-        mimeType: fileResponse.headers['content-type']
+        fileSize: fileResponse.data.size,
+        mimeType: file.type
       }];
     }
   } catch (e) {
