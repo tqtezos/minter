@@ -1,27 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Flex, Image } from '@chakra-ui/react';
 import { FiHelpCircle } from 'react-icons/fi';
-
-document.addEventListener("DOMContentLoaded", function () {
-  var lazyAssets = [].slice.call(document.querySelectorAll("img.lazy, video.lazy"));
-
-  if ("IntersectionObserver" in window) {
-    let lazyObserver = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          let lazyAsset = entry.target as HTMLImageElement | HTMLVideoElement;
-          lazyAsset.src = lazyAsset.dataset.src ?? "";
-          lazyAsset.classList.remove("lazy");
-          lazyObserver.unobserve(lazyAsset);
-        }
-      });
-    });
-
-    lazyAssets.forEach(function (lazyAsset) {
-      lazyObserver.observe(lazyAsset);
-    });
-  }
-});
 
 function MediaNotFound() {
   return (
@@ -39,23 +18,59 @@ function MediaNotFound() {
   );
 }
 
-export function TokenMedia(props: { src: string, maxW?: string, onLoad?: Function, height?: string }) {
+export function TokenMedia(props: { src: string, srcThumbnail?: string, maxW?: string, onLoad?: Function, height?: string }) {
   const [errored, setErrored] = useState(false);
   const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
-  useEffect(() => {
-    (async () => {
+  const loadingStateRef = useRef(null as null | 'thumbnail' | 'image' );
+  const imageRef = useRef(null as null | HTMLImageElement );
+  const videoRef = useRef(null as null | HTMLVideoElement );
+
+  const loadImage = async(imageUrl: string, kind: 'thumbnail' | 'image')=>{
+      if( kind === 'thumbnail' && loadingStateRef.current ) { return; }
+      if( kind === 'image' && loadingStateRef.current !== 'thumbnail' ) { return; }
+
+      console.log('loadImage START', { imageUrl, kind });
+
+      loadingStateRef.current = kind;
+
       let blob;
       try {
-        blob = await fetch(props.src).then(r => r.blob());
+        blob = await fetch(imageUrl).then(r => r.blob());
       } catch (e) {
         return setErrored(true);
       }
       setObj({
         url: URL.createObjectURL(blob),
-        type: blob.type
+        type: blob.type,
       });
+  };
+  
+  const compRef = imageRef.current ?? videoRef.current;
+  useEffect(() => {
+
+    // Load thumbnail
+    (async ()=>{
+      if(props.srcThumbnail) {
+        await loadImage(props.srcThumbnail, 'thumbnail');
+      } else {
+        await loadImage(props.src, 'image');
+      }
     })();
-  }, [props.src]);
+
+    if(!compRef){ return; }
+
+    let observer = new IntersectionObserver((e) => {
+      console.log('IntersectionObserver', { e });
+      if( !e[0].isIntersecting ) { return; }
+
+      loadImage(props.src, 'image');
+    }, {
+      threshold: 0.05,
+    });
+    observer.observe(compRef);
+
+    return () => observer.disconnect();
+  }, [compRef, props.src, props.srcThumbnail]);
 
   if (errored) {
     return <MediaNotFound />;
@@ -63,17 +78,26 @@ export function TokenMedia(props: { src: string, maxW?: string, onLoad?: Functio
 
   if (!obj) return null;
 
+  const onLoaded = ()=>{
+    // loadIfOnScreen();
+
+    if(props.onLoad) {
+      props.onLoad(obj.url, obj.type);
+    }
+  };
+
   if (/^image\/.*/.test(obj.type)) {
     return (
       <Image
+        ref={imageRef}
         className="lazy"
-        src={props.src}
+        src={obj.url}
         height={props.height ?? "100%"}
         flex="1"
         maxWidth={props.maxW}
         style={{ objectFit: "scale-down" }}
         onError={() => setErrored(true)}
-        onLoad={() => props.onLoad ? props.onLoad(obj.url, obj.type) : ''}
+        onLoad={onLoaded}
       />
     );
   }
@@ -81,12 +105,13 @@ export function TokenMedia(props: { src: string, maxW?: string, onLoad?: Functio
   if (/^video\/.*/.test(obj.type)) {
     return (
       <video
+        ref={videoRef}
         className="lazy"
         loop
         onClick={e => e.preventDefault()}
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
-        onLoadedData={() => props.onLoad ? props.onLoad(obj.url, obj.type) : ''}
+        onLoadedData={onLoaded}
         height={props.height ?? "100%"}
         style={{ objectFit: "scale-down", maxWidth: props.maxW ?? '100%', maxHeight: '100%' }}
       >

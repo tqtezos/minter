@@ -31,6 +31,7 @@ export default function FeaturedToken(props: FeaturedTokenProps) {
         <Flex pr={[0, 10]} borderRight={["unset", "2px solid #aaa"]} justifyContent="center" height="calc(100% - 24px)">
           <TokenMedia
             src={ipfsUriToGatewayUrl(props.network, props.artifactUri)}
+            srcThumbnail={props.metadata.thumbnailUri ? ipfsUriToGatewayUrl(props.network, props.metadata.thumbnailUri) : undefined}
             maxW="50%"
             height="calc(100% - 24px)"
           />

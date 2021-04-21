@@ -62,6 +62,7 @@ export function getAverageRGB(src: string, type: string) {
 export default function TokenCard(props: TokenCardProps) {
   const [, setLocation] = useLocation();
   const [obj, setObj] = useState<{ r: number, g: number, b: number }>({ r: 255, g: 255, b: 255 });
+  const srcThumbnail = props.metadata.thumbnailUri ? ipfsUriToGatewayUrl(props.network, props.metadata.thumbnailUri) : undefined;
   const src = ipfsUriToGatewayUrl(props.network, props.artifactUri);
 
   return (
@@ -90,6 +91,7 @@ export default function TokenCard(props: TokenCardProps) {
         <Box>
           <TokenMedia
             src={src}
+            srcThumbnail={srcThumbnail}
             onLoad={async (url: string, type: string) => {
               let rgb = await getAverageRGB(url, type) as any;
               setObj(rgb);
