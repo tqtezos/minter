@@ -14,9 +14,11 @@ import { getMarketplaceNftsQuery } from '../../reducer/async/queries';
 
 export default function App() {
   const dispatch = useDispatch();
-  const state = useSelector(s => s);
+  const state = useSelector(
+    s => s
+  );
 
-  let walletReconnectAttempted = state.system.walletReconnectAttempted;
+  let walletReconnectAttempted = state.system.walletReconnectAttempted
 
   useEffect(() => {
     dispatch(getMarketplaceNftsQuery(state.marketplace.marketplace.address));
