@@ -4,8 +4,22 @@ import { useDispatch, useSelector } from '../../reducer';
 import {
   deliverNotification,
   readNotification
-} from '../../reducer/slices/notifications';
+} from '../../reducer/slices/notificationsActions';
 import _ from 'lodash';
+import { Notification } from '../../reducer/slices/notifications';
+
+function notificationStatus(notification: Notification) {
+  switch (notification.status) {
+    case 'pending':
+      return 'info';
+    case 'success':
+      return 'success';
+    case 'error':
+      return 'error';
+    default:
+      return 'info';
+  }
+}
 
 export default function Notifications() {
   const toast = useToast();
@@ -13,26 +27,23 @@ export default function Notifications() {
   const notifications = useSelector(
     state =>
       state.notifications.filter(({ read, delivered }) => !read && !delivered),
-    (left, right) =>
-      _.isEqual(
-        _.uniq(_.map(left, n => n.requestId)),
-        _.uniq(_.map(right, n => n.requestId))
-      )
+    _.isEqual
   );
 
   useEffect(() => {
     for (let notification of notifications) {
+      dispatch(deliverNotification(notification.requestId));
       toast({
         title: notification.title,
         description: notification.description,
-        status: notification.status,
+        status: notificationStatus(notification),
         duration: 10000,
         isClosable: true,
+        position: 'bottom-right',
         onCloseComplete() {
           dispatch(readNotification(notification.requestId));
         }
       });
-      dispatch(deliverNotification(notification.requestId));
     }
   }, [notifications, dispatch, toast]);
 
