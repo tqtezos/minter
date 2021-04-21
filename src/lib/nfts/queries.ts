@@ -7,7 +7,6 @@ import { ContractAbstraction } from '@taquito/taquito';
 import { tzip12 } from '@taquito/tzip12';
 import { TzKt } from '../service/tzkt';
 import { isLeft } from 'fp-ts/lib/Either';
-import axios from 'axios';
 
 export type AssetMetadataResponse = t.TypeOf<typeof AssetMetadataResponse>;
 export const AssetMetadataResponse = t.array(
@@ -187,10 +186,8 @@ export async function getMarketplaceNfts(
   }
   const activeSales = tokenSales.filter(v => v.active);
 
-  // console.log(activeSales);
-
   return Promise.all(
-    activeSales.slice(0, 1).map(
+    activeSales.map(
       async (tokenSale): Promise<Nft> => {
         const {
           token_for_sale_address: saleAddress,
@@ -297,6 +294,8 @@ export async function getContractNfts(
     tokenSales = await getFixedPriceSales(system.tzkt, mktAddress);
     fixedPriceSalesCache[mktAddress] = tokenSales;
   }
+
+  console.log(tokens);
 
   return Promise.all(
     tokens.map(

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Config } from '../system';
 
 export async function getBigMapKeys(config: Config, id: number) {
-  const uri = `${config.tzkt.api}/v1/bigmaps/${id}/keys?limit=500`;
+  const uri = `${config.tzkt.api}/v1/bigmaps/${id}/keys?limit=1000`;
   const response = await axios.get(uri);
   return response.data;
 }
@@ -12,7 +12,6 @@ export async function getBigMapUpdates(
   params?: Record<string, string>
 ) {
   const queryParams = new URLSearchParams(params).toString();
-  console.log(queryParams);
   const uri = `${config.tzkt.api}/v1/bigmaps/updates?${queryParams}`;
   const response = await axios.get(uri);
   return response.data;
@@ -29,7 +28,7 @@ export async function getContractBigMapKeys(
   address: string,
   name: string
 ) {
-  const uri = `${config.tzkt.api}/v1/contracts/${address}/bigmaps/${name}/keys`;
+  const uri = `${config.tzkt.api}/v1/contracts/${address}/bigmaps/${name}/keys?limit=1000`;
   const response = await axios.get(uri);
   return response.data;
 }
