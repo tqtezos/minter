@@ -10,7 +10,7 @@ import { Flex } from '@chakra-ui/react';
 import Notifications from '../common/Notifications';
 import { useSelector, useDispatch } from '../../reducer';
 import { reconnectWallet } from '../../reducer/async/wallet';
-import { getMarketplaceNftsQuery } from '../../reducer/async/queries';
+// import { getMarketplaceNftsQuery } from '../../reducer/async/queries';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -18,9 +18,13 @@ export default function App() {
 
   let walletReconnectAttempted = state.system.walletReconnectAttempted;
 
-  useEffect(() => {
-    dispatch(getMarketplaceNftsQuery(state.marketplace.marketplace.address));
-  }, [state.marketplace.marketplace.address, dispatch]);
+  // // This causes excessive resource consumption as *all* marketplace data
+  // // loads when the app is mounted, even if the user has not landed or will
+  // // not land on the `/marketplace` view
+  //
+  // useEffect(() => {
+  //   dispatch(getMarketplaceNftsQuery(state.marketplace.marketplace.address));
+  // }, [state.marketplace.marketplace.address, dispatch]);
 
   useEffect(() => {
     if (!walletReconnectAttempted) {

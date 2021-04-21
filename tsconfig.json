@@ -18,10 +18,6 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-    
-    // The below makes typescript more strict about types
-    // Consider changing them if you run into problems with
-    // existing libraries
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noImplicitThis": true,
