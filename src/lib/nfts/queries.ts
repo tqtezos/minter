@@ -3,8 +3,6 @@ import { Buffer } from 'buffer';
 import * as t from 'io-ts';
 import _ from 'lodash';
 import { SystemWithToolkit, SystemWithWallet } from '../system';
-import { ContractAbstraction } from '@taquito/taquito';
-import { tzip12 } from '@taquito/tzip12';
 import { TzKt } from '../service/tzkt';
 import { isLeft } from 'fp-ts/lib/Either';
 
@@ -170,7 +168,6 @@ function fromHexString(input: string) {
   return input;
 }
 
-const contractCache: Record<string, any> = {};
 const fixedPriceSalesCache: Record<string, FixedPriceSaleResponse> = {};
 
 export async function getMarketplaceNfts(
@@ -185,46 +182,65 @@ export async function getMarketplaceNfts(
     fixedPriceSalesCache[address] = tokenSales;
   }
   const activeSales = tokenSales.filter(v => v.active);
+  const addresses = activeSales
+    .map(s => s.key.sale_token.token_for_sale_address)
+    .join(',');
+
+  const tokenBigMapRows = await system.tzkt.getBigMapUpdates({
+    path: 'assets.token_metadata',
+    action: 'add_key',
+    'contract.in': addresses,
+    limit: '10000'
+  });
 
   return Promise.all(
-    activeSales.map(
-      async (tokenSale): Promise<Nft> => {
-        const {
-          token_for_sale_address: saleAddress,
-          token_for_sale_token_id: tokenIdStr
-        } = tokenSale.key.sale_token;
-        const tokenId = parseInt(tokenIdStr, 10);
-        const mutez = Number.parseInt(tokenSale.value, 10);
-        const sale = {
-          seller: tokenSale.key.sale_seller,
-          price: mutez / 1000000,
-          mutez: mutez,
-          type: 'fixedPrice'
-        };
+    activeSales
+      .map(
+        async (tokenSale): Promise<Nft> => {
+          const {
+            token_for_sale_address: saleAddress,
+            token_for_sale_token_id: tokenIdStr
+          } = tokenSale.key.sale_token;
+          const tokenId = parseInt(tokenIdStr, 10);
+          const mutez = Number.parseInt(tokenSale.value, 10);
+          const sale = {
+            seller: tokenSale.key.sale_seller,
+            price: mutez / 1000000,
+            mutez: mutez,
+            type: 'fixedPrice'
+          };
 
-        if (!(contractCache[saleAddress] instanceof ContractAbstraction)) {
-          contractCache[saleAddress] = await system.toolkit.contract.at(
-            saleAddress,
-            tzip12
-          );
+          // TODO: Move this behavior into a typed decoder
+          const tokenInfo = tokenBigMapRows.find((row: any) => {
+            return (
+              saleAddress === row.contract.address &&
+              tokenIdStr === row.content.value.token_id
+            );
+          })?.content?.value?.token_info;
+
+          const tokenMetadata = tokenInfo && tokenInfo[''];
+
+          if (!tokenMetadata) {
+            throw Error("Couldn't retrieve tokenMetadata");
+          }
+
+          const { metadata } = (await system.resolveMetadata(
+            fromHexString(tokenMetadata)
+          )) as any;
+
+          return {
+            address: saleAddress,
+            id: tokenId,
+            title: metadata.name || '',
+            owner: sale.seller,
+            description: metadata.description || '',
+            artifactUri: metadata.artifactUri || '',
+            metadata: metadata,
+            sale: sale
+          };
         }
-
-        const metadata = await contractCache[saleAddress]
-          .tzip12()
-          .getTokenMetadata(tokenId);
-
-        return {
-          address: saleAddress,
-          id: tokenId,
-          title: metadata.name,
-          owner: sale.seller,
-          description: metadata.description,
-          artifactUri: metadata.artifactUri,
-          metadata: metadata,
-          sale: sale
-        };
-      }
-    )
+      )
+      .map(p => p.catch(e => e))
   );
 }
 
@@ -294,8 +310,6 @@ export async function getContractNfts(
     tokenSales = await getFixedPriceSales(system.tzkt, mktAddress);
     fixedPriceSalesCache[mktAddress] = tokenSales;
   }
-
-  console.log(tokens);
 
   return Promise.all(
     tokens.map(
@@ -368,7 +382,8 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
     await system.tzkt.getBigMapUpdates({
       path: 'metadata',
       action: 'add_key',
-      'contract.in': addresses
+      'contract.in': addresses,
+      limit: '10000'
     })
   ).filter((v: any) => v.content.key === '');
 
