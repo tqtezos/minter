@@ -46,7 +46,7 @@ export async function getMarketplaceNfts(
     return v.data.value;
   });
 
-  return Promise.all(
+  return await Promise.all(
     activeSales.map(
       async (tokenSale: any): Promise<Nft> => {
         const saleAddress = select(tokenSale, { name: 'token_for_sale_address' })?.value;
