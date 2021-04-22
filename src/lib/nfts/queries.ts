@@ -144,6 +144,7 @@ export const NftMetadata = t.partial({
 export type NftMetadata = t.TypeOf<typeof NftMetadata>;
 
 interface NftSale {
+  id: number;
   seller: string;
   price: number;
   mutez: number;
@@ -362,8 +363,11 @@ export async function getMarketplaceNfts(
     limit: '10000'
   });
 
+  // Sort descending (newest first)
+  const salesToView = [...activeSales].reverse();
+
   return Promise.all(
-    activeSales
+    salesToView
       .map(
         async (tokenSale): Promise<Nft> => {
           const {
@@ -373,6 +377,7 @@ export async function getMarketplaceNfts(
           const tokenId = parseInt(tokenIdStr, 10);
           const mutez = Number.parseInt(tokenSale.value, 10);
           const sale = {
+            id: tokenSale.id,
             seller: tokenSale.key.sale_seller,
             price: mutez / 1000000,
             mutez: mutez,
