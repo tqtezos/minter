@@ -168,8 +168,6 @@ function fromHexString(input: string) {
   return input;
 }
 
-const fixedPriceSalesCache: Record<string, FixedPriceSaleResponse> = {};
-
 //// Data retrieval and decoding functions
 
 async function getAssetMetadata(
@@ -226,6 +224,8 @@ async function getFixedPriceSales(
 
 //// Main query functions
 
+// const fixedPriceSalesCache: Record<string, FixedPriceSaleResponse> = {};
+
 export async function getContractNfts(
   system: SystemWithToolkit | SystemWithWallet,
   address: string
@@ -233,13 +233,12 @@ export async function getContractNfts(
   const ledger = await getLedger(system.tzkt, address);
   const tokens = await getTokenMetadata(system.tzkt, address);
   const mktAddress = system.config.contracts.marketplace.fixedPrice.tez;
-  let tokenSales: FixedPriceSaleResponse;
-  if (fixedPriceSalesCache[mktAddress]) {
-    tokenSales = fixedPriceSalesCache[mktAddress];
-  } else {
-    tokenSales = await getFixedPriceSales(system.tzkt, mktAddress);
-    fixedPriceSalesCache[mktAddress] = tokenSales;
-  }
+  const tokenSales = await getFixedPriceSales(system.tzkt, mktAddress);
+  const activeSales = tokenSales.filter(sale => sale.active);
+
+  console.log(
+    ledger.find(l => l.value === 'tz1NhN4dqrFegi5mrwVtWJ2cQBTPETykAVAy')
+  );
 
   return Promise.all(
     tokens.map(
@@ -250,7 +249,7 @@ export async function getContractNfts(
         const resolvedInfo = await system.resolveMetadata(decodedInfo['']);
         const metadata = { ...decodedInfo, ...resolvedInfo.metadata };
 
-        const saleData = tokenSales.find(
+        const saleData = activeSales.find(
           v =>
             v.key.sale_token.token_for_sale_address === address &&
             v.key.sale_token.token_for_sale_token_id === tokenId
@@ -342,13 +341,7 @@ export async function getMarketplaceNfts(
   system: SystemWithToolkit | SystemWithWallet,
   address: string
 ): Promise<Nft[]> {
-  let tokenSales: FixedPriceSaleResponse;
-  if (fixedPriceSalesCache[address]) {
-    tokenSales = fixedPriceSalesCache[address];
-  } else {
-    tokenSales = await getFixedPriceSales(system.tzkt, address);
-    fixedPriceSalesCache[address] = tokenSales;
-  }
+  const tokenSales = await getFixedPriceSales(system.tzkt, address);
   const activeSales = tokenSales.filter(v => v.active);
   const addresses = activeSales
     .map(s => s.key.sale_token.token_for_sale_address)
