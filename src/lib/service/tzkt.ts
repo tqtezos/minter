@@ -1,8 +1,19 @@
 import axios from 'axios';
 import { Config } from '../system';
 
-export async function getBigMapKeys(config: Config, id: number) {
-  const uri = `${config.tzkt.api}/v1/bigmaps/${id}/keys?limit=1000`;
+function mkQueryParams(params: Record<string, string> | undefined) {
+  const finalParams = { limit: '10000', ...params };
+  return new URLSearchParams(finalParams).toString();
+}
+
+export async function getBigMapKeys(
+  config: Config,
+  id: number,
+  params?: Record<string, string>
+) {
+  const uri = `${config.tzkt.api}/v1/bigmaps/${id}/keys?${mkQueryParams(
+    params
+  )}`;
   const response = await axios.get(uri);
   return response.data;
 }
@@ -11,14 +22,19 @@ export async function getBigMapUpdates(
   config: Config,
   params?: Record<string, string>
 ) {
-  const queryParams = new URLSearchParams(params).toString();
-  const uri = `${config.tzkt.api}/v1/bigmaps/updates?${queryParams}`;
+  const uri = `${config.tzkt.api}/v1/bigmaps/updates?${mkQueryParams(params)}`;
   const response = await axios.get(uri);
   return response.data;
 }
 
-export async function getContract(config: Config, address: string) {
-  const uri = `${config.tzkt.api}/v1/contracts/${address}`;
+export async function getContract(
+  config: Config,
+  address: string,
+  params?: Record<string, string>
+) {
+  const uri = `${config.tzkt.api}/v1/contracts/${address}?${mkQueryParams(
+    params
+  )}`;
   const response = await axios.get(uri);
   return response.data;
 }
@@ -26,21 +42,36 @@ export async function getContract(config: Config, address: string) {
 export async function getContractBigMapKeys(
   config: Config,
   address: string,
-  name: string
+  name: string,
+  params?: Record<string, string>
 ) {
-  const uri = `${config.tzkt.api}/v1/contracts/${address}/bigmaps/${name}/keys?limit=1000`;
+  const uri = `${
+    config.tzkt.api
+  }/v1/contracts/${address}/bigmaps/${name}/keys?${mkQueryParams(params)}`;
   const response = await axios.get(uri);
   return response.data;
 }
 
-export async function getContractStorage(config: Config, address: string) {
-  const uri = `${config.tzkt.api}/v1/contracts/${address}/storage`;
+export async function getContractStorage(
+  config: Config,
+  address: string,
+  params?: Record<string, string>
+) {
+  const uri = `${
+    config.tzkt.api
+  }/v1/contracts/${address}/storage?${mkQueryParams(params)}`;
   const response = await axios.get(uri);
   return response.data;
 }
 
-export async function getAccountContracts(config: Config, address: string) {
-  const uri = `${config.tzkt.api}/v1/accounts/${address}/contracts`;
+export async function getAccountContracts(
+  config: Config,
+  address: string,
+  params?: Record<string, string>
+) {
+  const uri = `${
+    config.tzkt.api
+  }/v1/accounts/${address}/contracts?${mkQueryParams(params)}`;
   const response = await axios.get(uri);
   return response.data;
 }
