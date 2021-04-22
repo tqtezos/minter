@@ -1,139 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation } from 'wouter';
+import React, { useEffect } from 'react';
 import {
-  AspectRatio,
   Box,
   Flex,
   Heading,
-  Image,
   Link,
   SimpleGrid,
   Spinner,
   Text
 } from '@chakra-ui/react';
 import { MinterButton } from '../../common';
-import { RefreshCw, ExternalLink, Wind, HelpCircle } from 'react-feather';
-import { Token } from '../../../reducer/slices/collections';
-import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
+import { RefreshCw, ExternalLink, Wind } from 'react-feather';
 import { useDispatch, useSelector } from '../../../reducer';
 import { getContractNftsQuery } from '../../../reducer/async/queries';
 import CollectionsDropdown from './CollectionsDropdown';
-
-function MediaNotFound() {
-  return (
-    <Flex
-      flexDir="column"
-      align="center"
-      justify="center"
-      flex="1"
-      bg="gray.100"
-      color="gray.300"
-      height="100%"
-    >
-      <HelpCircle size="70px" />
-    </Flex>
-  );
-}
-
-function TokenImage(props: { src: string }) {
-  const [errored, setErrored] = useState(false);
-  const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
-  useEffect(() => {
-    (async () => {
-      let blob;
-      try {
-        blob = await fetch(props.src).then(r => r.blob());
-      } catch (e) {
-        return setErrored(true);
-      }
-      setObj({
-        url: URL.createObjectURL(blob),
-        type: blob.type
-      });
-    })();
-  }, [props.src]);
-
-  if (errored) {
-    return <MediaNotFound />;
-  }
-
-  if (!obj) return null;
-
-  if (/^image\/.*/.test(obj.type)) {
-    return (
-      <Image
-        src={props.src}
-        objectFit="scale-down"
-        flex="1"
-        height="100%"
-        onError={() => setErrored(true)}
-      />
-    );
-  }
-
-  if (/^video\/.*/.test(obj.type)) {
-    return (
-      <video
-        loop
-        onClick={e => e.preventDefault()}
-        onMouseEnter={e => e.currentTarget.play()}
-        onMouseLeave={e => e.currentTarget.pause()}
-      >
-        <source src={obj.url} type={obj.type} />
-      </video>
-    );
-  }
-
-  return <MediaNotFound />;
-}
-
-interface TokenTileProps extends Token {
-  network: string;
-  address: string;
-}
-
-function TokenTile(props: TokenTileProps) {
-  const [, setLocation] = useLocation();
-  return (
-    <Flex
-      flexDir="column"
-      ratio={1}
-      w="100%"
-      bg="white"
-      border="1px solid"
-      borderColor="brand.lightBlue"
-      borderRadius="3px"
-      overflow="hidden"
-      boxShadow="0px 0px 0px 4px rgba(15, 97, 255, 0)"
-      transition="all linear 50ms"
-      _hover={{
-        cursor: 'pointer',
-        boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.1)'
-      }}
-      onClick={() =>
-        setLocation(`/collection/${props.address}/token/${props.id}`)
-      }
-    >
-      <AspectRatio ratio={3 / 2}>
-        <Box p={4}>
-          <TokenImage
-            src={ipfsUriToGatewayUrl(props.network, props.artifactUri)}
-          />
-        </Box>
-      </AspectRatio>
-      <Flex
-        width="100%"
-        px={4}
-        py={4}
-        bg="white"
-        borderTop="1px solid"
-        borderColor="brand.lightBlue"
-      >
-        <Text>{props.title}</Text>
-      </Flex>
-    </Flex>
-  );
-}
+import TokenCard from '../../common/TokenCard';
 
 interface CollectionDisplayProps {
   address: string | null;
@@ -166,7 +46,7 @@ export default function CollectionDisplay({
 
   if (!collection.loaded) {
     return (
-      <Flex flexDir="column" align="center" flex="1" pt={20}>
+      <Flex flexDir="column" align="center" flex="1" pt={20} borderLeft="2px solid #aaa">
         <Spinner size="xl" mb={6} color="gray.300" />
         <Heading size="lg" textAlign="center" color="gray.500">
           Loading...
@@ -188,7 +68,7 @@ export default function CollectionDisplay({
 
   if (tokens.length === 0) {
     return (
-      <Flex w="100%" flex="1" flexDir="column" align="center">
+      <Flex w="100%" flex="1" flexDir="column" align="center" borderLeft="2px solid #aaa">
         <Flex
           px={20}
           py={10}
@@ -221,10 +101,9 @@ export default function CollectionDisplay({
       pt={6}
       flex="1"
       bg="brand.brightGray"
-      borderLeftWidth="1px"
-      borderLeftColor="brand.lightBlue"
       overflowY="scroll"
       justify="start"
+      borderLeft="2px solid #aaa"
     >
       {ownedOnly && wallet !== null ? (
         <Flex display={{ base: 'flex', md: 'none' }} mb={4}>
@@ -285,7 +164,7 @@ export default function CollectionDisplay({
       <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
         {tokens.map(token => {
           return (
-            <TokenTile
+            <TokenCard
               key={token.id}
               address={address}
               network={config.network}

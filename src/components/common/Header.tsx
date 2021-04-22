@@ -306,6 +306,7 @@ export function Header() {
       paddingY={3}
       alignItems="center"
       justifyContent="space-between"
+      boxShadow="0px 2px 10px #3333"
     >
       <Image
         display={{

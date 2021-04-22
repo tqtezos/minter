@@ -1,6 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { Flex, Image } from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 import { FiHelpCircle } from 'react-icons/fi';
+import { useSelector } from '../../reducer';
+
+function lazyLoad() {
+    const lazyAssets = [].slice.call(document.querySelectorAll(".lazy"));
+    if ("IntersectionObserver" in window) {
+      let lazyObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            let lazyAsset = entry.target as HTMLImageElement | HTMLVideoElement;
+            const s = lazyAsset.querySelector('source');
+            if(!!s) {
+              lazyAsset.src = (s.dataset.src) ?? '';
+            } else {
+              lazyAsset.src = (lazyAsset.dataset.src) ?? '';
+            }
+            lazyAsset.classList.remove("lazy");
+            lazyObserver.unobserve(lazyAsset);
+          }
+        });
+      });
+
+      lazyAssets.forEach(function (lazyAsset) {
+        lazyObserver.unobserve(lazyAsset);
+        lazyObserver.observe(lazyAsset);
+      });
+    }
+};
 
 function MediaNotFound() {
   return (
@@ -18,9 +45,13 @@ function MediaNotFound() {
   );
 }
 
-export function TokenMedia(props: { src: string, maxW?: string }) {
+export function TokenMedia(props: { src: string, maxW?: string, onLoad?: Function, height?: string }) {
   const [errored, setErrored] = useState(false);
   const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
+  const { marketplace, collections } = useSelector(s => s);
+  if(marketplace.marketplace.loaded || collections.collections[collections.selectedCollection ?? ''].loaded) {
+    lazyLoad();
+  }
   useEffect(() => {
     (async () => {
       let blob;
@@ -43,16 +74,14 @@ export function TokenMedia(props: { src: string, maxW?: string }) {
   if (!obj) return null;
 
   if (/^image\/.*/.test(obj.type)) {
-    console.log(props.src)
     return (
-      <Image
-        src={props.src}
-        objectFit="scale-down"
-        height="100%"
-        flex="1"
-        maxWidth={props.maxW}
-        style={{objectFit:"scale-down"}}
+      <img
+        className="lazy"
+        data-src={obj.url}
+        style={{ objectFit: "scale-down", maxWidth: props.maxW ?? '100%', height: "100%"}}
         onError={() => setErrored(true)}
+        onLoad={() => { if (props.onLoad && obj?.url) { props.onLoad(obj.url, obj.type) }; }}
+        alt=""
       />
     );
   }
@@ -60,14 +89,15 @@ export function TokenMedia(props: { src: string, maxW?: string }) {
   if (/^video\/.*/.test(obj.type)) {
     return (
       <video
+        className="lazy"
         loop
         onClick={e => e.preventDefault()}
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
-        height="100%"
-        style={{maxWidth:props.maxW}}
+        style={{ objectFit: "scale-down", maxWidth: props.maxW ?? '100%', height: "100%" }}
+        onLoadedMetadata={() => { if (props.onLoad && obj?.url) { props.onLoad(obj.url, obj.type) } }}
       >
-        <source src={obj.url} type={obj.type} />
+        <source data-src={obj.url} type={obj.type} />
       </video>
     );
   }
