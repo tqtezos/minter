@@ -85,7 +85,7 @@ export const getMarketplaceNftsQuery = createAsyncThunk<
     const { system } = getState();
     try {
       const tokens = await getMarketplaceNfts(system, address);
-      return { tokens: tokens.sort((t1, t2) => t2.id - t1.id) };
+      return { tokens };
     } catch (e) {
       return rejectWithValue({
         kind: ErrorKind.GetMarketplaceNftsFailed,
