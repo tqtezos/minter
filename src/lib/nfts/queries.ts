@@ -378,6 +378,12 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
   const response = await system.tzkt.getAccountContracts(system.tzPublicKey);
   const assetContracts = response.filter((v: any) => v.kind === 'asset');
   const addresses = assetContracts.map((a: any) => a.address);
+  const results: AssetContract[] = [];
+
+  if (addresses.length === 0) {
+    return results;
+  }
+
   const assetBigMapRows = (
     await system.tzkt.getBigMapUpdates({
       path: 'metadata',
@@ -387,7 +393,6 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
     })
   ).filter((v: any) => v.content.key === '');
 
-  const results: AssetContract[] = [];
   for (const row of assetBigMapRows) {
     try {
       const metaUri = row.content.value;
