@@ -94,7 +94,7 @@ export function TokenMedia(props: { src: string, maxW?: string, onLoad?: Functio
         onClick={e => e.preventDefault()}
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
-        style={{ objectFit: "scale-down", maxWidth: props.maxW ?? '100%', height: "100%" }}
+        style={{ objectFit: "contain", width: '100%', height: "100%" }}
         onLoadedMetadata={() => { if (props.onLoad && obj?.url) { props.onLoad(obj.url, obj.type) } }}
       >
         <source data-src={obj.url} type={obj.type} />
