@@ -335,7 +335,7 @@ export async function getContractNfts(
 
         return {
           id: parseInt(tokenId, 10),
-          owner: ledger.find(e => e.key === tokenId),
+          owner: ledger.find(e => e.key === tokenId)?.value,
           title: metadata.name,
           description: metadata.description,
           artifactUri: metadata.artifactUri,
