@@ -253,13 +253,9 @@ export async function getContractNfts(
   const tokenSales = await getFixedPriceSales(system.tzkt, mktAddress);
   const activeSales = tokenSales.filter(sale => sale.active);
 
-  console.log(
-    ledger.find(l => l.value === 'tz1NhN4dqrFegi5mrwVtWJ2cQBTPETykAVAy')
-  );
-
   return Promise.all(
     tokens.map(
-      async (token): Promise<any> => {
+      async (token): Promise<Nft> => {
         const { token_id: tokenId, token_info: tokenInfo } = token.value;
 
         // TODO: Write decoder function for data retrieval
@@ -274,6 +270,7 @@ export async function getContractNfts(
         );
 
         const sale = saleData && {
+          id: saleData.id,
           seller: saleData.key.sale_seller,
           price: Number.parseInt(saleData.value, 10) / 1000000,
           mutez: Number.parseInt(saleData.value, 10),
@@ -282,7 +279,7 @@ export async function getContractNfts(
 
         return {
           id: parseInt(tokenId, 10),
-          owner: ledger.find(e => e.key === tokenId)?.value,
+          owner: ledger.find(e => e.key === tokenId)?.value!,
           title: metadata.name,
           description: metadata.description,
           artifactUri: metadata.artifactUri,
@@ -383,9 +380,7 @@ export async function getMarketplaceNfts(
       key: t.string,
       value: t.type({
         token_id: t.string,
-        token_info: t.type({
-          '': t.string
-        })
+        token_info: t.record(t.string, t.string)
       })
     }
   );
@@ -411,7 +406,7 @@ export async function getMarketplaceNfts(
             type: 'fixedPrice'
           };
 
-          const tokenInfo = tokenBigMapRows.find((row: any) => {
+          const tokenInfo = tokenBigMapRows.find(row => {
             return (
               saleAddress === row.contract.address &&
               tokenIdStr === row.content.value.token_id
