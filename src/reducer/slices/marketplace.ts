@@ -2,6 +2,7 @@ import { createSlice, PayloadAction, CaseReducer } from '@reduxjs/toolkit';
 import { getMarketplaceNftsQuery } from '../async/queries';
 import { Nft } from '../../lib/nfts/queries';
 import config from '../../config.json';
+import { DataSource } from '../../lib/util/dataSource';
 
 //// State
 
@@ -11,7 +12,7 @@ export type Token = Nft;
 
 export interface Marketplace {
   address: string;
-  tokens: Token[] | null;
+  tokens: DataSource<Token> | null;
   loaded: boolean;
 }
 
@@ -35,7 +36,7 @@ export const initialState: MarketplaceState = {
 
 //// Reducers & Slice
 
-type PopulateMarketplace = Reducer<{ tokens: Token[] }>;
+type PopulateMarketplace = Reducer<{ tokens: DataSource<Token> }>;
 
 const populateMarketplaceR: PopulateMarketplace = (state, { payload }) => {
   state.marketplace.tokens = payload.tokens;

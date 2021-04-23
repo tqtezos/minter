@@ -14,10 +14,7 @@ export default function Catalog() {
     dispatch(getMarketplaceNftsQuery(state.marketplace.address));
   }, [ state.marketplace.address, dispatch ]);
 
-  let tokens = state.marketplace.tokens;
-  if (tokens === null) {
-    tokens = [];
-  }
+  let tokens = state.marketplace.tokens?.getItems() ?? [];
 
   return (
     <Flex

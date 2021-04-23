@@ -9,6 +9,7 @@ import {
   getWalletNftAssetContracts
 } from '../../lib/nfts/queries';
 import { ErrorKind, RejectValue } from './errors';
+import { DataSource } from '../../lib/util/dataSource';
 
 type Opts = { state: State; rejectValue: RejectValue };
 
@@ -76,7 +77,7 @@ export const getWalletAssetContractsQuery = createAsyncThunk<
 );
 
 export const getMarketplaceNftsQuery = createAsyncThunk<
-  { tokens: Nft[] },
+  { tokens: DataSource<Nft> },
   string,
   Opts
 >(
@@ -85,6 +86,9 @@ export const getMarketplaceNftsQuery = createAsyncThunk<
     const { system } = getState();
     try {
       const tokens = await getMarketplaceNfts(system, address);
+      // Load first chunk
+      await tokens.loadMore(13);
+
       return { tokens };
     } catch (e) {
       return rejectWithValue({

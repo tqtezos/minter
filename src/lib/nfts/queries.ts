@@ -5,6 +5,7 @@ import _ from 'lodash';
 import { SystemWithToolkit, SystemWithWallet } from '../system';
 import { TzKt } from '../service/tzkt';
 import { isLeft } from 'fp-ts/lib/Either';
+import { createDataSourceFromArrayMap, DataSource } from '../util/dataSource';
 
 export type AssetMetadataResponse = t.TypeOf<typeof AssetMetadataResponse>;
 export const AssetMetadataResponse = t.array(
@@ -341,7 +342,7 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
 export async function getMarketplaceNfts(
   system: SystemWithToolkit | SystemWithWallet,
   address: string
-): Promise<Nft[]> {
+): Promise<DataSource<Nft>> {
   const tokenSales = await getFixedPriceSales(system.tzkt, address);
   const activeSales = tokenSales.filter(v => v.active);
   const addresses = activeSales
@@ -359,53 +360,50 @@ export async function getMarketplaceNfts(
   // Sort descending (newest first)
   const salesToView = [...activeSales].reverse();
 
-  return Promise.all(
-    salesToView
-      .map(
-        async (tokenSale): Promise<Nft> => {
-          const {
-            token_for_sale_address: saleAddress,
-            token_for_sale_token_id: tokenIdStr
-          } = tokenSale.key.sale_token;
-          const tokenId = parseInt(tokenIdStr, 10);
-          const mutez = Number.parseInt(tokenSale.value, 10);
-          const sale = {
-            id: tokenSale.id,
-            seller: tokenSale.key.sale_seller,
-            price: mutez / 1000000,
-            mutez: mutez,
-            type: 'fixedPrice'
-          };
+  return createDataSourceFromArrayMap(
+    salesToView,
+    async (tokenSale): Promise<Nft> => {
+      const {
+        token_for_sale_address: saleAddress,
+        token_for_sale_token_id: tokenIdStr
+      } = tokenSale.key.sale_token;
+      const tokenId = parseInt(tokenIdStr, 10);
+      const mutez = Number.parseInt(tokenSale.value, 10);
+      const sale = {
+        id: tokenSale.id,
+        seller: tokenSale.key.sale_seller,
+        price: mutez / 1000000,
+        mutez: mutez,
+        type: 'fixedPrice'
+      };
 
-          const tokenInfo = tokenBigMapRows.find((row: any) => {
-            return (
-              saleAddress === row.contract.address &&
-              tokenIdStr === row.content.value.token_id
-            );
-          })?.content?.value?.token_info;
+      const tokenInfo = tokenBigMapRows.find((row: any) => {
+        return (
+          saleAddress === row.contract.address &&
+          tokenIdStr === row.content.value.token_id
+        );
+      })?.content?.value?.token_info;
 
-          const tokenMetadata = tokenInfo && tokenInfo[''];
+      const tokenMetadata = tokenInfo && tokenInfo[''];
 
-          if (!tokenMetadata) {
-            throw Error("Couldn't retrieve tokenMetadata");
-          }
+      if (!tokenMetadata) {
+        throw Error("Couldn't retrieve tokenMetadata");
+      }
 
-          const { metadata } = (await system.resolveMetadata(
-            fromHexString(tokenMetadata)
-          )) as any;
+      const { metadata } = (await system.resolveMetadata(
+        fromHexString(tokenMetadata)
+      )) as any;
 
-          return {
-            address: saleAddress,
-            id: tokenId,
-            title: metadata.name || '',
-            owner: sale.seller,
-            description: metadata.description || '',
-            artifactUri: metadata.artifactUri || '',
-            metadata: metadata,
-            sale: sale
-          };
-        }
-      )
-      .map(p => p.catch(e => e))
+      return {
+        address: saleAddress,
+        id: tokenId,
+        title: metadata.name || '',
+        owner: sale.seller,
+        description: metadata.description || '',
+        artifactUri: metadata.artifactUri || '',
+        metadata: metadata,
+        sale: sale
+      };
+    }
   );
 }
