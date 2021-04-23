@@ -4,65 +4,95 @@ import { useLocation } from 'wouter';
 import { ipfsUriToGatewayUrl } from '../../lib/util/ipfs';
 import { AspectRatio, Box, Flex, Heading } from '@chakra-ui/react';
 import { TokenMedia } from './TokenMedia';
+import { getMarketplaceNft, Nft } from '../../lib/nfts/queries';
+import { useSelector } from '../../reducer';
+import { SystemWithToolkit, SystemWithWallet } from '../../lib/system';
 
 interface TokenCardProps extends Token {
   network: string;
   selectedCollection?: string;
+  index?: number;
 }
 
-export function getAverageRGB(src: string, type: string) {
-  return new Promise(resolve => {
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d') as CanvasRenderingContext2D ?? {} as any;
-    let asset: HTMLImageElement | HTMLVideoElement;
-    let image = new window.Image();
-    let video = document.createElement('video');
+// export function getAverageRGB(src: string, type: string) {
+//   return new Promise(resolve => {
+//     const canvas = document.createElement('canvas');
+//     const context = canvas.getContext('2d') as CanvasRenderingContext2D ?? {} as any;
+//     let asset: HTMLImageElement | HTMLVideoElement;
+//     let image = new window.Image();
+//     let video = document.createElement('video');
 
-    const load = async function () {
-      let rgb = { r: 255, g: 255, b: 255 }
-      let height = canvas.height = asset.offsetHeight || asset.height || (asset as HTMLVideoElement)?.videoHeight;
-      let width = canvas.width = asset.offsetWidth || asset.width || (asset as HTMLVideoElement)?.videoWidth;
-      context.drawImage(asset, 0, 0, width, height);
-      let data;
-      try {
-        data = context.getImageData(0, 0, width, height);
-      } catch (e) {
-        return resolve(rgb);
-      }
-      let length = data?.data.length, blockSize = 4, i = 0, count = 0;
-      if (!length) { return resolve(rgb); }
-      while ((i += blockSize * 4) < length) {
-        ++count;
-        rgb.r += data.data[i];
-        rgb.g += data.data[i + 1];
-        rgb.b += data.data[i + 2];
-      }
-      rgb.r = ~~(rgb.r / (count));
-      rgb.g = ~~(rgb.g / (count));
-      rgb.b = ~~(rgb.b / (count));
-      return resolve(rgb);
-    }
+//     const load = async function () {
+//       let rgb = { r: 255, g: 255, b: 255 }
+//       let height = canvas.height = asset.offsetHeight || asset.height || (asset as HTMLVideoElement)?.videoHeight;
+//       let width = canvas.width = asset.offsetWidth || asset.width || (asset as HTMLVideoElement)?.videoWidth;
+//       context.drawImage(asset, 0, 0, width, height);
+//       let data;
+//       try {
+//         data = context.getImageData(0, 0, width, height);
+//       } catch (e) {
+//         return resolve(rgb);
+//       }
+//       let length = data?.data.length, blockSize = 4, i = 0, count = 0;
+//       if (!length) { return resolve(rgb); }
+//       while ((i += blockSize * 4) < length) {
+//         ++count;
+//         rgb.r += data.data[i];
+//         rgb.g += data.data[i + 1];
+//         rgb.b += data.data[i + 2];
+//       }
+//       rgb.r = ~~(rgb.r / (count));
+//       rgb.g = ~~(rgb.g / (count));
+//       rgb.b = ~~(rgb.b / (count));
+//       return resolve(rgb);
+//     }
 
-    if (/^image\/.*/.test(type)) {
-      asset = image;
-      asset.onload = load;
-      asset.crossOrigin = "Anonymous";
-      asset.src = src;
-    } else if (/^video\/.*/.test(type)) {
-      asset = video;
-      asset.onloadeddata = load;
-      asset.crossOrigin = "Anonymous";
-      asset.src = src + '#t=1';
-    } else {
-      return resolve({ r: 255, g: 255, b: 255 });
-    }
-  });
-}
+//     if (/^image\/.*/.test(type)) {
+//       asset = image;
+//       asset.onload = load;
+//       asset.crossOrigin = "Anonymous";
+//       asset.src = src;
+//     } else if (/^video\/.*/.test(type)) {
+//       asset = video;
+//       asset.onloadeddata = load;
+//       asset.crossOrigin = "Anonymous";
+//       asset.src = src + '#t=1';
+//     } else {
+//       return resolve({ r: 255, g: 255, b: 255 });
+//     }
+//   });
+//   let rgb = await getAverageRGB(url, type) as any;
+//   setObj(rgb);
+// }
+
+async function lazyLoad(system: SystemWithToolkit | SystemWithWallet, nft: Nft) {
+  const lazyAssets = [].slice.call(document.querySelectorAll(".lazy"));
+  if ("IntersectionObserver" in window) {
+    let lazyObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(async function (entry) {
+        if (entry.isIntersecting) {
+          let lazyAsset = entry.target as HTMLImageElement | HTMLVideoElement;
+          lazyAsset.src = await ipfsUriToGatewayUrl(system.config.network, nft.artifactUri);
+          lazyAsset.classList.remove("lazy");
+          lazyObserver.unobserve(lazyAsset);
+        }
+      });
+    });
+
+    lazyAssets.forEach(function (lazyAsset) {
+      lazyObserver.unobserve(lazyAsset);
+      lazyObserver.observe(lazyAsset);
+    });
+  }
+};
 
 export default function TokenCard(props: TokenCardProps) {
   const [, setLocation] = useLocation();
-  const [obj, setObj] = useState<{ r: number, g: number, b: number }>({ r: 255, g: 255, b: 255 });
-  const src = ipfsUriToGatewayUrl(props.network, props.artifactUri);
+  const [obj] = useState<{ r: number, g: number, b: number }>({ r: 255, g: 255, b: 255 });
+  const { system } = useSelector(s => s);
+  (async () => {
+    lazyLoad(system, await getMarketplaceNft(system, props.address ?? '', props.index ?? 0));
+  })();
 
   return (
     <Flex
@@ -88,13 +118,7 @@ export default function TokenCard(props: TokenCardProps) {
     >
       <AspectRatio ratio={3 / 2} height="100%">
         <Box>
-          <TokenMedia
-            src={src}
-            onLoad={async (url: string, type: string) => {
-              let rgb = await getAverageRGB(url, type) as any;
-              setObj(rgb);
-            }}
-          />
+          <TokenMedia />
         </Box>
       </AspectRatio>
       <Flex

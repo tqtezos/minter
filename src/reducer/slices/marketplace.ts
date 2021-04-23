@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction, CaseReducer } from '@reduxjs/toolkit';
-import { getMarketplaceNftsQuery } from '../async/queries';
 import { Nft } from '../../lib/nfts/queries';
 import config from '../../config.json';
 
@@ -47,9 +46,6 @@ const slice = createSlice({
   initialState,
   reducers: {
     populateMarketplace: populateMarketplaceR
-  },
-  extraReducers: ({ addCase }) => {
-    addCase(getMarketplaceNftsQuery.fulfilled, populateMarketplaceR);
   }
 });
 

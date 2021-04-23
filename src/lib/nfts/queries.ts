@@ -33,6 +33,47 @@ export interface Nft {
 
 const contractCache: Record<string, any> = {};
 
+export async function getMarketplaceNft(
+  system: SystemWithToolkit | SystemWithWallet,
+  address: string,
+  idx: number
+): Promise<Nft> {
+  const storage = await system.betterCallDev.getContractStorage(address);
+  const bigMapId = select(storage, {
+    type: 'big_map'
+  })?.value;
+  const tokenSales = await system.betterCallDev.getBigMapKeys(bigMapId);
+  const activeSales = tokenSales.filter((v: any) => {
+    return v.data.value;
+  });
+  const tokenSale = activeSales[idx];
+  const saleAddress = select(tokenSale, { name: 'token_for_sale_address' })?.value;
+  const tokenId = parseInt(select(tokenSale, { name: 'token_for_sale_token_id' })?.value, 10);
+  const sale = {
+    seller: select(tokenSale, { name: 'sale_seller' })?.value,
+    price: Number.parseInt(tokenSale.data.value?.value || 0, 10) / 1000000,
+    mutez: Number.parseInt(tokenSale.data.value?.value || 0, 10),
+    type: 'fixedPrice'
+  };
+
+  if (!(contractCache[saleAddress] instanceof ContractAbstraction)) {
+    contractCache[saleAddress] = await system.toolkit.contract.at(saleAddress, tzip12);
+  }
+
+  const metadata = await contractCache[saleAddress].tzip12().getTokenMetadata(tokenId);
+
+  return {
+    address: saleAddress,
+    id: tokenId,
+    title: metadata.name,
+    owner: sale.seller,
+    description: metadata.description,
+    artifactUri: metadata.artifactUri,
+    metadata: metadata,
+    sale: sale
+  };
+}
+
 export async function getMarketplaceNfts(
   system: SystemWithToolkit | SystemWithWallet,
   address: string
@@ -42,50 +83,50 @@ export async function getMarketplaceNfts(
     type: 'big_map'
   })?.value;
   const tokenSales = await system.betterCallDev.getBigMapKeys(bigMapId);
-  const activeSales = tokenSales.filter((v: any) => {
+  return tokenSales.filter((v: any) => {
     return v.data.value;
   });
 
-  return await Promise.all(
-    activeSales.map(
-      async (tokenSale: any): Promise<Nft> => {
-        const saleAddress = select(tokenSale, { name: 'token_for_sale_address' })?.value;
-        const tokenId = parseInt(select(tokenSale, { name: 'token_for_sale_token_id' })?.value, 10);
-        const sale = {
-          seller: select(tokenSale, { name: 'sale_seller' })?.value,
-          price: Number.parseInt(tokenSale.data.value?.value || 0, 10) / 1000000,
-          mutez: Number.parseInt(tokenSale.data.value?.value || 0, 10),
-          type: 'fixedPrice'
-        };
+  // return await Promise.all(
+  //   activeSales.map(
+  //     async (tokenSale: any): Promise<Nft> => {
+  //       const saleAddress = select(tokenSale, { name: 'token_for_sale_address' })?.value;
+  //       const tokenId = parseInt(select(tokenSale, { name: 'token_for_sale_token_id' })?.value, 10);
+  //       const sale = {
+  //         seller: select(tokenSale, { name: 'sale_seller' })?.value,
+  //         price: Number.parseInt(tokenSale.data.value?.value || 0, 10) / 1000000,
+  //         mutez: Number.parseInt(tokenSale.data.value?.value || 0, 10),
+  //         type: 'fixedPrice'
+  //       };
 
-        if (!(contractCache[saleAddress] instanceof ContractAbstraction)) {
-          contractCache[saleAddress] = await system.toolkit.contract.at(saleAddress, tzip12);
-        }
+  //       if (!(contractCache[saleAddress] instanceof ContractAbstraction)) {
+  //         contractCache[saleAddress] = await system.toolkit.contract.at(saleAddress, tzip12);
+  //       }
 
-        const metadata = await contractCache[saleAddress].tzip12().getTokenMetadata(tokenId);
+  //       const metadata = await contractCache[saleAddress].tzip12().getTokenMetadata(tokenId);
 
-        return {
-          address: saleAddress,
-          id: tokenId,
-          title: metadata.name,
-          owner: sale.seller,
-          description: metadata.description,
-          artifactUri: metadata.artifactUri,
-          metadata: metadata,
-          sale: sale
-        };
-      }
-    )
-  );
+  //       return {
+  //         address: saleAddress,
+  //         id: tokenId,
+  //         title: metadata.name,
+  //         owner: sale.seller,
+  //         description: metadata.description,
+  //         artifactUri: metadata.artifactUri,
+  //         metadata: metadata,
+  //         sale: sale
+  //       };
+  //     }
+  //   )
+  // );
 }
 
 export class NftMetadata {
   [index: string]:
-    | string
-    | undefined
-    | number
-    | Array<String | NftMetadataFormat | NftMetadataAttribute>
-    | boolean;
+  | string
+  | undefined
+  | number
+  | Array<String | NftMetadataFormat | NftMetadataAttribute>
+  | boolean;
   ''?: string;
   name?: string;
   minter?: string;
