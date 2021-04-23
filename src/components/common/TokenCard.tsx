@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Token } from '../../reducer/slices/collections';
 import { useLocation } from 'wouter';
 import { ipfsUriToGatewayUrl } from '../../lib/util/ipfs';
 import { AspectRatio, Box, Flex, Heading } from '@chakra-ui/react';
@@ -8,11 +7,6 @@ import { getMarketplaceNft, Nft } from '../../lib/nfts/queries';
 import { useSelector } from '../../reducer';
 import { SystemWithToolkit, SystemWithWallet } from '../../lib/system';
 
-interface TokenCardProps extends Token {
-  network: string;
-  selectedCollection?: string;
-  index?: number;
-}
 
 // export function getAverageRGB(src: string, type: string) {
 //   return new Promise(resolve => {
@@ -86,7 +80,7 @@ async function lazyLoad(system: SystemWithToolkit | SystemWithWallet, nft: Nft) 
   }
 };
 
-export default function TokenCard(props: TokenCardProps) {
+export default function TokenCard(props: any) {
   const [, setLocation] = useLocation();
   const [obj] = useState<{ r: number, g: number, b: number }>({ r: 255, g: 255, b: 255 });
   const { system } = useSelector(s => s);

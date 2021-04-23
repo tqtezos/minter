@@ -31,9 +31,8 @@ export default function Catalog() {
           {ref.current?.map((nft: any, index: number) => {
             return (
               <TokenCard
-                key={`${nft.address}-${nft.id}`}
+                nft={nft}
                 network={system.config.network}
-                {...nft}
                 index={index}
               />
             );
