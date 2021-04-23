@@ -21,7 +21,7 @@ export const BigMapRow = <K extends t.Mixed, V extends t.Mixed>(props: {
     updates: t.number
   });
 
-export const BigMapUpdate = <K extends t.Mixed, V extends t.Mixed>(props: {
+export const BigMapUpdateRow = <K extends t.Mixed, V extends t.Mixed>(props: {
   key: K;
   value: V;
 }) =>
@@ -38,6 +38,15 @@ export const BigMapUpdate = <K extends t.Mixed, V extends t.Mixed>(props: {
     action: t.string,
     content: t.type({ hash: t.string, key: props.key, value: props.value })
   });
+
+export type AccountContractRow = t.TypeOf<typeof AccountContractRow>;
+export const AccountContractRow = t.type({
+  kind: t.string,
+  address: t.string,
+  balance: t.number,
+  creationLevel: t.number,
+  creationTime: t.string
+});
 
 export type AssetMetadataResponse = t.TypeOf<typeof AssetMetadataResponse>;
 export const AssetMetadataResponse = t.array(
@@ -233,10 +242,24 @@ async function getBigMapUpdates<K extends t.Mixed, V extends t.Mixed>(
   props: { key: K; value: V }
 ) {
   const bigMapUpdates = await tzkt.getBigMapUpdates(params);
-  const decoder = t.array(BigMapUpdate(props));
+  const decoder = t.array(BigMapUpdateRow(props));
   const decoded = decoder.decode(bigMapUpdates);
   if (isLeft(decoded)) {
-    throw Error('Failed to decode `getFixedPriceSales` response');
+    throw Error('Failed to decode `getBigMapUpdates` response');
+  }
+  return decoded.right;
+}
+
+async function getAccountContracts(
+  tzkt: TzKt,
+  address: string,
+  params?: Params
+) {
+  const accountContracts = await tzkt.getAccountContracts(address, params);
+  const decoder = t.array(AccountContractRow);
+  const decoded = decoder.decode(accountContracts);
+  if (isLeft(decoded)) {
+    throw Error('Failed to decode `getAccountContracts` response');
   }
   return decoded.right;
 }
@@ -319,10 +342,10 @@ export async function getNftAssetContract(
 }
 
 export async function getWalletNftAssetContracts(system: SystemWithWallet) {
-  // TODO: Write decoder function for data retrieval
-  const response = await system.tzkt.getAccountContracts(system.tzPublicKey);
-  const assetContracts = response.filter((v: any) => v.kind === 'asset');
-  const addresses = assetContracts.map((a: any) => a.address);
+  const response = await getAccountContracts(system.tzkt, system.tzPublicKey);
+  const addresses = response
+    .filter(c => c.kind === 'asset')
+    .map(c => c.address);
   const results: AssetContract[] = [];
 
   if (addresses.length === 0) {
@@ -335,7 +358,7 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
       {
         path: 'metadata',
         action: 'add_key',
-        'contract.in': addresses,
+        'contract.in': addresses.join(','),
         limit: '10000'
       },
       {
