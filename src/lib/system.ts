@@ -105,7 +105,7 @@ function createMetadataResolver(
   const ipfsGateway =
     system.config.network === 'sandboxnet'
       ? 'localhost:8080'
-      : 'gateway.pinata.cloud';
+      : 'dweb.link';
   const gatewayProtocol =
     system.config.network === 'sandboxnet' ? 'http' : 'https';
   const ipfsHandler = new CustomIpfsHttpHandler(ipfsGateway, gatewayProtocol);
