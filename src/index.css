@@ -41,8 +41,10 @@ model-viewer.individual {
 
 model-viewer.featured {
   height: 500px;
+  width: 500px;
 }
 
 model-viewer.fullscreen {
   height: 85%;
+  width: 85%;
 }
