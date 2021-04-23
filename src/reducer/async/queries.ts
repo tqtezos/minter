@@ -6,10 +6,11 @@ import {
   getContractNfts,
   getMarketplaceNfts,
   Nft,
-  getWalletNftAssetContracts
+  getWalletNftAssetContracts,
+  NftMarketLoadData,
+  loadMarketplaceNft
 } from '../../lib/nfts/queries';
 import { ErrorKind, RejectValue } from './errors';
-import { DataSource } from '../../lib/util/dataSource';
 
 type Opts = { state: State; rejectValue: RejectValue };
 
@@ -77,7 +78,7 @@ export const getWalletAssetContractsQuery = createAsyncThunk<
 );
 
 export const getMarketplaceNftsQuery = createAsyncThunk<
-  { tokens: DataSource<Nft> },
+  { tokens: NftMarketLoadData[] },
   string,
   Opts
 >(
@@ -86,14 +87,45 @@ export const getMarketplaceNftsQuery = createAsyncThunk<
     const { system } = getState();
     try {
       const tokens = await getMarketplaceNfts(system, address);
-      // Load first chunk
-      await tokens.loadMore(13);
-
+      for( const i in tokens.slice(0, 9)){
+        tokens[i] = await loadMarketplaceNft(system, tokens[i]);
+      }
       return { tokens };
     } catch (e) {
       return rejectWithValue({
         kind: ErrorKind.GetMarketplaceNftsFailed,
         message: `Failed to retrieve marketplace nfts from: ${address}`
+      });
+    }
+  }
+);
+
+export const loadMoreMarketplaceNftsQuery = createAsyncThunk<
+  { tokens: NftMarketLoadData[] },
+  {},
+  Opts
+>(
+  'query/loadMoreMarketplaceNftsQuery',
+  async (_, { getState, rejectWithValue }) => {
+    const { system, marketplace } = getState();
+    try {
+
+      const tokens = marketplace.marketplace.tokens ?? [];
+
+      const iStart = tokens.findIndex(x => !x.token);
+      const iEnd = iStart + 8;
+
+      const tokensAfter = await Promise.all(tokens
+        .map(async (x,i) => x.token || i >= iEnd ? x 
+          : await loadMarketplaceNft(system, x)));
+
+      console.log('loadMoreMarketplaceNftsQuery', { tokensAfter });
+      return { tokens: tokensAfter };
+
+    } catch (e) {
+      return rejectWithValue({
+        kind: ErrorKind.GetMarketplaceNftsFailed,
+        message: `Failed to load marketplace nfts`
       });
     }
   }

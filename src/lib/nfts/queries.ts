@@ -342,7 +342,7 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
 export async function getMarketplaceNfts(
   system: SystemWithToolkit | SystemWithWallet,
   address: string
-): Promise<DataSource<Nft>> {
+): Promise<NftMarketLoadData[]> {
   const tokenSales = await getFixedPriceSales(system.tzkt, address);
   const activeSales = tokenSales.filter(v => v.active);
   const addresses = activeSales
@@ -350,60 +350,92 @@ export async function getMarketplaceNfts(
     .join(',');
 
   // TODO: Write decoder function for data retrieval
-  const tokenBigMapRows = await system.tzkt.getBigMapUpdates({
+  type TokenStorage = { 
+    contract: { address:string },
+    content: { value: { token_id: number, token_info: { '': string } } },
+  };
+  const tokenBigMapItems = await system.tzkt.getBigMapUpdates({
     path: 'assets.token_metadata',
     action: 'add_key',
     'contract.in': addresses,
     limit: '10000'
-  });
+  }) as { find: (predicate: (item: TokenStorage) => boolean) => undefined | TokenStorage };
 
   // Sort descending (newest first)
   const salesToView = [...activeSales].reverse();
+  const salesWithTokenMetadata = salesToView.map(x => ({
+    tokenSale: x,
+    tokenItem: tokenBigMapItems
+      .find(item => x.key.sale_token.token_for_sale_address === item.contract.address 
+        && x.key.sale_token.token_for_sale_token_id === (item.content.value.token_id + '')),
+  })).map(x=>({
+    loading: false,
+    token: null,
+    tokenSale: x.tokenSale,
+    tokenMetadata: x.tokenItem?.content?.value?.token_info[''],
+  }));
 
-  return createDataSourceFromArrayMap(
-    salesToView,
-    async (tokenSale): Promise<Nft> => {
-      const {
-        token_for_sale_address: saleAddress,
-        token_for_sale_token_id: tokenIdStr
-      } = tokenSale.key.sale_token;
-      const tokenId = parseInt(tokenIdStr, 10);
-      const mutez = Number.parseInt(tokenSale.value, 10);
-      const sale = {
-        id: tokenSale.id,
-        seller: tokenSale.key.sale_seller,
-        price: mutez / 1000000,
-        mutez: mutez,
-        type: 'fixedPrice'
-      };
-
-      const tokenInfo = tokenBigMapRows.find((row: any) => {
-        return (
-          saleAddress === row.contract.address &&
-          tokenIdStr === row.content.value.token_id
-        );
-      })?.content?.value?.token_info;
-
-      const tokenMetadata = tokenInfo && tokenInfo[''];
-
-      if (!tokenMetadata) {
-        throw Error("Couldn't retrieve tokenMetadata");
-      }
-
-      const { metadata } = (await system.resolveMetadata(
-        fromHexString(tokenMetadata)
-      )) as any;
-
-      return {
-        address: saleAddress,
-        id: tokenId,
-        title: metadata.name || '',
-        owner: sale.seller,
-        description: metadata.description || '',
-        artifactUri: metadata.artifactUri || '',
-        metadata: metadata,
-        sale: sale
-      };
-    }
-  );
+  return salesWithTokenMetadata;
 }
+
+export type NftMarketLoadData = { 
+  loading: boolean,
+  error?: string,
+  token: null | Nft,
+  tokenSale: FixedPriceSaleResponse[number], 
+  tokenMetadata: undefined | string,
+};
+export const loadMarketplaceNft = async (
+  system: SystemWithToolkit | SystemWithWallet,
+  tokenLoadData: NftMarketLoadData
+): Promise<NftMarketLoadData> => {
+
+  const {
+    token,
+    loading,
+    tokenSale,
+    tokenMetadata,
+  } = tokenLoadData;
+  const result = {...tokenLoadData};
+
+  if(token || loading){ return result; }
+  result.loading = true;
+
+  const {
+    token_for_sale_address: saleAddress,
+    token_for_sale_token_id: tokenIdStr
+  } = tokenSale.key.sale_token;
+
+  const tokenId = parseInt(tokenIdStr, 10);
+  const mutez = Number.parseInt(tokenSale.value, 10);
+  const sale = {
+    id: tokenSale.id,
+    seller: tokenSale.key.sale_seller,
+    price: mutez / 1000000,
+    mutez: mutez,
+    type: 'fixedPrice'
+  };
+
+  if (!tokenMetadata) {
+    tokenLoadData.error = "Couldn't retrieve tokenMetadata";
+    console.error("Couldn't retrieve tokenMetadata", {tokenSale});
+    throw Error("Couldn't retrieve tokenMetadata");
+  }
+
+  const { metadata } = (await system.resolveMetadata(
+    fromHexString(tokenMetadata)
+  )) as any;
+
+  result.token = {
+    address: saleAddress,
+    id: tokenId,
+    title: metadata.name || '',
+    owner: sale.seller,
+    description: metadata.description || '',
+    artifactUri: metadata.artifactUri || '',
+    metadata: metadata,
+    sale: sale
+  };
+
+  return result;
+};
