@@ -7,8 +7,8 @@ import { getMarketplaceNftsQuery } from '../../../reducer/async/queries';
 export default function Catalog() {
   const { system, marketplace: state } = useSelector(s => s);
   let dispatch = useDispatch();
-  dispatch(getMarketplaceNftsQuery(state.marketplace.address));
   useEffect(() => {
+    dispatch(getMarketplaceNftsQuery(state.marketplace.address));
   }, [dispatch, state.marketplace.address, system]);
 
   return (
@@ -24,7 +24,7 @@ export default function Catalog() {
     >
       <>
         <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
-          {console.log(state.marketplace)}
+          {console.log(state.marketplace.tokens)}
           {state.marketplace.tokens?.map((nft: any, index: number) => {
             return (
               <TokenCard
