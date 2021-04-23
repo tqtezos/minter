@@ -400,41 +400,55 @@ export const loadMarketplaceNft = async (
   if(token || loaded){ return result; }
   result.loaded = true;
 
-  const {
-    token_for_sale_address: saleAddress,
-    token_for_sale_token_id: tokenIdStr
-  } = tokenSale.key.sale_token;
+  try {
+    const {
+      token_for_sale_address: saleAddress,
+      token_for_sale_token_id: tokenIdStr
+    } = tokenSale.key.sale_token;
 
-  const tokenId = parseInt(tokenIdStr, 10);
-  const mutez = Number.parseInt(tokenSale.value, 10);
-  const sale = {
-    id: tokenSale.id,
-    seller: tokenSale.key.sale_seller,
-    price: mutez / 1000000,
-    mutez: mutez,
-    type: 'fixedPrice'
-  };
+    const tokenId = parseInt(tokenIdStr, 10);
+    const mutez = Number.parseInt(tokenSale.value, 10);
+    const sale = {
+      id: tokenSale.id,
+      seller: tokenSale.key.sale_seller,
+      price: mutez / 1000000,
+      mutez: mutez,
+      type: 'fixedPrice'
+    };
 
-  if (!tokenMetadata) {
-    tokenLoadData.error = "Couldn't retrieve tokenMetadata";
-    console.error("Couldn't retrieve tokenMetadata", {tokenSale});
-    throw Error("Couldn't retrieve tokenMetadata");
+    // // TESTING: Simulate error
+    // if( Math.random() < 0.25){
+    //   result.error = "SIMULATED Random Network Error";
+    //   console.error("SIMULATED Random Network Error", {tokenSale});
+    //   // throw new Error("SIMULATED Random Network Error");
+    //   return result;
+    // }
+
+    if (!tokenMetadata) {
+      result.error = "Couldn't retrieve tokenMetadata";
+      console.error("Couldn't retrieve tokenMetadata", { tokenSale });
+      return result;
+    }
+
+    const { metadata } = (await system.resolveMetadata(
+      fromHexString(tokenMetadata)
+    )) as any;
+
+    result.token = {
+      address: saleAddress,
+      id: tokenId,
+      title: metadata.name || '',
+      owner: sale.seller,
+      description: metadata.description || '',
+      artifactUri: metadata.artifactUri || '',
+      metadata: metadata,
+      sale: sale
+    };
+
+    return result;
+  } catch (err) {
+    result.error = "Couldn't load token";
+    console.error("Couldn't load token", { tokenSale, err });
+    return result;
   }
-
-  const { metadata } = (await system.resolveMetadata(
-    fromHexString(tokenMetadata)
-  )) as any;
-
-  result.token = {
-    address: saleAddress,
-    id: tokenId,
-    title: metadata.name || '',
-    owner: sale.seller,
-    description: metadata.description || '',
-    artifactUri: metadata.artifactUri || '',
-    metadata: metadata,
-    sale: sale
-  };
-
-  return result;
 };
