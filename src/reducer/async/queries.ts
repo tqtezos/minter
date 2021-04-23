@@ -86,11 +86,16 @@ export const getMarketplaceNftsQuery = createAsyncThunk<
   async (address, { getState, rejectWithValue }) => {
     const { system } = getState();
     try {
+      
       const tokens = await getMarketplaceNfts(system, address);
+
+      // Load 9 initially (1-feature + at least 2 rows)
       for( const i in tokens.slice(0, 9)){
         tokens[i] = await loadMarketplaceNft(system, tokens[i]);
       }
+
       return { tokens };
+
     } catch (e) {
       return rejectWithValue({
         kind: ErrorKind.GetMarketplaceNftsFailed,
@@ -112,6 +117,7 @@ export const loadMoreMarketplaceNftsQuery = createAsyncThunk<
 
       const tokens = marketplace.marketplace.tokens ?? [];
 
+      // Load 8 more (at least 2 rows)
       const iStart = tokens.findIndex(x => !x.loaded);
       const iEnd = iStart + 8;
 
