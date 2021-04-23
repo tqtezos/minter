@@ -112,14 +112,14 @@ export const loadMoreMarketplaceNftsQuery = createAsyncThunk<
 
       const tokens = marketplace.marketplace.tokens ?? [];
 
-      const iStart = tokens.findIndex(x => !x.token);
+      const iStart = tokens.findIndex(x => !x.loaded);
       const iEnd = iStart + 8;
 
+      // Need to rebuild the array
       const tokensAfter = await Promise.all(tokens
-        .map(async (x,i) => x.token || i >= iEnd ? x 
-          : await loadMarketplaceNft(system, x)));
+        .map(async (x,i) => i >= iStart && i < iEnd 
+          ? await loadMarketplaceNft(system, x) : x));
 
-      console.log('loadMoreMarketplaceNftsQuery', { tokensAfter });
       return { tokens: tokensAfter };
 
     } catch (e) {

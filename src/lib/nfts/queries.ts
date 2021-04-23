@@ -368,7 +368,7 @@ export async function getMarketplaceNfts(
       .find(item => x.key.sale_token.token_for_sale_address === item.contract.address 
         && x.key.sale_token.token_for_sale_token_id === (item.content.value.token_id + '')),
   })).map(x=>({
-    loading: false,
+    loaded: false,
     token: null,
     tokenSale: x.tokenSale,
     tokenMetadata: x.tokenItem?.content?.value?.token_info[''],
@@ -378,7 +378,7 @@ export async function getMarketplaceNfts(
 }
 
 export type MarketplaceNftLoadingData = { 
-  loading: boolean,
+  loaded: boolean,
   error?: string,
   token: null | Nft,
   tokenSale: FixedPriceSaleResponse[number], 
@@ -391,14 +391,14 @@ export const loadMarketplaceNft = async (
 
   const {
     token,
-    loading,
+    loaded,
     tokenSale,
     tokenMetadata,
   } = tokenLoadData;
   const result = {...tokenLoadData};
 
-  if(token || loading){ return result; }
-  result.loading = true;
+  if(token || loaded){ return result; }
+  result.loaded = true;
 
   const {
     token_for_sale_address: saleAddress,
