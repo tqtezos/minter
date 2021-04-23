@@ -40,6 +40,7 @@ export default function CollectionSelect() {
           fontWeight="normal"
           py={3}
           height="auto"
+          backgroundColor="white"
           color={state.collectionAddress ? 'brand.black' : 'brand.gray'}
         >
           <Flex align="center">

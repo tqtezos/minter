@@ -5,6 +5,9 @@
     "api": "https://api.better-call.dev",
     "gui": "https://better-call.dev"
   },
+  "tzkt": {
+    "api": "https://staging.api.edo2net.tzkt.io"
+  },
   "contracts": {
     "nftFaucet": "KT1Hagc5XQYzkX7HfRbUNXdi4CBfiENzbHiU",
     "marketplace": {

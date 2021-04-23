@@ -59,7 +59,7 @@ export function TokenMedia(props: TokenMediaProps) {
         height="100%"
         flex="1"
         maxWidth={props.maxW}
-        style={{objectFit:"scale-down"}}
+        style={{ objectFit: 'scale-down' }}
         onError={() => setErrored(true)}
       />
     );
@@ -73,7 +73,7 @@ export function TokenMedia(props: TokenMediaProps) {
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
         height="100%"
-        style={{maxWidth:props.maxW}}
+        style={{ maxWidth: props.maxW }}
       >
         <source src={obj.url} type={obj.type} />
       </video>
