@@ -84,7 +84,7 @@ export default function Catalog() {
                         />
                       );
                     })}
-                    <VisibilityTrigger key={state.marketplace.tokens?.length + ':' + tokens.length} onVisible={loadMore}/>
+                    <VisibilityTrigger key={state.marketplace.tokens?.length + ':' + tokens.length} onVisible={loadMore} allowedDistanceToViewport={600}/>
                   </>
                 </SimpleGrid>
               </>

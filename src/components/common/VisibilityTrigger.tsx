@@ -1,39 +1,35 @@
 import React, { useEffect, useRef } from "react";
 
 // Based on https://github.com/olistic/react-use-visibility#readme MIT License
-function isElementInDisplay(el: HTMLElement, partial = true) {
+function isElementNearViewport(element: HTMLElement, allowedDistanceToViewport = 0) {
   
     const {
       top,
       right,
       bottom,
       left,
-      width,
       height,
-    } = el.getBoundingClientRect();
-  
-    if (!width) {
-      return false;
-    }
-  
-    const topCheck = partial ? top + height : top;
-    const bottomCheck = partial ? bottom - height : bottom;
-    const rightCheck = partial ? right - width : right;
-    const leftCheck = partial ? left + width : left;
-  
+      width,
+    } = element.getBoundingClientRect();
+
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
+
+    const topCheck = top + height;
+    const leftCheck = left + width;
+    const bottomCheck = bottom - height;
+    const rightCheck = right - width;
   
     return (
-      topCheck >= 0 &&
-      leftCheck >= 0 &&
-      bottomCheck <= windowHeight &&
-      rightCheck <= windowWidth
+      topCheck >= -allowedDistanceToViewport &&
+      leftCheck >= -allowedDistanceToViewport &&
+      bottomCheck <= windowHeight + allowedDistanceToViewport &&
+      rightCheck <= windowWidth + allowedDistanceToViewport
     );
 }
 
 /** Simple Cross Browser Visibility Trigger */
-export const useVisibilityTrigger = (elementRef: { current: undefined | null | HTMLElement }, onVisible: () => void) => {
+export const useVisibilityTrigger = (elementRef: { current: undefined | null | HTMLElement }, onVisible: () => void, allowedDistanceToViewport = 0) => {
 
     const hasTriggered = useRef(false);
 
@@ -42,23 +38,23 @@ export const useVisibilityTrigger = (elementRef: { current: undefined | null | H
             if(hasTriggered.current) { return; }
             if(!elementRef.current) { return; }
 
-            if(!isElementInDisplay(elementRef.current)){ return; }
+            if(!isElementNearViewport(elementRef.current, allowedDistanceToViewport)){ return; }
 
             hasTriggered.current = true;
             onVisible();
         }, 100);
         return () => clearInterval(intervalId);
-    },[elementRef, onVisible]);
+    },[allowedDistanceToViewport, elementRef, onVisible]);
 
     return {
         reset: () => { hasTriggered.current = false; },
     };
 };
 
-export const VisibilityTrigger = ({ onVisible }: { onVisible: () => void }) => {
+export const VisibilityTrigger = ({ onVisible, allowedDistanceToViewport }: { onVisible: () => void, allowedDistanceToViewport?:number }) => {
 
     const divRef = useRef(null as null | HTMLDivElement);
-    useVisibilityTrigger(divRef, onVisible);
+    useVisibilityTrigger(divRef, onVisible, allowedDistanceToViewport ?? 0);
 
     return (
         <div ref={divRef} />
