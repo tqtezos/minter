@@ -75,7 +75,7 @@ export async function getMarketplaceNfts(
     type: 'big_map'
   })?.value;
   const tokenSales = await system.betterCallDev.getBigMapKeys(bigMapId);
-  return tokenSales.map((v: any) => v.data.value);
+  return tokenSales.filter((v: any) => v.data.value);
 
   // return await Promise.all(
   //   activeSales.map(
