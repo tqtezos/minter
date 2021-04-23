@@ -1,11 +1,12 @@
 import React from 'react';
 import { Token } from '../../../reducer/slices/collections';
 import { useLocation } from 'wouter';
+import { IpfsGatewayConfig } from '../../../lib/util/ipfs';
 import { AspectRatio, Box, Flex, Text, Heading } from '@chakra-ui/react';
 import { TokenMedia } from '../../common/TokenMedia';
 
 interface TokenCardProps extends Token {
-  network: string;
+  config: IpfsGatewayConfig,
 }
 
 export default function TokenCard(props: TokenCardProps) {
@@ -33,7 +34,6 @@ export default function TokenCard(props: TokenCardProps) {
       <AspectRatio ratio={3 / 2}>
         <Box>
           <TokenMedia
-            class="grid"
             {...props}
           />
         </Box>

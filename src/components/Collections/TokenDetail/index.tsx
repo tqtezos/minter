@@ -290,7 +290,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
 
           <TokenImage
             id="fullScreenAssetView"
-            src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
+            src={ipfsUriToGatewayUrl(system.config, token.artifactUri)}
             metadata={token.metadata}
             width="auto"
             height="auto"
@@ -325,7 +325,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
         flexDir="column"
       >
         <TokenImage
-          src={ipfsUriToGatewayUrl(system.config.network, token.artifactUri)}
+          src={ipfsUriToGatewayUrl(system.config, token.artifactUri)}
           metadata={token.metadata}
           height="75%"
           width="auto"

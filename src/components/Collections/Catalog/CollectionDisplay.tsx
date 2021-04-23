@@ -14,7 +14,7 @@ import {
 import { MinterButton } from '../../common';
 import { ExternalLink, Wind, HelpCircle } from 'react-feather';
 import { Token } from '../../../reducer/slices/collections';
-import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
+import { IpfsGatewayConfig, ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 import { useDispatch, useSelector } from '../../../reducer';
 import { getContractNftsQuery } from '../../../reducer/async/queries';
 import CollectionsDropdown from './CollectionsDropdown';
@@ -36,7 +36,7 @@ function MediaNotFound() {
 }
 
 function TokenImage(props: TokenTileProps) {
-  const src = ipfsUriToGatewayUrl(props.network, props.artifactUri);
+  const src = ipfsUriToGatewayUrl(props.config, props.artifactUri);
   const [errored, setErrored] = useState(false);
   const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
   useEffect(() => {
@@ -106,7 +106,7 @@ function TokenImage(props: TokenTileProps) {
 }
 
 interface TokenTileProps extends Token {
-  network: string;
+  config: IpfsGatewayConfig;
   address: string;
 }
 
@@ -300,7 +300,7 @@ export default function CollectionDisplay({
             <TokenTile
               key={token.id}
               address={address}
-              network={config.network}
+              config={config}
               {...token}
             />
           );

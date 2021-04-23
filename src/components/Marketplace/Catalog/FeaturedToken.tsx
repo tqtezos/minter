@@ -1,6 +1,7 @@
 import React from 'react';
 import { Token } from '../../../reducer/slices/collections';
 import { useLocation } from 'wouter';
+import { IpfsGatewayConfig } from '../../../lib/util/ipfs';
 import {
   Box,
   Container,
@@ -14,7 +15,7 @@ import { MinterButton } from '../../common';
 import { TokenMedia } from '../../common/TokenMedia';
 
 interface FeaturedTokenProps extends Token {
-  network: string;
+  config: IpfsGatewayConfig;
 }
 
 export default function FeaturedToken(props: FeaturedTokenProps) {

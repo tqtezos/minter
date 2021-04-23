@@ -17,5 +17,6 @@
       }
     }
   },
-  "ipfsApi": "http://localhost:3300"
+  "ipfsApi": "http://localhost:3300",
+  "ipfsGateway": "http://localhost:8080"
 }

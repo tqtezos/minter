@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { Config } from '../system';
 
-function mkQueryParams(params: Record<string, string> | undefined) {
+export type Params = Record<string, string>;
+
+function mkQueryParams(params: Params | undefined) {
   const finalParams = { limit: '10000', ...params };
   return new URLSearchParams(finalParams).toString();
 }
@@ -9,7 +11,7 @@ function mkQueryParams(params: Record<string, string> | undefined) {
 export async function getBigMapKeys(
   config: Config,
   id: number,
-  params?: Record<string, string>
+  params?: Params
 ) {
   const uri = `${config.tzkt.api}/v1/bigmaps/${id}/keys?${mkQueryParams(
     params
@@ -18,10 +20,7 @@ export async function getBigMapKeys(
   return response.data;
 }
 
-export async function getBigMapUpdates(
-  config: Config,
-  params?: Record<string, string>
-) {
+export async function getBigMapUpdates(config: Config, params?: Params) {
   const uri = `${config.tzkt.api}/v1/bigmaps/updates?${mkQueryParams(params)}`;
   const response = await axios.get(uri);
   return response.data;
@@ -30,7 +29,7 @@ export async function getBigMapUpdates(
 export async function getContract(
   config: Config,
   address: string,
-  params?: Record<string, string>
+  params?: Params
 ) {
   const uri = `${config.tzkt.api}/v1/contracts/${address}?${mkQueryParams(
     params
@@ -43,7 +42,7 @@ export async function getContractBigMapKeys(
   config: Config,
   address: string,
   name: string,
-  params?: Record<string, string>
+  params?: Params
 ) {
   const uri = `${
     config.tzkt.api
@@ -55,7 +54,7 @@ export async function getContractBigMapKeys(
 export async function getContractStorage(
   config: Config,
   address: string,
-  params?: Record<string, string>
+  params?: Params
 ) {
   const uri = `${
     config.tzkt.api
@@ -67,7 +66,7 @@ export async function getContractStorage(
 export async function getAccountContracts(
   config: Config,
   address: string,
-  params?: Record<string, string>
+  params?: Params
 ) {
   const uri = `${
     config.tzkt.api
@@ -83,27 +82,27 @@ export class TzKt {
     this.config = config;
   }
 
-  getBigMapKeys(id: number) {
-    return getBigMapKeys(this.config, id);
+  getBigMapKeys(id: number, params?: Params) {
+    return getBigMapKeys(this.config, id, params);
   }
 
-  getBigMapUpdates(params?: Record<string, string>) {
+  getBigMapUpdates(params?: Params) {
     return getBigMapUpdates(this.config, params);
   }
 
-  getContract(address: string) {
-    return getContract(this.config, address);
+  getContract(address: string, params?: Params) {
+    return getContract(this.config, address, params);
   }
 
-  getContractBigMapKeys(address: string, name: string) {
-    return getContractBigMapKeys(this.config, address, name);
+  getContractBigMapKeys(address: string, name: string, params?: Params) {
+    return getContractBigMapKeys(this.config, address, name, params);
   }
 
-  getContractStorage(address: string) {
-    return getContractStorage(this.config, address);
+  getContractStorage(address: string, params?: Params) {
+    return getContractStorage(this.config, address, params);
   }
 
-  getAccountContracts(address: string) {
-    return getAccountContracts(this.config, address);
+  getAccountContracts(address: string, params?: Params) {
+    return getAccountContracts(this.config, address, params);
   }
 }

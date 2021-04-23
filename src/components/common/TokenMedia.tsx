@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Flex, Image } from '@chakra-ui/react';
 import { FiHelpCircle } from 'react-icons/fi';
-import { ipfsUriToGatewayUrl } from '../../lib/util/ipfs';
+import { IpfsGatewayConfig, ipfsUriToGatewayUrl } from '../../lib/util/ipfs';
 import { Token } from '../../reducer/slices/collections';
 
 interface TokenMediaProps extends Token {
-  network: string;
+  config: IpfsGatewayConfig;
   maxW?: string;
   class?: string;
 }
@@ -27,7 +27,7 @@ function MediaNotFound() {
 }
 
 export function TokenMedia(props: TokenMediaProps) {
-  const src = ipfsUriToGatewayUrl(props.network, props.artifactUri);
+  const src = ipfsUriToGatewayUrl(props.config, props.artifactUri);
   const [errored, setErrored] = useState(false);
   const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
   useEffect(() => {
