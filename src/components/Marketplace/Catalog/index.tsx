@@ -2,9 +2,10 @@ import React, { useEffect } from 'react';
 import { Box, Container, Text, Flex, Heading, SimpleGrid, Spinner } from '@chakra-ui/react';
 import { Wind } from 'react-feather';
 import { useSelector, useDispatch } from '../../../reducer';
-import { getMarketplaceNftsQuery } from '../../../reducer/async/queries';
+import { getMarketplaceNftsQuery, loadMoreMarketplaceNftsQuery } from '../../../reducer/async/queries';
 import TokenCard from './TokenCard';
 import FeaturedToken from './FeaturedToken';
+import { VisibilityTrigger } from '../../common/VisibilityTrigger';
 
 export default function Catalog() {
   const { system, marketplace: state } = useSelector(s => s);
@@ -14,10 +15,11 @@ export default function Catalog() {
     dispatch(getMarketplaceNftsQuery(state.marketplace.address));
   }, [ state.marketplace.address, dispatch ]);
 
-  let tokens = state.marketplace.tokens;
-  if (tokens === null) {
-    tokens = [];
-  }
+  const loadMore = () => {
+    dispatch(loadMoreMarketplaceNftsQuery({}));
+  };
+
+  let tokens = state.marketplace.tokens?.filter(x=>x.token).map(x=>x.token!) ?? [];
 
   return (
     <Flex
@@ -72,15 +74,18 @@ export default function Catalog() {
             ) : (
               <>
                 <SimpleGrid columns={{sm: 1, md: 2, lg: 3, xl: 4}} gap={8} pb={8}>
-                  {tokens.slice(1).map(token => {
-                    return (
-                      <TokenCard
-                        key={`${token.address}-${token.id}`}
-                        network={system.config.network}
-                        {...token}
-                      />
-                    );
-                  })}
+                  <>
+                    {tokens.slice(1).map(token => {
+                      return (
+                        <TokenCard
+                          key={`${token.address}-${token.id}`}
+                          network={system.config.network}
+                          {...token}
+                        />
+                      );
+                    })}
+                    <VisibilityTrigger key={state.marketplace.tokens?.length + ':' + tokens.length} onVisible={loadMore} allowedDistanceToViewport={600}/>
+                  </>
                 </SimpleGrid>
               </>
           )}
