@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Flex, SimpleGrid } from '@chakra-ui/react';
 import { useSelector } from '../../../reducer';
 import TokenCard from '../../common/TokenCard';
@@ -6,10 +6,13 @@ import { getMarketplaceNfts } from '../../../lib/nfts/queries';
 
 export default function Catalog() {
   const { system, marketplace: state } = useSelector(s => s);
-  let nfts: any
-  (async() => {
-  nfts = await getMarketplaceNfts(system, state.marketplace.address);
-  })();
+  let nfts: any;
+  let ref = useRef(nfts);
+  useEffect(() => {
+    (async () => {
+      ref.current = await getMarketplaceNfts(system, state.marketplace.address);
+    })();
+  });
 
   return (
     <Flex
