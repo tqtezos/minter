@@ -11,7 +11,6 @@ export default function Catalog() {
   useEffect(() => {
     (async () => {
       ref.current = await getMarketplaceNfts(system, state.marketplace.address);
-      console.log(ref.current)
     })();
   }, [state.marketplace.address, system]);
 
@@ -28,7 +27,7 @@ export default function Catalog() {
     >
       <>
         <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
-          {ref.current?.map((nft: any, index: number) => {
+          {nfts?.map((nft: any, index: number) => {
             return (
               <TokenCard
                 nft={nft}
