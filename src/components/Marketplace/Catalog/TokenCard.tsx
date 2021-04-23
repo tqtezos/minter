@@ -48,7 +48,6 @@ export default function TokenCard(props: TokenCardProps) {
         flexDir="column"
       >
         <Heading size="sm">{props.title}</Heading>
-        <Text fontSize="sm">Seller: {props.sale?.seller.substr(0, 5)}...{props.sale?.seller.substr(-5)}</Text>
       </Flex>
       <Flex
         px={2}
