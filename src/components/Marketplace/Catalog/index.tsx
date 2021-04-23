@@ -12,7 +12,7 @@ export default function Catalog() {
     (async () => {
       ref.current = await getMarketplaceNfts(system, state.marketplace.address);
     })();
-  });
+  }, [state.marketplace.address, system]);
 
   return (
     <Flex
