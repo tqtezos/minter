@@ -96,7 +96,7 @@ const slice = createSlice({
       state.displayImageFile = null;
     },
     addMetadataRow(state) {
-      state.attributes.push({ name: null, value: null });
+      state.attributes.push({ name: '', value: '' });
     },
     updateMetadataRowName(state, action: UpdateRowNameAction) {
       if (state.attributes[action.payload.key]) {
