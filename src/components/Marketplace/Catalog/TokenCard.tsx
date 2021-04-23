@@ -1,7 +1,7 @@
 import React from 'react';
 import { Token } from '../../../reducer/slices/collections';
 import { useLocation } from 'wouter';
-import { IpfsGatewayConfig, ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
+import { IpfsGatewayConfig } from '../../../lib/util/ipfs';
 import { AspectRatio, Box, Flex, Text, Heading } from '@chakra-ui/react';
 import { TokenMedia } from '../../common/TokenMedia';
 
