@@ -341,7 +341,7 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
 export async function getMarketplaceNfts(
   system: SystemWithToolkit | SystemWithWallet,
   address: string
-): Promise<NftMarketLoadData[]> {
+): Promise<MarketplaceNftLoadingData[]> {
   const tokenSales = await getFixedPriceSales(system.tzkt, address);
   const activeSales = tokenSales.filter(v => v.active);
   const addresses = activeSales
@@ -377,7 +377,7 @@ export async function getMarketplaceNfts(
   return salesWithTokenMetadata;
 }
 
-export type NftMarketLoadData = { 
+export type MarketplaceNftLoadingData = { 
   loading: boolean,
   error?: string,
   token: null | Nft,
@@ -386,8 +386,8 @@ export type NftMarketLoadData = {
 };
 export const loadMarketplaceNft = async (
   system: SystemWithToolkit | SystemWithWallet,
-  tokenLoadData: NftMarketLoadData
-): Promise<NftMarketLoadData> => {
+  tokenLoadData: MarketplaceNftLoadingData
+): Promise<MarketplaceNftLoadingData> => {
 
   const {
     token,

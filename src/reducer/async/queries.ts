@@ -7,7 +7,7 @@ import {
   getMarketplaceNfts,
   Nft,
   getWalletNftAssetContracts,
-  NftMarketLoadData,
+  MarketplaceNftLoadingData,
   loadMarketplaceNft
 } from '../../lib/nfts/queries';
 import { ErrorKind, RejectValue } from './errors';
@@ -78,7 +78,7 @@ export const getWalletAssetContractsQuery = createAsyncThunk<
 );
 
 export const getMarketplaceNftsQuery = createAsyncThunk<
-  { tokens: NftMarketLoadData[] },
+  { tokens: MarketplaceNftLoadingData[] },
   string,
   Opts
 >(
@@ -101,7 +101,7 @@ export const getMarketplaceNftsQuery = createAsyncThunk<
 );
 
 export const loadMoreMarketplaceNftsQuery = createAsyncThunk<
-  { tokens: NftMarketLoadData[] },
+  { tokens: MarketplaceNftLoadingData[] },
   {},
   Opts
 >(
