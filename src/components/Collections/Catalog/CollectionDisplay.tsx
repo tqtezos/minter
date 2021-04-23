@@ -14,7 +14,7 @@ import {
 import { MinterButton } from '../../common';
 import { ExternalLink, Wind, HelpCircle } from 'react-feather';
 import { Token } from '../../../reducer/slices/collections';
-import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
+import { IpfsGatewayConfig, ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 import { useDispatch, useSelector } from '../../../reducer';
 import { getContractNftsQuery } from '../../../reducer/async/queries';
 import CollectionsDropdown from './CollectionsDropdown';
@@ -88,7 +88,7 @@ function TokenImage(props: { src: string }) {
 }
 
 interface TokenTileProps extends Token {
-  network: string;
+  config: IpfsGatewayConfig;
   address: string;
 }
 
@@ -117,7 +117,7 @@ function TokenTile(props: TokenTileProps) {
       <AspectRatio ratio={3 / 2}>
         <Box p={4}>
           <TokenImage
-            src={ipfsUriToGatewayUrl(props.network, props.artifactUri)}
+            src={ipfsUriToGatewayUrl(props.config, props.artifactUri)}
           />
         </Box>
       </AspectRatio>
@@ -284,7 +284,7 @@ export default function CollectionDisplay({
             <TokenTile
               key={token.id}
               address={address}
-              network={config.network}
+              config={config}
               {...token}
             />
           );
