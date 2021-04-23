@@ -34,8 +34,18 @@ export const readFileAsDataUrlAction = createAsyncThunk<
 >('action/readFileAsDataUrl', async ({ ns, file }, { rejectWithValue }) => {
   const readFile = new Promise<{ ns: string; result: SelectedFile }>(
     (resolve, reject) => {
-      const { name, type, size } = file;
+      let { name, type, size } = file;
       const reader = new FileReader();
+
+      if (!type) {
+        if (name.substr(-4) === '.glb') {
+          type = 'model/gltf-binary';
+        }
+        if (name.substr(-5) === '.gltf') {
+          type = 'model/gltf+json';
+        }
+      }
+
       reader.onload = e => {
         const buffer = e.target?.result;
         if (!buffer || !(buffer instanceof ArrayBuffer)) {
@@ -198,21 +208,17 @@ export const mintTokenAction = createAsyncThunk<
         ipfsMetadata.artifactUri = fileResponse.data.ipfsUri;
         ipfsMetadata.displayUri = imageResponse.data.ipfsUri;
         ipfsMetadata.thumbnailUri = imageResponse.data.thumbnail.ipfsUri;
-        ipfsMetadata.formats = [
-          {
-            fileSize: imageResponse.headers['content-length'],
-            mimeType: imageResponse.headers['content-type']
-          }
-        ];
+        ipfsMetadata.formats = [{
+          fileSize: fileResponse.headers['content-length'],
+          mimeType: fileResponse.headers['content-type']
+        }];
       } else {
         const fileResponse = await uploadIPFSFile(system.config.ipfsApi, file);
         ipfsMetadata.artifactUri = fileResponse.data.ipfsUri;
-        ipfsMetadata.formats = [
-          {
-            fileSize: fileResponse.headers['content-length'],
-            mimeType: fileResponse.headers['content-type']
-          }
-        ];
+        ipfsMetadata.formats = [{
+          fileSize: fileResponse.data.size,
+          mimeType: file.type
+        }];
       }
     } catch (e) {
       return rejectWithValue({
