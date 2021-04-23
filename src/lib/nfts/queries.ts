@@ -34,19 +34,11 @@ export interface Nft {
 const contractCache: Record<string, any> = {};
 
 export async function getMarketplaceNft(
-  system: SystemWithToolkit | SystemWithWallet,
-  address: string,
-  idx: number
+  activeSale: any,
+  system: SystemWithToolkit | SystemWithWallet
 ): Promise<Nft> {
-  const storage = await system.betterCallDev.getContractStorage(address);
-  const bigMapId = select(storage, {
-    type: 'big_map'
-  })?.value;
-  const tokenSales = await system.betterCallDev.getBigMapKeys(bigMapId);
-  const activeSales = tokenSales.filter((v: any) => {
-    return v.data.value;
-  });
-  const tokenSale = activeSales[idx];
+  console.log(activeSale, system);
+  const tokenSale = activeSale;
   const saleAddress = select(tokenSale, { name: 'token_for_sale_address' })?.value;
   const tokenId = parseInt(select(tokenSale, { name: 'token_for_sale_token_id' })?.value, 10);
   const sale = {

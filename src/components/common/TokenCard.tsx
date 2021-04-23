@@ -84,8 +84,9 @@ export default function TokenCard(props: any) {
   const [, setLocation] = useLocation();
   const [obj] = useState<{ r: number, g: number, b: number }>({ r: 255, g: 255, b: 255 });
   const { system } = useSelector(s => s);
+  console.log(props);
   (async () => {
-    lazyLoad(system, await getMarketplaceNft(system, props.address ?? '', props.index ?? 0));
+    lazyLoad(system, await getMarketplaceNft(system, props.address ?? ''));
   })();
 
   return (
