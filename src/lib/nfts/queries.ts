@@ -86,24 +86,24 @@ const FixedPriceSaleResponse = t.array(
 );
 
 //
-export const NftMetadataFormatDimensions = t.partial({
-  value: t.string,
-  unit: t.string
-});
 
 export type NftMetadataFormatDimensions = t.TypeOf<
   typeof NftMetadataFormatDimensions
 >;
-
-export const NtfMetadataFormatDataRate = t.partial({
-  value: t.number,
+export const NftMetadataFormatDimensions = t.partial({
+  value: t.string,
   unit: t.string
 });
 
 export type NtfMetadataFormatDataRate = t.TypeOf<
   typeof NtfMetadataFormatDataRate
 >;
+export const NtfMetadataFormatDataRate = t.partial({
+  value: t.number,
+  unit: t.string
+});
 
+export type NftMetadataFormat = t.TypeOf<typeof NftMetadataFormat>;
 export const NftMetadataFormat = t.partial({
   uri: t.string,
   hash: t.string,
@@ -115,15 +115,13 @@ export const NftMetadataFormat = t.partial({
   dataRate: NtfMetadataFormatDataRate
 });
 
-export type NftMetadataFormat = t.TypeOf<typeof NftMetadataFormat>;
-
+export type NftMetadataAttribute = t.TypeOf<typeof NftMetadataAttribute>;
 export const NftMetadataAttribute = t.intersection([
   t.type({ name: t.string, value: t.string }),
   t.partial({ type: t.string })
 ]);
 
-export type NftMetadataAttribute = t.TypeOf<typeof NftMetadataAttribute>;
-
+export type NftMetadata = t.TypeOf<typeof NftMetadata>;
 export const NftMetadata = t.partial({
   '': t.string,
   name: t.string,
@@ -153,8 +151,6 @@ export const NftMetadata = t.partial({
   formats: t.array(NftMetadataFormat),
   attributes: t.array(NftMetadataAttribute)
 });
-
-export type NftMetadata = t.TypeOf<typeof NftMetadata>;
 
 interface NftSale {
   id: number;
