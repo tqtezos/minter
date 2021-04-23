@@ -11,6 +11,7 @@ export default function Catalog() {
   useEffect(() => {
     (async () => {
       ref.current = await getMarketplaceNfts(system, state.marketplace.address);
+      console.log(ref.current)
     })();
   }, [state.marketplace.address, system]);
 
