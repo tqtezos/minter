@@ -169,7 +169,7 @@ function TokenImage(props: {
             camera-controls
             rotation-per-second="30deg"
             src={obj.url}
-            class="individual"
+            class={props.id === "fullScreenAssetView" ? "fullscreen" : "individual"}
             style={{Height: props.height || '100%'}}
           ></model-viewer>
         </>

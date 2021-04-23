@@ -38,3 +38,11 @@ model-viewer.upload-preview {
 model-viewer.individual {
   height: 400px;
 }
+
+model-viewer.featured {
+  height: 500px;
+}
+
+model-viewer.fullscreen {
+  height: 85%;
+}
