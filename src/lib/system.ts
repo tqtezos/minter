@@ -27,6 +27,7 @@ export interface Config {
     };
   };
   ipfsApi: string;
+  ipfsGateway: string;
 }
 
 export enum Status {
@@ -102,12 +103,11 @@ function createMetadataResolver(
   toolkit: TezosToolkit,
   contractAddress: string
 ): ResolveMetadata {
-  const ipfsGateway =
-    system.config.network === 'sandboxnet'
-      ? 'localhost:8080'
-      : 'gateway.pinata.cloud';
-  const gatewayProtocol =
-    system.config.network === 'sandboxnet' ? 'http' : 'https';
+  
+  const ipfsUrl = system.config.ipfsGateway;
+  const ipfsGateway = ipfsUrl.replace(/^https?:\/\//,'');
+  const gatewayProtocol = ipfsUrl.startsWith('https') ? 'https' : 'http';
+
   const ipfsHandler = new CustomIpfsHttpHandler(ipfsGateway, gatewayProtocol);
   DEFAULT_HANDLERS.set('ipfs', ipfsHandler);
   const provider = new MetadataProvider(DEFAULT_HANDLERS);

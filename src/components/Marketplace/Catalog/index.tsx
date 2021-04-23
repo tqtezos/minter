@@ -34,7 +34,7 @@ export default function Catalog() {
     >
       {state.marketplace.loaded && tokens.length > 0 ? (
         <Box>
-          <FeaturedToken network={system.config.network} {...tokens[0]} />
+          <FeaturedToken config={system.config} {...tokens[0]} />
         </Box>
       ) : null}
       <Container maxW="80em">
@@ -79,7 +79,7 @@ export default function Catalog() {
                       return (
                         <TokenCard
                           key={`${token.address}-${token.id}`}
-                          network={system.config.network}
+                          config={system.config}
                           {...token}
                         />
                       );
