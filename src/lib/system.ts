@@ -105,7 +105,7 @@ function createMetadataResolver(
   const ipfsGateway =
     system.config.network === 'sandboxnet'
       ? 'localhost:8080'
-      : 'dweb.link';
+      : 'ipfs.fleek.co';
   const gatewayProtocol =
     system.config.network === 'sandboxnet' ? 'http' : 'https';
   const ipfsHandler = new CustomIpfsHttpHandler(ipfsGateway, gatewayProtocol);
