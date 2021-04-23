@@ -5,7 +5,6 @@ import _ from 'lodash';
 import { SystemWithToolkit, SystemWithWallet } from '../system';
 import { TzKt } from '../service/tzkt';
 import { isLeft } from 'fp-ts/lib/Either';
-import { createDataSourceFromArrayMap, DataSource } from '../util/dataSource';
 
 export type AssetMetadataResponse = t.TypeOf<typeof AssetMetadataResponse>;
 export const AssetMetadataResponse = t.array(

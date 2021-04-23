@@ -12,7 +12,7 @@ import {
   Text
 } from '@chakra-ui/react';
 import { MinterButton } from '../../common';
-import { RefreshCw, ExternalLink, Wind, HelpCircle } from 'react-feather';
+import { ExternalLink, Wind, HelpCircle } from 'react-feather';
 import { Token } from '../../../reducer/slices/collections';
 import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 import { useDispatch, useSelector } from '../../../reducer';
@@ -276,10 +276,6 @@ export default function CollectionDisplay({
             md: 0
           }}
         >
-          <Box color="currentcolor">
-            <RefreshCw size={16} strokeWidth="3" />
-          </Box>
-          <Text ml={2}>Refresh</Text>
         </MinterButton>
       </Flex>
       <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
