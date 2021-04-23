@@ -1,18 +1,15 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { Flex, SimpleGrid } from '@chakra-ui/react';
-import { useSelector } from '../../../reducer';
+import { useDispatch, useSelector } from '../../../reducer';
 import TokenCard from '../../common/TokenCard';
-import { getMarketplaceNfts } from '../../../lib/nfts/queries';
+import { getMarketplaceNftsQuery } from '../../../reducer/async/queries';
 
 export default function Catalog() {
   const { system, marketplace: state } = useSelector(s => s);
-  let nfts: any;
-  let ref = useRef(nfts);
+  let dispatch = useDispatch();
   useEffect(() => {
-    (async () => {
-      ref.current = await getMarketplaceNfts(system, state.marketplace.address);
-    })();
-  }, [state.marketplace.address, system]);
+       dispatch(getMarketplaceNftsQuery(state.marketplace.address));
+  }, [dispatch, state.marketplace.address, system]);
 
   return (
     <Flex
@@ -27,7 +24,7 @@ export default function Catalog() {
     >
       <>
         <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
-          {nfts?.map((nft: any, index: number) => {
+          {state.marketplace.tokens?.map((nft: any, index: number) => {
             return (
               <TokenCard
                 nft={nft}
