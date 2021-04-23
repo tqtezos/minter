@@ -27,7 +27,7 @@ export default function Catalog() {
     >
       <>
         <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
-          {nfts?.map((nft: any, index: number) => {
+          {ref.current?.map((nft: any, index: number) => {
             return (
               <TokenCard
                 key={`${nft.address}-${nft.id}`}
