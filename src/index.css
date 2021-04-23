@@ -30,3 +30,21 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+model-viewer.upload-preview {
+  height: 400px;
+}
+
+model-viewer.individual {
+  height: 400px;
+}
+
+model-viewer.featured {
+  height: 500px;
+  width: 500px;
+}
+
+model-viewer.fullscreen {
+  height: 85%;
+  width: 85%;
+}

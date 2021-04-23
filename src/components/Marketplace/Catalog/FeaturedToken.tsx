@@ -1,7 +1,7 @@
 import React from 'react';
 import { Token } from '../../../reducer/slices/collections';
 import { useLocation } from 'wouter';
-import { IpfsGatewayConfig, ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
+import { IpfsGatewayConfig } from '../../../lib/util/ipfs';
 import {
   Box,
   Container,
@@ -25,8 +25,9 @@ export default function FeaturedToken(props: FeaturedTokenProps) {
       <Stack width="100%" direction={{ base: 'column', md: 'row' }} spacing="24px" mb={10} display="flex" flexDir="row" flexWrap="wrap" justifyContent="center" alignItems="center">
         <Flex pr={[0, 10]} borderRight={["unset", "2px solid #666"]} justifyContent="center">
           <TokenMedia
-            src={ipfsUriToGatewayUrl(props.config, props.artifactUri)}
             maxW="90%"
+            class="featured"
+            {...props}
           />
         </Flex>
         <Box pl={[0, 10]} marginLeft="0 !important">

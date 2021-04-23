@@ -35,14 +35,15 @@ function MediaNotFound() {
   );
 }
 
-function TokenImage(props: { src: string }) {
+function TokenImage(props: TokenTileProps) {
+  const src = ipfsUriToGatewayUrl(props.config, props.artifactUri);
   const [errored, setErrored] = useState(false);
   const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
   useEffect(() => {
     (async () => {
       let blob;
       try {
-        blob = await fetch(props.src).then(r => r.blob());
+        blob = await fetch(src).then(r => r.blob());
       } catch (e) {
         return setErrored(true);
       }
@@ -51,7 +52,7 @@ function TokenImage(props: { src: string }) {
         type: blob.type
       });
     })();
-  }, [props.src]);
+  }, [src]);
 
   if (errored) {
     return <MediaNotFound />;
@@ -62,7 +63,7 @@ function TokenImage(props: { src: string }) {
   if (/^image\/.*/.test(obj.type)) {
     return (
       <Image
-        src={props.src}
+        src={src}
         objectFit="scale-down"
         flex="1"
         height="100%"
@@ -82,6 +83,23 @@ function TokenImage(props: { src: string }) {
         <source src={obj.url} type={obj.type} />
       </video>
     );
+  }
+
+  if (props.metadata.formats?.length) {
+    if (props.metadata.formats[0].mimeType === 'model/gltf-binary' ||
+      props.metadata.formats[0].mimeType === 'model/gltf+json'
+    ) {
+      return (
+        <>
+          <model-viewer
+            auto-rotate
+            rotation-per-second="30deg"
+            src={obj.url}
+            class="grid"
+          ></model-viewer>
+        </>
+      );
+    }
   }
 
   return <MediaNotFound />;
@@ -116,9 +134,7 @@ function TokenTile(props: TokenTileProps) {
     >
       <AspectRatio ratio={3 / 2}>
         <Box p={4}>
-          <TokenImage
-            src={ipfsUriToGatewayUrl(props.config, props.artifactUri)}
-          />
+          <TokenImage {...props} />
         </Box>
       </AspectRatio>
       <Flex

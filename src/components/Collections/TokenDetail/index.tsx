@@ -36,6 +36,7 @@ import {
   getContractNftsQuery,
   getNftAssetContractQuery
 } from '../../../reducer/async/queries';
+import { NftMetadata } from '../../../lib/nfts/queries';
 
 import { Maximize2 } from 'react-feather';
 
@@ -91,6 +92,7 @@ function MediaNotFound() {
 function TokenImage(props: {
   id?: string;
   src: string;
+  metadata: NftMetadata;
   width?: string;
   maxWidth?: string;
   maxHeight?: string;
@@ -154,6 +156,25 @@ function TokenImage(props: {
         <source src={obj.url} type={obj.type} />
       </video>
     );
+  }
+
+  if (props.metadata.formats?.length) {
+    if (props.metadata.formats[0].mimeType === 'model/gltf-binary' ||
+      props.metadata.formats[0].mimeType === 'model/gltf+json'
+    ) {
+      return (
+        <>
+          <model-viewer
+            auto-rotate
+            camera-controls
+            rotation-per-second="30deg"
+            src={obj.url}
+            class={props.id === "fullScreenAssetView" ? "fullscreen" : "individual"}
+            style={{Height: props.height || '100%'}}
+          ></model-viewer>
+        </>
+      );
+    }
   }
 
   return <MediaNotFound />;
@@ -270,6 +291,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           <TokenImage
             id="fullScreenAssetView"
             src={ipfsUriToGatewayUrl(system.config, token.artifactUri)}
+            metadata={token.metadata}
             width="auto"
             height="auto"
             maxWidth="85%"
@@ -304,6 +326,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       >
         <TokenImage
           src={ipfsUriToGatewayUrl(system.config, token.artifactUri)}
+          metadata={token.metadata}
           height="75%"
           width="auto"
         />

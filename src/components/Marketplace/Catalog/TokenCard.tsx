@@ -34,7 +34,7 @@ export default function TokenCard(props: TokenCardProps) {
       <AspectRatio ratio={3 / 2}>
         <Box>
           <TokenMedia
-            src={ipfsUriToGatewayUrl(props.config, props.artifactUri)}
+            {...props}
           />
         </Box>
       </AspectRatio>
