@@ -7,8 +7,8 @@ import { getMarketplaceNftsQuery } from '../../../reducer/async/queries';
 export default function Catalog() {
   const { system, marketplace: state } = useSelector(s => s);
   let dispatch = useDispatch();
+  dispatch(getMarketplaceNftsQuery(state.marketplace.address));
   useEffect(() => {
-       dispatch(getMarketplaceNftsQuery(state.marketplace.address));
   }, [dispatch, state.marketplace.address, system]);
 
   return (
