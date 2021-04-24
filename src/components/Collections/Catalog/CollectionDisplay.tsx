@@ -16,7 +16,7 @@ import { ExternalLink, Wind, HelpCircle } from 'react-feather';
 import { Token } from '../../../reducer/slices/collections';
 import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 import { useDispatch, useSelector } from '../../../reducer';
-import { getContractNftsQuery } from '../../../reducer/async/queries';
+import { getPersonalContractNftsQuery } from '../../../reducer/async/queries';
 import CollectionsDropdown from './CollectionsDropdown';
 
 function MediaNotFound() {
@@ -111,7 +111,7 @@ function TokenTile(props: TokenTileProps) {
         boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.1)'
       }}
       onClick={() =>
-        setLocation(`/collection/${props.address}/token/${props.id}`)
+        setLocation(`/asset/${props.address}/token/${props.id}`)
       }
     >
       <AspectRatio ratio={3 / 2}>
@@ -145,12 +145,12 @@ export default function CollectionDisplay({
   ownedOnly = true
 }: CollectionDisplayProps) {
   const collections = useSelector(s => s.collections);
-  const { config, tzPublicKey, wallet } = useSelector(s => s.system);
+  const { config, wallet } = useSelector(s => s.system);
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (address !== null) {
-      dispatch(getContractNftsQuery(address));
+      dispatch(getPersonalContractNftsQuery(address));
     }
   }, [address, dispatch]);
 
@@ -158,8 +158,7 @@ export default function CollectionDisplay({
     return <></>;
   }
 
-  const collection = collections.collections[address];
-
+  const collection = collections.personalCollections[address];
   if (!collection) {
     return <></>;
   }
@@ -175,18 +174,13 @@ export default function CollectionDisplay({
     );
   }
 
-  if (collection.tokens === null) {
+  if (!collection.tokens) {
     return <></>;
   }
 
-  const tokens = ownedOnly
-    ? collection.tokens.filter(
-        ({ owner, sale }) =>
-          owner === tzPublicKey || sale?.seller === tzPublicKey
-      )
-    : collection.tokens;
+  const tokens = collection.tokens;
 
-  if (tokens.length === 0) {
+  if (tokens?.length === 0) {
     return (
       <Flex w="100%" flex="1" flexDir="column" align="center">
         <Flex
@@ -268,7 +262,7 @@ export default function CollectionDisplay({
           onClick={() => {
             const selectedCollection = collections.selectedCollection;
             if (selectedCollection !== null) {
-              dispatch(getContractNftsQuery(selectedCollection));
+              dispatch(getPersonalContractNftsQuery(selectedCollection));
             }
           }}
           mt={{
@@ -279,7 +273,7 @@ export default function CollectionDisplay({
         </MinterButton>
       </Flex>
       <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
-        {tokens.map(token => {
+        {tokens?.map(token => {
           return (
             <TokenTile
               key={token.id}

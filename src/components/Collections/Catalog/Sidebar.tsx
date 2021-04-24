@@ -75,7 +75,7 @@ export default function Sidebar() {
         key={state.globalCollection}
         selected={state.globalCollection === state.selectedCollection}
         onSelect={address => dispatch(selectCollection(address))}
-        {...state.collections[state.globalCollection]}
+        {...state.personalCollections[state.globalCollection]}
       />
       <Heading
         fontFamily="mono"
@@ -87,14 +87,13 @@ export default function Sidebar() {
       >
         Your Collections
       </Heading>
-      {Object.keys(state.collections)
-        .filter(address => address !== state.globalCollection)
-        .map(address => (
+      {Object.keys(state.personalCollections)
+        .map(key => (
           <CollectionTab
-            key={address}
-            selected={address === state.selectedCollection}
+            key={state.personalCollections[key].address}
+            selected={state.personalCollections[key].address === state.selectedCollection}
             onSelect={address => dispatch(selectCollection(address))}
-            {...state.collections[address]}
+            {...state.personalCollections[key]}
           />
         ))}
       <Flex px={2} pt={4} justify="center" pb={8}>

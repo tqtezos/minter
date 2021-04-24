@@ -28,7 +28,7 @@ export default function TokenCard(props: TokenCardProps) {
         boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.1)'
       }}
       onClick={() =>
-        setLocation(`/collection/${props.address}/token/${props.id}`)
+        setLocation(`/asset/${props.address}/token/${props.id}`)
       }
     >
       <AspectRatio ratio={3 / 2}>

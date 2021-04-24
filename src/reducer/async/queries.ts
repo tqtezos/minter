@@ -29,12 +29,33 @@ export const getNftAssetContractQuery = createAsyncThunk<
   }
 });
 
+export const getPersonalContractNftsQuery = createAsyncThunk<
+  { address: string; tokens: Nft[] },
+  string,
+  Opts
+>('query/getPersonalContractNfts', async (address, { getState, rejectWithValue }) => {
+  const { system, collections } = getState();
+  console.log(getState());
+  try {
+    const tokens = await getContractNfts(system, address);
+    return { address, tokens };
+  } catch (e) {
+    return rejectWithValue({
+      kind: ErrorKind.GetContractNftsFailed,
+      message: `Failed to retrieve contract nfts from: ${
+        collections.collections[address]?.metadata?.name ?? address
+      }`
+    });
+  }
+});
+
 export const getContractNftsQuery = createAsyncThunk<
   { address: string; tokens: Nft[] },
   string,
   Opts
 >('query/getContractNfts', async (address, { getState, rejectWithValue }) => {
   const { system, collections } = getState();
+  console.log(getState());
   try {
     const tokens = await getContractNfts(system, address);
     return { address, tokens };

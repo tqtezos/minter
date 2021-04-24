@@ -2,6 +2,7 @@ import { createSlice, PayloadAction, CaseReducer } from '@reduxjs/toolkit';
 import {
   getContractNftsQuery,
   getNftAssetContractQuery,
+  getPersonalContractNftsQuery,
   getWalletAssetContractsQuery
 } from '../async/queries';
 import { Nft, AssetContract } from '../../lib/nfts/queries';
@@ -22,6 +23,7 @@ export interface CollectionsState {
   selectedCollection: string | null;
   globalCollection: string;
   collections: Record<string, Collection>;
+  personalCollections: Record<string, Collection>;
 }
 
 type Reducer<A> = CaseReducer<CollectionsState, PayloadAction<A>>;
@@ -34,6 +36,8 @@ export const initialState: CollectionsState = {
   selectedCollection: null,
   globalCollection: globalCollectionAddress,
   collections: {
+  },
+  personalCollections: {
     [globalCollectionAddress]: {
       address: globalCollectionAddress,
       metadata: {
@@ -53,6 +57,22 @@ const populateCollectionR: PopulateCollection = (state, { payload }) => {
   if (state.collections[payload.address]) {
     state.collections[payload.address].tokens = payload.tokens;
     state.collections[payload.address].loaded = true;
+  }
+};
+
+const populatePersonalCollectionsR: PopulateCollection = (state, { payload }) => {
+  if (state.personalCollections[payload.address]) {
+    state.personalCollections[payload.address].tokens = payload.tokens;
+    state.personalCollections[payload.address].loaded = true;
+  }
+};
+
+
+const updatePersonalCollectionsR: Reducer<AssetContract[]> = (state, action) => {
+  for (let coll of action.payload) {
+    if (!state.personalCollections[coll.address]) {
+      state.personalCollections[coll.address] = { ...coll, tokens: null, loaded: false };
+    }
   }
 };
 
@@ -85,8 +105,9 @@ const slice = createSlice({
   },
   extraReducers: ({ addCase }) => {
     addCase(getContractNftsQuery.fulfilled, populateCollectionR);
+    addCase(getPersonalContractNftsQuery.fulfilled, populatePersonalCollectionsR);
     addCase(getNftAssetContractQuery.fulfilled, updateCollectionR);
-    addCase(getWalletAssetContractsQuery.fulfilled, updateCollectionsR);
+    addCase(getWalletAssetContractsQuery.fulfilled, updatePersonalCollectionsR);
   }
 });
 
