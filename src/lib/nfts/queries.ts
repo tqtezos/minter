@@ -348,13 +348,15 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
     return results;
   }
 
+  const uniqueAddresses = Array.from(new Set(addresses));
+
   const assetBigMapRows = (
     await getBigMapUpdates(
       system.tzkt,
       {
         path: 'metadata',
         action: 'add_key',
-        'contract.in': addresses.join(','),
+        'contract.in': uniqueAddresses.join(','),
         limit: '10000'
       },
       {
@@ -384,15 +386,16 @@ export async function getMarketplaceNfts(
   const tokenSales = await getFixedPriceSales(system.tzkt, address);
   const activeSales = tokenSales.filter(v => v.active);
   const addresses = activeSales
-    .map(s => s.key.sale_token.token_for_sale_address)
-    .join(',');
+    .map(s => s.key.sale_token.token_for_sale_address);
+
+  const uniqueAddresses = Array.from(new Set(addresses));
 
   const tokenBigMapRows = await getBigMapUpdates(
     system.tzkt,
     {
       path: 'assets.token_metadata',
       action: 'add_key',
-      'contract.in': addresses,
+      'contract.in': uniqueAddresses.join(','),
       limit: '10000'
     },
     {
