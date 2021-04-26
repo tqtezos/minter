@@ -26,6 +26,12 @@ export async function getBigMapUpdates(config: Config, params?: Params) {
   return response.data;
 }
 
+export async function getContracts(config: Config, params?: Params) {
+  const uri = `${config.tzkt.api}/v1/contracts?${mkQueryParams(params)}`;
+  const response = await axios.get(uri);
+  return response.data;
+}
+
 export async function getContract(
   config: Config,
   address: string,
@@ -63,18 +69,6 @@ export async function getContractStorage(
   return response.data;
 }
 
-export async function getAccountContracts(
-  config: Config,
-  address: string,
-  params?: Params
-) {
-  const uri = `${
-    config.tzkt.api
-  }/v1/accounts/${address}/contracts?${mkQueryParams(params)}`;
-  const response = await axios.get(uri);
-  return response.data;
-}
-
 export class TzKt {
   config: Config;
 
@@ -90,6 +84,10 @@ export class TzKt {
     return getBigMapUpdates(this.config, params);
   }
 
+  getContracts(params?: Params) {
+    return getContracts(this.config, params);
+  }
+
   getContract(address: string, params?: Params) {
     return getContract(this.config, address, params);
   }
@@ -100,9 +98,5 @@ export class TzKt {
 
   getContractStorage(address: string, params?: Params) {
     return getContractStorage(this.config, address, params);
-  }
-
-  getAccountContracts(address: string, params?: Params) {
-    return getAccountContracts(this.config, address, params);
   }
 }

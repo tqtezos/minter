@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { NftMetadataAttribute } from '../../lib/nfts/queries';
+import { NftMetadataAttribute } from '../../lib/nfts/decoders';
 import { readFileAsDataUrlAction } from '../async/actions';
 
 // State
