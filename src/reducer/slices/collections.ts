@@ -59,14 +59,22 @@ const populateCollectionR: PopulateCollection = (state, { payload }) => {
 const updateCollectionsR: Reducer<AssetContract[]> = (state, action) => {
   for (let coll of action.payload) {
     if (!state.collections[coll.address]) {
-      state.collections[coll.address] = { ...coll, tokens: null, loaded: false };
+      state.collections[coll.address] = {
+        ...coll,
+        tokens: null,
+        loaded: false
+      };
     }
   }
 };
 
 const updateCollectionR: Reducer<AssetContract> = (state, { payload }) => {
   if (!state.collections[payload.address]) {
-    state.collections[payload.address] = { ...payload, tokens: null, loaded: false };
+    state.collections[payload.address] = {
+      ...payload,
+      tokens: null,
+      loaded: false
+    };
   }
 };
 

@@ -130,9 +130,9 @@ function TokenImage(props: {
         id={props.id || 'assetImage'}
         key={props.id || 'assetImage'}
         src={props.src}
-        objectFit={props.objectFit ?? "scale-down"}
+        objectFit={props.objectFit ?? 'scale-down'}
         flex="1"
-        height={props.height ?? "100%"}
+        height={props.height ?? '100%'}
         width={props.width}
         maxWidth={props.maxWidth}
         maxHeight={props.maxHeight ?? 'unset'}
@@ -147,7 +147,8 @@ function TokenImage(props: {
       <video
         controls
         style={{
-          margin: 'auto', height: props.height || '100%',
+          margin: 'auto',
+          height: props.height || '100%',
           width: props.width,
           maxWidth: props.maxWidth ?? 'unset',
           maxHeight: props.maxHeight ?? 'unset'
@@ -159,7 +160,8 @@ function TokenImage(props: {
   }
 
   if (props.metadata.formats?.length) {
-    if (props.metadata.formats[0].mimeType === 'model/gltf-binary' ||
+    if (
+      props.metadata.formats[0].mimeType === 'model/gltf-binary' ||
       props.metadata.formats[0].mimeType === 'model/gltf+json'
     ) {
       return (
@@ -169,8 +171,10 @@ function TokenImage(props: {
             camera-controls
             rotation-per-second="30deg"
             src={obj.url}
-            class={props.id === "fullScreenAssetView" ? "fullscreen" : "individual"}
-            style={{Height: props.height || '100%'}}
+            class={
+              props.id === 'fullScreenAssetView' ? 'fullscreen' : 'individual'
+            }
+            style={{ Height: props.height || '100%' }}
           ></model-viewer>
         </>
       );
@@ -218,8 +222,9 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       img.style.width = `${imageWidth * zoom}px`;
       img.style.height = `${imageHeight * zoom}px`;
       if (isPortrait && imageHeight > imageWidth) {
-        img.style.margin = `calc((((${imageHeight - wHeight
-          }px) / 2) * ${initialZoom} - 80px) * ${1 - zoom}) auto`;
+        img.style.margin = `calc((((${
+          imageHeight - wHeight
+        }px) / 2) * ${initialZoom} - 80px) * ${1 - zoom}) auto`;
       }
     }
   }, [imageHeight, imageWidth, initialZoom, zoom]);
@@ -298,7 +303,25 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             maxHeight="85%"
             objectFit="contain"
           />
-          <ModalCloseButton position="absolute" right="0 !important" bottom="0 !important" display="block !important" fontSize="18px" top="unset" borderLeft="2px solid #aaa" color="white" borderTop="2px solid #aaa" width="4rem" height="4rem" borderRight="none" borderBottom="none" borderBottomStartRadius="0" borderBottomEndRadius="0" borderTopEndRadius="0" border="0" />
+          <ModalCloseButton
+            position="absolute"
+            right="0 !important"
+            bottom="0 !important"
+            display="block !important"
+            fontSize="18px"
+            top="unset"
+            borderLeft="2px solid #aaa"
+            color="white"
+            borderTop="2px solid #aaa"
+            width="4rem"
+            height="4rem"
+            borderRight="none"
+            borderBottom="none"
+            borderBottomStartRadius="0"
+            borderBottomEndRadius="0"
+            borderTopEndRadius="0"
+            border="0"
+          />
         </ModalContent>
       </Modal>
       <Flex pt={8} px={8}>
@@ -383,7 +406,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             ) : (
               <>
                 <Text color="black" fontSize={['sm', 'lg']} mr={1}>
-                {token.sale.price.toFixed(2)}ꜩ
+                  {token.sale.price.toFixed(2)}ꜩ
                 </Text>
                 <BuyTokenButton contract={contractAddress} token={token} />
               </>
@@ -398,7 +421,13 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           </Button>
         </Flex>
       </Flex>
-      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1} borderTop="2px solid #aaa">
+      <Flex
+        width={['100%']}
+        bg="white"
+        flexDir="column"
+        flexGrow={1}
+        borderTop="2px solid #aaa"
+      >
         <Flex
           width={['90%', '70%']}
           mx="auto"

@@ -86,7 +86,8 @@ function TokenImage(props: TokenTileProps) {
   }
 
   if (props.metadata.formats?.length) {
-    if (props.metadata.formats[0].mimeType === 'model/gltf-binary' ||
+    if (
+      props.metadata.formats[0].mimeType === 'model/gltf-binary' ||
       props.metadata.formats[0].mimeType === 'model/gltf+json'
     ) {
       return (
@@ -291,8 +292,7 @@ export default function CollectionDisplay({
             base: 4,
             md: 0
           }}
-        >
-        </MinterButton>
+        ></MinterButton>
       </Flex>
       <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
         {tokens.map(token => {

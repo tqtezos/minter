@@ -9,7 +9,7 @@ body {
 
 ::-webkit-scrollbar-track {
   border-radius: 4px;
-  background-color: #DADADA;
+  background-color: #dadada;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -19,7 +19,7 @@ body {
 ::-webkit-scrollbar {
   height: 8px;
   width: 8px;
-  background-color: #DADADA;
+  background-color: #dadada;
 }
 
 .bg-dropdown-arrow {

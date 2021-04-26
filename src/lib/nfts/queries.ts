@@ -385,8 +385,9 @@ export async function getMarketplaceNfts(
 ): Promise<MarketplaceNftLoadingData[]> {
   const tokenSales = await getFixedPriceSales(system.tzkt, address);
   const activeSales = tokenSales.filter(v => v.active);
-  const addresses = activeSales
-    .map(s => s.key.sale_token.token_for_sale_address);
+  const addresses = activeSales.map(
+    s => s.key.sale_token.token_for_sale_address
+  );
 
   const uniqueAddresses = Array.from(new Set(addresses));
 

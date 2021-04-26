@@ -224,9 +224,9 @@ const theme = extendTheme({
       variants: {
         primary: {
           color: 'gray.300',
-          _hover: { color: "brand.blue" },
-          _expanded: { color: "brand.blue" },
-          _focus: { color: "brand.blue" }
+          _hover: { color: 'brand.blue' },
+          _expanded: { color: 'brand.blue' },
+          _focus: { color: 'brand.blue' }
         }
       }
     },
@@ -234,8 +234,8 @@ const theme = extendTheme({
       variants: {
         primary: {
           _focus: {
-            bg: "brand.lightBlue",
-            color: "brand.blue"
+            bg: 'brand.lightBlue',
+            color: 'brand.blue'
           }
         }
       }

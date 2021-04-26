@@ -11,7 +11,14 @@ import {
 export function FilePreview({ file }: { file: SelectedFile }) {
   const dispatch = useDispatch();
   if (/^image\/.*/.test(file.type)) {
-    return <Image src={file.objectUrl} width="100%" height="100%" objectFit="scale-down" />;
+    return (
+      <Image
+        src={file.objectUrl}
+        width="100%"
+        height="100%"
+        objectFit="scale-down"
+      />
+    );
   }
   if (/^video\/.*/.test(file.type)) {
     const canvasRef = createRef<HTMLCanvasElement>();
@@ -57,7 +64,13 @@ export function FilePreview({ file }: { file: SelectedFile }) {
   if (file.type === 'model/gltf+json' || file.type === 'model/gltf-binary') {
     return (
       <>
-        <model-viewer camera-controls auto-rotate data-js-focus-visible src={file.objectUrl} class="upload-preview"></model-viewer>
+        <model-viewer
+          camera-controls
+          auto-rotate
+          data-js-focus-visible
+          src={file.objectUrl}
+          class="upload-preview"
+        ></model-viewer>
       </>
     );
   }
@@ -79,7 +92,14 @@ export default function FileUpload() {
     onDrop,
     maxFiles: 1,
     maxSize: 30 * 1024 * 1024,
-    accept: ['image/*', 'video/*', 'model/gltf-binary', 'model/gltf+json', '.gltf', '.glb']
+    accept: [
+      'image/*',
+      'video/*',
+      'model/gltf-binary',
+      'model/gltf+json',
+      '.gltf',
+      '.glb'
+    ]
   });
 
   return (

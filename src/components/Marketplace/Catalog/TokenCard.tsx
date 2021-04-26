@@ -6,7 +6,7 @@ import { AspectRatio, Box, Flex, Text, Heading } from '@chakra-ui/react';
 import { TokenMedia } from '../../common/TokenMedia';
 
 interface TokenCardProps extends Token {
-  config: IpfsGatewayConfig,
+  config: IpfsGatewayConfig;
 }
 
 export default function TokenCard(props: TokenCardProps) {
@@ -33,9 +33,7 @@ export default function TokenCard(props: TokenCardProps) {
     >
       <AspectRatio ratio={3 / 2}>
         <Box>
-          <TokenMedia
-            {...props}
-          />
+          <TokenMedia {...props} />
         </Box>
       </AspectRatio>
       <Flex
@@ -59,7 +57,9 @@ export default function TokenCard(props: TokenCardProps) {
         justify="space-between"
       >
         <Text fontSize="md">Current Price</Text>
-        <Text fontSize="md" fontWeight="600">{props.sale?.price} ꜩ</Text>
+        <Text fontSize="md" fontWeight="600">
+          {props.sale?.price} ꜩ
+        </Text>
       </Flex>
     </Flex>
   );
