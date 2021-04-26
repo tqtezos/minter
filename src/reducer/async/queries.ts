@@ -32,22 +32,22 @@ export const getNftAssetContractQuery = createAsyncThunk<
 });
 
 export const getContractNftsQuery = createAsyncThunk<
-  { address: string; tokens: Nft[] },
-  string,
-  Opts
->('query/getContractNfts', async (address, { getState, rejectWithValue }) => {
-  const { system, collections } = getState();
-  try {
-    const tokens = await getContractNfts(system, address);
-    return { address, tokens };
-  } catch (e) {
-    return rejectWithValue({
-      kind: ErrorKind.GetContractNftsFailed,
-      message: `Failed to retrieve contract nfts from: ${
-        collections.collections[address]?.metadata?.name ?? address
-      }`
-    });
-  }
+{ address: string; tokens: Nft[]; tzPublicKey: string },
+string,
+Opts
+>('query/getPersonalContractNfts', async (address, { getState, rejectWithValue }) => {
+const { system, collections } = getState();
+try {
+  const tokens = await getContractNfts(system, address);
+  return { address, tokens, tzPublicKey: system.tzPublicKey ?? '' };
+} catch (e) {
+  return rejectWithValue({
+    kind: ErrorKind.GetContractNftsFailed,
+    message: `Failed to retrieve contract nfts from: ${
+      collections.collections[address]?.metadata?.name ?? address
+    }`
+  });
+}
 });
 
 export const getWalletAssetContractsQuery = createAsyncThunk<

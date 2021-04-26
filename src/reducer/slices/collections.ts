@@ -16,6 +16,7 @@ export type Token = Nft;
 export interface Collection extends AssetContract {
   tokens: Token[] | null;
   loaded: boolean;
+  owned: boolean;
 }
 
 export interface CollectionsState {
@@ -40,18 +41,20 @@ export const initialState: CollectionsState = {
         name: 'Minter'
       },
       tokens: null,
-      loaded: false
+      loaded: false,
+      owned: true
     }
-  }
+  },
 };
 
 //// Reducers & Slice
 
-type PopulateCollection = Reducer<{ address: string; tokens: Token[] }>;
+type PopulateCollection = Reducer<{ address: string; tokens: Token[], tzPublicKey: string }>;
 
 const populateCollectionR: PopulateCollection = (state, { payload }) => {
   if (state.collections[payload.address]) {
     state.collections[payload.address].tokens = payload.tokens;
+    state.collections[payload.address].tokens?.map((token) => { if(token.owner ===  payload.tzPublicKey || token.sale?.seller === payload.tzPublicKey) { token.owned = true; } return token; });
     state.collections[payload.address].loaded = true;
   }
 };
@@ -59,22 +62,22 @@ const populateCollectionR: PopulateCollection = (state, { payload }) => {
 const updateCollectionsR: Reducer<AssetContract[]> = (state, action) => {
   for (let coll of action.payload) {
     if (!state.collections[coll.address]) {
-      state.collections[coll.address] = {
-        ...coll,
-        tokens: null,
-        loaded: false
-      };
+      state.collections[coll.address] = {...state.collections[coll.address], ...coll, tokens: null, loaded: false };
+    }
+  }
+};
+
+const updateOwnedCollectionsR: Reducer<AssetContract[]> = (state, action) => {
+  for (let coll of action.payload) {
+    if (!state.collections[coll.address]) {
+      state.collections[coll.address] = { ...coll, tokens: null, loaded: false, owned: true };
     }
   }
 };
 
 const updateCollectionR: Reducer<AssetContract> = (state, { payload }) => {
   if (!state.collections[payload.address]) {
-    state.collections[payload.address] = {
-      ...payload,
-      tokens: null,
-      loaded: false
-    };
+    state.collections[payload.address] = { ...state.collections[payload.address], ...payload, tokens: null, loaded: false };
   }
 };
 
@@ -94,7 +97,7 @@ const slice = createSlice({
   extraReducers: ({ addCase }) => {
     addCase(getContractNftsQuery.fulfilled, populateCollectionR);
     addCase(getNftAssetContractQuery.fulfilled, updateCollectionR);
-    addCase(getWalletAssetContractsQuery.fulfilled, updateCollectionsR);
+    addCase(getWalletAssetContractsQuery.fulfilled, updateOwnedCollectionsR);
   }
 });
 

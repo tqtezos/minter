@@ -78,8 +78,8 @@ export function BuyTokenButton(props: BuyTokenButtonProps) {
   const disclosure = useDisclosure();
   return (
     <>
-      <MinterButton variant="primaryAction" onClick={disclosure.onOpen}>
-        Buy now
+      <MinterButton minWidth={32} variant="primaryAction" onClick={disclosure.onOpen}>
+        Buy
       </MinterButton>
 
       <BuyTokenModal {...props} disclosure={disclosure} sync={props.sync} />

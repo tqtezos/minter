@@ -51,7 +51,7 @@ export default function App() {
           </Route>
           <Route path="/collection/:contractAddress">
             {({ contractAddress }) => (
-              <CollectionDisplay address={contractAddress} ownedOnly={false} />
+              <CollectionDisplay address={contractAddress} />
             )}
           </Route>
           <Route path="/collection/:contractAddress/token/:tokenId">

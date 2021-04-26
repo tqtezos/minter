@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Flex, Image } from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 import { FiHelpCircle } from 'react-icons/fi';
 import { IpfsGatewayConfig, ipfsUriToGatewayUrl } from '../../lib/util/ipfs';
 import { Token } from '../../reducer/slices/collections';
@@ -8,6 +8,7 @@ interface TokenMediaProps extends Token {
   config: IpfsGatewayConfig;
   maxW?: string;
   class?: string;
+  onLoad?: Function;
 }
 
 function MediaNotFound() {
@@ -53,14 +54,12 @@ export function TokenMedia(props: TokenMediaProps) {
 
   if (/^image\/.*/.test(obj.type)) {
     return (
-      <Image
-        src={src}
-        objectFit="scale-down"
-        height="100%"
-        flex="1"
-        maxWidth={props.maxW}
-        style={{ objectFit: 'scale-down' }}
+      <img
+        src={obj.url}
+        style={{ objectFit: "scale-down", maxWidth: props.maxW ?? '100%', height: "100%"}}
         onError={() => setErrored(true)}
+        onLoad={() => { if (props.onLoad && obj?.url) { props.onLoad(obj.url, obj.type) }; }}
+        alt=""
       />
     );
   }
@@ -72,17 +71,16 @@ export function TokenMedia(props: TokenMediaProps) {
         onClick={e => e.preventDefault()}
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
-        height="100%"
-        style={{ maxWidth: props.maxW }}
+        style={{ objectFit: "cover", width: '100%', height: "100%" }}
+        onLoadedMetadata={() => { if (props.onLoad && obj?.url) { props.onLoad(obj.url, obj.type) } }}
       >
         <source src={obj.url} type={obj.type} />
       </video>
     );
   }
 
-  if (props.metadata.formats?.length) {
-    if (
-      props.metadata.formats[0].mimeType === 'model/gltf-binary' ||
+  if (props.metadata?.formats?.length) {
+    if (props.metadata.formats[0].mimeType === 'model/gltf-binary' ||
       props.metadata.formats[0].mimeType === 'model/gltf+json'
     ) {
       return (

@@ -5,18 +5,17 @@ import {
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
-  AspectRatio,
   Box,
   Button,
   Flex,
+  FormControl,
+  FormLabel,
   Heading,
-  Image,
   Menu,
   MenuList,
   Modal,
   ModalCloseButton,
   ModalContent,
-  ResponsiveValue,
   Slider,
   SliderFilledTrack,
   SliderThumb,
@@ -24,7 +23,7 @@ import {
   Text,
   useDisclosure
 } from '@chakra-ui/react';
-import { ChevronLeft, HelpCircle, MoreHorizontal, Star } from 'react-feather';
+import { ChevronLeft, ChevronRight, HelpCircle, MoreHorizontal } from 'react-feather';
 import { MinterButton, MinterMenuButton, MinterMenuItem } from '../../common';
 import { TransferTokenModal } from '../../common/modals/TransferToken';
 import { SellTokenButton } from '../../common/modals/SellToken';
@@ -33,12 +32,14 @@ import { BuyTokenButton } from '../../common/modals/BuyToken';
 import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 import { useSelector, useDispatch } from '../../../reducer';
 import {
-  getContractNftsQuery,
-  getNftAssetContractQuery
+  getContractNftsQuery, getNftAssetContractQuery
 } from '../../../reducer/async/queries';
-import { NftMetadata } from '../../../lib/nfts/queries';
-
+import { Switch } from "@chakra-ui/react"
 import { Maximize2 } from 'react-feather';
+import TokenCard from '../../common/TokenCard';
+import { TokenMedia } from '../../common/TokenMedia';
+import { Nft } from '../../../lib/nfts/queries';
+
 
 function NotFound() {
   return (
@@ -68,122 +69,6 @@ function NotFound() {
   );
 }
 
-function MediaNotFound() {
-  return (
-    <AspectRatio
-      ratio={4 / 3}
-      width="100%"
-      borderRadius="3px"
-      bg="gray.100"
-      overflow="hidden"
-    >
-      <Flex flexDir="column" align="center" justify="center">
-        <Box color="gray.300" pb={10}>
-          <HelpCircle size="100px" />
-        </Box>
-        <Heading color="gray.300" size="xl">
-          Image not found
-        </Heading>
-      </Flex>
-    </AspectRatio>
-  );
-}
-
-function TokenImage(props: {
-  id?: string;
-  src: string;
-  metadata: NftMetadata;
-  width?: string;
-  maxWidth?: string;
-  maxHeight?: string;
-  height?: string;
-  objectFit?: ResponsiveValue<any>;
-  onLoad?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
-  onFetch?: (type: string) => void;
-}) {
-  const [errored, setErrored] = useState(false);
-  const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
-  useEffect(() => {
-    (async () => {
-      let blob;
-      try {
-        blob = await fetch(props.src).then(r => r.blob());
-      } catch (e) {
-        return setErrored(true);
-      }
-      setObj({
-        url: URL.createObjectURL(blob),
-        type: blob.type
-      });
-      props.onFetch?.(blob.type);
-    })();
-  }, [props, props.onFetch, props.src]);
-
-  if (errored) {
-    return <MediaNotFound />;
-  }
-  if (!obj) return null;
-
-  if (/^image\/.*/.test(obj.type)) {
-    return (
-      <Image
-        id={props.id || 'assetImage'}
-        key={props.id || 'assetImage'}
-        src={props.src}
-        objectFit={props.objectFit ?? 'scale-down'}
-        flex="1"
-        height={props.height ?? '100%'}
-        width={props.width}
-        maxWidth={props.maxWidth}
-        maxHeight={props.maxHeight ?? 'unset'}
-        onError={() => setErrored(true)}
-        onLoad={props.onLoad}
-      />
-    );
-  }
-
-  if (/^video\/.*/.test(obj.type)) {
-    return (
-      <video
-        controls
-        style={{
-          margin: 'auto',
-          height: props.height || '100%',
-          width: props.width,
-          maxWidth: props.maxWidth ?? 'unset',
-          maxHeight: props.maxHeight ?? 'unset'
-        }}
-      >
-        <source src={obj.url} type={obj.type} />
-      </video>
-    );
-  }
-
-  if (props.metadata.formats?.length) {
-    if (
-      props.metadata.formats[0].mimeType === 'model/gltf-binary' ||
-      props.metadata.formats[0].mimeType === 'model/gltf+json'
-    ) {
-      return (
-        <>
-          <model-viewer
-            auto-rotate
-            camera-controls
-            rotation-per-second="30deg"
-            src={obj.url}
-            class={
-              props.id === 'fullScreenAssetView' ? 'fullscreen' : 'individual'
-            }
-            style={{ Height: props.height || '100%' }}
-          ></model-viewer>
-        </>
-      );
-    }
-  }
-
-  return <MediaNotFound />;
-}
-
 interface TokenDetailProps {
   contractAddress: string;
   tokenId: number;
@@ -195,11 +80,10 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
   const dispatch = useDispatch();
   const collection = state.collections[contractAddress];
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [zoom, setZoom] = useState(0);
+  const [, setZoom] = useState(0);
   const [initialZoom] = useState(0);
-  const [imageHeight] = useState(0);
-  const [imageWidth] = useState(0);
   const [mediaType] = useState('');
+  const [obj, setObj] = useState({ opacity: 1, ownedOnly: false } as any);
 
   const collectionUndefined = collection === undefined;
 
@@ -211,40 +95,23 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
     }
   }, [contractAddress, tokenId, collectionUndefined, dispatch]);
 
-  useEffect(() => {
-    const img = document.getElementById('fullScreenAssetView');
-    const wHeight = window.innerHeight;
-    const wWidth = window.innerWidth;
-    const isPortrait = wHeight > wWidth;
-
-    if (img && zoom !== 0 && zoom !== initialZoom) {
-      img.style.maxWidth = `${imageWidth}px`;
-      img.style.width = `${imageWidth * zoom}px`;
-      img.style.height = `${imageHeight * zoom}px`;
-      if (isPortrait && imageHeight > imageWidth) {
-        img.style.margin = `calc((((${
-          imageHeight - wHeight
-        }px) / 2) * ${initialZoom} - 80px) * ${1 - zoom}) auto`;
-      }
-    }
-  }, [imageHeight, imageWidth, initialZoom, zoom]);
-
-  if (!collection?.tokens) {
+  let tokens = obj.ownedOnly ? collection?.tokens?.filter(token => token.owned) : collection?.tokens;
+  if (!tokens) {
     return null;
   }
 
-  const token = collection.tokens.find(token => token.id === tokenId);
+  let token = tokens?.find((token: Nft, idx) => { if (token?.id === tokenId) { if (obj?.idx === undefined) { setObj({ ...obj, idx }); } return token ?? null; } return null; });
+
+  if (obj.opacity === 0) { setObj({ ...obj, opacity: 1 }) };
+
   if (!token) {
     return <NotFound />;
   }
 
-  const isOwner =
-    system.tzPublicKey &&
-    (system.tzPublicKey === token.owner ||
-      system.tzPublicKey === token.sale?.seller);
+  const isOwner = tokens[obj.idx]?.owned ?? false;
 
   return (
-    <Flex flexDir="column" bg="brand.brightGray" flexGrow={1}>
+    <Flex flexDir={["column-reverse", "row"]} flexWrap="nowrap" bg="brand.brightGray" flexGrow={1}>
       <Modal
         isOpen={isOpen}
         onClose={onClose}
@@ -293,15 +160,10 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             ''
           )}
 
-          <TokenImage
-            id="fullScreenAssetView"
-            src={ipfsUriToGatewayUrl(system.config, token.artifactUri)}
-            metadata={token.metadata}
-            width="auto"
-            height="auto"
-            maxWidth="85%"
-            maxHeight="85%"
-            objectFit="contain"
+          <TokenMedia
+            config={system.config}
+            maxW="85%"
+            {...tokens[obj.idx]}
           />
           <ModalCloseButton
             position="absolute"
@@ -324,115 +186,30 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           />
         </ModalContent>
       </Modal>
-      <Flex pt={8} px={8}>
-        <MinterButton
-          variant="primaryActionInverted"
-          onClick={e => {
-            e.preventDefault();
-            window.history.back();
-          }}
-        >
-          <Box color="currentcolor">
-            <ChevronLeft size={16} strokeWidth="3" />
-          </Box>
-        </MinterButton>
-      </Flex>
-      <Flex
-        align="center"
-        flex="1"
-        pb={4}
-        px={[4, 16]}
-        mx="auto"
-        width={['90%', '70%']}
-        maxHeight="70vh"
-        flexDir="column"
-      >
-        <TokenImage
-          src={ipfsUriToGatewayUrl(system.config, token.artifactUri)}
-          metadata={token.metadata}
-          height="75%"
-          width="auto"
-        />
-        <Flex align="center" justify="space-evenly" width={['90vw']} mt="4">
-          {isOwner ? (
-            <Menu>
-              <MinterMenuButton variant="primary">
-                <MoreHorizontal color="#25282B" />
-              </MinterMenuButton>
-              <MenuList
-                borderColor="brand.lightBlue"
-                borderRadius="2px"
-                p={0}
-                minWidth={[100]}
-              >
-                {token.sale ? (
-                  <></>
-                ) : (
-                  <MinterMenuItem
-                    w={[100]}
-                    variant="primary"
-                    onClick={disclosure.onOpen}
-                  >
-                    Transfer
-                  </MinterMenuItem>
-                )}
-              </MenuList>
-              <TransferTokenModal
-                contractAddress={contractAddress}
-                tokenId={tokenId}
-                disclosure={disclosure}
-              />
-            </Menu>
-          ) : (
-            <></>
-          )}
-
-          {token.sale ? (
-            isOwner ? (
-              <Flex direction="column">
-                <Flex align="center" alignSelf="center">
-                  <Text color="black" fontSize="3xl" mr={1}>
-                    ꜩ
-                  </Text>
-                  <Text color="brand.black" fontSize="xl" fontWeight="700">
-                    {token.sale.price}
-                  </Text>
-                </Flex>
-                <CancelTokenSaleButton
-                  contract={contractAddress}
-                  tokenId={tokenId}
-                />
-              </Flex>
-            ) : (
-              <>
-                <Text color="black" fontSize={['sm', 'lg']} mr={1}>
-                  {token.sale.price.toFixed(2)}ꜩ
-                </Text>
-                <BuyTokenButton contract={contractAddress} token={token} />
-              </>
-            )
-          ) : isOwner ? (
-            <SellTokenButton contract={contractAddress} tokenId={tokenId} />
-          ) : (
-            <></>
-          )}
-          <Button onClick={onOpen}>
-            <Maximize2 size={16} strokeWidth="3" />
-          </Button>
+      <Flex width={['100vw', '25vw']} bg="white" flexDir="column" borderRight="2px solid #aaa">
+        <Flex pt={8} px={8} justifyContent="space-between">
+          <MinterButton
+            variant="primaryActionInverted"
+            onClick={e => {
+              e.preventDefault();
+              window.history.back();
+            }}
+          >
+            <Box color="currentcolor">
+              <ChevronLeft size={16} strokeWidth="3" />
+            </Box>
+          </MinterButton>
+          <FormControl display="flex" alignItems="center" width="auto">
+            <FormLabel htmlFor="owned-toggle" mb="0">
+              {!obj.ownedOnly ? "All" : "Owned"}
+            </FormLabel>
+            <Switch size="lg" id="owned-toggle" onChange={(e) => { setObj({ ...obj, ownedOnly: !obj.ownedOnly }) }} />
+          </FormControl>
         </Flex>
-      </Flex>
-      <Flex
-        width={['100%']}
-        bg="white"
-        flexDir="column"
-        flexGrow={1}
-        borderTop="2px solid #aaa"
-      >
         <Flex
-          width={['90%', '70%']}
-          mx="auto"
+          width={['100%']}
           flexDir="column"
-          px={[4, 16]}
+          px={[8]}
           flex="1"
         >
           <Flex
@@ -443,30 +220,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             mb={10}
             pos="relative"
           >
-            {isOwner ? (
-              <Flex>
-                <Flex
-                  py={1}
-                  px={3}
-                  mb={3}
-                  borderRightRadius="5px"
-                  bg="brand.turquoise"
-                  color="brand.black"
-                  align="center"
-                  justify="center"
-                >
-                  <Star fill="currentColor" size={16} />
-                  <Text fontWeight="600" ml={2} fontSize="sm">
-                    You own this asset
-                  </Text>
-                </Flex>
-              </Flex>
-            ) : null}
             <Heading color="brand.black" size="xl">
-              {token.title}
-            </Heading>
-            <Heading color="brand.darkGray" size="md" mt={[2, 4]}>
-              Minter: {token.metadata?.minter || 'Unknown'}
+              {tokens[obj.idx]?.title}
             </Heading>
             <Text
               fontSize="md"
@@ -474,7 +229,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               fontWeight="bold"
               mt={[2, 4]}
             >
-              {token.description || 'No description provided'}
+              {tokens[obj.idx]?.description || 'No description provided'}
             </Text>
             <Flex mt={[4, 8]}>
               <Flex flexDir="column" width={['100%', 'auto']}>
@@ -491,8 +246,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   <AccordionIcon />
                 </AccordionButton>
                 <AccordionPanel pb={4}>
-                  {token.metadata?.attributes?.map(({ name, value }) => (
-                    <Flex mt={[4, 8]}>
+                  {token.metadata?.attributes?.map(({ name, value }, idx: number) => (
+                    <Flex key={idx} mt={[4, 8]}>
                       <Text color="brand.neutralGray">{name}:</Text>
                       <Text color="brand.darkGray" fontWeight="bold" ml={[1]}>
                         {value}
@@ -503,6 +258,112 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               </AccordionItem>
             </Accordion>
           </Flex>
+        </Flex>
+      </Flex>
+      <Flex
+        align="center"
+        flex="1"
+        px={[4, 0]}
+        mx="auto"
+        width={['100%']}
+        height="calc(100vh - 4rem)"
+        flexDir="column"
+        position="relative"
+        justifyContent="flex-start"
+      >
+        <TokenCard
+          address={ipfsUriToGatewayUrl(system.config, tokens[obj.idx]?.artifactUri)}
+          config={system.config}
+          {...(tokens ? tokens[obj.idx] : {} as any)}
+          height="calc(100% - 3.5rem)"
+          opacity={obj.opacity}
+        />
+        <Flex align="center" justify="space-between" width="calc(100% - 0.25rem)" py={2} position="absolute" bottom="0" bg="white" borderLeft="2px solid #aaa" borderRight="2px solid #aaa">
+          <MinterButton
+            variant="primaryActionInverted"
+            onClick={e => {
+              setObj({ ...obj, idx: (obj?.idx - 1) % (tokens?.length ?? 1) });
+            }}
+          >
+            <Box color="currentcolor">
+              <ChevronLeft size={16} strokeWidth="3" />
+            </Box>
+          </MinterButton>
+          {isOwner ? (
+            <Menu>
+              <MinterMenuButton variant="primary">
+                <MoreHorizontal color="#25282B" />
+              </MinterMenuButton>
+              <MenuList
+                borderColor="brand.lightBlue"
+                borderRadius="2px"
+                p={0}
+                minWidth={[100]}
+              >
+                {tokens[obj.idx]?.sale ? (
+                  <></>
+                ) : (
+                  <MinterMenuItem
+                    w={[100]}
+                    variant="primary"
+                    onClick={disclosure.onOpen}
+                  >
+                    Transfer
+                  </MinterMenuItem>
+                )}
+              </MenuList>
+              <TransferTokenModal
+                contractAddress={contractAddress}
+                tokenId={tokens[obj.idx]?.id}
+                disclosure={disclosure}
+              />
+            </Menu>
+          ) : (
+            <></>
+          )}
+
+          {tokens[obj.idx]?.sale ? (
+            isOwner ? (
+              <>
+                <Flex direction="column">
+                  <Flex align="center" alignSelf="center">
+                    <Text color="brand.black" fontSize="xl" fontWeight="700">
+                      {tokens[obj.idx]?.sale?.price} &#42793;
+                    </Text>
+                  </Flex>
+                </Flex>
+                <CancelTokenSaleButton
+                  contract={contractAddress}
+                  tokenId={tokens[obj.idx].id}
+                />
+              </>
+            ) : (
+              <>
+                <Text color="black" fontSize={['sm', 'lg']} mr={1}>
+                  {tokens[obj.idx]?.sale?.price.toFixed(2)} &#42793;
+                </Text>
+                <BuyTokenButton contract={contractAddress} token={tokens[obj.idx]} />
+              </>
+            )
+          ) : isOwner ? (
+            <SellTokenButton contract={contractAddress} tokenId={tokens[obj.idx]?.id} />
+          ) : (
+            <></>
+          )}
+          <Button onClick={onOpen}>
+            <Maximize2 size={16} strokeWidth="3" />
+          </Button>
+          <MinterButton
+            variant="primaryActionInverted"
+            onClick={() => {
+              setObj({ ...obj, opacity: 0 })
+              setTimeout(() => setObj({ ...obj, idx: (obj?.idx + 1) % (tokens?.length ?? 1) }), 250);
+            }}
+          >
+            <Box color="currentcolor">
+              <ChevronRight size={16} strokeWidth="3" />
+            </Box>
+          </MinterButton>
         </Flex>
       </Flex>
     </Flex>

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Flex, Heading, Text, Link, Image } from '@chakra-ui/react';
 import { useLocation } from 'wouter';
 import Sidebar from './Sidebar';
+
 import CollectionDisplay from './CollectionDisplay';
 import { useSelector, useDispatch } from '../../../reducer';
 import { getWalletAssetContractsQuery } from '../../../reducer/async/queries';
@@ -96,7 +97,7 @@ export default function Catalog() {
         w="250px"
         h="100%"
         flexDir="column"
-        overflowY="scroll"
+        overflowY="auto"
         display={{
           base: 'none',
           md: 'flex'

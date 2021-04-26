@@ -59,7 +59,7 @@ export default function Sidebar() {
   const dispatch = useDispatch();
   return (
     <>
-      <Heading px={4} pt={6} pb={4} size="md" color="brand.darkGray">
+      <Heading px={4} pt={6} pb={4} mb={4} borderBottom="2px solid #aaa" size="md" color="brand.darkGray">
         Collections
       </Heading>
       <Heading
@@ -88,15 +88,18 @@ export default function Sidebar() {
         Your Collections
       </Heading>
       {Object.keys(state.collections)
-        .filter(address => address !== state.globalCollection)
-        .map(address => (
-          <CollectionTab
-            key={address}
-            selected={address === state.selectedCollection}
-            onSelect={address => dispatch(selectCollection(address))}
-            {...state.collections[address]}
-          />
-        ))}
+        .map(key => {
+          return state.collections[key].owned ?
+           (
+            <CollectionTab
+              key={state.collections[key].address}
+              selected={state.collections[key].address === state.selectedCollection}
+              onSelect={address => dispatch(selectCollection(address))}
+              {...state.collections[key]}
+            />
+          ) : null
+        }
+        )}
       <Flex px={2} pt={4} justify="center" pb={8}>
         <CreateCollectionButton />
       </Flex>

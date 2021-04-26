@@ -1,168 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation } from 'wouter';
+import React, { useEffect } from 'react';
 import {
-  AspectRatio,
-  Box,
   Flex,
   Heading,
-  Image,
   Link,
   SimpleGrid,
   Spinner,
   Text
 } from '@chakra-ui/react';
 import { MinterButton } from '../../common';
-import { ExternalLink, Wind, HelpCircle } from 'react-feather';
-import { Token } from '../../../reducer/slices/collections';
-import { IpfsGatewayConfig, ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
+import { ExternalLink, Wind } from 'react-feather';
 import { useDispatch, useSelector } from '../../../reducer';
 import { getContractNftsQuery } from '../../../reducer/async/queries';
 import CollectionsDropdown from './CollectionsDropdown';
-
-function MediaNotFound() {
-  return (
-    <Flex
-      flexDir="column"
-      align="center"
-      justify="center"
-      flex="1"
-      bg="gray.100"
-      color="gray.300"
-      height="100%"
-    >
-      <HelpCircle size="70px" />
-    </Flex>
-  );
-}
-
-function TokenImage(props: TokenTileProps) {
-  const src = ipfsUriToGatewayUrl(props.config, props.artifactUri);
-  const [errored, setErrored] = useState(false);
-  const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
-  useEffect(() => {
-    (async () => {
-      let blob;
-      try {
-        blob = await fetch(src).then(r => r.blob());
-      } catch (e) {
-        return setErrored(true);
-      }
-      setObj({
-        url: URL.createObjectURL(blob),
-        type: blob.type
-      });
-    })();
-  }, [src]);
-
-  if (errored) {
-    return <MediaNotFound />;
-  }
-
-  if (!obj) return null;
-
-  if (/^image\/.*/.test(obj.type)) {
-    return (
-      <Image
-        src={src}
-        objectFit="scale-down"
-        flex="1"
-        height="100%"
-        onError={() => setErrored(true)}
-      />
-    );
-  }
-
-  if (/^video\/.*/.test(obj.type)) {
-    return (
-      <video
-        loop
-        onClick={e => e.preventDefault()}
-        onMouseEnter={e => e.currentTarget.play()}
-        onMouseLeave={e => e.currentTarget.pause()}
-      >
-        <source src={obj.url} type={obj.type} />
-      </video>
-    );
-  }
-
-  if (props.metadata.formats?.length) {
-    if (
-      props.metadata.formats[0].mimeType === 'model/gltf-binary' ||
-      props.metadata.formats[0].mimeType === 'model/gltf+json'
-    ) {
-      return (
-        <>
-          <model-viewer
-            auto-rotate
-            rotation-per-second="30deg"
-            src={obj.url}
-            class="grid"
-          ></model-viewer>
-        </>
-      );
-    }
-  }
-
-  return <MediaNotFound />;
-}
-
-interface TokenTileProps extends Token {
-  config: IpfsGatewayConfig;
-  address: string;
-}
-
-function TokenTile(props: TokenTileProps) {
-  const [, setLocation] = useLocation();
-  return (
-    <Flex
-      flexDir="column"
-      ratio={1}
-      w="100%"
-      bg="white"
-      border="1px solid"
-      borderColor="brand.lightBlue"
-      borderRadius="3px"
-      overflow="hidden"
-      boxShadow="0px 0px 0px 4px rgba(15, 97, 255, 0)"
-      transition="all linear 50ms"
-      _hover={{
-        cursor: 'pointer',
-        boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.1)'
-      }}
-      onClick={() =>
-        setLocation(`/collection/${props.address}/token/${props.id}`)
-      }
-    >
-      <AspectRatio ratio={3 / 2}>
-        <Box p={4}>
-          <TokenImage {...props} />
-        </Box>
-      </AspectRatio>
-      <Flex
-        width="100%"
-        px={4}
-        py={4}
-        bg="white"
-        borderTop="1px solid"
-        borderColor="brand.lightBlue"
-      >
-        <Text>{props.title}</Text>
-      </Flex>
-    </Flex>
-  );
-}
+import TokenCard from '../../common/TokenCard';
+import { Nft } from '../../../lib/nfts/queries';
 
 interface CollectionDisplayProps {
   address: string | null;
-  ownedOnly?: boolean;
 }
 
 export default function CollectionDisplay({
-  address,
-  ownedOnly = true
+  address
 }: CollectionDisplayProps) {
   const collections = useSelector(s => s.collections);
-  const { config, tzPublicKey, wallet } = useSelector(s => s.system);
+  const { system } = useSelector(s => s);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -176,14 +37,13 @@ export default function CollectionDisplay({
   }
 
   const collection = collections.collections[address];
-
   if (!collection) {
     return <></>;
   }
 
   if (!collection.loaded) {
     return (
-      <Flex flexDir="column" align="center" flex="1" pt={20}>
+      <Flex flexDir="column" align="center" flex="1" pt={20} borderLeft="2px solid #aaa">
         <Spinner size="xl" mb={6} color="gray.300" />
         <Heading size="lg" textAlign="center" color="gray.500">
           Loading...
@@ -192,20 +52,15 @@ export default function CollectionDisplay({
     );
   }
 
-  if (collection.tokens === null) {
+  if (!collection.tokens) {
     return <></>;
   }
 
-  const tokens = ownedOnly
-    ? collection.tokens.filter(
-        ({ owner, sale }) =>
-          owner === tzPublicKey || sale?.seller === tzPublicKey
-      )
-    : collection.tokens;
+  const tokens = collection.tokens;
 
-  if (tokens.length === 0) {
+  if (tokens?.length === 0) {
     return (
-      <Flex w="100%" flex="1" flexDir="column" align="center">
+      <Flex w="100%" flex="1" flexDir="column" align="center" borderLeft="2px solid #aaa">
         <Flex
           px={20}
           py={10}
@@ -220,9 +75,7 @@ export default function CollectionDisplay({
         >
           <Wind />
           <Text fontWeight="600" pt={5}>
-            {ownedOnly
-              ? 'No owned tokens to display in this collection'
-              : 'No tokens to display in this collection'}
+            'No tokens to display in this collection.
           </Text>
         </Flex>
       </Flex>
@@ -238,12 +91,11 @@ export default function CollectionDisplay({
       pt={6}
       flex="1"
       bg="brand.brightGray"
-      borderLeftWidth="1px"
-      borderLeftColor="brand.lightBlue"
       overflowY="scroll"
       justify="start"
+      borderLeft="2px solid #aaa"
     >
-      {ownedOnly && wallet !== null ? (
+      { system.wallet !== null ? (
         <Flex display={{ base: 'flex', md: 'none' }} mb={4}>
           <CollectionsDropdown />
         </Flex>
@@ -270,7 +122,7 @@ export default function CollectionDisplay({
               {collection.address}
             </Text>
             <Link
-              href={config.bcd.gui + '/' + collection.address}
+              href={system.config.bcd.gui + '/' + collection.address}
               color="brand.darkGray"
               isExternal
               ml={2}
@@ -295,16 +147,14 @@ export default function CollectionDisplay({
         ></MinterButton>
       </Flex>
       <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
-        {tokens.map(token => {
-          return (
-            <TokenTile
-              key={token.id}
-              address={address}
-              config={config}
-              {...token}
-            />
-          );
-        })}
+        {tokens?.filter((token: Nft) => token.owned).map((token: Nft, idx: number) =>
+          <TokenCard
+            key={idx}
+            address={collection.address}
+            config={system.config} {...token}
+          />
+        )}
+
       </SimpleGrid>
     </Flex>
   );
