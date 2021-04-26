@@ -26,6 +26,12 @@ export async function getBigMapUpdates(config: Config, params?: Params) {
   return response.data;
 }
 
+export async function getContracts(config: Config, params?: Params) {
+  const uri = `${config.tzkt.api}/v1/contracts?${mkQueryParams(params)}`;
+  const response = await axios.get(uri);
+  return response.data;
+}
+
 export async function getContract(
   config: Config,
   address: string,
@@ -88,6 +94,10 @@ export class TzKt {
 
   getBigMapUpdates(params?: Params) {
     return getBigMapUpdates(this.config, params);
+  }
+
+  getContracts(params?: Params) {
+    return getContracts(this.config, params);
   }
 
   getContract(address: string, params?: Params) {

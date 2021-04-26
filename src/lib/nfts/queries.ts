@@ -6,6 +6,29 @@ import { SystemWithToolkit, SystemWithWallet } from '../system';
 import { TzKt, Params } from '../service/tzkt';
 import { isLeft } from 'fp-ts/lib/Either';
 
+export const ContractRow = <S extends t.Mixed>(storage: S) =>
+  t.type({
+    type: t.string,
+    kind: t.string,
+    tzips: t.array(t.string),
+    address: t.string,
+    balance: t.number,
+    creator: t.type({
+      address: t.string
+    }),
+    numContracts: t.number,
+    numDelegations: t.number,
+    numOriginations: t.number,
+    numTransactions: t.number,
+    numReveals: t.number,
+    numMigrations: t.number,
+    firstActivity: t.number,
+    firstActivityTime: t.string,
+    lastActivity: t.number,
+    lastActivityTime: t.string,
+    storage: t.record(t.string, storage)
+  });
+
 export const BigMapRow = <K extends t.Mixed, V extends t.Mixed>(props: {
   key: K;
   value: V;
@@ -21,7 +44,7 @@ export const BigMapRow = <K extends t.Mixed, V extends t.Mixed>(props: {
     updates: t.number
   });
 
-export const BigMapUpdateRow = <K extends t.Mixed, V extends t.Mixed>(props: {
+export const BigMapUpdateRow = <K extends t.Mixed, V extends t.Mixed>(content: {
   key: K;
   value: V;
 }) =>
@@ -36,7 +59,7 @@ export const BigMapUpdateRow = <K extends t.Mixed, V extends t.Mixed>(props: {
     ]),
     path: t.string,
     action: t.string,
-    content: t.type({ hash: t.string, key: props.key, value: props.value })
+    content: t.type({ hash: t.string, key: content.key, value: content.value })
   });
 
 export type AccountContractRow = t.TypeOf<typeof AccountContractRow>;
@@ -235,10 +258,10 @@ async function getFixedPriceSales(
 async function getBigMapUpdates<K extends t.Mixed, V extends t.Mixed>(
   tzkt: TzKt,
   params: Params,
-  props: { key: K; value: V }
+  content: { key: K; value: V }
 ) {
   const bigMapUpdates = await tzkt.getBigMapUpdates(params);
-  const decoder = t.array(BigMapUpdateRow(props));
+  const decoder = t.array(BigMapUpdateRow(content));
   const decoded = decoder.decode(bigMapUpdates);
   if (isLeft(decoded)) {
     throw Error('Failed to decode `getBigMapUpdates` response');
@@ -256,6 +279,20 @@ async function getAccountContracts(
   const decoded = decoder.decode(accountContracts);
   if (isLeft(decoded)) {
     throw Error('Failed to decode `getAccountContracts` response');
+  }
+  return decoded.right;
+}
+
+async function getContracts<S extends t.Mixed>(
+  tzkt: TzKt,
+  params: Params,
+  storage: S
+) {
+  const contracts = await tzkt.getContracts(params);
+  const decoder = t.array(ContractRow(storage));
+  const decoded = decoder.decode(contracts);
+  if (isLeft(decoded)) {
+    throw Error('Failed to decode `getBigMapUpdates` response');
   }
   return decoded.right;
 }
@@ -338,10 +375,19 @@ export async function getNftAssetContract(
 }
 
 export async function getWalletNftAssetContracts(system: SystemWithWallet) {
-  const response = await getAccountContracts(system.tzkt, system.tzPublicKey);
+  const response = await getContracts(
+    system.tzkt,
+    {
+      creator: system.tzPublicKey,
+      includeStorage: 'true'
+    },
+    t.unknown
+  );
+
   const addresses = response
-    .filter(c => c.kind === 'asset')
+    .filter(c => c.kind === 'asset' && c.tzips.includes('fa2'))
     .map(c => c.address);
+
   const results: AssetContract[] = [];
 
   if (addresses.length === 0) {
