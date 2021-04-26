@@ -317,7 +317,7 @@ export function Header() {
         src={logo}
         onClick={e => {
           e.preventDefault();
-          setLocation('/collections');
+          setLocation('/marketplace');
         }}
         cursor="pointer"
       />
@@ -330,7 +330,7 @@ export function Header() {
         src={headerLogo}
         onClick={e => {
           e.preventDefault();
-          setLocation('/collections');
+          setLocation('/marketplace');
         }}
         cursor="pointer"
       />
