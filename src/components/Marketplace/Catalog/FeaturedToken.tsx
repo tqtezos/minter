@@ -34,11 +34,11 @@ export default function FeaturedToken(props: FeaturedTokenProps) {
             <Heading size="md" mt={4} fontSize="2.5rem">
               {props.title}
             </Heading>
-            <br/>
             <Text fontSize="sm" fontWeight="600" color="gray.500">
               {props.description}
             </Text>
             <Spacer />
+            <br />
             <Text fontSize="md">
               Current Price:{' '}
               <Text as="span" fontWeight="600">
