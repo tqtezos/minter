@@ -220,7 +220,13 @@ async function getFixedPriceSales(
   tzkt: TzKt,
   address: string
 ): Promise<FixedPriceSaleResponse> {
-  const fixedPriceBigMapId = await tzkt.getContractStorage(address);
+  let fixedPriceBigMapId;
+  const fixedPriceStorage = await tzkt.getContractStorage(address);
+  if (fixedPriceStorage.hasOwnProperty('sales')) {
+    fixedPriceBigMapId = fixedPriceStorage.sales;
+  } else {
+    fixedPriceBigMapId = fixedPriceStorage; // legacy marketplace contract
+  }
   if (isLeft(t.number.decode(fixedPriceBigMapId))) {
     throw Error('Failed to decode `getFixedPriceSales` bigMap ID');
   }
