@@ -103,9 +103,8 @@ function createMetadataResolver(
   toolkit: TezosToolkit,
   contractAddress: string
 ): ResolveMetadata {
-  
   const ipfsUrl = system.config.ipfsGateway;
-  const ipfsGateway = ipfsUrl.replace(/^https?:\/\//,'');
+  const ipfsGateway = ipfsUrl.replace(/^https?:\/\//, '');
   const gatewayProtocol = ipfsUrl.startsWith('https') ? 'https' : 'http';
 
   const ipfsHandler = new CustomIpfsHttpHandler(ipfsGateway, gatewayProtocol);

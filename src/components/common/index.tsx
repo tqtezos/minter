@@ -37,9 +37,7 @@ export function MinterMenuButton(
   return <MenuButton sx={styles} {...rest} />;
 }
 
-export function MinterMenuItem(
-  props: MenuItemProps & { variant?: string }
-) {
+export function MinterMenuItem(props: MenuItemProps & { variant?: string }) {
   const { variant, ...rest } = props;
   const styles = useStyleConfig('MenuItem', { variant });
   return <MenuItem sx={styles} {...rest} />;

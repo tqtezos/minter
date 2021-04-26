@@ -1,5 +1,4 @@
 declare module 'ipfs-http-client' {
-
   export type FileContent = any | Blob | string;
 
   export interface Cid {
@@ -16,6 +15,5 @@ declare module 'ipfs-http-client' {
     add: (data: FileContent) => Promise<IpfsFile>;
   }
 
-  export default function(any): IpfsClientApi;
+  export default function (any): IpfsClientApi;
 }
-   

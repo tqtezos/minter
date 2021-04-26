@@ -1,8 +1,19 @@
 import React, { useEffect } from 'react';
-import { Box, Container, Text, Flex, Heading, SimpleGrid, Spinner } from '@chakra-ui/react';
+import {
+  Box,
+  Container,
+  Text,
+  Flex,
+  Heading,
+  SimpleGrid,
+  Spinner
+} from '@chakra-ui/react';
 import { Wind } from 'react-feather';
 import { useSelector, useDispatch } from '../../../reducer';
-import { getMarketplaceNftsQuery, loadMoreMarketplaceNftsQuery } from '../../../reducer/async/queries';
+import {
+  getMarketplaceNftsQuery,
+  loadMoreMarketplaceNftsQuery
+} from '../../../reducer/async/queries';
 import TokenCard from './TokenCard';
 import FeaturedToken from './FeaturedToken';
 import { VisibilityTrigger } from '../../common/VisibilityTrigger';
@@ -13,13 +24,14 @@ export default function Catalog() {
 
   useEffect(() => {
     dispatch(getMarketplaceNftsQuery(state.marketplace.address));
-  }, [ state.marketplace.address, dispatch ]);
+  }, [state.marketplace.address, dispatch]);
 
   const loadMore = () => {
     dispatch(loadMoreMarketplaceNftsQuery({}));
   };
 
-  let tokens = state.marketplace.tokens?.filter(x=>x.token).map(x=>x.token!) ?? [];
+  let tokens =
+    state.marketplace.tokens?.filter(x => x.token).map(x => x.token!) ?? [];
 
   return (
     <Flex
@@ -38,11 +50,7 @@ export default function Catalog() {
         </Box>
       ) : null}
       <Container maxW="80em">
-        <Flex
-          flex="1"
-          w="100%"
-          flexDir="column"
-        >
+        <Flex flex="1" w="100%" flexDir="column">
           {!state.marketplace.loaded ? (
             <Flex flexDir="column" align="center" flex="1" pt={20}>
               <Spinner size="xl" mb={6} color="gray.300" />
@@ -50,8 +58,7 @@ export default function Catalog() {
                 Loading...
               </Heading>
             </Flex>
-          ) :
-            tokens.length === 0 ? (
+          ) : tokens.length === 0 ? (
             <Flex w="100%" flex="1" flexDir="column" align="center">
               <Flex
                 px={20}
@@ -71,23 +78,31 @@ export default function Catalog() {
                 </Text>
               </Flex>
             </Flex>
-            ) : (
-              <>
-                <SimpleGrid columns={{sm: 1, md: 2, lg: 3, xl: 4}} gap={8} pb={8}>
-                  <>
-                    {tokens.slice(1).map(token => {
-                      return (
-                        <TokenCard
-                          key={`${token.address}-${token.id}`}
-                          config={system.config}
-                          {...token}
-                        />
-                      );
-                    })}
-                    <VisibilityTrigger key={state.marketplace.tokens?.length + ':' + tokens.length} onVisible={loadMore} allowedDistanceToViewport={600}/>
-                  </>
-                </SimpleGrid>
-              </>
+          ) : (
+            <>
+              <SimpleGrid
+                columns={{ sm: 1, md: 2, lg: 3, xl: 4 }}
+                gap={8}
+                pb={8}
+              >
+                <>
+                  {tokens.slice(1).map(token => {
+                    return (
+                      <TokenCard
+                        key={`${token.address}-${token.id}`}
+                        config={system.config}
+                        {...token}
+                      />
+                    );
+                  })}
+                  <VisibilityTrigger
+                    key={state.marketplace.tokens?.length + ':' + tokens.length}
+                    onVisible={loadMore}
+                    allowedDistanceToViewport={600}
+                  />
+                </>
+              </SimpleGrid>
+            </>
           )}
         </Flex>
       </Container>

@@ -81,7 +81,8 @@ export function TokenMedia(props: TokenMediaProps) {
   }
 
   if (props.metadata.formats?.length) {
-    if (props.metadata.formats[0].mimeType === 'model/gltf-binary' ||
+    if (
+      props.metadata.formats[0].mimeType === 'model/gltf-binary' ||
       props.metadata.formats[0].mimeType === 'model/gltf+json'
     ) {
       return (

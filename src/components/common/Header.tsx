@@ -122,15 +122,22 @@ function WalletDisplay() {
     <>
       {system.status === 'WalletConnected' ? (
         <Menu placement="bottom-end" offset={[4, 24]}>
-          <MenuButton padding={2} _hover={{
-            textDecoration: 'none',
-            background: '#2D3748',
-            color: '#EDF2F7'
-          }}>
-            <Image src={wallet_icon} width={4} height="auto" style={{ filter: 'invert(1)' }} />
+          <MenuButton
+            padding={2}
+            _hover={{
+              textDecoration: 'none',
+              background: '#2D3748',
+              color: '#EDF2F7'
+            }}
+          >
+            <Image
+              src={wallet_icon}
+              width={4}
+              height="auto"
+              style={{ filter: 'invert(1)' }}
+            />
           </MenuButton>
           <MenuList color="brand.black">
-
             <Flex flexDir="column" px={4} py={2}>
               <Text fontSize={16} fontWeight="600">
                 Network: {system.config.network}
@@ -240,7 +247,12 @@ function NavItems() {
                       mb={4}
                     >
                       Connect Wallet
-                      <Image src={wallet_icon} width="auto" height="40%" paddingLeft={3} />
+                      <Image
+                        src={wallet_icon}
+                        width="auto"
+                        height="40%"
+                        paddingLeft={3}
+                      />
                     </MinterButton>
                   )}
                 </Flex>
