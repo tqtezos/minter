@@ -28,21 +28,10 @@ type Reducer<A> = CaseReducer<CollectionsState, PayloadAction<A>>;
 
 // Data
 
-const globalCollectionAddress = config.contracts.nftFaucet;
-
 export const initialState: CollectionsState = {
   selectedCollection: null,
-  globalCollection: globalCollectionAddress,
-  collections: {
-    [globalCollectionAddress]: {
-      address: globalCollectionAddress,
-      metadata: {
-        name: 'Minter'
-      },
-      tokens: null,
-      loaded: false
-    }
-  }
+  globalCollection: config.contracts.nftFaucet,
+  collections: {}
 };
 
 //// Reducers & Slice

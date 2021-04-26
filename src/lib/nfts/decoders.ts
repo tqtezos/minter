@@ -186,10 +186,14 @@ export const Nft = t.intersection([
 
 // Contract Metadata
 
-export type AssetContract = t.TypeOf<typeof AssetContract>;
-export const AssetContract = t.type({
-  address: t.string,
-  metadata: t.type({
-    name: t.string
-  })
+export const AssetContractMetadata = t.type({
+  name: t.string
 });
+
+export type AssetContract = t.TypeOf<typeof AssetContract>;
+export const AssetContract = t.intersection([
+  ContractRow(t.unknown),
+  t.type({
+    metadata: AssetContractMetadata
+  })
+]);

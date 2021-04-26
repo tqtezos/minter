@@ -101,6 +101,20 @@ async function getContracts<S extends t.Mixed>(
   return compact(decodedArray.map(getRight));
 }
 
+async function getContract<S extends t.Mixed>(
+  tzkt: TzKt,
+  address: string,
+  params: Params,
+  storage: S
+) {
+  const contract = await tzkt.getContract(address, params);
+  const decoded = D.ContractRow(storage).decode(contract);
+  if (isLeft(decoded)) {
+    throw Error('Failed to decode `getContracts` response');
+  }
+  return decoded.right;
+}
+
 //// Main query functions
 
 export async function getContractNfts(
@@ -155,6 +169,7 @@ export async function getNftAssetContract(
   system: SystemWithToolkit | SystemWithWallet,
   address: string
 ): Promise<D.AssetContract> {
+  const contract = await getContract(system.tzkt, address, {}, t.unknown);
   const metaBigMap = await getAssetMetadataBigMap(system.tzkt, address);
   const metaUri = metaBigMap.find(v => v.key === '')?.value;
   if (!metaUri) {
@@ -162,16 +177,18 @@ export async function getNftAssetContract(
   }
 
   const { metadata } = await system.resolveMetadata(fromHexString(metaUri));
-  const decoded = D.AssetContract.props.metadata.decode(metadata);
+  const decoded = D.AssetContractMetadata.decode(metadata);
 
   if (isLeft(decoded)) {
     throw Error('Metadata validation failed');
   }
-  return { address, metadata: decoded.right };
+  return { ...contract, metadata: decoded.right };
 }
 
-export async function getWalletNftAssetContracts(system: SystemWithWallet) {
-  const response = await getContracts(
+export async function getWalletNftAssetContracts(
+  system: SystemWithWallet
+): Promise<D.AssetContract[]> {
+  const contracts = await getContracts(
     system.tzkt,
     {
       creator: system.tzPublicKey,
@@ -181,7 +198,7 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
   );
 
   const addresses = _.uniq(
-    response
+    contracts
       .filter(c => c.kind === 'asset' && c.tzips?.includes('fa2'))
       .map(c => c.address)
   );
@@ -209,16 +226,17 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
   ).filter(v => v.content.key === '');
 
   for (const row of assetBigMapRows) {
+    const contract = contracts.find(c => c.address === row.contract.address);
+    if (!contract) {
+      continue;
+    }
     try {
       const metaUri = row.content.value;
       const { metadata } = await system.resolveMetadata(fromHexString(metaUri));
-      const decoded = D.AssetContract.props.metadata.decode(metadata);
-      if (isLeft(decoded)) {
-        throw Error(
-          `Could not decode contract metadata for ${row.contract.address}`
-        );
+      const decoded = D.AssetContractMetadata.decode(metadata);
+      if (!isLeft(decoded)) {
+        results.push({ ...contract, metadata: decoded.right });
       }
-      results.push({ address: row.contract.address, metadata: decoded.right });
     } catch (e) {
       console.log(e);
     }

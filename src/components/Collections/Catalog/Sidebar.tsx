@@ -55,6 +55,7 @@ function CollectionTab({
 }
 
 export default function Sidebar() {
+  const tzPublicKey = useSelector(s => s.system.tzPublicKey);
   const state = useSelector(s => s.collections);
   const dispatch = useDispatch();
   return (
@@ -71,12 +72,14 @@ export default function Sidebar() {
       >
         Featured
       </Heading>
-      <CollectionTab
-        key={state.globalCollection}
-        selected={state.globalCollection === state.selectedCollection}
-        onSelect={address => dispatch(selectCollection(address))}
-        {...state.collections[state.globalCollection]}
-      />
+      {state.collections[state.globalCollection] ? (
+        <CollectionTab
+          key={state.globalCollection}
+          selected={state.globalCollection === state.selectedCollection}
+          onSelect={address => dispatch(selectCollection(address))}
+          {...state.collections[state.globalCollection]}
+        />
+      ) : null}
       <Heading
         fontFamily="mono"
         px={4}
@@ -88,7 +91,11 @@ export default function Sidebar() {
         Your Collections
       </Heading>
       {Object.keys(state.collections)
-        .filter(address => address !== state.globalCollection)
+        .filter(
+          address =>
+            address !== state.globalCollection &&
+            state.collections[address]?.creator?.address === tzPublicKey
+        )
         .map(address => (
           <CollectionTab
             key={address}
