@@ -146,6 +146,7 @@ function TokenImage(props: {
     return (
       <video
         controls
+        muted
         style={{
           margin: 'auto',
           height: props.height || '100%',

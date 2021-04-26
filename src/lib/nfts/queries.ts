@@ -164,6 +164,7 @@ export interface Nft {
   id: number;
   title: string;
   owner: string;
+  owned: boolean;
   description: string;
   artifactUri: string;
   metadata: NftMetadata;
@@ -299,6 +300,7 @@ export async function getContractNfts(
         return {
           id: parseInt(tokenId, 10),
           owner: ledger.find(e => e.key === tokenId)?.value!,
+          owned: false,
           title: metadata.name,
           description: metadata.description,
           artifactUri: metadata.artifactUri,
@@ -488,6 +490,7 @@ export const loadMarketplaceNft = async (
       id: tokenId,
       title: metadata.name || '',
       owner: sale.seller,
+      owned: false,
       description: metadata.description || '',
       artifactUri: metadata.artifactUri || '',
       metadata: metadata,
