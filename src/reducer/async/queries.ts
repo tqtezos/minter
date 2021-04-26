@@ -2,14 +2,13 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { State } from '../index';
 import {
   getNftAssetContract,
-  AssetContract,
   getContractNfts,
   getMarketplaceNfts,
-  Nft,
   getWalletNftAssetContracts,
   MarketplaceNftLoadingData,
   loadMarketplaceNft
 } from '../../lib/nfts/queries';
+import { Nft, AssetContract } from '../../lib/nfts/decoders';
 import { ErrorKind, RejectValue } from './errors';
 
 type Opts = { state: State; rejectValue: RejectValue };

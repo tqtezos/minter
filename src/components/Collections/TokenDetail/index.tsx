@@ -36,7 +36,7 @@ import {
   getContractNftsQuery,
   getNftAssetContractQuery
 } from '../../../reducer/async/queries';
-import { NftMetadata } from '../../../lib/nfts/queries';
+import { NftMetadata } from '../../../lib/nfts/decoders';
 
 import { Maximize2 } from 'react-feather';
 
