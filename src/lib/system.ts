@@ -1,4 +1,10 @@
-import { TezosToolkit, MichelCodecPacker, Context } from '@taquito/taquito';
+import {
+  TezosToolkit,
+  MichelCodecPacker,
+  Context,
+  ContractAbstraction,
+  ContractProvider
+} from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
 import { MetadataProvider, DEFAULT_HANDLERS } from '@taquito/tzip16';
 import { Tzip12Module } from '@taquito/tzip12';
@@ -7,6 +13,7 @@ import { BetterCallDev } from './service/bcd';
 import * as tzUtils from './util/tezosToolkit';
 import { DAppClientOptions, NetworkType } from '@airgap/beacon-sdk';
 import { TzKt } from './service/tzkt';
+import { isIpfsUri } from './util/ipfs';
 
 export interface Config {
   rpc: string;
@@ -48,7 +55,8 @@ export interface SystemConfigured {
 }
 
 type ResolveMetadata = (
-  uri: string
+  uri: string,
+  address: string
 ) => ReturnType<MetadataProvider['provideMetadata']>;
 
 export interface SystemWithToolkit {
@@ -111,18 +119,20 @@ function createMetadataResolver(
   DEFAULT_HANDLERS.set('ipfs', ipfsHandler);
   const provider = new MetadataProvider(DEFAULT_HANDLERS);
   const context = new Context(toolkit.rpc);
-  // This is a performance optimization: We're only resolving off-chain
-  // metadata, however the storage handler requires a ContractAbstraction
-  // instance present - if we fetch a contract on each invokation, the time
-  // to resolution can take several hundred milliseconds.
-  //
-  // TODO: Is it possible to only fetch contracts at the storage resolver level
-  // and make an "off-chain" metadata resolver that excludes the need for a
-  // ContractAbstraction instance?
+
   const defaultContract = toolkit.contract.at(contractAddress);
-  return async uri => {
-    const contract = await defaultContract;
-    return provider.provideMetadata(contract, uri, context);
+  type Contract = ContractAbstraction<ContractProvider>;
+  const contractCache: Record<string, Contract> = {};
+
+  return async (uri, address) => {
+    if (isIpfsUri(uri)) {
+      const contract = await defaultContract;
+      return provider.provideMetadata(contract, uri, context);
+    }
+    if (!contractCache[address]) {
+      contractCache[address] = await toolkit.contract.at(address);
+    }
+    return provider.provideMetadata(contractCache[address], uri, context);
   };
 }
 

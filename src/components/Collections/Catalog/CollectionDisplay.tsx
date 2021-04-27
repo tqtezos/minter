@@ -16,7 +16,10 @@ import { ExternalLink, Wind, HelpCircle } from 'react-feather';
 import { Token } from '../../../reducer/slices/collections';
 import { IpfsGatewayConfig, ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 import { useDispatch, useSelector } from '../../../reducer';
-import { getContractNftsQuery } from '../../../reducer/async/queries';
+import {
+  getContractNftsQuery,
+  getNftAssetContractQuery
+} from '../../../reducer/async/queries';
 import CollectionsDropdown from './CollectionsDropdown';
 
 function MediaNotFound() {
@@ -168,7 +171,9 @@ export default function CollectionDisplay({
 
   useEffect(() => {
     if (address !== null) {
-      dispatch(getContractNftsQuery(address));
+      dispatch(getNftAssetContractQuery(address)).then(() =>
+        dispatch(getContractNftsQuery(address))
+      );
     }
   }, [address, dispatch]);
 

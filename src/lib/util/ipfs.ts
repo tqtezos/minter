@@ -33,6 +33,10 @@ export async function uploadIPFSImageWithThumbnail(api: string, file: File) {
 
 // URI Utils
 
+export function isIpfsUri(uri: string) {
+  return /^ipfs:\/\/.+/.test(uri);
+}
+
 export function ipfsUriToCid(uri: string) {
   const baseRegex = /^ipfs:\/\//;
   const ipfsRegex = new RegExp(baseRegex.source + '.+');
