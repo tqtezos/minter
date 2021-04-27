@@ -351,7 +351,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           maxHeight="45vh"
         />
       </Box>
-      <Flex width="99vw" height={[7, 5]} justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
+      <Flex width="99vw" height={8} justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
         <Button onClick={onOpen}>
           <Maximize2 size={16} strokeWidth="3" />
         </Button>

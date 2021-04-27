@@ -19,14 +19,14 @@ export default function TokenCard(props: TokenCardProps) {
       w="100%"
       bg="white"
       border="1px solid"
-      borderColor="brand.lightBlue"
-      borderRadius="3px"
+      borderColor="#eee"
+      borderRadius="0px"
       overflow="hidden"
-      boxShadow="0px 0px 0px 4px rgba(15, 97, 255, 0)"
+      boxShadow="none"
       transition="all linear 50ms"
       _hover={{
         cursor: 'pointer',
-        boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.05)',
+        boxShadow: '0px 0px 10px #3339',
       }}
       onClick={() =>
         setLocation(`/collection/${props.address}/token/${props.id}`)
