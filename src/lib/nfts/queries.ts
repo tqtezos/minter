@@ -134,7 +134,10 @@ export async function getContractNfts(
 
         // TODO: Write decoder function for data retrieval
         const decodedInfo = _.mapValues(tokenInfo, fromHexString) as any;
-        const resolvedInfo = await system.resolveMetadata(decodedInfo['']);
+        const resolvedInfo = await system.resolveMetadata(
+          decodedInfo[''],
+          address
+        );
         const metadata = { ...decodedInfo, ...resolvedInfo.metadata };
 
         const saleData = activeSales.find(
@@ -176,7 +179,10 @@ export async function getNftAssetContract(
     throw Error(`Could not extract metadata URI from ${address} storage`);
   }
 
-  const { metadata } = await system.resolveMetadata(fromHexString(metaUri));
+  const { metadata } = await system.resolveMetadata(
+    fromHexString(metaUri),
+    address
+  );
   const decoded = D.AssetContractMetadata.decode(metadata);
 
   if (isLeft(decoded)) {
@@ -232,7 +238,10 @@ export async function getWalletNftAssetContracts(
     }
     try {
       const metaUri = row.content.value;
-      const { metadata } = await system.resolveMetadata(fromHexString(metaUri));
+      const { metadata } = await system.resolveMetadata(
+        fromHexString(metaUri),
+        contract.address
+      );
       const decoded = D.AssetContractMetadata.decode(metadata);
       if (!isLeft(decoded)) {
         results.push({ ...contract, metadata: decoded.right });
@@ -337,7 +346,8 @@ export const loadMarketplaceNft = async (
     }
 
     const { metadata } = (await system.resolveMetadata(
-      fromHexString(tokenMetadata)
+      fromHexString(tokenMetadata),
+      saleAddress
     )) as any;
 
     result.token = {
