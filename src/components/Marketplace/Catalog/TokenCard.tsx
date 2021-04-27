@@ -2,7 +2,7 @@ import React from 'react';
 import { Token } from '../../../reducer/slices/collections';
 import { useLocation } from 'wouter';
 import { IpfsGatewayConfig } from '../../../lib/util/ipfs';
-import { AspectRatio, Box, Flex, Text, Heading } from '@chakra-ui/react';
+import { AspectRatio, Box, Flex } from '@chakra-ui/react';
 import { TokenMedia } from '../../common/TokenMedia';
 
 interface TokenCardProps extends Token {
@@ -13,6 +13,7 @@ export default function TokenCard(props: TokenCardProps) {
   const [, setLocation] = useLocation();
   return (
     <Flex
+      position="relative"
       flexDir="column"
       ratio={1}
       w="100%"
@@ -25,7 +26,7 @@ export default function TokenCard(props: TokenCardProps) {
       transition="all linear 50ms"
       _hover={{
         cursor: 'pointer',
-        boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.1)'
+        boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.05)',
       }}
       onClick={() =>
         setLocation(`/collection/${props.address}/token/${props.id}`)
@@ -43,23 +44,13 @@ export default function TokenCard(props: TokenCardProps) {
         bg="white"
         borderTop="1px solid"
         borderColor="brand.lightBlue"
-        flexDir="column"
+        flexDir="row"
+        justifyContent="space-between"
       >
-        <Heading size="sm">{props.title}</Heading>
-      </Flex>
-      <Flex
-        px={2}
-        py={4}
-        mx={2}
-        bg="white"
-        borderTop="1px solid"
-        borderColor="brand.lightGray"
-        justify="space-between"
-      >
-        <Text fontSize="md">Current Price</Text>
-        <Text fontSize="md" fontWeight="600">
+        <Flex display="block" fontSize="md" width="70%" alignItems="center" height="100%" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{props.title}</Flex>
+        <Flex fontSize="md" fontWeight="600" width="30%" justifyContent="flex-end" alignItems="center">
           {props.sale?.price} ꜩ
-        </Text>
+        </Flex>
       </Flex>
     </Flex>
   );

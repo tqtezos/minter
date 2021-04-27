@@ -79,6 +79,7 @@ function TokenImage(props: TokenTileProps) {
         onClick={e => e.preventDefault()}
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
+        muted
       >
         <source src={obj.url} type={obj.type} />
       </video>

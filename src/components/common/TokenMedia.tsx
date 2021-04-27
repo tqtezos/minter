@@ -56,7 +56,6 @@ export function TokenMedia(props: TokenMediaProps) {
       <Image
         src={src}
         objectFit="scale-down"
-        height="100%"
         flex="1"
         maxWidth={props.maxW}
         style={{ objectFit: 'scale-down' }}
@@ -72,8 +71,8 @@ export function TokenMedia(props: TokenMediaProps) {
         onClick={e => e.preventDefault()}
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
-        height="100%"
         style={{ maxWidth: props.maxW }}
+        muted
       >
         <source src={obj.url} type={obj.type} />
       </video>

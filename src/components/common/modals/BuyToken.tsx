@@ -12,7 +12,7 @@ import {
 import { MinterButton } from '../../common';
 import { useDispatch } from '../../../reducer';
 import { buyTokenAction } from '../../../reducer/async/actions';
-import { Nft } from '../../../lib/nfts/queries';
+import { Nft } from '../../../lib/nfts/decoders';
 import FormModal, { BaseModalProps, BaseModalButtonProps } from './FormModal';
 
 interface BuyTokenModalProps extends BaseModalProps {

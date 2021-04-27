@@ -6,7 +6,7 @@ import {
 import { Buffer } from 'buffer';
 import { SystemWithWallet } from '../system';
 import { uploadIPFSJSON } from '../util/ipfs';
-import { NftMetadata } from './queries';
+import { NftMetadata } from './decoders';
 
 function toHexString(input: string) {
   return Buffer.from(input).toString('hex');
