@@ -351,7 +351,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           maxHeight="45vh"
         />
       </Box>
-      <Flex width="99vw" height={8} justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
+      <Flex width="99vw" height={10} justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
         <Button onClick={onOpen}>
           <Maximize2 size={16} strokeWidth="3" />
         </Button>
@@ -360,7 +360,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
         <Flex align="center" justify="space-evenly" width={['100']} mt="4">
         </Flex>
         <Flex
-          width={['90%', '70%']}
+          width={['90%', '90%', '70%']}
           mx="auto"
           flexDir="column"
           px={[4, 16]}
@@ -374,11 +374,11 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             mb={10}
             pos="relative"
           >
-            <Flex display={['block', 'flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'row']} flexWrap="wrap">
-              <Heading textAlign="left" color="brand.black" width={["100%", "80%"]} fontSize={["10vw", "3vw"]} display="inline-block">
+            <Flex display={['block', 'block', 'flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'column', 'row']} flexWrap="wrap">
+              <Heading textAlign="left" color="brand.black" width={["100%", "100%", "80%"]} fontSize={["10vw", "3vw"]} display="inline-block">
                 {token.title}
               </Heading>
-              <Flex justifyContent={["space-between", "flex-end"]} alignItems="center" width="100%">
+              <Flex justifyContent={["space-between", "space-between", "space-between", "flex-end"]} alignItems="center" width="100%">
                 {token.sale ? (
                   isOwner ? (
                     <>
@@ -394,7 +394,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                     </>
                   ) : (
                     <>
-                      <Text color="black" fontSize={['md', 'lg']} mr={1} fontWeight="700" marginRight={8}>
+                      <Text color="black" fontSize={['md', 'md', 'lg']} mr={1} fontWeight="700" marginRight={8}>
                         {token.sale.price.toFixed(2)} ꜩ
                       </Text>
                       <Box>
@@ -448,7 +448,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               color="brand.neutralGray"
               fontWeight="bold"
               mt={[2, 4]}
-              width={['100%', '60%']}
+              width={['100%', '100%', '100%', '100%', '60%']}
             >
               {token.description || 'No description provided'}
             </Text>
