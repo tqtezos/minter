@@ -17,6 +17,7 @@ import { MinterButton } from '../../common';
 import { useDispatch } from '../../../reducer';
 import { listTokenAction } from '../../../reducer/async/actions';
 import FormModal, { BaseModalProps, BaseModalButtonProps } from './FormModal';
+import tz from '../assets/tezos-sym.svg'
 
 interface SellTokenModalProps extends BaseModalProps {
   contract: string;
@@ -60,7 +61,7 @@ export function SellTokenModal(props: SellTokenModalProps) {
                     pointerEvents="none"
                     color="gray.900"
                     fontSize="1.2em"
-                    children="ꜩ"
+                    children={<img src={tz} alt="" width={10} height="auto" style={{display: 'inline-block'}}/>}
                   />
                   <Input
                     autoFocus={true}

@@ -37,9 +37,9 @@ import {
   getContractNftsQuery,
   getNftAssetContractQuery
 } from '../../../reducer/async/queries';
-import { NftMetadata } from '../../../lib/nfts/decoders';
-
+import tz from '../../common/assets/tezos-sym.svg'
 import { Maximize2 } from 'react-feather';
+import { NftMetadata } from '../../../lib/nfts/decoders';
 
 function NotFound() {
   return (
@@ -99,7 +99,9 @@ function TokenImage(props: {
   maxHeight?: string;
   height?: string;
   objectFit?: ResponsiveValue<any>;
-  onLoad?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
+  cursor?: string;
+  onClick?: (event: React.SyntheticEvent<HTMLImageElement | HTMLVideoElement, Event>) => void;
+  onLoad?: (event: React.SyntheticEvent<HTMLImageElement | HTMLVideoElement, Event>) => void;
   onFetch?: (type: string) => void;
 }) {
   const [errored, setErrored] = useState(false);
@@ -136,6 +138,8 @@ function TokenImage(props: {
         width={props.width}
         maxWidth={props.maxWidth}
         maxHeight={props.maxHeight ?? 'unset'}
+        cursor={props.cursor}
+        onClick={props.onClick}
         onError={() => setErrored(true)}
         onLoad={props.onLoad}
       />
@@ -151,7 +155,8 @@ function TokenImage(props: {
           height: props.height || '100%',
           width: props.width,
           maxWidth: props.maxWidth ?? 'unset',
-          maxHeight: props.maxHeight ?? 'unset'
+          maxHeight: props.maxHeight ?? 'unset',
+          cursor: props.cursor
         }}
         muted
       >
@@ -383,7 +388,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   isOwner ? (
                     <>
                       <Text color="brand.black" fontSize="xl" fontWeight="700" marginRight={8}>
-                        {token.sale.price} ꜩ
+                        {token.sale.price} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
                     </Text>
                       <Box marginRight={8}>
                         <CancelTokenSaleButton
@@ -395,7 +400,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   ) : (
                     <>
                       <Text color="black" fontSize={['md', 'md', 'lg']} mr={1} fontWeight="700" marginRight={8}>
-                        {token.sale.price.toFixed(2)} ꜩ
+                        {token.sale.price.toFixed(2)} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
                       </Text>
                       <Box>
                         <BuyTokenButton contract={contractAddress} token={token} />
