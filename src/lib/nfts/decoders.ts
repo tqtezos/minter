@@ -90,38 +90,31 @@ export const TokenMetadataBigMap = t.array(
 
 // FixedPriceSale BigMaps
 
-const FPSMapKeyBase = t.type({
+const FPSMapKeyInput = t.partial({
+  sale_seller: t.string,
+  seller: t.string
+});
+
+type FPSMapKeyOutput = t.TypeOf<typeof FPSMapKeyOutput>;
+const FPSMapKeyOutput = t.type({
   sale_token: t.type({
     token_for_sale_address: t.string,
     token_for_sale_token_id: t.string
-  })
+  }),
+  sale_seller: t.string
 });
 
-const FPSMapKeyAmbiguous = t.intersection([
-  FPSMapKeyBase,
-  t.partial({ sale_seller: t.string, seller: t.string })
-]);
-
-type FPSMapKeyConcrete = t.TypeOf<typeof FPSMapKeyConcrete>;
-const FPSMapKeyConcrete = t.intersection([
-  FPSMapKeyBase,
-  t.type({ sale_seller: t.string })
-]);
-
-const FixedPriceSaleBigMapKey = new t.Type<FPSMapKeyConcrete, unknown>(
+const FixedPriceSaleBigMapKey = new t.Type<FPSMapKeyOutput, unknown>(
   'FixedPriceSaleBigMapKey',
-  FPSMapKeyConcrete.is,
-  (u, c) => {
-    return pipe(
-      FPSMapKeyAmbiguous.validate(u, c),
+  FPSMapKeyOutput.is,
+  (input, context) =>
+    pipe(
+      FPSMapKeyInput.validate(input, context),
       e.chain(decoded => {
         const sale_seller = decoded.seller || decoded.sale_seller;
-        return sale_seller
-          ? t.success({ ...decoded, sale_seller })
-          : t.failure(u, c);
+        return FPSMapKeyOutput.validate({ ...decoded, sale_seller }, context);
       })
-    );
-  },
+    ),
   t.identity
 );
 
