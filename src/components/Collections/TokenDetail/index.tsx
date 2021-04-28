@@ -468,7 +468,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   <Flex mt={[4, 8]}>
                     <Text color="brand.neutralGray">Collection:</Text>
                     <Text color="brand.darkGray" fontWeight="bold" ml={[1]}  whiteSpace="nowrap" overflow="hidden">
-                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://tzkt.io/${contractAddress}`}>{contractAddress}</Link>
+                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://tzkt.io/${contractAddress}`}>{!!state.selectedCollection ? `${state.collections[state.selectedCollection]?.metadata.name} - ${contractAddress}` : `${contractAddress}`}</Link>
                     </Text>
                   </Flex>
                   {token.metadata?.attributes?.map(({ name, value }) => (
