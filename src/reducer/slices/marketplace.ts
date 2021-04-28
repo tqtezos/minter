@@ -5,7 +5,7 @@ import {
 } from '../async/queries';
 import { Nft } from '../../lib/nfts/decoders';
 import { MarketplaceNftLoadingData } from '../../lib/nfts/queries';
-import config from '../../config.json';
+import config from '../../config';
 
 //// State
 

@@ -1,6 +1,6 @@
 import { Minter, SystemWithToolkit, SystemWithWallet } from '../../lib/system';
 import { createSlice } from '@reduxjs/toolkit';
-import config from '../../config.json';
+import config from '../../config';
 import {
   connectWallet,
   disconnectWallet,

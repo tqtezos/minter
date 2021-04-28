@@ -26,6 +26,7 @@
     "immer": "8.0.0",
     "io-ts": "2.2.16",
     "joi": "17.3.0",
+    "lodash": "4.17.21",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-dropzone": "11.2.4",
@@ -51,7 +52,7 @@
     "ts-node": "9.1.1"
   },
   "scripts": {
-    "start": "yarn start:testnet",
+    "start": "react-scripts start",
     "start:testnet": "cp ./config/testnet.json src/config.json && react-scripts start",
     "start:sandbox": "cp ./config/sandbox-bootstrapped.json src/config.json && react-scripts start",
     "start:mainnet": "cp ./config/mainnet.json src/config.json && react-scripts start",

@@ -1,0 +1,24 @@
+{
+  "rpc": "https://rpctest.tzbeta.net",
+  "admin": {
+    "secret": "edsk2xHxaCtgpKpncPBXgLbZhAz17yp5qgwv6K88zMqqwsrui3UaRB"
+  },
+  "tzkt": {
+    "api": "https://staging.api.edo2net.tzkt.io"
+  },
+  "network": "edonet",
+  "bcd": {
+    "api": "https://api.better-call.dev",
+    "gui": "https://better-call.dev"
+  },
+  "contracts": {
+    "nftFaucet": "KT1NXuDT1xczTMNcLPj6ymqTAZhTEQARy3YL",
+    "marketplace": {
+      "fixedPrice": {
+        "tez": "KT1SgCbeuKsbUtQnndYSG9rdM9h8mRADxhSr"
+      }
+    }
+  },
+  "ipfsApi": "http://localhost:3300",
+  "ipfsGateway": "https://mypinata.cloud"
+}
