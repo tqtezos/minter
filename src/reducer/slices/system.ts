@@ -16,6 +16,7 @@ const slice = createSlice({
   initialState,
   reducers: {
     swapConfig(state, action) {
+      console.log(action.payload)
       return {
         ...state,
         config: (config as {

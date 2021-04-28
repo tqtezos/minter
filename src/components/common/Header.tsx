@@ -172,13 +172,13 @@ function WalletDisplay() {
             </Text>
                       <MenuItemOption
                         value={'mainnet'}
-                        onClick={ async () => { await dispatch(disconnectWallet()); swapConfig("mainnet"); dispatch(connectWallet()); }}
+                        onClick={ async () => { await dispatch(disconnectWallet()); dispatch(swapConfig("mainnet")); dispatch(connectWallet()); }}
                       >
                         mainnet
               </MenuItemOption>
                       <MenuItemOption
-                        value={'edo2net'}
-                        onClick={ async () => { await dispatch(disconnectWallet()); swapConfig("edo2net"); dispatch(connectWallet()); }}
+                        value={'testnet'}
+                        onClick={ async () => { await dispatch(disconnectWallet()); dispatch(swapConfig("testnet")); dispatch(connectWallet()); }}
                       >
                         edo2net
               </MenuItemOption>
