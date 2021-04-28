@@ -27,7 +27,7 @@ type Reducer<A> = CaseReducer<MarketplaceState, PayloadAction<A>>;
 
 // Data
 
-const globalMarketplaceAddress = config.contracts.marketplace.fixedPrice.tez;
+const globalMarketplaceAddress = config.mainnet.contracts.marketplace.fixedPrice.tez;
 
 export const initialState: MarketplaceState = {
   marketplace: {

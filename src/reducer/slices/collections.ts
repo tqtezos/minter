@@ -30,7 +30,7 @@ type Reducer<A> = CaseReducer<CollectionsState, PayloadAction<A>>;
 
 export const initialState: CollectionsState = {
   selectedCollection: null,
-  globalCollection: config.contracts.nftFaucet,
+  globalCollection: config.mainnet.contracts.nftFaucet,
   collections: {}
 };
 

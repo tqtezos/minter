@@ -8,9 +8,10 @@ import MarketplaceCatalog from '../Marketplace/Catalog';
 import Header from '../common/Header';
 import { Flex } from '@chakra-ui/react';
 import Notifications from '../common/Notifications';
-import { useSelector, useDispatch } from '../../reducer';
+import { useSelector, useDispatch, persistor, store } from '../../reducer';
 import { reconnectWallet } from '../../reducer/async/wallet';
-// import { getMarketplaceNftsQuery } from '../../reducer/async/queries';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/lib/integration/react';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -33,38 +34,42 @@ export default function App() {
   }, [walletReconnectAttempted, dispatch]);
 
   return (
-    <Flex pos="absolute" w="100%" h="100%">
-      <Flex justifyContent="space-between" width="100%" flexDir="column">
-        <Header />
-        <Switch>
-          <Route path="/">
-            <MarketplaceCatalog />
-          </Route>
-          <Route path="/create">
-            <CreateNonFungiblePage />
-          </Route>
-          <Route path="/collections">
-            <CollectionsCatalog />
-          </Route>
-          <Route path="/marketplace">
-            <MarketplaceCatalog />
-          </Route>
-          <Route path="/collection/:contractAddress">
-            {({ contractAddress }) => (
-              <CollectionDisplay address={contractAddress} ownedOnly={false} />
-            )}
-          </Route>
-          <Route path="/collection/:contractAddress/token/:tokenId">
-            {({ contractAddress, tokenId }) => (
-              <CollectionsTokenDetail
-                contractAddress={contractAddress}
-                tokenId={parseInt(tokenId)}
-              />
-            )}
-          </Route>
-        </Switch>
-        <Notifications />
-      </Flex>
-    </Flex>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <Flex pos="absolute" w="100%" h="100%">
+          <Flex justifyContent="space-between" width="100%" flexDir="column">
+            <Header />
+            <Switch>
+              <Route path="/">
+                <MarketplaceCatalog />
+              </Route>
+              <Route path="/create">
+                <CreateNonFungiblePage />
+              </Route>
+              <Route path="/collections">
+                <CollectionsCatalog />
+              </Route>
+              <Route path="/marketplace">
+                <MarketplaceCatalog />
+              </Route>
+              <Route path="/collection/:contractAddress">
+                {({ contractAddress }) => (
+                  <CollectionDisplay address={contractAddress} ownedOnly={false} />
+                )}
+              </Route>
+              <Route path="/collection/:contractAddress/token/:tokenId">
+                {({ contractAddress, tokenId }) => (
+                  <CollectionsTokenDetail
+                    contractAddress={contractAddress}
+                    tokenId={parseInt(tokenId)}
+                  />
+                )}
+              </Route>
+            </Switch>
+            <Notifications />
+          </Flex>
+        </Flex>
+      </PersistGate>
+    </Provider>
   );
 }

@@ -9,6 +9,17 @@ import systemSlice from './slices/system';
 import statusSlice from './slices/status';
 import notificationsSlice from './slices/notifications';
 import marketplaceSlice from './slices/marketplace';
+import storage from "redux-persist/lib/storage";
+import {
+  persistStore, persistReducer, createTransform,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER
+} from 'redux-persist';
+import JSOG from 'jsog';
 
 export const reducer = combineReducers({
   collections: collectionsSlice.reducer,
@@ -19,8 +30,22 @@ export const reducer = combineReducers({
   notifications: notificationsSlice.reducer
 });
 
+export const JSOGTransform = createTransform(
+    (inboundState, key) => JSOG.encode(inboundState),
+    (outboundState, key) => JSOG.decode(outboundState),
+)
+
+const persistConfig = {
+  key: "App",
+  version: 1,
+  storage,
+  transforms: [JSOGTransform]
+};
+
+const persistedReducer = persistReducer(persistConfig, reducer);
+
 export const store = configureStore({
-  reducer,
+  reducer: persistedReducer,
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       immutableCheck: {
@@ -31,11 +56,14 @@ export const store = configureStore({
         ignoredActions: [
           'wallet/connect/fulfilled',
           'wallet/reconnect/fulfilled',
-          'wallet/disconnect/fulfilled'
+          'wallet/disconnect/fulfilled',
+          FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER
         ]
       }
     })
 });
+
+export const persistor = persistStore(store);
 
 export type State = ReturnType<typeof reducer>;
 export type Dispatch = typeof store.dispatch;
@@ -47,3 +75,4 @@ export function useSelector<TSelect = unknown>(
 ) {
   return baseUseSelector<State, TSelect>(selector, equalityFn);
 }
+

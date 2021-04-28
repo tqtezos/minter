@@ -7,14 +7,24 @@ import {
   reconnectWallet
 } from '../async/wallet';
 
-const initialState = Minter.connectToolkit(Minter.configure(config)) as
+const initialState = Minter.connectToolkit(Minter.configure(config.mainnet)) as
   | SystemWithToolkit
   | SystemWithWallet;
 
 const slice = createSlice({
   name: 'system',
   initialState,
-  reducers: {},
+  reducers: {
+    swapConfig(state, action) {
+console.log(action.payload)
+      return {
+        ...state,
+        config: (config as {
+          [key: string]: any,
+        })[action.payload]
+      }
+    }
+  },
   extraReducers: ({ addCase }) => {
     addCase(connectWallet.fulfilled, (_, { payload }) => payload);
     addCase(disconnectWallet.fulfilled, (_, { payload }) => payload);
@@ -22,4 +32,5 @@ const slice = createSlice({
   }
 });
 
+export const swapConfig = slice.actions.swapConfig;
 export default slice;

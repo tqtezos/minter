@@ -15,13 +15,15 @@ import {
   DrawerContent,
   DrawerCloseButton,
   DrawerBody,
-  Heading
+  Heading,
+  MenuItemOption
 } from '@chakra-ui/react';
-import { Plus, Menu as HamburgerIcon } from 'react-feather';
+import { Plus, Menu as HamburgerIcon, ChevronDown } from 'react-feather';
 import { RiStore2Line } from 'react-icons/ri';
 import { MdCollections } from 'react-icons/md';
 import headerLogo from './assets/header-logo.svg';
 import { useSelector, useDispatch } from '../../reducer';
+import { swapConfig } from '../../reducer/slices/system';
 import { connectWallet, disconnectWallet } from '../../reducer/async/wallet';
 import { MinterButton } from '.';
 import logo from './assets/splash-logo.svg';
@@ -121,41 +123,72 @@ function WalletDisplay() {
   return (
     <>
       {system.status === 'WalletConnected' ? (
-        <Menu placement="bottom-end" offset={[4, 24]}>
-          <MenuButton
-            padding={2}
-            _hover={{
-              textDecoration: 'none',
-              background: '#2D3748',
-              color: '#EDF2F7'
-            }}
-          >
-            <Image
-              src={wallet_icon}
-              width={4}
-              height="auto"
-              style={{ filter: 'invert(1)' }}
-            />
-          </MenuButton>
-          <MenuList color="brand.black">
-            <Flex flexDir="column" px={4} py={2}>
-              <Text fontSize={16} fontWeight="600">
-                Network: {system.config.network}
-              </Text>
-              <WalletInfo tzPublicKey={system.tzPublicKey} />
-              <MinterButton
-                alignSelf="flex-start"
-                variant="cancelAction"
-                onClick={async () => {
-                  await dispatch(disconnectWallet());
-                  setLocation('/');
-                }}
-              >
-                Disconnect
+        <>
+          <Menu placement="bottom-end" offset={[4, 24]}>
+            <MenuButton
+              padding={2}
+              _hover={{
+                textDecoration: 'none',
+                background: '#2D3748',
+                color: '#EDF2F7'
+              }}
+            >
+              <Image
+                src={wallet_icon}
+                width={4}
+                height="auto"
+                style={{ filter: 'invert(1)' }}
+              />
+            </MenuButton>
+            <MenuList color="brand.black">
+              <Flex flexDir="column" px={4} py={2}>
+                <Text fontSize={16} fontWeight="600">
+                  Network: {system.config.network}
+                </Text>
+                <WalletInfo tzPublicKey={system.tzPublicKey} />
+                <Flex flexDir="row" justifyContent="space-between">
+                  <MinterButton
+                    alignSelf="flex-start"
+                    variant="cancelAction"
+                    onClick={async () => {
+                      await dispatch(disconnectWallet());
+                      setLocation('/');
+                    }}
+                  >
+                    Disconnect
               </MinterButton>
-            </Flex>
-          </MenuList>
-        </Menu>
+                  <Menu>
+                    <MenuButton border="1px solid #333" borderRadius="2px">
+                      <Flex align="center" color="brand.black" pr={4} pl={2}>
+                        <Box mr={2}>
+                          <ChevronDown size={18}/>
+                        </Box>
+                Networks
+              </Flex>
+                    </MenuButton>
+                    <MenuList>
+                      <Text ml={4} my={2} fontWeight="600">
+                        Networks
+            </Text>
+                      <MenuItemOption
+                        value={'mainnet'}
+                        onClick={ async () => { await dispatch(disconnectWallet()); swapConfig("mainnet"); dispatch(connectWallet()); }}
+                      >
+                        mainnet
+              </MenuItemOption>
+                      <MenuItemOption
+                        value={'edo2net'}
+                        onClick={ async () => { await dispatch(disconnectWallet()); swapConfig("edo2net"); dispatch(connectWallet()); }}
+                      >
+                        edo2net
+              </MenuItemOption>
+                    </MenuList>
+                  </Menu>
+                </Flex>
+              </Flex>
+            </MenuList>
+          </Menu>
+        </>
       ) : (
         <MinterButton
           variant="secondaryAction"
