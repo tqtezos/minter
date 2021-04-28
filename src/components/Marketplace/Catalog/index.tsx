@@ -11,19 +11,19 @@ import FeaturedToken from './FeaturedToken';
 import { VisibilityTrigger } from '../../common/VisibilityTrigger';
 
 export default function Catalog() {
-  const { system, marketplace: state } = useSelector(s => s);
+  const { system, marketplace } = useSelector(s => s);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getMarketplaceNftsQuery(state.marketplace.address));
-  }, [state.marketplace.address, dispatch]);
+    dispatch(getMarketplaceNftsQuery(system.config.contracts.marketplace.fixedPrice.tez));
+  }, [marketplace.marketplace.address, dispatch, system.config.contracts.marketplace.fixedPrice.tez]);
 
   const loadMore = () => {
     dispatch(loadMoreMarketplaceNftsQuery({}));
   };
 
   let tokens =
-    state.marketplace.tokens?.filter(x => x.token).map(x => x.token!) ?? [];
+    marketplace.marketplace.tokens?.filter(x => x.token).map(x => x.token!) ?? [];
 
   return (
     <Flex
@@ -36,7 +36,7 @@ export default function Catalog() {
       justify="start"
       flexDir="column"
     >
-      {state.marketplace.loaded && tokens.length > 0 ? (
+      {marketplace.marketplace.loaded && tokens.length > 0 ? (
         <Flex width="calc(100vw - 5rem)" justifyContent="center" alignItems="center">
           <FeaturedToken config={system.config} {...tokens[0]} />
         </Flex>
@@ -46,7 +46,7 @@ export default function Catalog() {
         w="100%"
         flexDir="column"
       >
-        {!state.marketplace.loaded ? (
+        {!marketplace.marketplace.loaded ? (
           <Flex flexDir="column" align="center" flex="1" pt={20}>
             <Spinner size="xl" mb={6} color="gray.300" />
             <Heading size="lg" textAlign="center" color="gray.500">
@@ -93,7 +93,7 @@ export default function Catalog() {
                   );
                 })}
                 <VisibilityTrigger
-                  key={state.marketplace.tokens?.length + ':' + tokens.length}
+                  key={marketplace.marketplace.tokens?.length + ':' + tokens.length}
                   onVisible={loadMore}
                   allowedDistanceToViewport={600}
                 />

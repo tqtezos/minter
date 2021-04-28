@@ -17,24 +17,20 @@ export default function Catalog() {
   const collections = useSelector(s => s.collections);
   const dispatch = useDispatch();
 
-  const globalCollection =
-    collections.collections[collections.globalCollection];
-
   useEffect(() => {
-    if (!globalCollection) {
-      dispatch(getNftAssetContractQuery(collections.globalCollection));
+    if (!collections.collections[system.config.contracts.nftFaucet]) {
+      dispatch(getNftAssetContractQuery(system.config.contracts.nftFaucet));
       return;
     }
     if (collections.selectedCollection === null) {
-      dispatch(selectCollection(collections.globalCollection));
+      dispatch(selectCollection(system.config.contracts.nftFaucet));
       return;
     }
-  }, [
-    globalCollection,
-    collections.selectedCollection,
-    collections.globalCollection,
-    dispatch
-  ]);
+  }, [collections.selectedCollection, dispatch, collections.collections, system.config.contracts.nftFaucet]);
+
+  useEffect(() => {
+    dispatch(selectCollection(system.config.contracts.nftFaucet))
+  }, [dispatch, system.config.contracts.nftFaucet])
 
   useEffect(() => {
     if (system.status === 'WalletConnected') {

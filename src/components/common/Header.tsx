@@ -161,7 +161,7 @@ function WalletDisplay() {
                     <MenuButton border="1px solid #333" borderRadius="2px">
                       <Flex align="center" color="brand.black" pr={4} pl={2}>
                         <Box mr={2}>
-                          <ChevronDown size={18}/>
+                          <ChevronDown size={18} />
                         </Box>
                 Networks
               </Flex>
@@ -172,15 +172,15 @@ function WalletDisplay() {
             </Text>
                       <MenuItemOption
                         value={'mainnet'}
-                        onClick={ async () => { await dispatch(disconnectWallet()); dispatch(swapConfig("mainnet")); dispatch(connectWallet()); }}
+                        onClick={async () => { await dispatch(disconnectWallet()); dispatch(swapConfig("mainnet")); await dispatch(connectWallet()); }}
                       >
                         mainnet
               </MenuItemOption>
                       <MenuItemOption
                         value={'testnet'}
-                        onClick={ async () => { await dispatch(disconnectWallet()); dispatch(swapConfig("testnet")); dispatch(connectWallet()); }}
+                        onClick={async () => { await dispatch(disconnectWallet()); dispatch(swapConfig("testnet")); await dispatch(connectWallet());}}
                       >
-                        edo2net
+                        edonet
               </MenuItemOption>
                     </MenuList>
                   </Menu>

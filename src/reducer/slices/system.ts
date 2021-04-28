@@ -16,12 +16,8 @@ const slice = createSlice({
   initialState,
   reducers: {
     swapConfig(state, action) {
-      console.log(action.payload)
       return {
-        ...state,
-        config: (config as {
-          [key: string]: any,
-        })[action.payload]
+        ...(Minter.connectToolkit(Minter.configure((config as any)[action.payload])) as SystemWithToolkit | SystemWithWallet)
       }
     }
   },
