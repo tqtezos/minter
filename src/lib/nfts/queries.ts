@@ -216,6 +216,16 @@ async function getTokenMetadata(
   return decoded.right;
 }
 
+function transformFixedPriceSales(fixedPriceSales: any): t.Mixed[] {
+  fixedPriceSales.forEach((fixedPriceSale: any, i: number) => {
+    if (fixedPriceSale.key.hasOwnProperty('seller')) {
+      fixedPriceSales[i].key['sale_seller'] = fixedPriceSale.key.seller;
+      delete fixedPriceSales[i].key.seller;
+    }
+  });
+  return fixedPriceSales;
+}
+
 async function getFixedPriceSales(
   tzkt: TzKt,
   address: string
@@ -230,7 +240,7 @@ async function getFixedPriceSales(
   if (isLeft(t.number.decode(fixedPriceBigMapId))) {
     throw Error('Failed to decode `getFixedPriceSales` bigMap ID');
   }
-  const fixedPriceSales = await tzkt.getBigMapKeys(fixedPriceBigMapId);
+  const fixedPriceSales = transformFixedPriceSales(await tzkt.getBigMapKeys(fixedPriceBigMapId));
   const decoded = FixedPriceSaleResponse.decode(fixedPriceSales);
   if (isLeft(decoded)) {
     throw Error('Failed to decode `getFixedPriceSales` response');
