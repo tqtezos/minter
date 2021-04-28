@@ -20,7 +20,7 @@ export const reducer = combineReducers({
 });
 
 export const store = configureStore({
-  reducer: reducer,
+  reducer,
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       immutableCheck: {
