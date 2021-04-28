@@ -6,7 +6,7 @@ import {
 import { Buffer } from 'buffer';
 import { SystemWithWallet } from '../system';
 import { uploadIPFSJSON } from '../util/ipfs';
-import { NftMetadata } from './queries';
+import { NftMetadata } from './decoders';
 
 function toHexString(input: string) {
   return Buffer.from(input).toString('hex');
@@ -129,7 +129,7 @@ export async function listTokenForSale(
 ) {
   const contractM = await system.toolkit.wallet.at(marketplaceContract);
   const contractT = await system.toolkit.wallet.at(tokenContract);
-  const batch = await system.toolkit.wallet
+  const batch = system.toolkit.wallet
     .batch([])
     .withContractCall(
       contractT.methods.update_operators([
@@ -156,7 +156,7 @@ export async function cancelTokenSale(
 ) {
   const contractM = await system.toolkit.wallet.at(marketplaceContract);
   const contractT = await system.toolkit.wallet.at(tokenContract);
-  const batch = await system.toolkit.wallet
+  const batch = system.toolkit.wallet
     .batch([])
     .withContractCall(
       contractM.methods.cancel(system.tzPublicKey, tokenContract, tokenId)

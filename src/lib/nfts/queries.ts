@@ -5,171 +5,9 @@ import _ from 'lodash';
 import { SystemWithToolkit, SystemWithWallet } from '../system';
 import { TzKt, Params } from '../service/tzkt';
 import { isLeft } from 'fp-ts/lib/Either';
-
-export const BigMapRow = <K extends t.Mixed, V extends t.Mixed>(props: {
-  key: K;
-  value: V;
-}) =>
-  t.type({
-    id: t.number,
-    active: t.boolean,
-    hash: t.string,
-    key: props.key,
-    value: props.value,
-    firstLevel: t.number,
-    lastLevel: t.number,
-    updates: t.number
-  });
-
-export const BigMapUpdateRow = <K extends t.Mixed, V extends t.Mixed>(props: {
-  key: K;
-  value: V;
-}) =>
-  t.type({
-    id: t.number,
-    level: t.number,
-    timestamp: t.string,
-    bigmap: t.number,
-    contract: t.intersection([
-      t.partial({ alias: t.string }),
-      t.type({ address: t.string })
-    ]),
-    path: t.string,
-    action: t.string,
-    content: t.type({ hash: t.string, key: props.key, value: props.value })
-  });
-
-export type AccountContractRow = t.TypeOf<typeof AccountContractRow>;
-export const AccountContractRow = t.type({
-  kind: t.string,
-  address: t.string,
-  balance: t.number,
-  creationLevel: t.number,
-  creationTime: t.string
-});
-
-export type AssetMetadataResponse = t.TypeOf<typeof AssetMetadataResponse>;
-export const AssetMetadataResponse = t.array(
-  BigMapRow({ key: t.string, value: t.string })
-);
-
-export type LedgerResponse = t.TypeOf<typeof LedgerResponse>;
-export const LedgerResponse = t.array(
-  BigMapRow({ key: t.string, value: t.string })
-);
-
-export type TokenMetadataResponse = t.TypeOf<typeof TokenMetadataResponse>;
-export const TokenMetadataResponse = t.array(
-  BigMapRow({
-    key: t.string,
-    value: t.type({
-      token_id: t.string,
-      token_info: t.type({
-        '': t.string
-      })
-    })
-  })
-);
-
-export type FixedPriceSaleResponse = t.TypeOf<typeof FixedPriceSaleResponse>;
-const FixedPriceSaleResponse = t.array(
-  BigMapRow({
-    key: t.type({
-      sale_token: t.type({
-        token_for_sale_address: t.string,
-        token_for_sale_token_id: t.string
-      }),
-      sale_seller: t.string
-    }),
-    value: t.string
-  })
-);
-
-//
-
-export type NftMetadataFormatDimensions = t.TypeOf<
-  typeof NftMetadataFormatDimensions
->;
-export const NftMetadataFormatDimensions = t.partial({
-  value: t.string,
-  unit: t.string
-});
-
-export type NtfMetadataFormatDataRate = t.TypeOf<
-  typeof NtfMetadataFormatDataRate
->;
-export const NtfMetadataFormatDataRate = t.partial({
-  value: t.number,
-  unit: t.string
-});
-
-export type NftMetadataFormat = t.TypeOf<typeof NftMetadataFormat>;
-export const NftMetadataFormat = t.partial({
-  uri: t.string,
-  hash: t.string,
-  mimeType: t.string,
-  fileSize: t.number,
-  fileName: t.string,
-  duration: t.string,
-  dimensions: NftMetadataFormatDimensions,
-  dataRate: NtfMetadataFormatDataRate
-});
-
-export type NftMetadataAttribute = t.TypeOf<typeof NftMetadataAttribute>;
-export const NftMetadataAttribute = t.intersection([
-  t.type({ name: t.string, value: t.string }),
-  t.partial({ type: t.string })
-]);
-
-export type NftMetadata = t.TypeOf<typeof NftMetadata>;
-export const NftMetadata = t.partial({
-  '': t.string,
-  name: t.string,
-  minter: t.string,
-  symbol: t.string,
-  decimals: t.number,
-  rightUri: t.string,
-  artifactUri: t.string,
-  displayUri: t.string,
-  thumbnailUri: t.string,
-  externalUri: t.string,
-  description: t.string,
-  creators: t.array(t.string),
-  contributors: t.array(t.string),
-  publishers: t.array(t.string),
-  date: t.string,
-  blocklevel: t.number,
-  type: t.string,
-  tags: t.array(t.string),
-  genres: t.array(t.string),
-  language: t.string,
-  identifier: t.string,
-  rights: t.string,
-  isTransferable: t.boolean,
-  isBooleanAmount: t.boolean,
-  shouldPreferSymbol: t.boolean,
-  formats: t.array(NftMetadataFormat),
-  attributes: t.array(NftMetadataAttribute)
-});
-
-interface NftSale {
-  id: number;
-  seller: string;
-  price: number;
-  mutez: number;
-  type: string;
-}
-
-export interface Nft {
-  id: number;
-  title: string;
-  owner: string;
-  description: string;
-  artifactUri: string;
-  metadata: NftMetadata;
-  sale?: NftSale;
-  address?: string;
-}
+import { compact } from 'fp-ts/lib/Array';
+import { getRight } from 'fp-ts/lib/Option';
+import * as D from './decoders';
 
 function fromHexString(input: string) {
   if (/^([A-Fa-f0-9]{2})*$/.test(input)) {
@@ -180,36 +18,39 @@ function fromHexString(input: string) {
 
 //// Data retrieval and decoding functions
 
-async function getAssetMetadata(
+async function getAssetMetadataBigMap(
   tzkt: TzKt,
   address: string
-): Promise<AssetMetadataResponse> {
+): Promise<D.AssetMetadataBigMap> {
   const path = 'metadata';
   const data = await tzkt.getContractBigMapKeys(address, path);
-  const decoded = LedgerResponse.decode(data);
+  const decoded = D.LedgerBigMap.decode(data);
   if (isLeft(decoded)) {
     throw Error('Failed to decode `getAssetMetadata` response');
   }
   return decoded.right;
 }
 
-async function getLedger(tzkt: TzKt, address: string): Promise<LedgerResponse> {
+async function getLedgerBigMap(
+  tzkt: TzKt,
+  address: string
+): Promise<D.LedgerBigMap> {
   const path = 'assets.ledger';
   const data = await tzkt.getContractBigMapKeys(address, path);
-  const decoded = LedgerResponse.decode(data);
+  const decoded = D.LedgerBigMap.decode(data);
   if (isLeft(decoded)) {
     throw Error('Failed to decode `getLedger` response');
   }
   return decoded.right;
 }
 
-async function getTokenMetadata(
+async function getTokenMetadataBigMap(
   tzkt: TzKt,
   address: string
-): Promise<TokenMetadataResponse> {
+): Promise<D.TokenMetadataBigMap> {
   const path = 'assets.token_metadata';
   const data = await tzkt.getContractBigMapKeys(address, path);
-  const decoded = TokenMetadataResponse.decode(data);
+  const decoded = D.TokenMetadataBigMap.decode(data);
   if (isLeft(decoded)) {
     throw Error('Failed to decode `getTokenMetadata` response');
   }
@@ -226,12 +67,12 @@ function transformFixedPriceSales(fixedPriceSales: any): t.Mixed[] {
   return fixedPriceSales;
 }
 
-async function getFixedPriceSales(
+async function getFixedPriceSalesBigMap(
   tzkt: TzKt,
   address: string
-): Promise<FixedPriceSaleResponse> {
+): Promise<D.FixedPriceSaleBigMap> {
   let fixedPriceBigMapId;
-  const fixedPriceStorage = await tzkt.getContractStorage(address);
+  const fixedPriceBigMapId = await tzkt.getContractStorage(address);
   if (fixedPriceStorage.hasOwnProperty('sales')) {
     fixedPriceBigMapId = fixedPriceStorage.sales;
   } else {
@@ -241,7 +82,7 @@ async function getFixedPriceSales(
     throw Error('Failed to decode `getFixedPriceSales` bigMap ID');
   }
   const fixedPriceSales = transformFixedPriceSales(await tzkt.getBigMapKeys(fixedPriceBigMapId));
-  const decoded = FixedPriceSaleResponse.decode(fixedPriceSales);
+  const decoded = D.FixedPriceSaleBigMap.decode(fixedPriceSales);
   if (isLeft(decoded)) {
     throw Error('Failed to decode `getFixedPriceSales` response');
   }
@@ -251,10 +92,10 @@ async function getFixedPriceSales(
 async function getBigMapUpdates<K extends t.Mixed, V extends t.Mixed>(
   tzkt: TzKt,
   params: Params,
-  props: { key: K; value: V }
+  content: { key: K; value: V }
 ) {
   const bigMapUpdates = await tzkt.getBigMapUpdates(params);
-  const decoder = t.array(BigMapUpdateRow(props));
+  const decoder = t.array(D.BigMapUpdateRow(content));
   const decoded = decoder.decode(bigMapUpdates);
   if (isLeft(decoded)) {
     throw Error('Failed to decode `getBigMapUpdates` response');
@@ -262,16 +103,30 @@ async function getBigMapUpdates<K extends t.Mixed, V extends t.Mixed>(
   return decoded.right;
 }
 
-async function getAccountContracts(
+async function getContracts<S extends t.Mixed>(
+  tzkt: TzKt,
+  params: Params,
+  storage: S
+) {
+  const contracts = await tzkt.getContracts(params);
+  const contractsArray = t.array(t.unknown).decode(contracts);
+  if (isLeft(contractsArray)) {
+    throw Error('Failed to decode `getContracts` response');
+  }
+  const decodedArray = contractsArray.right.map(D.ContractRow(storage).decode);
+  return compact(decodedArray.map(getRight));
+}
+
+async function getContract<S extends t.Mixed>(
   tzkt: TzKt,
   address: string,
-  params?: Params
+  params: Params,
+  storage: S
 ) {
-  const accountContracts = await tzkt.getAccountContracts(address, params);
-  const decoder = t.array(AccountContractRow);
-  const decoded = decoder.decode(accountContracts);
+  const contract = await tzkt.getContract(address, params);
+  const decoded = D.ContractRow(storage).decode(contract);
   if (isLeft(decoded)) {
-    throw Error('Failed to decode `getAccountContracts` response');
+    throw Error('Failed to decode `getContracts` response');
   }
   return decoded.right;
 }
@@ -281,21 +136,24 @@ async function getAccountContracts(
 export async function getContractNfts(
   system: SystemWithToolkit | SystemWithWallet,
   address: string
-): Promise<Nft[]> {
-  const ledger = await getLedger(system.tzkt, address);
-  const tokens = await getTokenMetadata(system.tzkt, address);
+): Promise<D.Nft[]> {
+  const ledger = await getLedgerBigMap(system.tzkt, address);
+  const tokens = await getTokenMetadataBigMap(system.tzkt, address);
   const mktAddress = system.config.contracts.marketplace.fixedPrice.tez;
-  const tokenSales = await getFixedPriceSales(system.tzkt, mktAddress);
+  const tokenSales = await getFixedPriceSalesBigMap(system.tzkt, mktAddress);
   const activeSales = tokenSales.filter(sale => sale.active);
 
   return Promise.all(
     tokens.map(
-      async (token): Promise<Nft> => {
+      async (token): Promise<D.Nft> => {
         const { token_id: tokenId, token_info: tokenInfo } = token.value;
 
         // TODO: Write decoder function for data retrieval
         const decodedInfo = _.mapValues(tokenInfo, fromHexString) as any;
-        const resolvedInfo = await system.resolveMetadata(decodedInfo['']);
+        const resolvedInfo = await system.resolveMetadata(
+          decodedInfo[''],
+          address
+        );
         const metadata = { ...decodedInfo, ...resolvedInfo.metadata };
 
         const saleData = activeSales.find(
@@ -326,45 +184,52 @@ export async function getContractNfts(
   );
 }
 
-export interface AssetContract {
-  address: string;
-  metadata: Record<string, any>;
-}
-
-const AssetMetadata = t.type({
-  name: t.string
-});
-
 export async function getNftAssetContract(
   system: SystemWithToolkit | SystemWithWallet,
   address: string
-): Promise<AssetContract> {
-  const metaBigMap = await getAssetMetadata(system.tzkt, address);
+): Promise<D.AssetContract> {
+  const contract = await getContract(system.tzkt, address, {}, t.unknown);
+  const metaBigMap = await getAssetMetadataBigMap(system.tzkt, address);
   const metaUri = metaBigMap.find(v => v.key === '')?.value;
   if (!metaUri) {
     throw Error(`Could not extract metadata URI from ${address} storage`);
   }
-  const { metadata } = await system.resolveMetadata(fromHexString(metaUri));
 
-  const decoded = AssetMetadata.decode(metadata);
+  const { metadata } = await system.resolveMetadata(
+    fromHexString(metaUri),
+    address
+  );
+  const decoded = D.AssetContractMetadata.decode(metadata);
+
   if (isLeft(decoded)) {
     throw Error('Metadata validation failed');
   }
-  return { address, metadata };
+  return { ...contract, metadata: decoded.right };
 }
 
-export async function getWalletNftAssetContracts(system: SystemWithWallet) {
-  const response = await getAccountContracts(system.tzkt, system.tzPublicKey);
-  const addresses = response
-    .filter(c => c.kind === 'asset')
-    .map(c => c.address);
-  const results: AssetContract[] = [];
+export async function getWalletNftAssetContracts(
+  system: SystemWithWallet
+): Promise<D.AssetContract[]> {
+  const contracts = await getContracts(
+    system.tzkt,
+    {
+      creator: system.tzPublicKey,
+      includeStorage: 'true'
+    },
+    t.unknown
+  );
+
+  const addresses = _.uniq(
+    contracts
+      .filter(c => c.kind === 'asset' && c.tzips?.includes('fa2'))
+      .map(c => c.address)
+  );
+
+  const results: D.AssetContract[] = [];
 
   if (addresses.length === 0) {
     return results;
   }
-
-  const uniqueAddresses = Array.from(new Set(addresses));
 
   const assetBigMapRows = (
     await getBigMapUpdates(
@@ -372,7 +237,7 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
       {
         path: 'metadata',
         action: 'add_key',
-        'contract.in': uniqueAddresses.join(','),
+        'contract.in': addresses.join(','),
         limit: '10000'
       },
       {
@@ -383,10 +248,20 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
   ).filter(v => v.content.key === '');
 
   for (const row of assetBigMapRows) {
+    const contract = contracts.find(c => c.address === row.contract.address);
+    if (!contract) {
+      continue;
+    }
     try {
       const metaUri = row.content.value;
-      const { metadata } = await system.resolveMetadata(fromHexString(metaUri));
-      results.push({ address: row.contract.address, metadata });
+      const { metadata } = await system.resolveMetadata(
+        fromHexString(metaUri),
+        contract.address
+      );
+      const decoded = D.AssetContractMetadata.decode(metadata);
+      if (!isLeft(decoded)) {
+        results.push({ ...contract, metadata: decoded.right });
+      }
     } catch (e) {
       console.log(e);
     }
@@ -395,14 +270,22 @@ export async function getWalletNftAssetContracts(system: SystemWithWallet) {
   return results;
 }
 
+export type MarketplaceNftLoadingData = {
+  loaded: boolean;
+  error?: string;
+  token: null | D.Nft;
+  tokenSale: D.FixedPriceSaleBigMap[number];
+  tokenMetadata: undefined | string;
+};
+
 export async function getMarketplaceNfts(
   system: SystemWithToolkit | SystemWithWallet,
   address: string
 ): Promise<MarketplaceNftLoadingData[]> {
-  const tokenSales = await getFixedPriceSales(system.tzkt, address);
+  const tokenSales = await getFixedPriceSalesBigMap(system.tzkt, address);
   const activeSales = tokenSales.filter(v => v.active);
-  const addresses = activeSales.map(
-    s => s.key.sale_token.token_for_sale_address
+  const addresses = _.uniq(
+    activeSales.map(s => s.key.sale_token.token_for_sale_address)
   );
 
   const uniqueAddresses = Array.from(new Set(addresses));
@@ -416,7 +299,7 @@ export async function getMarketplaceNfts(
     {
       path: 'assets.token_metadata',
       action: 'add_key',
-      'contract.in': uniqueAddresses.join(','),
+      'contract.in': addresses.join(','),
       limit: '10000'
     },
     {
@@ -450,13 +333,6 @@ export async function getMarketplaceNfts(
   return salesWithTokenMetadata;
 }
 
-export type MarketplaceNftLoadingData = {
-  loaded: boolean;
-  error?: string;
-  token: null | Nft;
-  tokenSale: FixedPriceSaleResponse[number];
-  tokenMetadata: undefined | string;
-};
 export const loadMarketplaceNft = async (
   system: SystemWithToolkit | SystemWithWallet,
   tokenLoadData: MarketplaceNftLoadingData
@@ -485,14 +361,6 @@ export const loadMarketplaceNft = async (
       type: 'fixedPrice'
     };
 
-    // // TESTING: Simulate error
-    // if( Math.random() < 0.25){
-    //   result.error = "SIMULATED Random Network Error";
-    //   console.error("SIMULATED Random Network Error", {tokenSale});
-    //   // throw new Error("SIMULATED Random Network Error");
-    //   return result;
-    // }
-
     if (!tokenMetadata) {
       result.error = "Couldn't retrieve tokenMetadata";
       console.error("Couldn't retrieve tokenMetadata", { tokenSale });
@@ -500,7 +368,8 @@ export const loadMarketplaceNft = async (
     }
 
     const { metadata } = (await system.resolveMetadata(
-      fromHexString(tokenMetadata)
+      fromHexString(tokenMetadata),
+      saleAddress
     )) as any;
 
     result.token = {

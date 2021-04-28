@@ -26,6 +26,7 @@ export function FilePreview({ file }: { file: SelectedFile }) {
       <>
         <video
           controls
+          muted
           onLoadedData={e => {
             const canvas = canvasRef.current;
             if (!canvas) {

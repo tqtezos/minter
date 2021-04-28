@@ -3,7 +3,8 @@ import {
   getMarketplaceNftsQuery,
   loadMoreMarketplaceNftsQuery
 } from '../async/queries';
-import { Nft, MarketplaceNftLoadingData } from '../../lib/nfts/queries';
+import { Nft } from '../../lib/nfts/decoders';
+import { MarketplaceNftLoadingData } from '../../lib/nfts/queries';
 import config from '../../config.json';
 
 //// State
