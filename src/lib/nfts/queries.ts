@@ -397,6 +397,10 @@ export async function getMarketplaceNfts(
 
   const uniqueAddresses = Array.from(new Set(addresses));
 
+  if (uniqueAddresses.length === 0) {
+    return [];
+  }
+
   const tokenBigMapRows = await getBigMapUpdates(
     system.tzkt,
     {
