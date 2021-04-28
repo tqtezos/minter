@@ -7,6 +7,7 @@ import { Token } from '../../reducer/slices/collections';
 interface TokenMediaProps extends Token {
   config: IpfsGatewayConfig;
   maxW?: string;
+  maxH?: string;
   class?: string;
 }
 
@@ -58,6 +59,7 @@ export function TokenMedia(props: TokenMediaProps) {
         objectFit="scale-down"
         flex="1"
         maxWidth={props.maxW}
+        maxHeight={props.maxH}
         style={{ objectFit: 'scale-down' }}
         onError={() => setErrored(true)}
       />
