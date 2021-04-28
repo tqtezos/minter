@@ -32,7 +32,7 @@ export default function CollectionsDropdown() {
               <ChevronDown />
             </Box>
             {state.selectedCollection
-              ? state.collections[state.selectedCollection].metadata.name
+              ? state.collections[state.selectedCollection]?.metadata.name
               : '-'}
           </Flex>
         </MenuButton>
@@ -52,7 +52,7 @@ export default function CollectionsDropdown() {
                 dispatch(selectCollection(state.globalCollection))
               }
             >
-              {state.collections[state.globalCollection].metadata.name}
+              {state.collections[state.globalCollection]?.metadata.name}
             </MenuItemOption>
             <Text ml={4} my={2} fontWeight="600">
               Your Collections
@@ -66,7 +66,7 @@ export default function CollectionsDropdown() {
                   selected={address === state.selectedCollection}
                   onClick={() => dispatch(selectCollection(address))}
                 >
-                  {state.collections[address].metadata.name}
+                  {state.collections[address]?.metadata.name}
                 </MenuItemOption>
               ))}
           </MenuOptionGroup>

@@ -28,6 +28,7 @@ import { connectWallet, disconnectWallet } from '../../reducer/async/wallet';
 import { MinterButton } from '.';
 import logo from './assets/splash-logo.svg';
 import wallet_icon from './assets/wallet.svg';
+import { selectCollection } from '../../reducer/slices/collections';
 
 interface MobileHeaderLinkProps {
   to: string;
@@ -172,13 +173,13 @@ function WalletDisplay() {
             </Text>
                       <MenuItemOption
                         value={'mainnet'}
-                        onClick={async () => { await dispatch(disconnectWallet()); dispatch(swapConfig("mainnet")); await dispatch(connectWallet()); }}
+                        onClick={async () => { await dispatch(disconnectWallet()); dispatch(swapConfig("mainnet")); await dispatch(connectWallet()); await dispatch(selectCollection(system.config.contracts.nftFaucet)) }}
                       >
                         mainnet
               </MenuItemOption>
                       <MenuItemOption
                         value={'testnet'}
-                        onClick={async () => { await dispatch(disconnectWallet()); dispatch(swapConfig("testnet")); await dispatch(connectWallet());}}
+                        onClick={async () => { await dispatch(disconnectWallet()); dispatch(swapConfig("testnet")); await dispatch(connectWallet()); await dispatch(selectCollection(system.config.contracts.nftFaucet))}}
                       >
                         edonet
               </MenuItemOption>

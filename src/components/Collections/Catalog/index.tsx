@@ -29,10 +29,6 @@ export default function Catalog() {
   }, [collections.selectedCollection, dispatch, collections.collections, system.config.contracts.nftFaucet]);
 
   useEffect(() => {
-    dispatch(selectCollection(system.config.contracts.nftFaucet))
-  }, [dispatch, system.config.contracts.nftFaucet])
-
-  useEffect(() => {
     if (system.status === 'WalletConnected') {
       dispatch(getWalletAssetContractsQuery());
     }
