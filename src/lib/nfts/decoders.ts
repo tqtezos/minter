@@ -1,5 +1,7 @@
 /* eslint-disable no-redeclare */
 import * as t from 'io-ts';
+import * as e from 'fp-ts/Either';
+import { pipe } from 'fp-ts/function';
 
 // Contracts
 
@@ -88,16 +90,45 @@ export const TokenMetadataBigMap = t.array(
 
 // FixedPriceSale BigMaps
 
+const FPSMapKeyBase = t.type({
+  sale_token: t.type({
+    token_for_sale_address: t.string,
+    token_for_sale_token_id: t.string
+  })
+});
+
+const FPSMapKeyAmbiguous = t.intersection([
+  FPSMapKeyBase,
+  t.partial({ sale_seller: t.string, seller: t.string })
+]);
+
+type FPSMapKeyConcrete = t.TypeOf<typeof FPSMapKeyConcrete>;
+const FPSMapKeyConcrete = t.intersection([
+  FPSMapKeyBase,
+  t.type({ sale_seller: t.string })
+]);
+
+const FixedPriceSaleBigMapKey = new t.Type<FPSMapKeyConcrete, unknown>(
+  'FixedPriceSaleBigMapKey',
+  FPSMapKeyConcrete.is,
+  (u, c) => {
+    return pipe(
+      FPSMapKeyAmbiguous.validate(u, c),
+      e.chain(decoded => {
+        const sale_seller = decoded.seller || decoded.sale_seller;
+        return sale_seller
+          ? t.success({ ...decoded, sale_seller })
+          : t.failure(u, c);
+      })
+    );
+  },
+  t.identity
+);
+
 export type FixedPriceSaleBigMap = t.TypeOf<typeof FixedPriceSaleBigMap>;
 export const FixedPriceSaleBigMap = t.array(
   BigMapRow({
-    key: t.type({
-      sale_token: t.type({
-        token_for_sale_address: t.string,
-        token_for_sale_token_id: t.string
-      }),
-      sale_seller: t.string
-    }),
+    key: FixedPriceSaleBigMapKey,
     value: t.string
   })
 );
