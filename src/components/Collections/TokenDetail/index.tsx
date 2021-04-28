@@ -99,7 +99,9 @@ function TokenImage(props: {
   maxHeight?: string;
   height?: string;
   objectFit?: ResponsiveValue<any>;
-  onLoad?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
+  cursor?: string;
+  onClick?: (event: React.SyntheticEvent<HTMLImageElement | HTMLVideoElement, Event>) => void;
+  onLoad?: (event: React.SyntheticEvent<HTMLImageElement | HTMLVideoElement, Event>) => void;
   onFetch?: (type: string) => void;
 }) {
   const [errored, setErrored] = useState(false);
@@ -136,6 +138,8 @@ function TokenImage(props: {
         width={props.width}
         maxWidth={props.maxWidth}
         maxHeight={props.maxHeight ?? 'unset'}
+        cursor={props.cursor}
+        onClick={props.onClick}
         onError={() => setErrored(true)}
         onLoad={props.onLoad}
       />
@@ -151,9 +155,11 @@ function TokenImage(props: {
           height: props.height || '100%',
           width: props.width,
           maxWidth: props.maxWidth ?? 'unset',
-          maxHeight: props.maxHeight ?? 'unset'
+          maxHeight: props.maxHeight ?? 'unset',
+          cursor: props.cursor
         }}
         muted
+        onClick={props.onClick}
       >
         <source src={obj.url} type={obj.type} />
       </video>
@@ -349,6 +355,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           height="auto"
           width="auto"
           maxHeight="45vh"
+          cursor="pointer"
+          onClick={onOpen}
         />
       </Box>
       <Flex width="99vw" height={10} justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
