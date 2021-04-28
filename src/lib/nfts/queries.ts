@@ -72,7 +72,7 @@ async function getFixedPriceSalesBigMap(
   address: string
 ): Promise<D.FixedPriceSaleBigMap> {
   let fixedPriceBigMapId;
-  const fixedPriceBigMapId = await tzkt.getContractStorage(address);
+  const fixedPriceStorage = await tzkt.getContractStorage(address);
   if (fixedPriceStorage.hasOwnProperty('sales')) {
     fixedPriceBigMapId = fixedPriceStorage.sales;
   } else {
