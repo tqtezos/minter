@@ -160,6 +160,7 @@ function TokenImage(props: {
           cursor: props.cursor
         }}
         muted
+        onClick={props.onClick}
       >
         <source src={obj.url} type={obj.type} />
       </video>
@@ -355,6 +356,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           height="auto"
           width="auto"
           maxHeight="45vh"
+          cursor="pointer"
+          onClick={onOpen}
         />
       </Box>
       <Flex width="99vw" height={10} justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
