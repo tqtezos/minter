@@ -37,9 +37,10 @@ import {
   getContractNftsQuery,
   getNftAssetContractQuery
 } from '../../../reducer/async/queries';
-import { NftMetadata } from '../../../lib/nfts/decoders';
-
+import lk from '../../common/assets/link-icon.svg'
+import tz from '../../common/assets/tezos-sym.svg'
 import { Maximize2 } from 'react-feather';
+import { NftMetadata } from '../../../lib/nfts/decoders';
 
 function NotFound() {
   return (
@@ -99,7 +100,9 @@ function TokenImage(props: {
   maxHeight?: string;
   height?: string;
   objectFit?: ResponsiveValue<any>;
-  onLoad?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
+  cursor?: string;
+  onClick?: (event: React.SyntheticEvent<HTMLImageElement | HTMLVideoElement, Event>) => void;
+  onLoad?: (event: React.SyntheticEvent<HTMLImageElement | HTMLVideoElement, Event>) => void;
   onFetch?: (type: string) => void;
 }) {
   const [errored, setErrored] = useState(false);
@@ -136,6 +139,8 @@ function TokenImage(props: {
         width={props.width}
         maxWidth={props.maxWidth}
         maxHeight={props.maxHeight ?? 'unset'}
+        cursor={props.cursor}
+        onClick={props.onClick}
         onError={() => setErrored(true)}
         onLoad={props.onLoad}
       />
@@ -151,9 +156,11 @@ function TokenImage(props: {
           height: props.height || '100%',
           width: props.width,
           maxWidth: props.maxWidth ?? 'unset',
-          maxHeight: props.maxHeight ?? 'unset'
+          maxHeight: props.maxHeight ?? 'unset',
+          cursor: props.cursor
         }}
         muted
+        onClick={props.onClick}
       >
         <source src={obj.url} type={obj.type} />
       </video>
@@ -348,7 +355,10 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           metadata={token.metadata}
           height="auto"
           width="auto"
+          maxWidth="100%"
           maxHeight="45vh"
+          cursor="pointer"
+          onClick={onOpen}
         />
       </Box>
       <Flex width="99vw" height={10} justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
@@ -383,7 +393,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   isOwner ? (
                     <>
                       <Text color="brand.black" fontSize="xl" fontWeight="700" marginRight={8}>
-                        {token.sale.price} ꜩ
+                        {token.sale.price} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
                     </Text>
                       <Box marginRight={8}>
                         <CancelTokenSaleButton
@@ -395,7 +405,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   ) : (
                     <>
                       <Text color="black" fontSize={['md', 'md', 'lg']} mr={1} fontWeight="700" marginRight={8}>
-                        {token.sale.price.toFixed(2)} ꜩ
+                        {token.sale.price.toFixed(2)} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
                       </Text>
                       <Box>
                         <BuyTokenButton contract={contractAddress} token={token} />
@@ -459,16 +469,16 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   <AccordionIcon />
                 </AccordionButton>
                 <AccordionPanel pb={4}>
-                  <Flex mt={[4, 8]}>
+                <Flex mt={[4, 8]}>
                     <Text color="brand.neutralGray">Minter:</Text>
                     <Text color="brand.darkGray" fontWeight="bold" ml={[1]}  whiteSpace="nowrap" overflow="hidden">
-                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://tzkt.io/${token.owner}`}>{token.owner}</Link>
+                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://tzkt.io/${token.owner}`}>{token.owner}&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{display: 'inline-block'}} /></sup></Link>
                     </Text>
                   </Flex>
                   <Flex mt={[4, 8]}>
                     <Text color="brand.neutralGray">Collection:</Text>
                     <Text color="brand.darkGray" fontWeight="bold" ml={[1]}  whiteSpace="nowrap" overflow="hidden">
-                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://tzkt.io/${contractAddress}`}>{contractAddress}</Link>
+                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://tzkt.io/${contractAddress}`}>{contractAddress}&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{display: 'inline-block'}} /></sup></Link>
                     </Text>
                   </Flex>
                   {token.metadata?.attributes?.map(({ name, value }) => (
