@@ -29,6 +29,7 @@
     "framer-motion": "3.1.4",
     "immer": "8.0.0",
     "io-ts": "2.2.16",
+    "io-ts-types": "0.5.16",
     "joi": "17.3.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
