@@ -348,6 +348,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           metadata={token.metadata}
           height="auto"
           width="auto"
+          maxWidth="100%"
           maxHeight="45vh"
         />
       </Box>
