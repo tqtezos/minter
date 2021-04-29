@@ -21,6 +21,7 @@ import { connectWallet } from './wallet';
 import { NftMetadata } from '../../lib/nfts/decoders';
 import { SystemWithToolkit, SystemWithWallet } from '../../lib/system';
 import { notifyPending, notifyFulfilled } from '../slices/notificationsActions';
+import { encodeImageToBlurhash } from '../../components/common/bh-helper';
 
 type Options = {
   state: State;
@@ -181,6 +182,7 @@ export const mintTokenAction = createAsyncThunk<
             mimeType: imageResponse.headers['content-type']
           }
         ];
+        ipfsMetadata.attributes?.push({name: "blurhash", value: await encodeImageToBlurhash(state.selectedFile.objectUrl)})
       } else if (/^video\/.*/.test(file.type)) {
         if (state.displayImageFile === null) {
           return rejectWithValue({
