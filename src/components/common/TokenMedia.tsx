@@ -72,11 +72,12 @@ export function TokenMedia(props: TokenMediaProps) {
   if (/^video\/.*/.test(obj.type)) {
     return (
       <video
-        loop
+      preload="metadata"
         onClick={e => e.preventDefault()}
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
         style={{ objectFit: props.objectFit ?? 'cover', maxWidth: props.maxW }}
+        onLoadedMetadata={e => {(e.target as HTMLVideoElement).currentTime = .05; }}
         muted
       >
         <source src={obj.url} type={obj.type} />
