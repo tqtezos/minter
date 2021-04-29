@@ -33,15 +33,4 @@ export const decodeBlurhashToDataURL = async (hash: string) => {
     imageData.data.set(pixels);
     ctx.putImageData(imageData, 0, 0);
     return canvas.toDataURL();
-
-    // const canvas = document.createElement("canvas");
-    // const ctx = canvas.getContext("2d");
-    // const imageData = ctx.createImageData(width, height);
-    // imageData.data.set(pixels);
-    // canvas.toBlob((blob) => {
-    //     const url = URL.createObjectURL([blob]);
-    // });
-    // const ctx = URL.createObjectURL([canvas.toBlob()]);
-    // const imageData = ctx.createImageData(width, height);
-    // imageData.to
 }
