@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { MouseEventHandler, useEffect, useState } from 'react';
 import { Flex, Image } from '@chakra-ui/react';
 import { FiHelpCircle } from 'react-icons/fi';
 import { IpfsGatewayConfig, ipfsUriToGatewayUrl } from '../../lib/util/ipfs';
@@ -9,6 +9,9 @@ interface TokenMediaProps extends Token {
   maxW?: string;
   maxH?: string;
   class?: string;
+  cursor?: string;
+  objectFit?: any; //ObjectFitProperty | undefined; Todo ObjectFitProperty not found
+  onClick?: Function;
 }
 
 function MediaNotFound() {
@@ -56,11 +59,11 @@ export function TokenMedia(props: TokenMediaProps) {
     return (
       <Image
         src={src}
-        objectFit="scale-down"
         flex="1"
         maxWidth={props.maxW}
         maxHeight={props.maxH}
-        style={{ objectFit: 'scale-down' }}
+        style={{ objectFit: props.objectFit ?? 'cover', cursor: props.cursor }}
+        onClick={props.onClick as MouseEventHandler<HTMLImageElement>}
         onError={() => setErrored(true)}
       />
     );
@@ -73,7 +76,7 @@ export function TokenMedia(props: TokenMediaProps) {
         onClick={e => e.preventDefault()}
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
-        style={{ maxWidth: props.maxW }}
+        style={{ objectFit: props.objectFit ?? 'cover', maxWidth: props.maxW }}
         muted
       >
         <source src={obj.url} type={obj.type} />

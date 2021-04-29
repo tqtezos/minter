@@ -33,8 +33,10 @@ import {
   getContractNftsQuery,
   getNftAssetContractQuery
 } from '../../../reducer/async/queries';
-import { Maximize2 } from 'react-feather';
 import { TokenMedia } from '../../common/TokenMedia';
+import lk from '../../common/assets/link-icon.svg'
+import tz from '../../common/assets/tezos-sym.svg'
+import { Maximize2 } from 'react-feather';
 
 function NotFound() {
   return (
@@ -227,7 +229,11 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           config={system.config}
           {...token}
           metadata={token.metadata}
+          maxW="100%"
           maxH="45vh"
+          objectFit="scale-down"
+          cursor="pointer"
+          onClick={onOpen}
         />
       </Box>
       <Flex width="99vw" height={10} justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
@@ -262,7 +268,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   isOwner ? (
                     <>
                       <Text color="brand.black" fontSize="xl" fontWeight="700" marginRight={8}>
-                        {token.sale.price} ꜩ
+                        {token.sale.price} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
                     </Text>
                       <Box marginRight={8}>
                         <CancelTokenSaleButton
@@ -274,7 +280,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   ) : (
                     <>
                       <Text color="black" fontSize={['md', 'md', 'lg']} mr={1} fontWeight="700" marginRight={8}>
-                        {token.sale.price.toFixed(2)} ꜩ
+                        {token.sale.price.toFixed(2)} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
                       </Text>
                       <Box>
                         <BuyTokenButton contract={contractAddress} token={token} />
@@ -338,16 +344,16 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   <AccordionIcon />
                 </AccordionButton>
                 <AccordionPanel pb={4}>
-                  <Flex mt={[4, 8]}>
+                <Flex mt={[4, 8]}>
                     <Text color="brand.neutralGray">Minter:</Text>
                     <Text color="brand.darkGray" fontWeight="bold" ml={[1]}  whiteSpace="nowrap" overflow="hidden">
-                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://tzkt.io/${token.owner}`}>{token.owner}</Link>
+                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://tzkt.io/${token.owner}`}>{token.owner}&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{display: 'inline-block'}} /></sup></Link>
                     </Text>
                   </Flex>
                   <Flex mt={[4, 8]}>
                     <Text color="brand.neutralGray">Collection:</Text>
                     <Text color="brand.darkGray" fontWeight="bold" ml={[1]}  whiteSpace="nowrap" overflow="hidden">
-                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://tzkt.io/${contractAddress}`}>{contractAddress}</Link>
+                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://tzkt.io/${contractAddress}`}>{contractAddress}&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{display: 'inline-block'}} /></sup></Link>
                     </Text>
                   </Flex>
                   {token.metadata?.attributes?.map(({ name, value }) => (
