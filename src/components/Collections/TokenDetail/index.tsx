@@ -149,7 +149,9 @@ function TokenImage(props: {
   if (/^video\/.*/.test(obj.type)) {
     return (
       <video
-        controls
+      controls
+      preload="metadata"
+      onLoadedMetadata={e => {(e.target as HTMLVideoElement).currentTime = .05; }}
         style={{
           margin: 'auto',
           height: props.height || '100%',
@@ -158,7 +160,6 @@ function TokenImage(props: {
           maxHeight: props.maxHeight ?? 'unset',
           cursor: props.cursor
         }}
-        muted
       >
         <source src={obj.url} type={obj.type} />
       </video>
