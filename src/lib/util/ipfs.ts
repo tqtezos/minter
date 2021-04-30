@@ -33,6 +33,10 @@ export async function uploadIPFSImageWithThumbnail(api: string, file: File) {
 
 // URI Utils
 
+export function isIpfsUri(uri: string) {
+  return /^ipfs:\/\/.+/.test(uri);
+}
+
 export function ipfsUriToCid(uri: string) {
   const baseRegex = /^ipfs:\/\//;
   const ipfsRegex = new RegExp(baseRegex.source + '.+');
@@ -42,13 +46,10 @@ export function ipfsUriToCid(uri: string) {
   return null;
 }
 
-export function ipfsUriToGatewayUrl(network: string, uri: string) {
-  const ipfsHost =
-    network === 'sandboxnet'
-      ? 'http://localhost:8080'
-      : 'https://gateway.pinata.cloud';
+export type IpfsGatewayConfig = { ipfsGateway: string };
+export function ipfsUriToGatewayUrl(config: IpfsGatewayConfig, uri: string) {
   const cid = ipfsUriToCid(uri);
-  return cid ? `${ipfsHost}/ipfs/${cid}` : uri;
+  return cid ? `${config.ipfsGateway}/ipfs/${cid}` : uri;
 }
 
 export function uriToCid(uri: string) {

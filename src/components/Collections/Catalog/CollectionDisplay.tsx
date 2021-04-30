@@ -12,11 +12,14 @@ import {
   Text
 } from '@chakra-ui/react';
 import { MinterButton } from '../../common';
-import { RefreshCw, ExternalLink, Wind, HelpCircle } from 'react-feather';
+import { ExternalLink, Wind, HelpCircle } from 'react-feather';
 import { Token } from '../../../reducer/slices/collections';
-import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
+import { IpfsGatewayConfig, ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 import { useDispatch, useSelector } from '../../../reducer';
-import { getContractNftsQuery } from '../../../reducer/async/queries';
+import {
+  getContractNftsQuery,
+  getNftAssetContractQuery
+} from '../../../reducer/async/queries';
 import CollectionsDropdown from './CollectionsDropdown';
 
 function MediaNotFound() {
@@ -35,14 +38,15 @@ function MediaNotFound() {
   );
 }
 
-function TokenImage(props: { src: string }) {
+function TokenImage(props: TokenTileProps) {
+  const src = ipfsUriToGatewayUrl(props.config, props.artifactUri);
   const [errored, setErrored] = useState(false);
   const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
   useEffect(() => {
     (async () => {
       let blob;
       try {
-        blob = await fetch(props.src).then(r => r.blob());
+        blob = await fetch(src).then(r => r.blob());
       } catch (e) {
         return setErrored(true);
       }
@@ -51,7 +55,7 @@ function TokenImage(props: { src: string }) {
         type: blob.type
       });
     })();
-  }, [props.src]);
+  }, [src]);
 
   if (errored) {
     return <MediaNotFound />;
@@ -62,7 +66,7 @@ function TokenImage(props: { src: string }) {
   if (/^image\/.*/.test(obj.type)) {
     return (
       <Image
-        src={props.src}
+        src={src}
         objectFit="scale-down"
         flex="1"
         height="100%"
@@ -78,17 +82,36 @@ function TokenImage(props: { src: string }) {
         onClick={e => e.preventDefault()}
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
+        muted
       >
         <source src={obj.url} type={obj.type} />
       </video>
     );
   }
 
+  if (props.metadata.formats?.length) {
+    if (
+      props.metadata.formats[0].mimeType === 'model/gltf-binary' ||
+      props.metadata.formats[0].mimeType === 'model/gltf+json'
+    ) {
+      return (
+        <>
+          <model-viewer
+            auto-rotate
+            rotation-per-second="30deg"
+            src={obj.url}
+            class="grid"
+          ></model-viewer>
+        </>
+      );
+    }
+  }
+
   return <MediaNotFound />;
 }
 
 interface TokenTileProps extends Token {
-  network: string;
+  config: IpfsGatewayConfig;
   address: string;
 }
 
@@ -116,9 +139,7 @@ function TokenTile(props: TokenTileProps) {
     >
       <AspectRatio ratio={3 / 2}>
         <Box p={4}>
-          <TokenImage
-            src={ipfsUriToGatewayUrl(props.network, props.artifactUri)}
-          />
+          <TokenImage {...props} />
         </Box>
       </AspectRatio>
       <Flex
@@ -150,7 +171,9 @@ export default function CollectionDisplay({
 
   useEffect(() => {
     if (address !== null) {
-      dispatch(getContractNftsQuery(address));
+      dispatch(getNftAssetContractQuery(address)).then(() =>
+        dispatch(getContractNftsQuery(address))
+      );
     }
   }, [address, dispatch]);
 
@@ -275,12 +298,7 @@ export default function CollectionDisplay({
             base: 4,
             md: 0
           }}
-        >
-          <Box color="currentcolor">
-            <RefreshCw size={16} strokeWidth="3" />
-          </Box>
-          <Text ml={2}>Refresh</Text>
-        </MinterButton>
+        ></MinterButton>
       </Flex>
       <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
         {tokens.map(token => {
@@ -288,7 +306,7 @@ export default function CollectionDisplay({
             <TokenTile
               key={token.id}
               address={address}
-              network={config.network}
+              config={config}
               {...token}
             />
           );

@@ -1,31 +1,33 @@
 import React from 'react';
 import { Token } from '../../../reducer/slices/collections';
 import { useLocation } from 'wouter';
-import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
-import { AspectRatio, Box, Flex, Text, Heading } from '@chakra-ui/react';
+import { IpfsGatewayConfig } from '../../../lib/util/ipfs';
+import { AspectRatio, Box, Flex } from '@chakra-ui/react';
 import { TokenMedia } from '../../common/TokenMedia';
+import tz from '../../common/assets/tezos-sym.svg'
 
 interface TokenCardProps extends Token {
-  network: string;
+  config: IpfsGatewayConfig;
 }
 
 export default function TokenCard(props: TokenCardProps) {
   const [, setLocation] = useLocation();
   return (
     <Flex
+      position="relative"
       flexDir="column"
       ratio={1}
       w="100%"
       bg="white"
       border="1px solid"
-      borderColor="brand.lightBlue"
-      borderRadius="3px"
+      borderColor="#eee"
+      borderRadius="0px"
       overflow="hidden"
-      boxShadow="0px 0px 0px 4px rgba(15, 97, 255, 0)"
+      boxShadow="none"
       transition="all linear 50ms"
       _hover={{
         cursor: 'pointer',
-        boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.1)'
+        boxShadow: '0px 0px 10px #3339',
       }}
       onClick={() =>
         setLocation(`/collection/${props.address}/token/${props.id}`)
@@ -33,9 +35,7 @@ export default function TokenCard(props: TokenCardProps) {
     >
       <AspectRatio ratio={3 / 2}>
         <Box>
-          <TokenMedia
-            src={ipfsUriToGatewayUrl(props.network, props.artifactUri)}
-          />
+          <TokenMedia {...props} />
         </Box>
       </AspectRatio>
       <Flex
@@ -45,22 +45,13 @@ export default function TokenCard(props: TokenCardProps) {
         bg="white"
         borderTop="1px solid"
         borderColor="brand.lightBlue"
-        flexDir="column"
+        flexDir="row"
+        justifyContent="space-between"
       >
-        <Heading size="sm">{props.title}</Heading>
-        <Text fontSize="sm">Seller: {props.sale?.seller.substr(0, 5)}...{props.sale?.seller.substr(-5)}</Text>
-      </Flex>
-      <Flex
-        px={2}
-        py={4}
-        mx={2}
-        bg="white"
-        borderTop="1px solid"
-        borderColor="brand.lightGray"
-        justify="space-between"
-      >
-        <Text fontSize="md">Current Price</Text>
-        <Text fontSize="md" fontWeight="600">{props.sale?.price} ꜩ</Text>
+        <Flex display="block" fontSize="md" width="70%" alignItems="center" height="100%" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{props.title}</Flex>
+        <Flex fontSize="md" fontWeight="600" width="30%" justifyContent="flex-end" alignItems="center">
+          {props.sale?.price} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
+        </Flex>
       </Flex>
     </Flex>
   );

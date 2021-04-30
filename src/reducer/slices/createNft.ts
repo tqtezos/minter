@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { NftMetadataAttribute } from '../../lib/nfts/queries';
+import { NftMetadataAttribute } from '../../lib/nfts/decoders';
 import { readFileAsDataUrlAction } from '../async/actions';
 
 // State
@@ -96,7 +96,7 @@ const slice = createSlice({
       state.displayImageFile = null;
     },
     addMetadataRow(state) {
-      state.attributes.push({ name: null, value: null });
+      state.attributes.push({ name: '', value: '' });
     },
     updateMetadataRowName(state, action: UpdateRowNameAction) {
       if (state.attributes[action.payload.key]) {

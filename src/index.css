@@ -1,3 +1,8 @@
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -9,7 +14,7 @@ body {
 
 ::-webkit-scrollbar-track {
   border-radius: 4px;
-  background-color: #DADADA;
+  background-color: #dadada;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -19,7 +24,7 @@ body {
 ::-webkit-scrollbar {
   height: 8px;
   width: 8px;
-  background-color: #DADADA;
+  background-color: #dadada;
 }
 
 .bg-dropdown-arrow {
@@ -29,4 +34,22 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+model-viewer.upload-preview {
+  height: 400px;
+}
+
+model-viewer.individual {
+  height: 400px;
+}
+
+model-viewer.featured {
+  height: 500px;
+  width: 500px;
+}
+
+model-viewer.fullscreen {
+  height: 85%;
+  width: 85%;
 }

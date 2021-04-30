@@ -1,10 +1,14 @@
 import React, { useEffect } from 'react';
-import { Box, Container, Text, Flex, Heading, SimpleGrid, Spinner } from '@chakra-ui/react';
+import { Text, Flex, Heading, SimpleGrid, Spinner, Box } from '@chakra-ui/react';
 import { Wind } from 'react-feather';
 import { useSelector, useDispatch } from '../../../reducer';
-import { getMarketplaceNftsQuery } from '../../../reducer/async/queries';
+import {
+  getMarketplaceNftsQuery,
+  loadMoreMarketplaceNftsQuery
+} from '../../../reducer/async/queries';
 import TokenCard from './TokenCard';
 import FeaturedToken from './FeaturedToken';
+import { VisibilityTrigger } from '../../common/VisibilityTrigger';
 
 export default function Catalog() {
   const { system, marketplace: state } = useSelector(s => s);
@@ -12,16 +16,18 @@ export default function Catalog() {
 
   useEffect(() => {
     dispatch(getMarketplaceNftsQuery(state.marketplace.address));
-  }, [ state.marketplace.address, dispatch ]);
+  }, [state.marketplace.address, dispatch]);
 
-  let tokens = state.marketplace.tokens;
-  if (tokens === null) {
-    tokens = [];
-  }
+  const loadMore = () => {
+    dispatch(loadMoreMarketplaceNftsQuery({}));
+  };
+
+  let tokens =
+    state.marketplace.tokens?.filter(x => x.token).map(x => x.token!) ?? [];
 
   return (
     <Flex
-      w="100%"
+      w="100vw"
       h="100%"
       bg="brand.brightGray"
       px={10}
@@ -31,61 +37,71 @@ export default function Catalog() {
       flexDir="column"
     >
       {state.marketplace.loaded && tokens.length > 0 ? (
-        <Box>
-          <FeaturedToken network={system.config.network} {...tokens[0]} />
-        </Box>
+        <Flex width="calc(100vw - 5rem)" justifyContent="center" alignItems="center">
+          <FeaturedToken config={system.config} {...tokens[0]} />
+        </Flex>
       ) : null}
-      <Container maxW="80em">
-        <Flex
-          flex="1"
-          w="100%"
-          flexDir="column"
-        >
-          {!state.marketplace.loaded ? (
-            <Flex flexDir="column" align="center" flex="1" pt={20}>
-              <Spinner size="xl" mb={6} color="gray.300" />
-              <Heading size="lg" textAlign="center" color="gray.500">
-                Loading...
+      <Flex
+        flex="1"
+        w="100%"
+        flexDir="column"
+      >
+        {!state.marketplace.loaded ? (
+          <Flex flexDir="column" align="center" flex="1" pt={20}>
+            <Spinner size="xl" mb={6} color="gray.300" />
+            <Heading size="lg" textAlign="center" color="gray.500">
+              Loading...
               </Heading>
-            </Flex>
-          ) :
-            tokens.length === 0 ? (
-            <Flex w="100%" flex="1" flexDir="column" align="center">
-              <Flex
-                px={20}
-                py={10}
-                bg="gray.200"
-                textAlign="center"
-                align="center"
-                borderRadius="5px"
-                flexDir="column"
-                fontSize="xl"
-                color="gray.400"
-                mt={28}
-              >
-                <Wind />
-                <Text fontWeight="600" pt={5}>
-                  No tokens to display in this marketplace
+          </Flex>
+        ) : tokens.length === 0 ? (
+          <Flex w="100%" flex="1" flexDir="column" align="center">
+            <Flex
+              px={20}
+              py={10}
+              bg="gray.200"
+              textAlign="center"
+              align="center"
+              borderRadius="5px"
+              flexDir="column"
+              fontSize="xl"
+              color="gray.400"
+              mt={28}
+            >
+              <Wind />
+              <Text fontWeight="600" pt={5}>
+                No tokens to display in this marketplace
                 </Text>
-              </Flex>
             </Flex>
-            ) : (
+          </Flex>
+        ) : (
+          <>
+            <SimpleGrid
+              columns={{ sm: 1, md: 2, lg: 3, xl: 4 }}
+              gap={7}
+              pb={8}
+            >
               <>
-                <SimpleGrid columns={{sm: 1, md: 2, lg: 3, xl: 4}} gap={8} pb={8}>
-                  {tokens.slice(1).map(token => {
-                    return (
+                {tokens.slice(1).map(token => {
+                  return (
+                    <Box display="grid" transition="250ms padding" padding={1} _hover={{padding: 0}}>
                       <TokenCard
                         key={`${token.address}-${token.id}`}
-                        network={system.config.network}
+                        config={system.config}
                         {...token}
                       />
-                    );
-                  })}
-                </SimpleGrid>
+                    </Box>
+                  );
+                })}
+                <VisibilityTrigger
+                  key={state.marketplace.tokens?.length + ':' + tokens.length}
+                  onVisible={loadMore}
+                  allowedDistanceToViewport={600}
+                />
               </>
-          )}
-        </Flex>
-      </Container>
+            </SimpleGrid>
+          </>
+        )}
+      </Flex>
     </Flex>
   );
 }

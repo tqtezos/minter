@@ -18,7 +18,7 @@ import {
 } from '../../lib/util/ipfs';
 import { SelectedFile } from '../slices/createNft';
 import { connectWallet } from './wallet';
-import { NftMetadata } from '../../lib/nfts/queries';
+import { NftMetadata } from '../../lib/nfts/decoders';
 import { SystemWithToolkit, SystemWithWallet } from '../../lib/system';
 import { notifyPending, notifyFulfilled } from '../slices/notificationsActions';
 
@@ -34,8 +34,18 @@ export const readFileAsDataUrlAction = createAsyncThunk<
 >('action/readFileAsDataUrl', async ({ ns, file }, { rejectWithValue }) => {
   const readFile = new Promise<{ ns: string; result: SelectedFile }>(
     (resolve, reject) => {
-      const { name, type, size } = file;
+      let { name, type, size } = file;
       const reader = new FileReader();
+
+      if (!type) {
+        if (name.substr(-4) === '.glb') {
+          type = 'model/gltf-binary';
+        }
+        if (name.substr(-5) === '.gltf') {
+          type = 'model/gltf+json';
+        }
+      }
+
       reader.onload = e => {
         const buffer = e.target?.result;
         if (!buffer || !(buffer instanceof ArrayBuffer)) {
@@ -98,28 +108,23 @@ function appendStateMetadata(
   metadata: NftMetadata,
   system: SystemWithToolkit | SystemWithWallet
 ) {
-  const appendedMetadata = { ...metadata };
-  appendedMetadata.name = state.fields.name as string;
+  const appendedMetadata: NftMetadata = {
+    ...metadata,
+    name: state.fields.name as string,
+    minter: system.tzPublicKey || undefined,
+    description: state.fields.description || undefined,
+    attributes: []
+  };
 
-  if (state.fields.description) {
-    appendedMetadata.description = state.fields.description;
-  }
-
-  for (let row of state.attributes) {
-    if (row.name !== null && row.value !== null) {
-      const keys = Object.getOwnPropertyNames(new NftMetadata());
-      if (keys.indexOf(row.name) !== -1) {
-        appendedMetadata[row.name as keyof NftMetadata] = row.value;
-      } else {
-        if (!appendedMetadata.attributes) appendedMetadata.attributes = [];
-        appendedMetadata.attributes.push({ name: row.name, value: row.value });
-      }
+  return state.attributes.reduce((acc, row) => {
+    const keys = Object.keys(NftMetadata.props);
+    const key = keys.find(k => k === row.name) as keyof NftMetadata;
+    if (key && NftMetadata.props[key].decode(row.value)._tag === 'Right') {
+      return { ...acc, [key]: row.value };
     }
-  }
-
-  appendedMetadata.minter = system.tzPublicKey || '';
-
-  return appendedMetadata;
+    const attribute = { name: row.name, value: row.value };
+    return { ...acc, attributes: [...acc.attributes!, attribute] };
+  }, appendedMetadata);
 }
 
 export const mintTokenAction = createAsyncThunk<
@@ -205,8 +210,8 @@ export const mintTokenAction = createAsyncThunk<
         ipfsMetadata.thumbnailUri = imageResponse.data.thumbnail.ipfsUri;
         ipfsMetadata.formats = [
           {
-            fileSize: imageResponse.headers['content-length'],
-            mimeType: imageResponse.headers['content-type']
+            fileSize: fileResponse.headers['content-length'],
+            mimeType: fileResponse.headers['content-type']
           }
         ];
       } else {
@@ -214,8 +219,8 @@ export const mintTokenAction = createAsyncThunk<
         ipfsMetadata.artifactUri = fileResponse.data.ipfsUri;
         ipfsMetadata.formats = [
           {
-            fileSize: fileResponse.headers['content-length'],
-            mimeType: fileResponse.headers['content-type']
+            fileSize: fileResponse.data.size,
+            mimeType: file.type
           }
         ];
       }

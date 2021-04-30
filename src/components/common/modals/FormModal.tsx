@@ -30,6 +30,7 @@ interface ContentProps {
   pendingMessage?: React.ReactNode;
   pendingAsyncMessage?: React.ReactNode;
   completeMessage?: React.ReactNode;
+  errorMessage?: React.ReactNode;
 }
 
 function Content(props: ContentProps) {
@@ -41,7 +42,7 @@ function Content(props: ContentProps) {
           <AlertCircle size="70px" />
         </Box>
         <Heading size="lg" textAlign="center" color="gray.500" mb={6}>
-          Error Creating Collection
+          {props.errorMessage || 'Operation failed'}
         </Heading>
         <Flex flexDir="row" justify="center">
           <MinterButton variant="primaryAction" onClick={() => onRetry()}>

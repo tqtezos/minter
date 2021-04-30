@@ -42,7 +42,7 @@ OpenMinter supports the following networks and software components:
 #### 🎨 Multimedia NFTs powered by [TZIP-21](https://tzip.tezosagora.org/proposal/tzip-21/)
 #### ⚙️ Smart contracts based on [minter-sdk](https://github.com/tqtezos/minter-sdk)
 #### 👛 Wallets compatible with [Beacon](https://www.walletbeacon.io/)
-#### 📖 Indexing via [Better Call Dev][bcdhub]
+#### 📖 Indexing via [tzkt][https://api.tzkt.io/]
 #### 🚀 [IPFS](https://ipfs.io/) via a local node or [Pinata](https://pinata.cloud/)
 
 The following dependencies are required to run OpenMinter.
@@ -96,8 +96,7 @@ To install and build the dependences required for local development, run:
 $ yarn install
 ```
 
-The installation process will fetch toplevel NPM dependences and build
-the `minter-ui-dev` and `minter-api-dev` Docker images.
+The installation process will fetch toplevel NPM dependences
 
 ### Running
 
@@ -111,6 +110,32 @@ To run OpenMinter configured for `mainnet`, run:
 
 ```sh
 yarn start:mainnet
+```
+
+### Bootstrapping Your Own Contracts
+
+OpenMinter ships with a set of contracts on mainnet and testnet that are intended
+only as a reference implementation and demo. In most cases, you will want to
+originate your own contracts to run OpenMinter. OpenMinter includes a configuration
+wizard CLI tool to make this process quick and easy.
+
+To start the configuration wizard, run:
+
+```sh
+yarn bootstrap
+```
+
+Once the configuration wizard is complete, you can run OpenMinter with your
+custom config by running:
+
+```sh
+yarn start:custom
+```
+
+And to build OpenMinter for a production deployment with your custom config, run:
+
+```sh
+yarn build:custom
 ```
 
 ## Sandboxed Mode

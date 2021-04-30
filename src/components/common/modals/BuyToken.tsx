@@ -12,8 +12,9 @@ import {
 import { MinterButton } from '../../common';
 import { useDispatch } from '../../../reducer';
 import { buyTokenAction } from '../../../reducer/async/actions';
-import { Nft } from '../../../lib/nfts/queries';
+import { Nft } from '../../../lib/nfts/decoders';
 import FormModal, { BaseModalProps, BaseModalButtonProps } from './FormModal';
+import tz from '../assets/tezos-sym.svg'
 
 interface BuyTokenModalProps extends BaseModalProps {
   contract: string;
@@ -50,7 +51,7 @@ export function BuyTokenModal(props: BuyTokenModalProps) {
               You are about to purchase
               <Box as="span" fontWeight="bold">
                 {' '}
-                {props.token.title} (ꜩ {props.token.sale?.price})
+                {props.token.title} (<img src={tz} alt="" width={10} height="auto" style={{display: 'inline-block'}}/> {props.token.sale?.price})
               </Box>
             </Text>
           </ModalBody>

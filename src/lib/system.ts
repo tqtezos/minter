@@ -1,4 +1,10 @@
-import { TezosToolkit, MichelCodecPacker, Context } from '@taquito/taquito';
+import {
+  TezosToolkit,
+  MichelCodecPacker,
+  Context,
+  ContractAbstraction,
+  ContractProvider
+} from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
 import { MetadataProvider, DEFAULT_HANDLERS } from '@taquito/tzip16';
 import { Tzip12Module } from '@taquito/tzip12';
@@ -6,6 +12,8 @@ import CustomIpfsHttpHandler from './util/taquito-custom-ipfs-http-handler';
 import { BetterCallDev } from './service/bcd';
 import * as tzUtils from './util/tezosToolkit';
 import { DAppClientOptions, NetworkType } from '@airgap/beacon-sdk';
+import { TzKt } from './service/tzkt';
+import { isIpfsUri } from './util/ipfs';
 
 export interface Config {
   rpc: string;
@@ -13,6 +21,9 @@ export interface Config {
   bcd: {
     api: string;
     gui: string;
+  };
+  tzkt: {
+    api: string;
   };
   contracts: {
     nftFaucet: string;
@@ -23,6 +34,7 @@ export interface Config {
     };
   };
   ipfsApi: string;
+  ipfsGateway: string;
 }
 
 export enum Status {
@@ -35,6 +47,7 @@ export interface SystemConfigured {
   status: Status.Configured;
   config: Config;
   betterCallDev: BetterCallDev;
+  tzkt: TzKt;
   toolkit: null;
   wallet: null;
   walletReconnectAttempted: boolean;
@@ -42,13 +55,15 @@ export interface SystemConfigured {
 }
 
 type ResolveMetadata = (
-  uri: string
+  uri: string,
+  address: string
 ) => ReturnType<MetadataProvider['provideMetadata']>;
 
 export interface SystemWithToolkit {
   status: Status.ToolkitConnected;
   config: Config;
   betterCallDev: BetterCallDev;
+  tzkt: TzKt;
   toolkit: TezosToolkit;
   resolveMetadata: ResolveMetadata;
   wallet: null;
@@ -60,6 +75,7 @@ export interface SystemWithWallet {
   status: Status.WalletConnected;
   config: Config;
   betterCallDev: BetterCallDev;
+  tzkt: TzKt;
   toolkit: TezosToolkit;
   resolveMetadata: ResolveMetadata;
   wallet: BeaconWallet;
@@ -82,6 +98,7 @@ export function configure(config: Config): SystemConfigured {
     status: Status.Configured,
     config: compatibilityConfig,
     betterCallDev: new BetterCallDev(compatibilityConfig),
+    tzkt: new TzKt(compatibilityConfig),
     toolkit: null,
     wallet: null,
     walletReconnectAttempted: false,
@@ -94,28 +111,28 @@ function createMetadataResolver(
   toolkit: TezosToolkit,
   contractAddress: string
 ): ResolveMetadata {
-  const ipfsGateway =
-    system.config.network === 'sandboxnet'
-      ? 'localhost:8080'
-      : 'gateway.pinata.cloud';
-  const gatewayProtocol =
-    system.config.network === 'sandboxnet' ? 'http' : 'https';
+  const ipfsUrl = system.config.ipfsGateway;
+  const ipfsGateway = ipfsUrl.replace(/^https?:\/\//, '');
+  const gatewayProtocol = ipfsUrl.startsWith('https') ? 'https' : 'http';
+
   const ipfsHandler = new CustomIpfsHttpHandler(ipfsGateway, gatewayProtocol);
   DEFAULT_HANDLERS.set('ipfs', ipfsHandler);
   const provider = new MetadataProvider(DEFAULT_HANDLERS);
   const context = new Context(toolkit.rpc);
-  // This is a performance optimization: We're only resolving off-chain
-  // metadata, however the storage handler requires a ContractAbstraction
-  // instance present - if we fetch a contract on each invokation, the time
-  // to resolution can take several hundred milliseconds.
-  //
-  // TODO: Is it possible to only fetch contracts at the storage resolver level
-  // and make an "off-chain" metadata resolver that excludes the need for a
-  // ContractAbstraction instance?
+
   const defaultContract = toolkit.contract.at(contractAddress);
-  return async uri => {
-    const contract = await defaultContract;
-    return provider.provideMetadata(contract, uri, context);
+  type Contract = ContractAbstraction<ContractProvider>;
+  const contractCache: Record<string, Contract> = {};
+
+  return async (uri, address) => {
+    if (isIpfsUri(uri)) {
+      const contract = await defaultContract;
+      return provider.provideMetadata(contract, uri, context);
+    }
+    if (!contractCache[address]) {
+      contractCache[address] = await toolkit.contract.at(address);
+    }
+    return provider.provideMetadata(contractCache[address], uri, context);
   };
 }
 
