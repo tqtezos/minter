@@ -1,27 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   Accordion,
   AccordionButton,
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
-  AspectRatio,
   Box,
   Button,
   Flex,
   Heading,
-  Image,
   Link,
   Menu,
   MenuList,
   Modal,
   ModalCloseButton,
   ModalContent,
-  ResponsiveValue,
-  Slider,
-  SliderFilledTrack,
-  SliderThumb,
-  SliderTrack,
   Text,
   useDisclosure
 } from '@chakra-ui/react';
@@ -31,16 +24,15 @@ import { TransferTokenModal } from '../../common/modals/TransferToken';
 import { SellTokenButton } from '../../common/modals/SellToken';
 import { CancelTokenSaleButton } from '../../common/modals/CancelTokenSale';
 import { BuyTokenButton } from '../../common/modals/BuyToken';
-import { ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
 import { useSelector, useDispatch } from '../../../reducer';
 import {
   getContractNftsQuery,
   getNftAssetContractQuery
 } from '../../../reducer/async/queries';
+import { TokenMedia } from '../../common/TokenMedia';
 import lk from '../../common/assets/link-icon.svg'
 import tz from '../../common/assets/tezos-sym.svg'
 import { Maximize2 } from 'react-feather';
-import { NftMetadata } from '../../../lib/nfts/decoders';
 
 function NotFound() {
   return (
@@ -70,126 +62,6 @@ function NotFound() {
   );
 }
 
-function MediaNotFound() {
-  return (
-    <AspectRatio
-      ratio={4 / 3}
-      width="100%"
-      borderRadius="3px"
-      bg="gray.100"
-      overflow="hidden"
-    >
-      <Flex flexDir="column" align="center" justify="center">
-        <Box color="gray.300" pb={10}>
-          <HelpCircle size="100px" />
-        </Box>
-        <Heading color="gray.300" size="xl">
-          Image not found
-        </Heading>
-      </Flex>
-    </AspectRatio>
-  );
-}
-
-function TokenImage(props: {
-  id?: string;
-  src: string;
-  metadata: NftMetadata;
-  width?: string;
-  maxWidth?: string;
-  maxHeight?: string;
-  height?: string;
-  objectFit?: ResponsiveValue<any>;
-  cursor?: string;
-  onClick?: (event: React.SyntheticEvent<HTMLImageElement | HTMLVideoElement, Event>) => void;
-  onLoad?: (event: React.SyntheticEvent<HTMLImageElement | HTMLVideoElement, Event>) => void;
-  onFetch?: (type: string) => void;
-}) {
-  const [errored, setErrored] = useState(false);
-  const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
-  useEffect(() => {
-    (async () => {
-      let blob;
-      try {
-        blob = await fetch(props.src).then(r => r.blob());
-      } catch (e) {
-        return setErrored(true);
-      }
-      setObj({
-        url: URL.createObjectURL(blob),
-        type: blob.type
-      });
-      props.onFetch?.(blob.type);
-    })();
-  }, [props, props.onFetch, props.src]);
-
-  if (errored) {
-    return <MediaNotFound />;
-  }
-  if (!obj) return null;
-
-  if (/^image\/.*/.test(obj.type)) {
-    return (
-      <Image
-        id={props.id || 'assetImage'}
-        key={props.id || 'assetImage'}
-        src={props.src}
-        objectFit={props.objectFit ?? "scale-down"}
-        height={props.height ?? "100%"}
-        width={props.width}
-        maxWidth={props.maxWidth}
-        maxHeight={props.maxHeight ?? 'unset'}
-        cursor={props.cursor}
-        onClick={props.onClick}
-        onError={() => setErrored(true)}
-        onLoad={props.onLoad}
-      />
-    );
-  }
-
-  if (/^video\/.*/.test(obj.type)) {
-    return (
-      <video
-        controls
-        style={{
-          margin: 'auto',
-          height: props.height || '100%',
-          width: props.width,
-          maxWidth: props.maxWidth ?? 'unset',
-          maxHeight: props.maxHeight ?? 'unset',
-          cursor: props.cursor
-        }}
-        muted
-        onClick={props.onClick}
-      >
-        <source src={obj.url} type={obj.type} />
-      </video>
-    );
-  }
-
-  if (props.metadata.formats?.length) {
-    if (
-      props.metadata.formats[0].mimeType === 'model/gltf-binary' ||
-      props.metadata.formats[0].mimeType === 'model/gltf+json'
-    ) {
-      return (
-        <>
-          <model-viewer
-            auto-rotate
-            camera-controls
-            rotation-per-second="30deg"
-            src={obj.url}
-            class={props.id === "fullScreenAssetView" ? "fullscreen" : "individual"}
-            style={{ Height: props.height || '100%' }}
-          ></model-viewer>
-        </>
-      );
-    }
-  }
-
-  return <MediaNotFound />;
-}
-
 interface TokenDetailProps {
   contractAddress: string;
   tokenId: number;
@@ -201,11 +73,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
   const dispatch = useDispatch();
   const collection = state.collections[contractAddress];
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [zoom, setZoom] = useState(0);
-  const [initialZoom] = useState(0);
-  const [imageHeight] = useState(0);
-  const [imageWidth] = useState(0);
-  const [mediaType] = useState('');
 
   const collectionUndefined = collection === undefined;
 
@@ -216,23 +83,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       dispatch(getContractNftsQuery(contractAddress));
     }
   }, [contractAddress, tokenId, collectionUndefined, dispatch]);
-
-  useEffect(() => {
-    const img = document.getElementById('fullScreenAssetView');
-    const wHeight = window.innerHeight;
-    const wWidth = window.innerWidth;
-    const isPortrait = wHeight > wWidth;
-
-    if (img && zoom !== 0 && zoom !== initialZoom) {
-      img.style.maxWidth = `${imageWidth}px`;
-      img.style.width = `${imageWidth * zoom}px`;
-      img.style.height = `${imageHeight * zoom}px`;
-      if (isPortrait && imageHeight > imageWidth) {
-        img.style.margin = `calc((((${imageHeight - wHeight
-          }px) / 2) * ${initialZoom} - 80px) * ${1 - zoom}) auto`;
-      }
-    }
-  }, [imageHeight, imageWidth, initialZoom, zoom]);
 
   if (!collection?.tokens) {
     return null;
@@ -266,47 +116,18 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           justifyContent="center"
           alignItems="center"
           position="relative"
-          backgroundColor="#222222f9"
+          backgroundColor="#111111fc"
           zIndex="2000"
           margin="0 !important"
           borderRadius="0"
         >
-          {/^image\/.*/.test(mediaType) ? (
-            <Flex
-              height="3rem"
-              alignItems="center"
-              position="sticky"
-              top={0}
-              left={0}
-            >
-              <Slider
-                defaultValue={initialZoom}
-                min={initialZoom}
-                max={1}
-                step={0.01}
-                width="10rem"
-                margin="auto"
-                onChange={setZoom}
-              >
-                <SliderTrack>
-                  <SliderFilledTrack />
-                </SliderTrack>
-                <SliderThumb />
-              </Slider>
-            </Flex>
-          ) : (
-            ''
-          )}
-
-          <TokenImage
-            id="fullScreenAssetView"
-            src={ipfsUriToGatewayUrl(system.config, token.artifactUri)}
+          <TokenMedia
+            key={`${token.address}-${token.id}`}
+            config={system.config}
+            {...token}
             metadata={token.metadata}
-            width="auto"
-            height="auto"
-            maxWidth="85%"
-            maxHeight="85%"
-            objectFit="contain"
+            maxW="95vw"
+            maxH="95vh"
           />
           <ModalCloseButton
             position="absolute"
@@ -321,8 +142,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             height="4rem"
             borderRight="none"
             borderBottom="none"
-            borderBottomStartRadius="0"
             borderBottomEndRadius="0"
+            borderTopStartRadius="0"
             borderTopEndRadius="0"
             border="0"
           />
@@ -350,18 +171,19 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
         maxHeight={["40vh", "70vh", "65vh"]}
         height={["auto"]}
       >
-        <TokenImage
-          src={ipfsUriToGatewayUrl(system.config, token.artifactUri)}
+        <TokenMedia
+          key={`${token.address}-${token.id}`}
+          config={system.config}
+          {...token}
           metadata={token.metadata}
-          height="auto"
-          width="auto"
-          maxWidth="100%"
-          maxHeight="45vh"
+          maxW="100%"
+          maxH="45vh"
+          objectFit="scale-down"
           cursor="pointer"
           onClick={onOpen}
         />
       </Box>
-      <Flex width="99vw" height={10} justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
+      <Flex width="99vw" height={10} maxHeight={10} justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
         <Button onClick={onOpen}>
           <Maximize2 size={16} strokeWidth="3" />
         </Button>
@@ -384,7 +206,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             mb={10}
             pos="relative"
           >
-            <Flex display={['block', 'block', 'flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'column', 'row']} flexWrap="wrap">
+            <Flex display={['block', 'block', 'block', 'flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'column', 'column', 'row']} flexWrap="wrap">
               <Heading textAlign="left" color="brand.black" width={["100%", "100%", "80%"]} fontSize={["10vw", "3vw"]} display="inline-block">
                 {token.title}
               </Heading>
