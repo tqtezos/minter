@@ -57,15 +57,31 @@ async function getTokenMetadataBigMap(
   return decoded.right;
 }
 
+function transformFixedPriceSales(fixedPriceSales: any): t.Mixed[] {
+  fixedPriceSales.forEach((fixedPriceSale: any, i: number) => {
+    if (fixedPriceSale.key.hasOwnProperty('seller')) {
+      fixedPriceSales[i].key['sale_seller'] = fixedPriceSale.key.seller;
+      delete fixedPriceSales[i].key.seller;
+    }
+  });
+  return fixedPriceSales;
+}
+
 async function getFixedPriceSalesBigMap(
   tzkt: TzKt,
   address: string
 ): Promise<D.FixedPriceSaleBigMap> {
-  const fixedPriceBigMapId = await tzkt.getContractStorage(address);
+  let fixedPriceBigMapId;
+  const fixedPriceStorage = await tzkt.getContractStorage(address);
+  if (fixedPriceStorage.hasOwnProperty('sales')) {
+    fixedPriceBigMapId = fixedPriceStorage.sales;
+  } else {
+    fixedPriceBigMapId = fixedPriceStorage; // legacy marketplace contract
+  }
   if (isLeft(t.number.decode(fixedPriceBigMapId))) {
     throw Error('Failed to decode `getFixedPriceSales` bigMap ID');
   }
-  const fixedPriceSales = await tzkt.getBigMapKeys(fixedPriceBigMapId);
+  const fixedPriceSales = transformFixedPriceSales(await tzkt.getBigMapKeys(fixedPriceBigMapId));
   const decoded = D.FixedPriceSaleBigMap.decode(fixedPriceSales);
   if (isLeft(decoded)) {
     throw Error('Failed to decode `getFixedPriceSales` response');
@@ -271,6 +287,12 @@ export async function getMarketplaceNfts(
   const addresses = _.uniq(
     activeSales.map(s => s.key.sale_token.token_for_sale_address)
   );
+
+  const uniqueAddresses = Array.from(new Set(addresses));
+
+  if (uniqueAddresses.length === 0) {
+    return [];
+  }
 
   const tokenBigMapRows = await getBigMapUpdates(
     system.tzkt,

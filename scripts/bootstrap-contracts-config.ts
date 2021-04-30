@@ -7,7 +7,8 @@ import { MichelsonMap, TezosToolkit } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
 import {
   Fa2MultiNftFaucetCode,
-  FixedPriceSaleMarketTezCode
+  FixedPriceSaleMarketTezCode,
+  FixedPriceSaleTezFixedFeeCode
 } from '@tqtezos/minter-contracts';
 
 function toHexString(input: string) {
@@ -161,19 +162,46 @@ async function bootstrap(env: string) {
   });
 
   // bootstrap marketplace fixed price (tez)
-  await bootstrapContract(bootstrappedConfig, toolkit, {
-    configKey: 'contracts.marketplace.fixedPrice.tez',
-    contractAlias: 'fixedPriceMarketTez',
-    contractCode: FixedPriceSaleMarketTezCode.code,
-    initStorage: () => ({ sales: new MichelsonMap() })
-  });
+  const marketplaceFeePercent = config.get("contractOpts.marketplace.fee.percent");
+  const marketplaceFeeAddress = config.get("contractOpts.marketplace.fee.address");
+  if (marketplaceFeePercent && marketplaceFeeAddress) {
+    await bootstrapContract(bootstrappedConfig, toolkit, {
+      configKey: 'contracts.marketplace.fixedPrice.tez',
+      contractAlias: 'fixedPriceMarketTez',
+      contractCode: FixedPriceSaleTezFixedFeeCode.code,
+      initStorage: () => ({
+        admin: {
+          admin: config.get("admin.address"),
+          paused: false
+        },
+        fee: {
+          fee_address: marketplaceFeeAddress,
+          fee_percent: marketplaceFeePercent
+        },
+        sales: new MichelsonMap()
+      })
+    });
+  } else {
+    await bootstrapContract(bootstrappedConfig, toolkit, {
+      configKey: 'contracts.marketplace.fixedPrice.tez',
+      contractAlias: 'fixedPriceMarketTez',
+      contractCode: FixedPriceSaleMarketTezCode.code,
+      initStorage: () => ({
+        admin: {
+          admin: config.get("admin.address"),
+          paused: false
+        },
+        sales: new MichelsonMap()
+      })
+    });
+  }
 }
 
 async function main() {
   console.log(process.argv[2]);
   const envArg = process.argv[2];
   let env;
-  if (['mainnet', 'testnet', 'sandbox'].includes(envArg)) {
+  if (['mainnet', 'testnet', 'custom', 'sandbox'].includes(envArg)) {
     env = envArg;
   } else {
     env = readEnv();
