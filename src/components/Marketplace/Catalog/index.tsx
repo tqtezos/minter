@@ -6,7 +6,7 @@ import {
   getMarketplaceNftsQuery,
   loadMoreMarketplaceNftsQuery
 } from '../../../reducer/async/queries';
-import TokenCard from './TokenCard';
+import TokenCard from '../../common/TokenCard';
 import FeaturedToken from './FeaturedToken';
 import { VisibilityTrigger } from '../../common/VisibilityTrigger';
 

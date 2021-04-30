@@ -1,10 +1,10 @@
 import React from 'react';
-import { Token } from '../../../reducer/slices/collections';
+import { Token } from '../../reducer/slices/collections';
 import { useLocation } from 'wouter';
-import { IpfsGatewayConfig } from '../../../lib/util/ipfs';
+import { IpfsGatewayConfig } from '../../lib/util/ipfs';
 import { AspectRatio, Box, Flex } from '@chakra-ui/react';
-import { TokenMedia } from '../../common/TokenMedia';
-import tz from '../../common/assets/tezos-sym.svg'
+import { TokenMedia } from './TokenMedia';
+import tz from './assets/tezos-sym.svg'
 
 interface TokenCardProps extends Token {
   config: IpfsGatewayConfig;
@@ -35,7 +35,7 @@ export default function TokenCard(props: TokenCardProps) {
     >
       <AspectRatio ratio={3 / 2}>
         <Box>
-          <TokenMedia {...props} />
+          <TokenMedia key={`${props.address}-${props.id}`} {...props} />
         </Box>
       </AspectRatio>
       <Flex
@@ -50,7 +50,7 @@ export default function TokenCard(props: TokenCardProps) {
       >
         <Flex display="block" fontSize="md" width="70%" alignItems="center" height="100%" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{props.title}</Flex>
         <Flex fontSize="md" fontWeight="600" width="30%" justifyContent="flex-end" alignItems="center">
-          {props.sale?.price} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
+          {props.sale?.price}&nbsp;<img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
         </Flex>
       </Flex>
     </Flex>
