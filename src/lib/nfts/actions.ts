@@ -51,6 +51,7 @@ export async function createAssetContract(
     tokenCategory: 'collectibles',
     ...metadata
   });
+
   metadataMap.set('', toHexString(resp.data.ipfsUri));
   return await system.toolkit.wallet
     .originate({

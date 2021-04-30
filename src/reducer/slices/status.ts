@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit';
 import {
   createAssetContractAction,
+  createEditionsContractAction,
   mintTokenAction,
   transferTokenAction,
   listTokenAction,
@@ -26,6 +27,7 @@ export interface Status {
 
 export interface StatusState {
   createAssetContract: Status;
+  createEditionsContract: Status;
   mintToken: Status;
   transferToken: Status;
   listToken: Status;
@@ -42,6 +44,7 @@ const defaultStatus: Status = { status: 'ready', error: null };
 
 const initialState: StatusState = {
   createAssetContract: defaultStatus,
+  createEditionsContract: defaultStatus,
   mintToken: defaultStatus,
   transferToken: defaultStatus,
   listToken: defaultStatus,
@@ -73,6 +76,7 @@ const slice = createSlice({
   extraReducers: ({ addCase }) => {
     [
       methodMap('createAssetContract', createAssetContractAction),
+      methodMap('createEditionsContract', createEditionsContractAction),
       methodMap('mintToken', mintTokenAction),
       methodMap('transferToken', transferTokenAction),
       methodMap('listToken', listTokenAction),

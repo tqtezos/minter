@@ -19,8 +19,10 @@ import {
 import { SelectedFile } from '../slices/createNft';
 import { connectWallet } from './wallet';
 import { NftMetadata } from '../../lib/nfts/decoders';
-import { SystemWithToolkit, SystemWithWallet } from '../../lib/system';
+import { SystemWithWallet } from '../../lib/system';
 import { notifyPending, notifyFulfilled } from '../slices/notificationsActions';
+import { createEditionsContract } from '../../lib/editions/actions';
+import * as e from 'fp-ts/Either';
 
 type Options = {
   state: State;
@@ -103,15 +105,51 @@ export const createAssetContractAction = createAsyncThunk<
   }
 );
 
+export const createEditionsContractAction = createAsyncThunk<
+  { name: string; address: string },
+  string,
+  Options
+>(
+  'action/createEditionsContract',
+  async (name, { getState, rejectWithValue, dispatch, requestId }) => {
+    const { system } = getState();
+    if (system.status !== 'WalletConnected') {
+      return rejectWithValue({
+        kind: ErrorKind.WalletNotConnected,
+        message: 'Cannot create collection: Wallet not connected'
+      });
+    }
+    try {
+      const op = await createEditionsContract(system, { name });
+      const pendingMessage = `Creating new editions collection ${name}`;
+      dispatch(notifyPending(requestId, pendingMessage));
+      await op.confirmation();
+
+      const { address } = await op.contract();
+      const fulfilledMessage = `Created new editions collection ${name} (${address})`;
+      dispatch(notifyFulfilled(requestId, fulfilledMessage));
+      // TODO: Poll for contract availability on indexer
+      dispatch(getWalletAssetContractsQuery());
+      return { name, address };
+    } catch (e) {
+      console.log(e);
+      return rejectWithValue({
+        kind: ErrorKind.CreateAssetContractFailed,
+        message: 'Editions collection creation failed'
+      });
+    }
+  }
+);
+
 function appendStateMetadata(
   state: State['createNft'],
   metadata: NftMetadata,
-  system: SystemWithToolkit | SystemWithWallet
+  system: SystemWithWallet
 ) {
   const appendedMetadata: NftMetadata = {
     ...metadata,
     name: state.fields.name as string,
-    minter: system.tzPublicKey || undefined,
+    minter: system.tzPublicKey,
     description: state.fields.description || undefined,
     attributes: []
   };
@@ -125,6 +163,73 @@ function appendStateMetadata(
     const attribute = { name: row.name, value: row.value };
     return { ...acc, attributes: [...acc.attributes!, attribute] };
   }, appendedMetadata);
+}
+
+async function fetchSelectedFile(
+  selectedFile: SelectedFile
+): Promise<e.Either<RejectValue, File>> {
+  try {
+    const { objectUrl, name, type } = selectedFile;
+    const fetched = await fetch(objectUrl);
+    const blob = await fetched.blob();
+    return e.right(new File([blob], name, { type }));
+  } catch (e) {
+    return e.left({
+      kind: ErrorKind.UknownError,
+      message: 'Could not mint token: selected file not found'
+    });
+  }
+}
+
+async function uploadImage(ipfsApi: string, file: File): Promise<NftMetadata> {
+  const imageResponse = await uploadIPFSImageWithThumbnail(ipfsApi, file);
+  return {
+    artifactUri: imageResponse.data.ipfsUri,
+    displayUri: imageResponse.data.ipfsUri,
+    thumbnailUri: imageResponse.data.thumbnail.ipfsUri,
+    formats: [
+      {
+        fileSize: imageResponse.headers['content-length'],
+        mimeType: imageResponse.headers['content-type']
+      }
+    ]
+  };
+}
+
+async function uploadVideo(
+  ipfsApi: string,
+  file: File,
+  displayFile: File
+): Promise<NftMetadata> {
+  const fileResponse = await uploadIPFSFile(ipfsApi, file);
+  const imageResponse = await uploadIPFSImageWithThumbnail(
+    ipfsApi,
+    displayFile
+  );
+  return {
+    artifactUri: fileResponse.data.ipfsUri,
+    displayUri: imageResponse.data.ipfsUri,
+    thumbnailUri: imageResponse.data.thumbnail.ipfsUri,
+    formats: [
+      {
+        fileSize: fileResponse.headers['content-length'],
+        mimeType: fileResponse.headers['content-type']
+      }
+    ]
+  };
+}
+
+async function uploadFile(ipfsApi: string, file: File): Promise<NftMetadata> {
+  const fileResponse = await uploadIPFSFile(ipfsApi, file);
+  return {
+    artifactUri: fileResponse.data.ipfsUri,
+    formats: [
+      {
+        fileSize: fileResponse.data.size,
+        mimeType: file.type
+      }
+    ]
+  };
 }
 
 export const mintTokenAction = createAsyncThunk<
@@ -152,78 +257,48 @@ export const mintTokenAction = createAsyncThunk<
       });
     }
 
-    let file: File;
-    try {
-      const { objectUrl, name, type } = state.selectedFile;
-      const fetched = await fetch(objectUrl);
-      const blob = await fetched.blob();
-      file = new File([blob], name, { type });
-    } catch (e) {
+    const fileResult = await fetchSelectedFile(state.selectedFile);
+    if (fileResult._tag === 'Left') {
+      return rejectWithValue(fileResult.left);
+    }
+    const file = fileResult.right;
+
+    if (/^video\/.*/.test(file.type) && state.displayImageFile === null) {
       return rejectWithValue({
-        kind: ErrorKind.UknownError,
-        message: 'Could not mint token: selected file not found'
+        kind: ErrorKind.IPFSUploadFailed,
+        message: 'Ipfs upload failed: Video display file not found'
       });
     }
 
-    let ipfsMetadata: NftMetadata = {};
-    try {
-      if (/^image\/.*/.test(file.type)) {
-        const imageResponse = await uploadIPFSImageWithThumbnail(
-          system.config.ipfsApi,
-          file
-        );
-        ipfsMetadata.artifactUri = imageResponse.data.ipfsUri;
-        ipfsMetadata.displayUri = imageResponse.data.ipfsUri;
-        ipfsMetadata.thumbnailUri = imageResponse.data.thumbnail.ipfsUri;
-        ipfsMetadata.formats = [
-          {
-            fileSize: imageResponse.headers['content-length'],
-            mimeType: imageResponse.headers['content-type']
-          }
-        ];
-      } else if (/^video\/.*/.test(file.type)) {
-        if (state.displayImageFile === null) {
-          return rejectWithValue({
-            kind: ErrorKind.IPFSUploadFailed,
-            message: 'Ipfs upload failed: Video display file not found'
-          });
-        }
-        let displayFile: File;
-        try {
-          const { objectUrl, name, type } = state.displayImageFile;
-          const fetched = await fetch(objectUrl);
-          const blob = await fetched.blob();
-          displayFile = new File([blob], name, { type });
-        } catch (e) {
-          return rejectWithValue({
-            kind: ErrorKind.UknownError,
-            message: 'Could not mint token: video display file not found'
-          });
-        }
-        const fileResponse = await uploadIPFSFile(system.config.ipfsApi, file);
-        const imageResponse = await uploadIPFSImageWithThumbnail(
-          system.config.ipfsApi,
-          displayFile
-        );
-        ipfsMetadata.artifactUri = fileResponse.data.ipfsUri;
-        ipfsMetadata.displayUri = imageResponse.data.ipfsUri;
-        ipfsMetadata.thumbnailUri = imageResponse.data.thumbnail.ipfsUri;
-        ipfsMetadata.formats = [
-          {
-            fileSize: fileResponse.headers['content-length'],
-            mimeType: fileResponse.headers['content-type']
-          }
-        ];
-      } else {
-        const fileResponse = await uploadIPFSFile(system.config.ipfsApi, file);
-        ipfsMetadata.artifactUri = fileResponse.data.ipfsUri;
-        ipfsMetadata.formats = [
-          {
-            fileSize: fileResponse.data.size,
-            mimeType: file.type
-          }
-        ];
+    let ipfsMetadataResult: Promise<NftMetadata>;
+
+    if (/^image\/.*/.test(file.type)) {
+      ipfsMetadataResult = uploadImage(system.config.ipfsApi, file);
+    } else if (/^video\/.*/.test(file.type)) {
+      let displayFile: File;
+      try {
+        const { objectUrl, name, type } = state.displayImageFile!;
+        const fetched = await fetch(objectUrl);
+        const blob = await fetched.blob();
+        displayFile = new File([blob], name, { type });
+      } catch (e) {
+        return rejectWithValue({
+          kind: ErrorKind.UknownError,
+          message: 'Could not mint token: video display file not found'
+        });
       }
+      ipfsMetadataResult = uploadVideo(
+        system.config.ipfsApi,
+        file,
+        displayFile
+      );
+    } else {
+      ipfsMetadataResult = uploadFile(system.config.ipfsApi, file);
+    }
+
+    let ipfsMetadata: NftMetadata;
+    try {
+      ipfsMetadata = await ipfsMetadataResult;
     } catch (e) {
       return rejectWithValue({
         kind: ErrorKind.IPFSUploadFailed,
