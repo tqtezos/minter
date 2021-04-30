@@ -259,7 +259,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             mb={10}
             pos="relative"
           >
-            <Flex display={['block', 'block', 'flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'column', 'row']} flexWrap="wrap">
+            <Flex display={['block', 'block', 'block', 'flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'column', 'column', 'row']} flexWrap="wrap">
               <Heading textAlign="left" color="brand.black" width={["100%", "100%", "80%"]} fontSize={["10vw", "3vw"]} display="inline-block">
                 {token.title}
               </Heading>
