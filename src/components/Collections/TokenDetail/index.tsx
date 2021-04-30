@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   Accordion,
   AccordionButton,
@@ -15,10 +15,6 @@ import {
   Modal,
   ModalCloseButton,
   ModalContent,
-  Slider,
-  SliderFilledTrack,
-  SliderThumb,
-  SliderTrack,
   Text,
   useDisclosure
 } from '@chakra-ui/react';
@@ -77,11 +73,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
   const dispatch = useDispatch();
   const collection = state.collections[contractAddress];
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [zoom, setZoom] = useState(0);
-  const [initialZoom] = useState(0);
-  const [imageHeight] = useState(0);
-  const [imageWidth] = useState(0);
-  const [mediaType] = useState('');
 
   const collectionUndefined = collection === undefined;
 
@@ -92,23 +83,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       dispatch(getContractNftsQuery(contractAddress));
     }
   }, [contractAddress, tokenId, collectionUndefined, dispatch]);
-
-  useEffect(() => {
-    const img = document.getElementById('fullScreenAssetView');
-    const wHeight = window.innerHeight;
-    const wWidth = window.innerWidth;
-    const isPortrait = wHeight > wWidth;
-
-    if (img && zoom !== 0 && zoom !== initialZoom) {
-      img.style.maxWidth = `${imageWidth}px`;
-      img.style.width = `${imageWidth * zoom}px`;
-      img.style.height = `${imageHeight * zoom}px`;
-      if (isPortrait && imageHeight > imageWidth) {
-        img.style.margin = `calc((((${imageHeight - wHeight
-          }px) / 2) * ${initialZoom} - 80px) * ${1 - zoom}) auto`;
-      }
-    }
-  }, [imageHeight, imageWidth, initialZoom, zoom]);
 
   if (!collection?.tokens) {
     return null;
@@ -147,33 +121,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           margin="0 !important"
           borderRadius="0"
         >
-          {/^image\/.*/.test(mediaType) ? (
-            <Flex
-              height="3rem"
-              alignItems="center"
-              position="sticky"
-              top={0}
-              left={0}
-            >
-              <Slider
-                defaultValue={initialZoom}
-                min={initialZoom}
-                max={1}
-                step={0.01}
-                width="10rem"
-                margin="auto"
-                onChange={setZoom}
-              >
-                <SliderTrack>
-                  <SliderFilledTrack />
-                </SliderTrack>
-                <SliderThumb />
-              </Slider>
-            </Flex>
-          ) : (
-            ''
-          )}
-
           <TokenMedia
             key={`${token.address}-${token.id}`}
             config={system.config}
