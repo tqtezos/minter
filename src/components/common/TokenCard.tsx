@@ -35,7 +35,7 @@ export default function TokenCard(props: TokenCardProps) {
     >
       <AspectRatio ratio={3 / 2}>
         <Box>
-          <TokenMedia {...props} />
+          <TokenMedia key={`${props.address}-${props.id}`} {...props} />
         </Box>
       </AspectRatio>
       <Flex
