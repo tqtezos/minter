@@ -126,8 +126,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             config={system.config}
             {...token}
             metadata={token.metadata}
-            maxW="85%"
-            maxH="85%"
+            maxW="95vw"
+            maxH="95vh"
           />
           <ModalCloseButton
             position="absolute"
