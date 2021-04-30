@@ -116,7 +116,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           justifyContent="center"
           alignItems="center"
           position="relative"
-          backgroundColor="#222222f9"
+          backgroundColor="#111111fc"
           zIndex="2000"
           margin="0 !important"
           borderRadius="0"
