@@ -3,6 +3,7 @@ import { Flex, Image } from '@chakra-ui/react';
 import { FiHelpCircle } from 'react-icons/fi';
 import { IpfsGatewayConfig, ipfsUriToGatewayUrl } from '../../lib/util/ipfs';
 import { Token } from '../../reducer/slices/collections';
+import { load } from './three-helper';
 
 interface TokenMediaProps extends Token {
   config: IpfsGatewayConfig;
@@ -86,12 +87,14 @@ export function TokenMedia(props: TokenMediaProps) {
     ) {
       return (
         <>
-          <model-viewer
+        <div id="canvas" style={{width: '100%', height: '100%'}} />
+        {load(props.metadata.formats[0].mimeType, obj.url, "canvas")}
+          {/* <model-viewer
             auto-rotate
             rotation-per-second="30deg"
             src={obj.url}
             class={props.class}
-          ></model-viewer>
+          ></model-viewer> */}
         </>
       );
     }

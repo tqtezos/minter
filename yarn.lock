@@ -2728,6 +2728,11 @@
     "@types/testing-library__dom" "*"
     pretty-format "^25.1.0"
 
+"@types/three@0.127.1":
+  version "0.127.1"
+  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.127.1.tgz#0978054e5daa6485946a3f1518a76412186ae81f"
+  integrity sha512-e90iYq3zde3axANg7BPZY0fKrez1AzveamIIFk23PMh9WtCx91geokDy+yEAIymdIldgUpvezAP6+zCV3oekXw==
+
 "@types/through@*":
   version "0.0.30"
   resolved "https://registry.yarnpkg.com/@types/through/-/through-0.0.30.tgz#e0e42ce77e897bd6aead6f6ea62aeb135b8a3895"
@@ -12079,6 +12084,11 @@ text-table@0.2.0, text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
+
+three@0.128.0:
+  version "0.128.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.128.0.tgz#884dacca6a330e45600a09ec5439283f50b76aa6"
+  integrity sha512-i0ap/E+OaSfzw7bD1TtYnPo3VEplkl70WX5fZqZnfZsE3k3aSFudqrrC9ldFZfYFkn1zwDmBcdGfiIm/hnbyZA==
 
 throat@^4.0.0:
   version "4.1.0"
