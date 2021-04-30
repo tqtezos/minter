@@ -1,10 +1,10 @@
 import React from 'react';
-import { Token } from '../../../reducer/slices/collections';
+import { Token } from '../../reducer/slices/collections';
 import { useLocation } from 'wouter';
-import { IpfsGatewayConfig } from '../../../lib/util/ipfs';
+import { IpfsGatewayConfig } from '../../lib/util/ipfs';
 import { AspectRatio, Box, Flex } from '@chakra-ui/react';
-import { TokenMedia } from '../../common/TokenMedia';
-import tz from '../../common/assets/tezos-sym.svg'
+import { TokenMedia } from './TokenMedia';
+import tz from './assets/tezos-sym.svg'
 
 interface TokenCardProps extends Token {
   config: IpfsGatewayConfig;
