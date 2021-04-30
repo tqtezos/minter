@@ -183,7 +183,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           onClick={onOpen}
         />
       </Box>
-      <Flex width="99vw" height={10} justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
+      <Flex width="99vw" height={10} maxHeight={10} justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
         <Button onClick={onOpen}>
           <Maximize2 size={16} strokeWidth="3" />
         </Button>
