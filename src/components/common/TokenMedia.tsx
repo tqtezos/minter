@@ -62,7 +62,7 @@ export function TokenMedia(props: TokenMediaProps) {
         flex="1"
         maxWidth={props.maxW}
         maxHeight={props.maxH}
-        style={{ objectFit: props.objectFit ?? 'cover', cursor: props.cursor }}
+        style={{ objectFit: props.objectFit ?? 'cover', maxWidth: props.maxW, maxHeight: '50vh', cursor: props.cursor }}
         onClick={props.onClick as MouseEventHandler<HTMLImageElement>}
         onError={() => setErrored(true)}
       />
@@ -76,9 +76,10 @@ export function TokenMedia(props: TokenMediaProps) {
         onClick={e => e.preventDefault()}
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
-        style={{ objectFit: props.objectFit ?? 'cover', maxWidth: props.maxW }}
+        style={{ objectFit: props.objectFit ?? 'cover', maxWidth: props.maxW, maxHeight: '50vh' }}
         onLoadedMetadata={e => {(e.target as HTMLVideoElement).currentTime = .05; }}
         muted
+        controls
       >
         <source src={obj.url} type={obj.type} />
       </video>

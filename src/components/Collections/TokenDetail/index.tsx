@@ -195,8 +195,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             height="4rem"
             borderRight="none"
             borderBottom="none"
-            borderBottomStartRadius="0"
             borderBottomEndRadius="0"
+            borderTopStartRadius="0"
             borderTopEndRadius="0"
             border="0"
           />
