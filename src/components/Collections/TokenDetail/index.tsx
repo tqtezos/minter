@@ -215,8 +215,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   isOwner ? (
                     <>
                       <Text color="brand.black" fontSize="xl" fontWeight="700" marginRight={8}>
-                        {token.sale.price} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
-                    </Text>
+                        {token.sale.price.toFixed(2)} <img src={tz} alt="" width={10} height="auto" style={{ display: token.sale.price ? 'inline-block' : 'none' }} />
+                      </Text>
                       <Box marginRight={8}>
                         <CancelTokenSaleButton
                           contract={contractAddress}
@@ -227,7 +227,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   ) : (
                     <>
                       <Text color="black" fontSize={['md', 'md', 'lg']} mr={1} fontWeight="700" marginRight={8}>
-                        {token.sale.price.toFixed(2)} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
+                        {token.sale.price.toFixed(2)} <img src={tz} alt="" width={10} height="auto" style={{ display: token.sale.price ? 'inline-block' : 'none' }} />
                       </Text>
                       <Box>
                         <BuyTokenButton contract={contractAddress} token={token} />
@@ -291,7 +291,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   <AccordionIcon />
                 </AccordionButton>
                 <AccordionPanel pb={4}>
-                <Flex mt={[4, 8]}>
+                  <Flex mt={[4, 8]}>
                     <Text color="brand.neutralGray">Minter:</Text>
                     <Text color="brand.darkGray" fontWeight="bold" ml={[1]}  whiteSpace="nowrap" overflow="hidden">
                       <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://${(system.config.network+'.').replace('mainnet.', '')}tzkt.io/${token.metadata?.minter}`}>{token.metadata?.minter}&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{display: 'inline-block'}} /></sup></Link>
@@ -306,7 +306,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   {token.metadata?.attributes?.map(({ name, value }) => (
                     <Flex mt={[4, 8]}>
                       <Text color="brand.neutralGray">{name}:</Text>
-                      <Text display="block" color="brand.darkGray" fontWeight="bold" ml={[1]}  whiteSpace="nowrap" overflow="hidden" textOverflow="wrap">
+                      <Text display="block" color="brand.darkGray" fontWeight="bold" ml={[1]} whiteSpace="nowrap" overflow="hidden" textOverflow="wrap">
                         {value}
                       </Text>
                     </Flex>
