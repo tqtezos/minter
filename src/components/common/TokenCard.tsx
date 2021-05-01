@@ -50,7 +50,7 @@ export default function TokenCard(props: TokenCardProps) {
       >
         <Flex display="block" fontSize="md" width="70%" alignItems="center" height="100%" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{props.title}</Flex>
         <Flex fontSize="md" fontWeight="600" width="30%" justifyContent="flex-end" alignItems="center">
-          {props.sale?.price.toFixed(2)} <img src={tz} alt="" width={10} height="auto" style={{ display: props.sale?.price ? 'inline-block' : 'none' }} />
+          {props.sale?.price.toFixed(2)}&nbsp;<img src={tz} alt="" width={10} height="auto" style={{ display: props.sale?.price ? 'inline-block' : 'none' }} />
         </Flex>
       </Flex>
     </Flex>
