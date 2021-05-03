@@ -302,8 +302,11 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   <Flex mt={[4, 8]}>
                     <Text color="brand.neutralGray">Collection:</Text>
                     <Text color="brand.darkGray" fontWeight="bold" ml={[1]} whiteSpace="nowrap" overflow="hidden">
+                      {
+                      console.log(state.collections, state.collections[state?.selectedCollection as string]?.metadata.name, state.collections[state.globalCollection]?.metadata.name, contractAddress)
+                      }
                       <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://${(system.config.network + '.').replace('mainnet.', '')}tzkt.io/${contractAddress}`}>{state.selectedCollection
-                        ? state.collections[state.selectedCollection]?.metadata.name : state.collections[state.globalCollection]?.metadata.name ? state.collections[state.globalCollection]?.metadata.name : contractAddress}&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{ display: 'inline-block' }} /></sup></Link>
+                        ? state.collections[state.selectedCollection]?.metadata.name : collection?.metadata.name ? collection?.metadata.name : contractAddress }&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{ display: 'inline-block' }} /></sup></Link>
                     </Text>
                   </Flex>
                   {token?.metadata?.attributes?.map(({ name, value }) => (
