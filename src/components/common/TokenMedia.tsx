@@ -96,6 +96,7 @@ export function TokenMedia(props: TokenMediaProps) {
           <model-viewer
             auto-rotate
             rotation-per-second="30deg"
+            camera-controls
             src={obj.url}
             class={props.class}
           ></model-viewer>
