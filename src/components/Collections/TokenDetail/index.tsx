@@ -149,7 +149,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           />
         </ModalContent>
       </Modal>
-      <Flex>
+      <Flex justifyContent="flex-start" width="4rem">
         <MinterButton
           variant="primaryActionInverted"
           onClick={e => {
