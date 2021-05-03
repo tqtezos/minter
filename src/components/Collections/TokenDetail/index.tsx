@@ -166,8 +166,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       <Box
         align="center"
         px={[4, 16]}
-        pt={[2, 0]}
-        pb={[1, 0]}
+        pt={[3, 0]}
+        pb={[1.5, 0]}
         mx="auto"
         width={['100%', "100%", "100%", '70%']}
         maxWidth="80%"
