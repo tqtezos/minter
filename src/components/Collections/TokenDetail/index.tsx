@@ -296,18 +296,20 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 <AccordionPanel pb={4}>
                   <Flex mt={[4, 8]}>
                     <Text color="brand.neutralGray">Minter:</Text>
-                    <Text color="brand.darkGray" fontWeight="bold" ml={[1]}  whiteSpace="nowrap" overflow="hidden">
-                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://${(system.config.network+'.').replace('mainnet.', '')}tzkt.io/${token.metadata?.minter}`}>{token.metadata?.minter}&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{display: 'inline-block'}} /></sup></Link>
+                    <Text color="brand.darkGray" fontWeight="bold" ml={[1]} whiteSpace="nowrap" overflow="hidden">
+                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://${(system.config.network + '.').replace('mainnet.', '')}tzkt.io/${token.metadata?.minter}`}>{token.metadata?.minter}&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{ display: 'inline-block' }} /></sup></Link>
                     </Text>
                   </Flex>
                   <Flex mt={[4, 8]}>
                     <Text color="brand.neutralGray">Collection:</Text>
-                    <Text color="brand.darkGray" fontWeight="bold" ml={[1]}  whiteSpace="nowrap" overflow="hidden">
-                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://${(system.config.network+'.').replace('mainnet.', '')}tzkt.io/${contractAddress}`}>{contractAddress}&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{display: 'inline-block'}} /></sup></Link>
+                    <Text color="brand.darkGray" fontWeight="bold" ml={[1]} whiteSpace="nowrap" overflow="hidden">
+                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://${(system.config.network + '.').replace('mainnet.', '')}tzkt.io/${contractAddress}`}>{state.selectedCollection
+                        ? state.collections[state.selectedCollection].metadata.name
+                        : contractAddress}&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{ display: 'inline-block' }} /></sup></Link>
                     </Text>
                   </Flex>
                   {token.metadata?.attributes?.map(({ name, value }) => (
-                    <Flex mt={[4, 8]}>
+                    <Flex key={name + value} mt={[4, 8]}>
                       <Text color="brand.neutralGray">{name}:</Text>
                       <Text display="block" color="brand.darkGray" fontWeight="bold" ml={[1]} whiteSpace="nowrap" overflow="hidden" textOverflow="wrap">
                         {value}
