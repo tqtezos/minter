@@ -137,7 +137,7 @@ export default function CollectionDisplay({
               {collection.address}
             </Text>
             <Link
-              href={config.bcd.gui + '/' + collection.address}
+              href={`${config.bcd.gui}/${config.network}/${collection.address}`}
               color="brand.darkGray"
               isExternal
               ml={2}
