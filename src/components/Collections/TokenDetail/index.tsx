@@ -163,8 +163,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           </Box>
         </MinterButton>
       </Flex>
-      <Box
-        align="center"
+      <Flex
         px={[4, 16]}
         pt={[10, 0]}
         pb={[5, 0]}
@@ -181,12 +180,12 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           metadata={token.metadata}
           maxW="100%"
           maxH="100%"
-          objectFit="contain"
+          objectFit="scale-down"
           cursor="pointer"
           onClick={onOpen}
         />
-      </Box>
-      <Flex width="99vw" height={10} maxHeight={10} justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
+      </Flex>
+      <Flex width="99vw" height="auto" justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
         <Button onClick={onOpen}>
           <Maximize2 size={16} strokeWidth="3" />
         </Button>
