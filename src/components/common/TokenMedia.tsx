@@ -76,7 +76,7 @@ export function TokenMedia(props: TokenMediaProps) {
         onClick={e => e.preventDefault()}
         onMouseEnter={e => e.currentTarget.play()}
         onMouseLeave={e => e.currentTarget.pause()}
-        style={{ objectFit: props.objectFit ?? 'cover', maxWidth: props.maxW, maxHeight: '50vh' }}
+        style={{ objectFit: props.objectFit ?? 'cover', maxWidth: props.maxW, maxHeight: props.maxH ?? '50vh', cursor: props.cursor }}
         onLoadedMetadata={e => {(e.target as HTMLVideoElement).currentTime = .05; }}
         muted
         controls
