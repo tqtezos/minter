@@ -166,13 +166,13 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
       <Box
         align="center"
         px={[4, 16]}
-        pt={[3, 0]}
-        pb={[1.5, 0]}
+        pt={[10, 0]}
+        pb={[5, 0]}
         mx="auto"
         width={['100%', "100%", "100%", '70%']}
         maxWidth="80%"
         maxHeight={["40vh", "70vh", "65vh"]}
-        height={["auto"]}
+        height={["100%"]}
       >
         <TokenMedia
           key={`${token.address}-${token.id}`}
@@ -180,8 +180,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           {...token}
           metadata={token.metadata}
           maxW="100%"
-          maxH="45vh"
-          objectFit="scale-down"
+          maxH="100%"
+          objectFit="contain"
           cursor="pointer"
           onClick={onOpen}
         />
