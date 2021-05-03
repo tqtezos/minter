@@ -210,73 +210,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             <Heading textAlign="left" color="brand.black" width={["100%", "100%", "80%"]} fontSize={["10vw", "3vw"]} display="inline-block">
               {token.title}
             </Heading>
-            {(window.innerWidth >= 777) ? <Flex display={['block', 'block', 'block', 'flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'column', 'column', 'row']} flexWrap="wrap">
-              <Flex justifyContent={["space-between", "space-between", "space-between", "flex-end"]} alignItems="center" width="100%">
-                {token.sale ? (
-                  isOwner ? (
-                    <>
-                      <Text color="brand.black" fontSize="xl" fontWeight="700" marginRight={8}>
-                        {token.sale.price.toFixed(2)} <img src={tz} alt="" width={10} height="auto" style={{ display: token.sale.price ? 'inline-block' : 'none' }} />
-                      </Text>
-                      <Box marginRight={8}>
-                        <CancelTokenSaleButton
-                          contract={contractAddress}
-                          tokenId={tokenId}
-                        />
-                      </Box>
-                    </>
-                  ) : (
-                    <>
-                      <Text color="black" fontSize={['md', 'md', 'lg']} mr={1} fontWeight="700" marginRight={8}>
-                        {token.sale.price.toFixed(2)} <img src={tz} alt="" width={10} height="auto" style={{ display: token.sale.price ? 'inline-block' : 'none' }} />
-                      </Text>
-                      <Box>
-                        <BuyTokenButton contract={contractAddress} token={token} />
-                      </Box>
-                    </>
-                  )
-                ) : isOwner ? (
-                  <Box marginRight={8}>
-                    <SellTokenButton contract={contractAddress} tokenId={tokenId} />
-                  </Box>
-                ) : (
-                  <></>
-                )}
-                {isOwner ? (
-                  <Menu>
-                    <MinterMenuButton variant="primary">
-                      <MoreHorizontal color="#25282B" />
-                    </MinterMenuButton>
-                    <MenuList
-                      borderColor="brand.lightBlue"
-                      borderRadius="2px"
-                      p={0}
-                      minWidth={[100]}
-                    >
-                      {token.sale ? (
-                        <></>
-                      ) : (
-                        <MinterMenuItem
-                          w={[100]}
-                          variant="primary"
-                          onClick={disclosure.onOpen}
-                        >
-                          Transfer
-                        </MinterMenuItem>
-                      )}
-                    </MenuList>
-                    <TransferTokenModal
-                      contractAddress={contractAddress}
-                      tokenId={tokenId}
-                      disclosure={disclosure}
-                    />
-                  </Menu>
-                ) : (
-                  <></>
-                )}
-              </Flex>
-            </Flex>
-              : null}
             <Text
               fontSize="md"
               color="brand.neutralGray"
@@ -302,9 +235,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   <Flex mt={[4, 8]}>
                     <Text color="brand.neutralGray">Collection:</Text>
                     <Text color="brand.darkGray" fontWeight="bold" ml={[1]} whiteSpace="nowrap" overflow="hidden">
-                      {
-                      console.log(state.collections, state.collections[state?.selectedCollection as string]?.metadata.name, state.collections[state.globalCollection]?.metadata.name, contractAddress)
-                      }
                       <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://${(system.config.network + '.').replace('mainnet.', '')}tzkt.io/${contractAddress}`}>{state.selectedCollection
                         ? state.collections[state.selectedCollection]?.metadata.name : collection?.metadata.name ? collection?.metadata.name : contractAddress }&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{ display: 'inline-block' }} /></sup></Link>
                     </Text>
@@ -320,8 +250,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 </AccordionPanel>
               </AccordionItem>
             </Accordion>
-            {(window.innerWidth < 777) ? <Flex display={['block', 'block', 'block', 'flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'column', 'column', 'row']} flexWrap="wrap">
-              <Flex justifyContent={["space-between", "space-between", "space-between", "flex-end"]} alignItems="center" width="100%">
+            <Flex display={['block', 'block', 'flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'column', 'row']} flexWrap="wrap">
+              <Flex justifyContent={["space-between", "space-between", "space-between"]} alignItems="center" width="100%">
                 {token.sale ? (
                   isOwner ? (
                     <>
@@ -386,7 +316,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 )}
               </Flex>
             </Flex>
-              : null}
           </Flex>
         </Flex>
       </Flex>
