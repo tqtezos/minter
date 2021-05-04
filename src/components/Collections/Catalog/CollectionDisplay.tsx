@@ -165,7 +165,7 @@ export default function CollectionDisplay({
         {tokens.map(token => {
           return (
             <TokenCard
-              key={token.id}
+              key={address + token.id}
               address={address}
               config={config}
               {...token}

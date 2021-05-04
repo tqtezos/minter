@@ -49,9 +49,9 @@ export default function Sidebar() {
             address !== state.globalCollection &&
             state.collections[address]?.creator?.address === tzPublicKey
         )
-        .map(address => (
+        .map((address, idx) => (
           <CollectionTab
-            key={address}
+            key={address + idx}
             selected={address === state.selectedCollection}
             onSelect={address => dispatch(selectCollection(address))}
             {...state.collections[address]}

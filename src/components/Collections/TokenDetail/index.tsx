@@ -164,11 +164,11 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
         </MinterButton>
       </Flex>
       <Flex
-        px={[4, 16]}
+        px={[8, 16]}
         pt={[10, 0]}
         pb={[5, 0]}
         width={['100%']}
-        maxHeight={["40vh", "70vh", "65vh"]}
+        maxHeight={["30vh", "60vh", "70vh"]}
         height={["100%"]}
         justifyContent="center"
       >
