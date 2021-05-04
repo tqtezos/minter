@@ -125,9 +125,10 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             key={`${token.address}-${token.id}`}
             config={system.config}
             {...token}
-            metadata={token.metadata}
+            metadata={token?.metadata}
             maxW="95vw"
             maxH="95vh"
+            objectFit="scale-down"
           />
           <ModalCloseButton
             position="absolute"
@@ -149,7 +150,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           />
         </ModalContent>
       </Modal>
-      <Flex>
+      <Flex justifyContent="flex-start" width="4rem">
         <MinterButton
           variant="primaryActionInverted"
           onClick={e => {
@@ -162,28 +163,28 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           </Box>
         </MinterButton>
       </Flex>
-      <Box
-        align="center"
-        px={[4, 16]}
-        mx="auto"
-        width={['100%', "100%", "100%", '70%']}
-        maxWidth="80%"
-        maxHeight={["40vh", "70vh", "65vh"]}
-        height={["auto"]}
+      <Flex
+        px={[8, 16]}
+        pt={[10, 0]}
+        pb={[5, 0]}
+        width={['100%']}
+        maxHeight={["30vh", "60vh", "70vh"]}
+        height={["100%"]}
+        justifyContent="center"
       >
         <TokenMedia
           key={`${token.address}-${token.id}`}
           config={system.config}
           {...token}
-          metadata={token.metadata}
+          metadata={token?.metadata}
           maxW="100%"
-          maxH="45vh"
+          maxH="100%"
           objectFit="scale-down"
           cursor="pointer"
           onClick={onOpen}
         />
-      </Box>
-      <Flex width="99vw" height={10} maxHeight={10} justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
+      </Flex>
+      <Flex width="99vw" height="auto" justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
         <Button onClick={onOpen}>
           <Maximize2 size={16} strokeWidth="3" />
         </Button>
@@ -206,16 +207,56 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             mb={10}
             pos="relative"
           >
-            <Flex display={['block', 'block', 'block', 'flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'column', 'column', 'row']} flexWrap="wrap">
-              <Heading textAlign="left" color="brand.black" width={["100%", "100%", "80%"]} fontSize={["10vw", "3vw"]} display="inline-block">
-                {token.title}
-              </Heading>
-              <Flex justifyContent={["space-between", "space-between", "space-between", "flex-end"]} alignItems="center" width="100%">
+            <Heading textAlign="left" color="brand.black" width={["100%", "100%", "80%"]} fontSize={["10vw", "3vw"]} display="inline-block">
+              {token.title}
+            </Heading>
+            <Text
+              fontSize="md"
+              color="brand.neutralGray"
+              fontWeight="bold"
+              mt={[2, 4]}
+              width={['100%', '100%', '60%']}
+            >
+              {token.description || 'No description provided'}
+            </Text>
+            <Accordion allowToggle mt={4}>
+              <AccordionItem border="none">
+                <AccordionButton p={0}>
+                  <Text color="brand.neutralGray">Token Info</Text>
+                  <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel pb={4}>
+                  <Flex mt={[4, 8]}>
+                    <Text color="brand.neutralGray">Minter:</Text>
+                    <Text color="brand.darkGray" fontWeight="bold" ml={[1]} whiteSpace="nowrap" overflow="hidden">
+                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://${(system.config.network + '.').replace('mainnet.', '')}tzkt.io/${token?.metadata?.minter}`}>{token?.metadata?.minter}&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{ display: 'inline-block' }} /></sup></Link>
+                    </Text>
+                  </Flex>
+                  <Flex mt={[4, 8]}>
+                    <Text color="brand.neutralGray">Collection:</Text>
+                    <Text color="brand.darkGray" fontWeight="bold" ml={[1]} whiteSpace="nowrap" overflow="hidden">
+                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://${(system.config.network + '.').replace('mainnet.', '')}tzkt.io/${contractAddress}`}>{state.selectedCollection
+                        ? state.collections[state.selectedCollection]?.metadata.name : collection?.metadata.name ? collection?.metadata.name : contractAddress }&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{ display: 'inline-block' }} /></sup></Link>
+                    </Text>
+                  </Flex>
+                  {token?.metadata?.attributes?.map(({ name, value }) => (
+                    <Flex key={name + value} mt={[4, 8]}>
+                      <Text color="brand.neutralGray">{name}:</Text>
+                      <Text display="block" color="brand.darkGray" fontWeight="bold" ml={[1]} whiteSpace="nowrap" overflow="hidden" textOverflow="wrap">
+                        {value}
+                      </Text>
+                    </Flex>
+                  ))}
+                </AccordionPanel>
+              </AccordionItem>
+            </Accordion>
+            <Flex display={['flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'row']} flexWrap="wrap" marginTop={2}>
+              <Flex justifyContent={["flex-start"]} alignItems="center" width="100%" marginTop={4}>
                 {token.sale ? (
                   isOwner ? (
                     <>
                       <Text color="brand.black" fontSize="xl" fontWeight="700" marginRight={8}>
-                        {token.sale.price.toFixed(2)} <img src={tz} alt="" width={10} height="auto" style={{ display: token.sale.price ? 'inline-block' : 'none' }} />
+                        {token.sale.price} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
                       </Text>
                       <Box marginRight={8}>
                         <CancelTokenSaleButton
@@ -227,7 +268,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   ) : (
                     <>
                       <Text color="black" fontSize={['md', 'md', 'lg']} mr={1} fontWeight="700" marginRight={8}>
-                        {token.sale.price.toFixed(2)} <img src={tz} alt="" width={10} height="auto" style={{ display: token.sale.price ? 'inline-block' : 'none' }} />
+                        {token.sale.price.toFixed(2)} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
                       </Text>
                       <Box>
                         <BuyTokenButton contract={contractAddress} token={token} />
@@ -275,45 +316,6 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 )}
               </Flex>
             </Flex>
-            <Text
-              fontSize="md"
-              color="brand.neutralGray"
-              fontWeight="bold"
-              mt={[2, 4]}
-              width={['100%', '100%', '100%', '100%', '60%']}
-            >
-              {token.description || 'No description provided'}
-            </Text>
-            <Accordion allowToggle>
-              <AccordionItem border="none">
-                <AccordionButton mt={[4, 8]} p={0}>
-                  <Text color="brand.neutralGray">Token Info</Text>
-                  <AccordionIcon />
-                </AccordionButton>
-                <AccordionPanel pb={4}>
-                  <Flex mt={[4, 8]}>
-                    <Text color="brand.neutralGray">Minter:</Text>
-                    <Text color="brand.darkGray" fontWeight="bold" ml={[1]}  whiteSpace="nowrap" overflow="hidden">
-                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://${(system.config.network+'.').replace('mainnet.', '')}tzkt.io/${token.metadata?.minter}`}>{token.metadata?.minter}&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{display: 'inline-block'}} /></sup></Link>
-                    </Text>
-                  </Flex>
-                  <Flex mt={[4, 8]}>
-                    <Text color="brand.neutralGray">Collection:</Text>
-                    <Text color="brand.darkGray" fontWeight="bold" ml={[1]}  whiteSpace="nowrap" overflow="hidden">
-                      <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://${(system.config.network+'.').replace('mainnet.', '')}tzkt.io/${contractAddress}`}>{contractAddress}&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{display: 'inline-block'}} /></sup></Link>
-                    </Text>
-                  </Flex>
-                  {token.metadata?.attributes?.map(({ name, value }) => (
-                    <Flex mt={[4, 8]}>
-                      <Text color="brand.neutralGray">{name}:</Text>
-                      <Text display="block" color="brand.darkGray" fontWeight="bold" ml={[1]} whiteSpace="nowrap" overflow="hidden" textOverflow="wrap">
-                        {value}
-                      </Text>
-                    </Flex>
-                  ))}
-                </AccordionPanel>
-              </AccordionItem>
-            </Accordion>
           </Flex>
         </Flex>
       </Flex>

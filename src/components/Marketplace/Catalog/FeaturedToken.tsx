@@ -20,9 +20,11 @@ export default function FeaturedToken(props: FeaturedTokenProps) {
   const [, setLocation] = useLocation();
   return (
     <Flex flexDir="row" flexWrap="wrap" mb={8} width="100%" justifyContent="center">
-      <Flex maxHeight={['45vh', '65vh']} marginRight={[0, 8]} justifyContent="center" width={['85vw', '65vw', '45vw']}>
+      <Flex maxHeight={['45vh', '65vh']} justifyContent="center" width={['85vw', '65vw', '45vw']}>
         <TokenMedia
           maxW="100%"
+          maxH="50vh"
+          objectFit="scale-down"
           class="featured"
           {...props}
         />
