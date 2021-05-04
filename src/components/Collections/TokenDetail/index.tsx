@@ -219,9 +219,9 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             >
               {token.description || 'No description provided'}
             </Text>
-            <Accordion allowToggle>
+            <Accordion allowToggle mt={4}>
               <AccordionItem border="none">
-                <AccordionButton mt={[4, 8]} p={0}>
+                <AccordionButton p={0}>
                   <Text color="brand.neutralGray">Token Info</Text>
                   <AccordionIcon />
                 </AccordionButton>
@@ -250,7 +250,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 </AccordionPanel>
               </AccordionItem>
             </Accordion>
-            <Flex display={['flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'row']} flexWrap="wrap">
+            <Flex display={['flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'row']} flexWrap="wrap" marginTop={2}>
               <Flex justifyContent={["flex-start"]} alignItems="center" width="100%" marginTop={4}>
                 {token.sale ? (
                   isOwner ? (
