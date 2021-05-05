@@ -6,7 +6,6 @@ import {
   AccordionItem,
   AccordionPanel,
   Box,
-  Button,
   Flex,
   Heading,
   Link,
@@ -18,8 +17,8 @@ import {
   Text,
   useDisclosure
 } from '@chakra-ui/react';
-import { ChevronLeft, HelpCircle, MoreHorizontal } from 'react-feather';
-import { MinterButton, MinterMenuButton, MinterMenuItem } from '../../common';
+import { HelpCircle, MoreHorizontal } from 'react-feather';
+import { MinterMenuButton, MinterMenuItem } from '../../common';
 import { TransferTokenModal } from '../../common/modals/TransferToken';
 import { SellTokenButton } from '../../common/modals/SellToken';
 import { CancelTokenSaleButton } from '../../common/modals/CancelTokenSale';
@@ -32,7 +31,6 @@ import {
 import { TokenMedia } from '../../common/TokenMedia';
 import lk from '../../common/assets/link-icon.svg'
 import tz from '../../common/assets/tezos-sym.svg'
-import { Maximize2 } from 'react-feather';
 
 function NotFound() {
   return (
@@ -150,27 +148,16 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           />
         </ModalContent>
       </Modal>
-      <Flex justifyContent="flex-start" width="4rem">
-        <MinterButton
-          variant="primaryActionInverted"
-          onClick={e => {
-            e.preventDefault();
-            window.history.back();
-          }}
-        >
-          <Box color="currentcolor">
-            <ChevronLeft size={24} strokeWidth="3" />
-          </Box>
-        </MinterButton>
-      </Flex>
       <Flex
-        px={[8, 16]}
-        pt={[10, 0]}
-        pb={[5, 0]}
+        px={[0, 16]}
+        pt={0}
+        pb={0}
         width={['100%']}
-        maxHeight={["30vh", "60vh", "70vh"]}
+        maxHeight={["50vh", "60vh", "70vh"]}
         height={["100%"]}
         justifyContent="center"
+        boxShadow="0px 0px 8px #333"
+        zIndex="100"
       >
         <TokenMedia
           key={`${token.address}-${token.id}`}
@@ -179,22 +166,16 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           metadata={token?.metadata}
           maxW="100%"
           maxH="100%"
-          objectFit="scale-down"
+          objectFit="contain"
           cursor="pointer"
           onClick={onOpen}
         />
       </Flex>
-      <Flex width="99vw" height="auto" justifyContent="flex-end" marginBottom={[3, 2]} zIndex="50">
-        <Button onClick={onOpen}>
-          <Maximize2 size={16} strokeWidth="3" />
-        </Button>
-      </Flex>
-      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1}>
-        <Flex align="center" justify="space-evenly" width={['100']} mt="4">
-        </Flex>
+      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1} marginTop={4}>
         <Flex
           width={['90%', '90%', '70%']}
           mx="auto"
+          marginBottom="10vw"
           flexDir="column"
           px={[4, 16]}
           flex="1"
@@ -203,7 +184,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             flexDir="column"
             w="100%"
             bg="white"
-            py={6}
+            py={1}
             mb={10}
             pos="relative"
           >
@@ -250,8 +231,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 </AccordionPanel>
               </AccordionItem>
             </Accordion>
-            <Flex display={['flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'row']} flexWrap="wrap" marginTop={2}>
-              <Flex justifyContent={["flex-start"]} alignItems="center" width="100%" marginTop={4}>
+            <Flex display={['flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'row']} flexWrap="wrap" position="fixed" bottom="0" left="0">
+              <Flex justifyContent={"space-between"} alignItems="center" width="100%" p={4} boxShadow="0px 0px 8px #333" bg="#fff">
                 {token.sale ? (
                   isOwner ? (
                     <>
