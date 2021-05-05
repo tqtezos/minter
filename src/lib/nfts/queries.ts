@@ -57,16 +57,6 @@ async function getTokenMetadataBigMap(
   return decoded.right;
 }
 
-function transformFixedPriceSales(fixedPriceSales: any): t.Mixed[] {
-  fixedPriceSales.forEach((fixedPriceSale: any, i: number) => {
-    if (fixedPriceSale.key.hasOwnProperty('seller')) {
-      fixedPriceSales[i].key['sale_seller'] = fixedPriceSale.key.seller;
-      delete fixedPriceSales[i].key.seller;
-    }
-  });
-  return fixedPriceSales;
-}
-
 async function getFixedPriceSalesBigMap(
   tzkt: TzKt,
   address: string

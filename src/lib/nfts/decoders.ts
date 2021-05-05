@@ -1,7 +1,6 @@
 /* eslint-disable no-redeclare */
 import * as t from 'io-ts';
 import * as e from 'fp-ts/Either';
-import { mapOutput } from 'io-ts-types';
 
 //// Contracts
 
