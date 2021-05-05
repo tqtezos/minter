@@ -176,7 +176,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
         <Flex
           width={['90%', '90%', '70%']}
           mx="auto"
-          marginBottom={[7, 1]}
+          marginBottom={[7, 0]}
           flexDir="column"
           px={[4, 16]}
           flex="1"
@@ -233,7 +233,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               </AccordionItem>
             </Accordion>
             <Flex display={['flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'row']} flexWrap="wrap" position={["fixed", "inherit"]} bottom="0" left="0">
-              <Flex justifyContent={["space-between", "flex-start"]} alignItems="center" width="100%" p={[4, 0]} boxShadow={["0px 0px 8px #333", "none"]} bg="#fff">
+              <Flex justifyContent={["space-between", "flex-start"]} alignItems="center" width="100%" px={[4, 0]} py={[4]} boxShadow={["0px 0px 8px #333", "none"]} bg="#fff">
                 {token.sale ? (
                   isOwner ? (
                     <>
