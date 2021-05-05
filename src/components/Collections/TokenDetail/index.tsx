@@ -232,8 +232,8 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                 </AccordionPanel>
               </AccordionItem>
             </Accordion>
-            <Flex display={['flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'row']} flexWrap="wrap" position="fixed" bottom="0" left="0">
-              <Flex justifyContent={["space-between", "center"]} alignItems="center" width="100%" p={4} boxShadow="0px 0px 8px #333" bg="#fff">
+            <Flex display={['flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'row']} flexWrap="wrap" position={["fixed", "inherit"]} bottom="0" left="0">
+              <Flex justifyContent={["space-between", "flex-start"]} alignItems="center" width="100%" p={[0, 4]} boxShadow={["0px 0px 8px #333", "none"]} bg="#fff">
                 {token.sale ? (
                   isOwner ? (
                     <>
@@ -252,7 +252,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                       <Text color="black" fontSize={['md', 'md', 'lg']} fontWeight="700" marginRight={[0, 16]}>
                         {token.sale.price.toFixed(2)} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
                       </Text>
-                      <Box marginRight={[8, 16]}>
+                      <Box marginRight={[0, 16]}>
                         <BuyTokenButton contract={contractAddress} token={token} />
                       </Box>
                     </>
