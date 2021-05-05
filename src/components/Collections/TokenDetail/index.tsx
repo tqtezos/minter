@@ -156,6 +156,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
         maxHeight={["50vh", "60vh", "70vh"]}
         height={["100%"]}
         justifyContent="center"
+        alignItems="center"
         boxShadow="0px 0px 8px #333"
         zIndex="100"
       >
@@ -164,18 +165,18 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
           config={system.config}
           {...token}
           metadata={token?.metadata}
-          maxW="100%"
-          maxH="100%"
+          maxW="85%"
+          maxH="85%"
           objectFit="contain"
           cursor="pointer"
           onClick={onOpen}
         />
       </Flex>
-      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1} marginTop={4}>
+      <Flex width={['100%']} bg="white" flexDir="column" flexGrow={1}>
         <Flex
           width={['90%', '90%', '70%']}
           mx="auto"
-          marginBottom="10vw"
+          marginBottom={[7, 1]}
           flexDir="column"
           px={[4, 16]}
           flex="1"
@@ -188,7 +189,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
             mb={10}
             pos="relative"
           >
-            <Heading textAlign="left" color="brand.black" width={["100%", "100%", "80%"]} fontSize={["10vw", "3vw"]} display="inline-block">
+            <Heading textAlign="left" color="brand.black" width={["100%", "100%", "80%"]} fontSize={["10vw", "3vw"]} display="inline-block" mt={[2, 4]}>
               {token.title}
             </Heading>
             <Text
@@ -196,7 +197,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               color="brand.neutralGray"
               fontWeight="bold"
               mt={[2, 4]}
-              width={['100%', '100%', '60%']}
+              width={['100%', '100%', '80%']}
             >
               {token.description || 'No description provided'}
             </Text>
@@ -206,7 +207,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                   <Text color="brand.neutralGray">Token Info</Text>
                   <AccordionIcon />
                 </AccordionButton>
-                <AccordionPanel pb={4}>
+                <AccordionPanel pb={[4, 1]}>
                   <Flex mt={[4, 8]}>
                     <Text color="brand.neutralGray">Minter:</Text>
                     <Text color="brand.darkGray" fontWeight="bold" ml={[1]} whiteSpace="nowrap" overflow="hidden">
@@ -232,14 +233,14 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
               </AccordionItem>
             </Accordion>
             <Flex display={['flex']} justifyContent="space-between" alignItems="center" width="100%" flexDir={['column', 'row']} flexWrap="wrap" position="fixed" bottom="0" left="0">
-              <Flex justifyContent={"space-between"} alignItems="center" width="100%" p={4} boxShadow="0px 0px 8px #333" bg="#fff">
+              <Flex justifyContent={["space-between", "center"]} alignItems="center" width="100%" p={4} boxShadow="0px 0px 8px #333" bg="#fff">
                 {token.sale ? (
                   isOwner ? (
                     <>
-                      <Text color="brand.black" fontSize="xl" fontWeight="700" marginRight={8}>
+                      <Text color="brand.black" fontSize="xl" fontWeight="700" marginRight={[0, 16]}>
                         {token.sale.price} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
                       </Text>
-                      <Box marginRight={8}>
+                      <Box marginRight={[8, 16]}>
                         <CancelTokenSaleButton
                           contract={contractAddress}
                           tokenId={tokenId}
@@ -248,16 +249,16 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                     </>
                   ) : (
                     <>
-                      <Text color="black" fontSize={['md', 'md', 'lg']} mr={1} fontWeight="700" marginRight={8}>
+                      <Text color="black" fontSize={['md', 'md', 'lg']} fontWeight="700" marginRight={[0, 16]}>
                         {token.sale.price.toFixed(2)} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
                       </Text>
-                      <Box>
+                      <Box marginRight={[8, 16]}>
                         <BuyTokenButton contract={contractAddress} token={token} />
                       </Box>
                     </>
                   )
                 ) : isOwner ? (
-                  <Box marginRight={8}>
+                  <Box marginRight={[8, 16]}>
                     <SellTokenButton contract={contractAddress} tokenId={tokenId} />
                   </Box>
                 ) : (

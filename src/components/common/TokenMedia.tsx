@@ -62,6 +62,7 @@ export function TokenMedia(props: TokenMediaProps) {
         flex="1"
         maxWidth={props.maxW}
         maxHeight={props.maxH}
+        transition="0.25s all"
         style={{ objectFit: props.objectFit ?? 'cover', maxWidth: props.maxW, maxHeight: props.maxH ?? '50vh', cursor: props.cursor }}
         onClick={props.onClick as MouseEventHandler<HTMLImageElement>}
         onError={() => setErrored(true)}
