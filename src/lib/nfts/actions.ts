@@ -44,7 +44,7 @@ export async function createAssetContract(
   system: SystemWithWallet,
   metadata: Record<string, string>
 ) {
-  const metadataMap = new MichelsonMap();
+  const metadataMap = new MichelsonMap<string, string>();
   const resp = await uploadIPFSJSON(system.config.ipfsApi, {
     description: 'An OpenMinter assets contract.',
     interfaces: ['TZIP-012', 'TZIP-016', 'TZIP-020'],
