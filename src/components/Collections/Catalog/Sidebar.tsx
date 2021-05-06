@@ -48,7 +48,7 @@ export default function Sidebar() {
           address =>
             address !== state.globalCollection &&
             state.collections[address]?.creator?.address === tzPublicKey
-        )
+        ).reverse()
         .map((address, idx) => (
           <CollectionTab
             key={address + idx}
