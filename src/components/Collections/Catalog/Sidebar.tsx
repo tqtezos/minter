@@ -2,9 +2,7 @@ import React from 'react';
 import { Flex, Heading } from '@chakra-ui/react';
 import { CreateCollectionButton } from '../../common/modals/CreateCollection';
 import { useSelector, useDispatch } from '../../../reducer';
-import {
-  selectCollection
-} from '../../../reducer/slices/collections';
+import { selectCollection } from '../../../reducer/slices/collections';
 import CollectionTab from './CollectionTab';
 
 export default function Sidebar() {
@@ -48,7 +46,8 @@ export default function Sidebar() {
           address =>
             address !== state.globalCollection &&
             state.collections[address]?.creator?.address === tzPublicKey
-        ).reverse()
+        )
+        .reverse()
         .map((address, idx) => (
           <CollectionTab
             key={address + idx}
