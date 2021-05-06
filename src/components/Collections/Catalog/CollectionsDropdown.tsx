@@ -58,7 +58,7 @@ export default function CollectionsDropdown() {
               Your Collections
             </Text>
             {Object.keys(state.collections)
-              .filter(address => address !== state.globalCollection).reverse()
+              .filter(address => address !== state.globalCollection)
               .map((address, idx) => (
                 <MenuItemOption
                   key={address + idx}
