@@ -37,7 +37,7 @@ export default function Notifications() {
         title: notification.title,
         description: notification.description,
         status: notificationStatus(notification),
-        duration: 10000,
+        duration: null,
         isClosable: true,
         position: 'bottom-right',
         onCloseComplete() {
