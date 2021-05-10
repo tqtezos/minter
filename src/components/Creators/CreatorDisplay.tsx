@@ -170,9 +170,10 @@ export default function CreatorDisplay({
                     <TabPanel>
                         <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
                             {tokens.filter(
-                                ({ owner, sale }) =>
-                                    owner === tzPublicKey
+                                ({ owner, metadata }) =>
+                                owner === tzPublicKey && (metadata?.creators?.find((creator) => creator === owner) || metadata?.minter === owner)
                             ).map(token => {
+                                console.log(token);
                                 return (
                                     <TokenCard
                                         key={address + token.id}
@@ -187,9 +188,10 @@ export default function CreatorDisplay({
                     <TabPanel>
                     <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
                             {tokens.filter(
-                                ({ owner, sale }) =>
-                                owner === tzPublicKey && sale?.seller !== tzPublicKey
+                                ({ owner, metadata }) =>
+                                owner === tzPublicKey && (!metadata?.creators?.find((creator) => creator === owner) && metadata?.minter !== owner)
                             ).map(token => {
+                                console.log(token);
                                 return (
                                     <TokenCard
                                         key={address + token.id}
@@ -207,6 +209,7 @@ export default function CreatorDisplay({
                                 ({ sale }) =>
                                     sale?.seller === tzPublicKey
                             ).map(token => {
+                                console.log(token);
                                 return (
                                     <TokenCard
                                         key={address + token.id}
