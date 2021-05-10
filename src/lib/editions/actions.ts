@@ -76,7 +76,7 @@ export async function createEditionsContract(
     .send();
 }
 
-export async function mintToken(
+export async function mintEditions(
   system: SystemWithWallet,
   address: string,
   metadata: NftMetadata,
@@ -92,6 +92,6 @@ export async function mintToken(
   edition_info.set('', toHexString(resp.data.ipfsUri));
 
   return contract.methods
-    .mint([{ edition_info, number_of_editions: amount }])
+    .mint_editions([{ edition_info, number_of_editions: amount }])
     .send();
 }

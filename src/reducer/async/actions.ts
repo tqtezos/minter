@@ -21,7 +21,10 @@ import { connectWallet } from './wallet';
 import { NftMetadata } from '../../lib/nfts/decoders';
 import { SystemWithWallet } from '../../lib/system';
 import { notifyPending, notifyFulfilled } from '../slices/notificationsActions';
-import { createEditionsContract } from '../../lib/editions/actions';
+import {
+  createEditionsContract,
+  mintEditions
+} from '../../lib/editions/actions';
 import * as e from 'fp-ts/Either';
 
 type Options = {
@@ -306,11 +309,13 @@ export const mintTokenAction = createAsyncThunk<
       });
     }
 
-    const address = state.collectionAddress as string;
+    // const address = state.collectionAddress!
+    const address = 'KT1RrzL4oaecunXPzwsRrKTYZAMa32r9EHhE';
     const metadata = appendStateMetadata(state, ipfsMetadata, system);
 
     try {
-      const op = await mintToken(system, address, metadata);
+      // const op = await mintToken(system, address, metadata);
+      const op = await mintEditions(system, address, metadata, 100);
       const pendingMessage = `Minting new token: ${metadata.name}`;
       dispatch(notifyPending(requestId, pendingMessage));
       await op.confirmation(2);
@@ -320,6 +325,7 @@ export const mintTokenAction = createAsyncThunk<
       dispatch(getContractNftsQuery(address));
       return { contract: address, metadata };
     } catch (e) {
+      console.log(e);
       return rejectWithValue({
         kind: ErrorKind.MintTokenFailed,
         message: 'Mint token failed'
