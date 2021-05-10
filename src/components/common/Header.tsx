@@ -228,38 +228,38 @@ function NavItems() {
                       <MobileHeaderLink to="/create" onClick={onClose}>
                         New Asset
                       </MobileHeaderLink>
-                      </>
                     ) : null}
+                    </>
+                    {system.status === 'WalletConnected' ? (
+                      <MinterButton
+                        variant="cancelAction"
+                        onClick={async () => {
+                          await dispatch(disconnectWallet());
+                          setLocation('/');
+                        }}
+                        mb={4}
+                      >
+                        Disconnect Wallet
+                      </MinterButton>
+                    ) : (
+                      <MinterButton
+                        variant="secondaryAction"
+                        onClick={e => {
+                          e.preventDefault();
+                          dispatch(connectWallet());
+                        }}
+                        mb={4}
+                      >
+                        Connect Wallet
+                        <Image
+                          src={wallet_icon}
+                          width="auto"
+                          height="40%"
+                          paddingLeft={3}
+                        />
+                      </MinterButton>
+                    )}
                   </Flex>
-                  {system.status === 'WalletConnected' ? (
-                    <MinterButton
-                      variant="cancelAction"
-                      onClick={async () => {
-                        await dispatch(disconnectWallet());
-                        setLocation('/');
-                      }}
-                      mb={4}
-                    >
-                      Disconnect Wallet
-                    </MinterButton>
-                  ) : (
-                    <MinterButton
-                      variant="secondaryAction"
-                      onClick={e => {
-                        e.preventDefault();
-                        dispatch(connectWallet());
-                      }}
-                      mb={4}
-                    >
-                      Connect Wallet
-                      <Image
-                        src={wallet_icon}
-                        width="auto"
-                        height="40%"
-                        paddingLeft={3}
-                      />
-                    </MinterButton>
-                  )}
                 </Flex>
               </DrawerBody>
             </DrawerContent>
