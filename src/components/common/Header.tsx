@@ -228,8 +228,8 @@ function NavItems() {
                       <MobileHeaderLink to="/create" onClick={onClose}>
                         New Asset
                       </MobileHeaderLink>
+                      </>
                     ) : null}
-                    </>
                     {system.status === 'WalletConnected' ? (
                       <MinterButton
                         variant="cancelAction"
