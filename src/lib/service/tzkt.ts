@@ -44,6 +44,31 @@ export async function getContract(
   return response.data;
 }
 
+export async function getContractEntrypoints(
+  config: Config,
+  address: string,
+  params?: Params
+) {
+  const uri = `${
+    config.tzkt.api
+  }/v1/contracts/${address}/entrypoints?${mkQueryParams(params)}`;
+  const response = await axios.get(uri);
+  return response.data;
+}
+
+export async function getContractEntrypoint(
+  config: Config,
+  address: string,
+  entrypoint: string,
+  params?: Params
+) {
+  const uri = `${
+    config.tzkt.api
+  }/v1/contracts/${address}/entrypoints/${entrypoint}?${mkQueryParams(params)}`;
+  const response = await axios.get(uri);
+  return response.data;
+}
+
 export async function getContractBigMapKeys(
   config: Config,
   address: string,
@@ -90,6 +115,14 @@ export class TzKt {
 
   getContract(address: string, params?: Params) {
     return getContract(this.config, address, params);
+  }
+
+  getContractEntrypoints(address: string, params?: Params) {
+    return getContractEntrypoints(this.config, address, params);
+  }
+
+  getContractEntrypoint(address: string, entrypoint: string, params?: Params) {
+    return getContractEntrypoint(this.config, address, entrypoint, params);
   }
 
   getContractBigMapKeys(address: string, name: string, params?: Params) {

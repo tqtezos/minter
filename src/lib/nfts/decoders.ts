@@ -26,6 +26,42 @@ export const ContractRow = <S extends t.Mixed>(storage: S) =>
     storage: storage
   });
 
+const MintEntrypointBaseSchema = t.type({
+  'token_metadata:object': t.type({
+    'token_id:nat': t.literal('nat'),
+    'token_info:map_flat:string:bytes': t.type({
+      string: t.literal('bytes')
+    })
+  }),
+  'owner:address': t.literal('address')
+});
+
+const MintEntrypointEditionSchema = t.intersection([
+  MintEntrypointBaseSchema,
+  t.type({
+    'amount:nat': t.literal('nat')
+  })
+]);
+
+const MintEntrypointGeneric = <S extends t.Mixed>(schema: S) =>
+  t.type({
+    name: t.literal('mint'),
+    jsonParameters: t.type({ 'schema:list:object': t.array(schema) }),
+    unused: t.literal(false)
+  });
+
+export const MintEntrypointBase = MintEntrypointGeneric(
+  MintEntrypointBaseSchema
+);
+export const MintEntrypointEdition = MintEntrypointGeneric(
+  MintEntrypointEditionSchema
+);
+
+export const MintEntrypoint = t.union([
+  MintEntrypointEdition,
+  MintEntrypointBase
+]);
+
 // Generic BigMaps
 
 export const BigMapRow = <K extends t.Mixed, V extends t.Mixed>(props: {
@@ -195,5 +231,8 @@ export const AssetContract = t.intersection([
   ContractRow(t.unknown),
   t.type({
     metadata: AssetContractMetadata
+  }),
+  t.partial({
+    mintType: t.union([t.literal('basic'), t.literal('editions')])
   })
 ]);
