@@ -19,7 +19,7 @@ import {
 } from '@chakra-ui/react';
 import { Plus, Menu as HamburgerIcon } from 'react-feather';
 import { RiStore2Line } from 'react-icons/ri';
-import { MdCollections } from 'react-icons/md';
+import { MdCollections, MdStar } from 'react-icons/md';
 import headerLogo from './assets/header-logo.svg';
 import { useSelector, useDispatch } from '../../reducer';
 import { connectWallet, disconnectWallet } from '../../reducer/async/wallet';
@@ -217,13 +217,18 @@ function NavItems() {
                     <MobileHeaderLink to="/marketplace" onClick={onClose}>
                       Marketplace
                     </MobileHeaderLink>
-                    <MobileHeaderLink to="/collections" onClick={onClose}>
-                      Collections
-                    </MobileHeaderLink>
                     {system.status === 'WalletConnected' ? (
+                      <>
+                      <MobileHeaderLink to="/creator" onClick={onClose}>
+                        Creator
+                      </MobileHeaderLink>
+                      <MobileHeaderLink to="/collections" onClick={onClose}>
+                        Collections
+                      </MobileHeaderLink>
                       <MobileHeaderLink to="/create" onClick={onClose}>
                         New Asset
                       </MobileHeaderLink>
+                      </>
                     ) : null}
                   </Flex>
                   {system.status === 'WalletConnected' ? (
@@ -278,6 +283,12 @@ function NavItems() {
         </DesktopHeaderLink>
         {system.status === 'WalletConnected' ? (
           <>
+            <DesktopHeaderLink to="/creator">
+              <Box color="brand.turquoise">
+                <MdStar size={16} />
+              </Box>
+              <Text ml={2}>Creator</Text>
+            </DesktopHeaderLink>
             <DesktopHeaderLink to="/collections">
               <Box color="brand.turquoise">
                 <MdCollections size={16} />
