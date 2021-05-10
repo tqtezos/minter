@@ -81,7 +81,9 @@ async function getFixedPriceSalesBigMap(
   if (isLeft(t.number.decode(fixedPriceBigMapId))) {
     throw Error('Failed to decode `getFixedPriceSales` bigMap ID');
   }
-  const fixedPriceSales = transformFixedPriceSales(await tzkt.getBigMapKeys(fixedPriceBigMapId));
+  const fixedPriceSales = transformFixedPriceSales(
+    await tzkt.getBigMapKeys(fixedPriceBigMapId)
+  );
   const decoded = D.FixedPriceSaleBigMap.decode(fixedPriceSales);
   if (isLeft(decoded)) {
     throw Error('Failed to decode `getFixedPriceSales` response');
@@ -126,9 +128,39 @@ async function getContract<S extends t.Mixed>(
   const contract = await tzkt.getContract(address, params);
   const decoded = D.ContractRow(storage).decode(contract);
   if (isLeft(decoded)) {
-    throw Error('Failed to decode `getContracts` response');
+    throw Error('Failed to decode `getContract` response');
   }
   return decoded.right;
+}
+
+async function getContractEntrypoint<S extends t.Mixed>(
+  tzkt: TzKt,
+  address: string,
+  entrypoint: string,
+  params: Params,
+  decoder: S
+) {
+  const contract = await tzkt.getContractEntrypoint(
+    address,
+    entrypoint,
+    params
+  );
+  const decoded = decoder.decode(contract);
+  if (isLeft(decoded)) {
+    throw Error('Failed to decode `getContractEntrypoint` response');
+  }
+  return decoded.right;
+}
+
+async function getMintEntrypointType(tzkt: TzKt, address: string) {
+  const mintEntrypoint = await getContractEntrypoint(
+    tzkt,
+    address,
+    'mint',
+    {},
+    D.MintEntrypoint
+  );
+  return D.MintEntrypointEdition.is(mintEntrypoint) ? 'editions' : 'basic';
 }
 
 //// Main query functions
@@ -189,6 +221,8 @@ export async function getNftAssetContract(
   address: string
 ): Promise<D.AssetContract> {
   const contract = await getContract(system.tzkt, address, {}, t.unknown);
+
+  const mintType = await getMintEntrypointType(system.tzkt, contract.address);
   const metaBigMap = await getAssetMetadataBigMap(system.tzkt, address);
   const metaUri = metaBigMap.find(v => v.key === '')?.value;
   if (!metaUri) {
@@ -204,7 +238,7 @@ export async function getNftAssetContract(
   if (isLeft(decoded)) {
     throw Error('Metadata validation failed');
   }
-  return { ...contract, metadata: decoded.right };
+  return { ...contract, metadata: decoded.right, mintType };
 }
 
 export async function getWalletNftAssetContracts(
@@ -252,7 +286,12 @@ export async function getWalletNftAssetContracts(
     if (!contract) {
       continue;
     }
+
     try {
+      const mintType: 'editions' | 'basic' = await getMintEntrypointType(
+        system.tzkt,
+        contract.address
+      ).catch(() => 'basic');
       const metaUri = row.content.value;
       const { metadata } = await system.resolveMetadata(
         fromHexString(metaUri),
@@ -260,7 +299,7 @@ export async function getWalletNftAssetContracts(
       );
       const decoded = D.AssetContractMetadata.decode(metadata);
       if (!isLeft(decoded)) {
-        results.push({ ...contract, metadata: decoded.right });
+        results.push({ ...contract, metadata: decoded.right, mintType });
       }
     } catch (e) {
       console.log(e);
@@ -333,10 +372,10 @@ export async function getMarketplaceNfts(
   return salesWithTokenMetadata;
 }
 
-export const loadMarketplaceNft = async (
+export async function loadMarketplaceNft(
   system: SystemWithToolkit | SystemWithWallet,
   tokenLoadData: MarketplaceNftLoadingData
-): Promise<MarketplaceNftLoadingData> => {
+): Promise<MarketplaceNftLoadingData> {
   const { token, loaded, tokenSale, tokenMetadata } = tokenLoadData;
   const result = { ...tokenLoadData };
 
@@ -389,4 +428,4 @@ export const loadMarketplaceNft = async (
     console.error("Couldn't load token", { tokenSale, err });
     return result;
   }
-};
+}
