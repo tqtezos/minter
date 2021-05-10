@@ -128,7 +128,7 @@ async function getContract<S extends t.Mixed>(
   const contract = await tzkt.getContract(address, params);
   const decoded = D.ContractRow(storage).decode(contract);
   if (isLeft(decoded)) {
-    throw Error('Failed to decode `getContracts` response');
+    throw Error('Failed to decode `getContract` response');
   }
   return decoded.right;
 }
@@ -147,7 +147,7 @@ async function getContractEntrypoint<S extends t.Mixed>(
   );
   const decoded = decoder.decode(contract);
   if (isLeft(decoded)) {
-    throw Error('Failed to decode `getContracts` response');
+    throw Error('Failed to decode `getContractEntrypoint` response');
   }
   return decoded.right;
 }
@@ -287,9 +287,11 @@ export async function getWalletNftAssetContracts(
       continue;
     }
 
-    const mintType = await getMintEntrypointType(system.tzkt, contract.address);
-
     try {
+      const mintType: 'editions' | 'basic' = await getMintEntrypointType(
+        system.tzkt,
+        contract.address
+      ).catch(() => 'basic');
       const metaUri = row.content.value;
       const { metadata } = await system.resolveMetadata(
         fromHexString(metaUri),
