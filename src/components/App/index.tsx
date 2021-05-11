@@ -44,9 +44,6 @@ export default function App() {
           <Route path="/create">
             <CreateNonFungiblePage />
           </Route>
-          <Route path="/collections">
-            <CollectionsCatalog />
-          </Route>
           <Route path="/marketplace">
             <MarketplaceCatalog />
           </Route>

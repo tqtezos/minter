@@ -222,9 +222,6 @@ function NavItems() {
                       <MobileHeaderLink to="/creator" onClick={onClose}>
                         Creator
                       </MobileHeaderLink>
-                      <MobileHeaderLink to="/collections" onClick={onClose}>
-                        Collections
-                      </MobileHeaderLink>
                       <MobileHeaderLink to="/create" onClick={onClose}>
                         New Asset
                       </MobileHeaderLink>
@@ -288,12 +285,6 @@ function NavItems() {
                 <MdStar size={16} />
               </Box>
               <Text ml={2}>Creator</Text>
-            </DesktopHeaderLink>
-            <DesktopHeaderLink to="/collections">
-              <Box color="brand.turquoise">
-                <MdCollections size={16} />
-              </Box>
-              <Text ml={2}>Collections</Text>
             </DesktopHeaderLink>
             <DesktopHeaderLink to="/create">
               <Box color="brand.blue">
