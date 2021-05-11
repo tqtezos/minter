@@ -17,6 +17,7 @@ import {
   getNftAssetContractQuery
 } from '../../reducer/async/queries';
 import TokenCard from '../common/TokenCard';
+import CollectionsDropdown from '../Collections/Catalog/CollectionsDropdown';
 
 interface CollectionDisplayProps {
   address: string | null;
@@ -28,7 +29,7 @@ export default function CreatorDisplay({
   ownedOnly = true
 }: CollectionDisplayProps) {
   const collections = useSelector(s => s.collections);
-  const { config, tzPublicKey } = useSelector(s => s.system);
+  const { config, tzPublicKey, wallet } = useSelector(s => s.system);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -108,11 +109,11 @@ export default function CreatorDisplay({
       overflowY="scroll"
       justify="start"
     >
-      {/* {ownedOnly && wallet !== null ? (
+      {wallet !== null ? (
         <Flex display={{ base: 'flex', md: 'none' }} mb={4}>
           <CollectionsDropdown />
         </Flex>
-      ) : null} */}
+      ) : null}
       <Flex
         w="100%"
         pb={6}

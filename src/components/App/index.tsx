@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Switch, Route } from 'wouter';
 import CreateNonFungiblePage from '../CreateNonFungiblePage';
-import CollectionsCatalog from '../Collections/Catalog';
 import CollectionDisplay from '../Collections/Catalog/CollectionDisplay';
 import CollectionsTokenDetail from '../Collections/TokenDetail';
 import MarketplaceCatalog from '../Marketplace/Catalog';
