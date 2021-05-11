@@ -7,6 +7,7 @@ import {
   getNftAssetContractQuery
 } from '../../reducer/async/queries';
 import { selectCollection } from '../../reducer/slices/collections';
+import Sidebar from '../Collections/Catalog/Sidebar';
 
 export default function Catalog() {
   const system = useSelector(s => s.system);
@@ -50,6 +51,18 @@ export default function Catalog() {
         md: 'row'
       }}
     >
+      <Flex
+        w="250px"
+        h="100%"
+        flexDir="column"
+        overflowY="scroll"
+        display={{
+          base: 'none',
+          md: 'flex'
+        }}
+      >
+        <Sidebar />
+      </Flex>
       <CreatorDisplay address={selectedCollection} />
     </Flex>
   );
