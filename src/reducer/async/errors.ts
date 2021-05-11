@@ -1,5 +1,5 @@
 export enum ErrorKind {
-  UknownError,
+  UnknownError,
   WalletNotConnected,
   CreateAssetContractFailed,
   CreateNftFormInvalid,

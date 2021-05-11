@@ -171,3 +171,35 @@ export default function FileUpload() {
     </Flex>
   );
 }
+
+export function CsvFileUpload() {
+  const state = useSelector(s => s.createNftCsvImport);
+  const dispatch = useDispatch();
+
+  const onDrop = useCallback(
+    (files: File[]) => {
+      dispatch(
+        readFileAsDataUrlAction({ ns: 'createNftCsvImport', file: files[0] })
+      );
+    },
+    [dispatch]
+  );
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    maxFiles: 1,
+    maxSize: 30 * 1024 * 1024,
+    accept: ['text/csv']
+  });
+
+  return (
+    <div {...getRootProps()}>
+      <input {...getInputProps()} />
+      <p>
+        {state.selectedCsvFile
+          ? state.selectedCsvFile.name
+          : 'Drop CSV file Here'}
+      </p>
+    </div>
+  );
+}

@@ -23,7 +23,8 @@
     "noImplicitThis": true,
     "strictPropertyInitialization": true,
     "strictBindCallApply": true,
-    "strictFunctionTypes": true
+    "strictFunctionTypes": true,
+    "downlevelIteration": true
   },
   "include": [
     "src"

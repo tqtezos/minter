@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import { Box, Flex, Text, useDisclosure } from '@chakra-ui/react';
 import { MinterButton } from '../common';
 import Form from './Form';
-import FileUpload from './FileUpload';
+import FileUpload, { CsvFileUpload } from './FileUpload';
 import CollectionSelect from './CollectionSelect';
 // import Preview from './Preview';
 import Confirmation from './Confirmation';
@@ -17,7 +17,10 @@ import {
   incrementStep,
   steps
 } from '../../reducer/slices/createNft';
-import { mintTokenAction } from '../../reducer/async/actions';
+import {
+  mintTokenAction,
+  mintCsvTokensAction
+} from '../../reducer/async/actions';
 import { validateCreateNftStep } from '../../reducer/validators/createNft';
 import FormModal from '../common/modals/FormModal';
 
@@ -57,11 +60,19 @@ function ProgressIndicator({ state }: { state: CreateNftState }) {
 
 function LeftContent() {
   const step = useSelector(s => s.createNft.step);
+  const dispatch = useDispatch();
   switch (step) {
     case 'file_upload':
       return (
         <Box w="100%" maxWidth="1200px">
           <FileUpload />
+          <CsvFileUpload />
+          <MinterButton
+            variant="primaryAction"
+            onClick={() => dispatch(mintCsvTokensAction())}
+          >
+            Mint from CSV
+          </MinterButton>
         </Box>
       );
     case 'asset_details':

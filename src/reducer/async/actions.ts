@@ -3,6 +3,7 @@ import { State } from '..';
 import {
   createAssetContract,
   mintToken,
+  mintTokens,
   transferToken,
   listTokenForSale,
   cancelTokenSale,
@@ -21,6 +22,8 @@ import { connectWallet } from './wallet';
 import { NftMetadata } from '../../lib/nfts/decoders';
 import { SystemWithToolkit, SystemWithWallet } from '../../lib/system';
 import { notifyPending, notifyFulfilled } from '../slices/notificationsActions';
+import parse from 'csv-parse/lib/sync';
+import * as t from 'io-ts';
 
 type Options = {
   state: State;
@@ -62,7 +65,7 @@ export const readFileAsDataUrlAction = createAsyncThunk<
     return await readFile;
   } catch (e) {
     return rejectWithValue({
-      kind: ErrorKind.UknownError,
+      kind: ErrorKind.UnknownError,
       message: 'Could not read file'
     });
   }
@@ -137,7 +140,7 @@ export const mintTokenAction = createAsyncThunk<
     const { system, createNft: state } = getState();
     if (state.selectedFile === null) {
       return rejectWithValue({
-        kind: ErrorKind.UknownError,
+        kind: ErrorKind.UnknownError,
         message: 'Could not mint token: no file selected'
       });
     } else if (system.status !== 'WalletConnected') {
@@ -160,7 +163,7 @@ export const mintTokenAction = createAsyncThunk<
       file = new File([blob], name, { type });
     } catch (e) {
       return rejectWithValue({
-        kind: ErrorKind.UknownError,
+        kind: ErrorKind.UnknownError,
         message: 'Could not mint token: selected file not found'
       });
     }
@@ -196,7 +199,7 @@ export const mintTokenAction = createAsyncThunk<
           displayFile = new File([blob], name, { type });
         } catch (e) {
           return rejectWithValue({
-            kind: ErrorKind.UknownError,
+            kind: ErrorKind.UnknownError,
             message: 'Could not mint token: video display file not found'
           });
         }
@@ -250,6 +253,79 @@ export const mintTokenAction = createAsyncThunk<
         message: 'Mint token failed'
       });
     }
+  }
+);
+
+const ParsedCsv = t.array(
+  t.intersection([
+    t.type({
+      name: t.string,
+      description: t.string,
+      artifactUri: t.string,
+      collection: t.string
+    }),
+    t.partial({
+      displayUri: t.string
+    }),
+    t.record(t.string, t.string)
+  ])
+);
+
+export const mintCsvTokensAction = createAsyncThunk<null, undefined, Options>(
+  'action/mintToken',
+  async (_, { getState, rejectWithValue, dispatch, requestId }) => {
+    const { system, createNftCsvImport: state } = getState();
+    if (system.status !== 'WalletConnected') {
+      return rejectWithValue({
+        kind: ErrorKind.WalletNotConnected,
+        message: 'Wallet not connected'
+      });
+    }
+    if (state.selectedCsvFile === null) {
+      return rejectWithValue({
+        kind: ErrorKind.UnknownError,
+        message: 'No CSV file selected'
+      });
+    }
+
+    let text: string;
+    try {
+      text = await fetch(state.selectedCsvFile.objectUrl).then(r => r.text());
+    } catch (e) {
+      return rejectWithValue({
+        kind: ErrorKind.UnknownError,
+        message: 'Could not mint tokens: selected CSV file not found'
+      });
+    }
+    const parsed = parse(text, { columns: true, skipEmptyLines: true });
+    if (!ParsedCsv.is(parsed)) {
+      console.log('ERROR:', parsed);
+      return rejectWithValue({
+        kind: ErrorKind.UnknownError,
+        message: ''
+      });
+    }
+    const attrRegex = /^attribute\./;
+    const attrRegexTest = new RegExp(attrRegex.source + '.+');
+    const metadataArray = parsed.map(p => {
+      const attributes = Object.keys(p)
+        .filter(k => attrRegexTest.test(k))
+        .map(k => ({
+          name: k.split(attrRegex)[1],
+          value: p[k]
+        }));
+      const metadata: NftMetadata = {
+        name: p.name,
+        description: p.description,
+        artifactUri: p.artifactUri,
+        displayUri: p.displayUri,
+        attributes
+      };
+      return metadata;
+    });
+    await mintTokens(system, parsed[0].collection, metadataArray);
+    console.log('OK:', metadataArray);
+    return null;
   }
 );
 

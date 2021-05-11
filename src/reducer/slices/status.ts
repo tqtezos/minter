@@ -92,7 +92,7 @@ const slice = createSlice({
         const rejectValue = action.payload
           ? action.payload
           : {
-              kind: ErrorKind.UknownError,
+              kind: ErrorKind.UnknownError,
               message: 'Unknown error'
             };
         state[method].error = {

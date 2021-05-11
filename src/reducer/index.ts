@@ -5,6 +5,7 @@ import {
 } from 'react-redux';
 import collectionsSlice from './slices/collections';
 import createNftSlice from './slices/createNft';
+import createNftCsvImportSlice from './slices/createNftCsvImport';
 import systemSlice from './slices/system';
 import statusSlice from './slices/status';
 import notificationsSlice from './slices/notifications';
@@ -14,6 +15,7 @@ export const reducer = combineReducers({
   collections: collectionsSlice.reducer,
   marketplace: marketplaceSlice.reducer,
   createNft: createNftSlice.reducer,
+  createNftCsvImport: createNftCsvImportSlice.reducer,
   system: systemSlice.reducer,
   status: statusSlice.reducer,
   notifications: notificationsSlice.reducer
