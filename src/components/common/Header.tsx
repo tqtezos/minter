@@ -19,7 +19,7 @@ import {
 } from '@chakra-ui/react';
 import { Plus, Menu as HamburgerIcon } from 'react-feather';
 import { RiStore2Line } from 'react-icons/ri';
-import { MdCollections, MdStar } from 'react-icons/md';
+import { MdCollections } from 'react-icons/md';
 import headerLogo from './assets/header-logo.svg';
 import { useSelector, useDispatch } from '../../reducer';
 import { connectWallet, disconnectWallet } from '../../reducer/async/wallet';
@@ -282,7 +282,7 @@ function NavItems() {
           <>
             <DesktopHeaderLink to="/creator">
               <Box color="brand.turquoise">
-                <MdStar size={16} />
+                <MdCollections size={16} />
               </Box>
               <Text ml={2}>Creator</Text>
             </DesktopHeaderLink>
