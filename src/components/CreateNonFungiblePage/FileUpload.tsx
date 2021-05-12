@@ -1,12 +1,26 @@
 import React, { createRef, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Box, Flex, Heading, Text, Image } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  Heading,
+  Text,
+  Image,
+  useDisclosure
+} from '@chakra-ui/react';
 import { useSelector, useDispatch } from '../../reducer';
-import { readFileAsDataUrlAction } from '../../reducer/async/actions';
+import {
+  mintCsvTokensAction,
+  readFileAsDataUrlAction
+} from '../../reducer/async/actions';
 import {
   updateDisplayImageFile,
   SelectedFile
 } from '../../reducer/slices/createNft';
+import FormModal from '../common/modals/FormModal';
+import { useLocation } from 'wouter';
+import { MinterButton } from '../common';
+import { clearSelectedCsvFile } from '../../reducer/slices/createNftCsvImport';
 
 export function FilePreview({ file }: { file: SelectedFile }) {
   const dispatch = useDispatch();
@@ -175,6 +189,8 @@ export default function FileUpload() {
 export function CsvFileUpload() {
   const state = useSelector(s => s.createNftCsvImport);
   const dispatch = useDispatch();
+  const disclosure = useDisclosure();
+  const [, setLocation] = useLocation();
 
   const onDrop = useCallback(
     (files: File[]) => {
@@ -193,13 +209,45 @@ export function CsvFileUpload() {
   });
 
   return (
-    <div {...getRootProps()}>
-      <input {...getInputProps()} />
-      <p>
-        {state.selectedCsvFile
-          ? state.selectedCsvFile.name
-          : 'Drop CSV file Here'}
-      </p>
+    <div>
+      <div {...getRootProps()}>
+        <input {...getInputProps()} />
+        <p>
+          {state.selectedCsvFile
+            ? state.selectedCsvFile.name
+            : 'Drop CSV file Here'}
+        </p>
+      </div>
+      <MinterButton variant="primaryAction" onClick={() => disclosure.onOpen()}>
+        Mint from CSV
+      </MinterButton>
+      <FormModal
+        disclosure={disclosure}
+        method="mintCsvTokens"
+        dispatchThunk={() => dispatch(mintCsvTokensAction())}
+        onComplete={() => dispatch(clearSelectedCsvFile())}
+        afterClose={() => setLocation('/collections')}
+        dispatchOnOpen={true}
+        pendingAsyncMessage={
+          <>
+            Opening wallet...
+            <br />
+            <Text
+              fontSize="1rem"
+              fontWeight="normal"
+              marginTop={4}
+              textAlign="center"
+              color="gray.500"
+            >
+              <span role="img" aria-label="lightbulb">
+                🌱
+              </span>{' '}
+              Minting on Tezos produces 1,500,000 times less CO2 emissions than
+              Ethereum.
+            </Text>
+          </>
+        }
+      />
     </div>
   );
 }

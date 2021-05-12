@@ -67,12 +67,6 @@ function LeftContent() {
         <Box w="100%" maxWidth="1200px">
           <FileUpload />
           <CsvFileUpload />
-          <MinterButton
-            variant="primaryAction"
-            onClick={() => dispatch(mintCsvTokensAction())}
-          >
-            Mint from CSV
-          </MinterButton>
         </Box>
       );
     case 'asset_details':
@@ -164,7 +158,7 @@ export default function CreateNonFungiblePage() {
             </MinterButton>
             <MinterButton
               variant={stepIsValid ? 'primaryAction' : 'primaryActionInactive'}
-              onClick={async () => {
+              onClick={() => {
                 if (!stepIsValid) return;
                 switch (state.step) {
                   case 'file_upload': {
