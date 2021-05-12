@@ -30,8 +30,8 @@ import {
   getNftAssetContractQuery
 } from '../../../reducer/async/queries';
 import { TokenMedia } from '../../common/TokenMedia';
-import lk from '../../common/assets/link-icon.svg'
-import tz from '../../common/assets/tezos-sym.svg'
+import lk from '../../common/assets/link-icon.svg';
+import tz from '../../common/assets/tezos-sym.svg';
 import { Maximize2 } from 'react-feather';
 
 function NotFound() {

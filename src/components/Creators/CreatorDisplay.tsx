@@ -29,6 +29,7 @@ export default function CreatorDisplay({
   ownedOnly = true
 }: CollectionDisplayProps) {
   const collections = useSelector(s => s.collections);
+  const system = useSelector(s => s.system);
   const { config, tzPublicKey, wallet } = useSelector(s => s.system);
   const dispatch = useDispatch();
 
@@ -129,16 +130,11 @@ export default function CreatorDisplay({
         marginBottom={2}
       >
         <Flex flexDir="column" width="100%">
-          <Flex justify="space-between" width="100%">
-            <Heading size="lg">{collection.metadata.name || ''}</Heading>
-          </Flex>
           <Flex align="center" display={{ base: 'none', md: 'flex' }}>
             <Image
               src={`https://services.tzkt.io/v1/avatars2/${collection.address}`}
             />
-            <Text fontFamily="mono" color="brand.lightGray">
-              {collection.address}
-            </Text>
+            <Link color="brand.darkGray" display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://${(system.config.network + '.').replace('mainnet.', '')}tzkt.io/${address}`}><Heading>{collection.address ? collection?.metadata.name : collection?.metadata.name ? collection?.metadata.name : address }</Heading></Link>
             <Link
               href={`${config.bcd.gui}/${config.network}/${collection.address}`}
               color="brand.darkGray"
