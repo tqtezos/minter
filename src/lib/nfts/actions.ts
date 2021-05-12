@@ -103,6 +103,14 @@ export async function mintToken(
     .send();
 }
 
+interface MintData {
+  owner: string;
+  token_metadata: {
+    token_id: number;
+    token_info: MichelsonMap<string, string>;
+  };
+}
+
 export async function mintTokens(
   system: SystemWithWallet,
   address: string,
@@ -112,7 +120,7 @@ export async function mintTokens(
   const storage = await contract.storage<any>();
 
   const token_id = storage.assets.next_token_id;
-  const mints: any[] = [];
+  const mints: MintData[] = [];
   for (const [index, meta] of metadata.entries()) {
     const token_info = new MichelsonMap<string, string>();
     const resp = await uploadIPFSJSON(system.config.ipfsApi, {

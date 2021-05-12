@@ -256,23 +256,32 @@ export const mintTokenAction = createAsyncThunk<
   }
 );
 
-const ParsedCsv = t.array(
-  t.intersection([
-    t.type({
-      name: t.string,
-      description: t.string,
-      artifactUri: t.string,
-      collection: t.string
-    }),
-    t.partial({
-      displayUri: t.string
-    }),
-    t.record(t.string, t.string)
-  ])
+interface NonEmptyArrayBrand {
+  readonly NonEmptyArray: unique symbol;
+}
+
+type ParsedCsvRow = t.TypeOf<typeof ParsedCsvRow>;
+const ParsedCsvRow = t.intersection([
+  t.type({
+    name: t.string,
+    description: t.string,
+    artifactUri: t.string,
+    collection: t.string
+  }),
+  t.partial({
+    displayUri: t.string
+  }),
+  t.record(t.string, t.string)
+]);
+
+const ParsedCsv = t.brand(
+  t.array(ParsedCsvRow),
+  (n): n is t.Branded<Array<ParsedCsvRow>, NonEmptyArrayBrand> => n.length > 0,
+  'NonEmptyArray'
 );
 
 export const mintCsvTokensAction = createAsyncThunk<null, undefined, Options>(
-  'action/mintToken',
+  'action/mintCsvTokens',
   async (_, { getState, rejectWithValue, dispatch, requestId }) => {
     const { system, createNftCsvImport: state } = getState();
     if (system.status !== 'WalletConnected') {
@@ -323,8 +332,24 @@ export const mintCsvTokensAction = createAsyncThunk<null, undefined, Options>(
       };
       return metadata;
     });
-    await mintTokens(system, parsed[0].collection, metadataArray);
-    console.log('OK:', metadataArray);
+
+    try {
+      const address = parsed[0].collection;
+      const op = await mintTokens(system, address, metadataArray);
+      const pendingMessage = `Minting new tokens from CSV`;
+      dispatch(notifyPending(requestId, pendingMessage));
+      await op.confirmation(2);
+
+      const fulfilledMessage = `Created new tokens from CSV in ${address}`;
+      dispatch(notifyFulfilled(requestId, fulfilledMessage));
+      dispatch(getContractNftsQuery(address));
+    } catch (e) {
+      return rejectWithValue({
+        kind: ErrorKind.MintTokenFailed,
+        message: 'Mint tokens from CSV failed'
+      });
+    }
+
     return null;
   }
 );
