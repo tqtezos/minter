@@ -10,7 +10,7 @@ import {
   useDisclosure
 } from '@chakra-ui/react';
 import { MinterButton } from '../../common';
-import { useDispatch } from '../../../reducer';
+import { useDispatch, useSelector } from '../../../reducer';
 import { buyTokenAction } from '../../../reducer/async/actions';
 import { Nft } from '../../../lib/nfts/decoders';
 import FormModal, { BaseModalProps, BaseModalButtonProps } from './FormModal';
@@ -77,9 +77,11 @@ interface BuyTokenButtonProps extends BaseModalButtonProps {
 
 export function BuyTokenButton(props: BuyTokenButtonProps) {
   const disclosure = useDisclosure();
+  const { status } = useSelector(s => s.status.buyToken)
+
   return (
     <>
-      <MinterButton variant="primaryAction" onClick={disclosure.onOpen}>
+      <MinterButton variant="primaryAction" onClick={disclosure.onOpen} disabled={status === 'in_transit'}>
         Buy now
       </MinterButton>
 
