@@ -5,7 +5,7 @@ import {
   getWalletAssetContractsQuery
 } from '../async/queries';
 import { Nft, AssetContract } from '../../lib/nfts/decoders';
-import config from '../../config.json';
+import config from '../../config';
 
 //// State
 
