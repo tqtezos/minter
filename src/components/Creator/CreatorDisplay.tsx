@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Flex,
   Heading,
@@ -6,10 +6,13 @@ import {
   SimpleGrid,
   Spinner,
   Text,
-  Image
+  Image,
+  Menu,
+  MenuList,
+  MenuOptionGroup,
+  MenuItemOption
 } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
-import { MinterButton } from '../common';
 import { ExternalLink, Wind } from 'react-feather';
 import { useDispatch, useSelector } from '../../reducer';
 import {
@@ -17,36 +20,38 @@ import {
   getNftAssetContractQuery
 } from '../../reducer/async/queries';
 import TokenCard from '../common/TokenCard';
-import CollectionsDropdown from '../Collections/Catalog/CollectionsDropdown';
+import { Collection } from '../../reducer/slices/collections';
 
-interface CollectionDisplayProps {
-  address: string | null;
+interface CreatorDisplayProps {
+  minter: string;
+  collections: { [key: string]: Collection };
   ownedOnly?: boolean;
 }
 
 export default function CreatorDisplay({
-  address,
+  minter,
+  collections,
   ownedOnly = true
-}: CollectionDisplayProps) {
-  const collections = useSelector(s => s.collections);
+}: CreatorDisplayProps) {
   const system = useSelector(s => s.system);
-  const { config, tzPublicKey, wallet } = useSelector(s => s.system);
+  const { config } = useSelector(s => s.system);
+  const [obj, setObj] = useState('');
   const dispatch = useDispatch();
+  let selectedCollection = Object.keys(collections)[0];
 
   useEffect(() => {
-    if (address !== null) {
-      dispatch(getNftAssetContractQuery(address)).then(() =>
-        dispatch(getContractNftsQuery(address))
+    if (selectedCollection) {
+      dispatch(getNftAssetContractQuery(selectedCollection)).then(() =>
+        dispatch(getContractNftsQuery(selectedCollection))
       );
     }
-  }, [address, dispatch]);
+  }, [dispatch, selectedCollection]);
 
-  if (address === null) {
+  if (!selectedCollection) {
     return <></>;
   }
 
-  const collection = collections.collections[address];
-
+  const collection = collections[selectedCollection];
   if (!collection) {
     return <></>;
   }
@@ -67,8 +72,6 @@ export default function CreatorDisplay({
   }
 
   const tokens = collection.tokens;
-
-  console.log(tokens);
 
   if (tokens.length === 0) {
     return (
@@ -110,11 +113,25 @@ export default function CreatorDisplay({
       overflowY="scroll"
       justify="start"
     >
-      {wallet !== null ? (
-        <Flex display={{ base: 'flex', md: 'none' }} mb={4}>
-          <CollectionsDropdown />
-        </Flex>
-      ) : null}
+      <Menu>
+        <MenuList>
+          <MenuOptionGroup type="radio" defaultValue={obj || ''}>
+            <Text ml={4} my={2} fontWeight="600">
+              Collections
+            </Text>
+            {Object.keys(collections).map((address, idx) => (
+              <MenuItemOption
+                key={address + idx}
+                value={address}
+                selected={address === obj}
+                onClick={() => setObj(address)}
+              >
+                {collections[address].metadata.name}
+              </MenuItemOption>
+            ))}
+          </MenuOptionGroup>
+        </MenuList>
+      </Menu>
       <Flex
         w="100%"
         pb={6}
@@ -134,7 +151,19 @@ export default function CreatorDisplay({
             <Image
               src={`https://services.tzkt.io/v1/avatars2/${collection.address}`}
             />
-            <Link color="brand.darkGray" display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://${(system.config.network + '.').replace('mainnet.', '')}tzkt.io/${address}`}><Heading>{collection.address ? collection?.metadata.name : collection?.metadata.name ? collection?.metadata.name : address }</Heading></Link>
+            <Link
+              color="brand.darkGray"
+              display="block"
+              whiteSpace="nowrap"
+              overflow="hidden"
+              textOverflow="ellipsis"
+              href={`https://${(system.config.network + '.').replace(
+                'mainnet.',
+                ''
+              )}tzkt.io/${collection.address}`}
+            >
+              <Heading>{collection.address}</Heading>
+            </Link>
             <Link
               href={`${config.bcd.gui}/${config.network}/${collection.address}`}
               color="brand.darkGray"
@@ -145,20 +174,6 @@ export default function CreatorDisplay({
             </Link>
           </Flex>
         </Flex>
-        <MinterButton
-          display={{ base: 'none', md: 'flex' }}
-          variant="primaryActionInverted"
-          onClick={() => {
-            const selectedCollection = collections.selectedCollection;
-            if (selectedCollection !== null) {
-              dispatch(getContractNftsQuery(selectedCollection));
-            }
-          }}
-          mt={{
-            base: 4,
-            md: 0
-          }}
-        ></MinterButton>
       </Flex>
       <Tabs>
         <TabList>
@@ -173,16 +188,15 @@ export default function CreatorDisplay({
               {tokens
                 .filter(
                   ({ owner, metadata }) =>
-                    owner === tzPublicKey &&
+                    owner === minter &&
                     (metadata?.creators?.find(creator => creator === owner) ||
                       metadata?.minter === owner)
                 )
                 .map(token => {
-                  console.log(token);
                   return (
                     <TokenCard
-                      key={address + token.id}
-                      address={address}
+                      key={collection.address + token.id}
+                      address={collection.address}
                       config={config}
                       {...token}
                     />
@@ -195,16 +209,15 @@ export default function CreatorDisplay({
               {tokens
                 .filter(
                   ({ owner, metadata }) =>
-                    owner === tzPublicKey &&
+                    owner === minter &&
                     !metadata?.creators?.find(creator => creator === owner) &&
                     metadata?.minter !== owner
                 )
                 .map(token => {
-                  console.log(token);
                   return (
                     <TokenCard
-                      key={address + token.id}
-                      address={address}
+                      key={collection.address + token.id}
+                      address={collection.address}
                       config={config}
                       {...token}
                     />
@@ -215,13 +228,12 @@ export default function CreatorDisplay({
           <TabPanel>
             <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
               {tokens
-                .filter(({ sale }) => sale?.seller === tzPublicKey)
+                .filter(({ sale }) => sale?.seller === minter)
                 .map(token => {
-                  console.log(token);
                   return (
                     <TokenCard
-                      key={address + token.id}
-                      address={address}
+                      key={collection.address + token.id}
+                      address={collection.address}
                       config={config}
                       {...token}
                     />

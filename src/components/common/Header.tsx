@@ -219,8 +219,8 @@ function NavItems() {
                     </MobileHeaderLink>
                     {system.status === 'WalletConnected' ? (
                       <>
-                      <MobileHeaderLink to="/creator" onClick={onClose}>
-                        Creator
+                      <MobileHeaderLink to="/collections" onClick={onClose}>
+                        Collections
                       </MobileHeaderLink>
                       <MobileHeaderLink to="/create" onClick={onClose}>
                         New Asset
@@ -280,11 +280,11 @@ function NavItems() {
         </DesktopHeaderLink>
         {system.status === 'WalletConnected' ? (
           <>
-            <DesktopHeaderLink to="/creator">
+            <DesktopHeaderLink to="/collections">
               <Box color="brand.turquoise">
                 <MdCollections size={16} />
               </Box>
-              <Text ml={2}>Creator</Text>
+              <Text ml={2}>Collections</Text>
             </DesktopHeaderLink>
             <DesktopHeaderLink to="/create">
               <Box color="brand.blue">
