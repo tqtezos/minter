@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { Check } from 'react-feather';
 import { MinterButton } from '../../common';
-import { useDispatch } from '../../../reducer';
+import { useDispatch, useSelector } from '../../../reducer';
 import { listTokenAction } from '../../../reducer/async/actions';
 import FormModal, { BaseModalProps, BaseModalButtonProps } from './FormModal';
 import tz from '../assets/tezos-sym.svg'
@@ -98,9 +98,11 @@ interface SellTokenButtonProps extends BaseModalButtonProps {
 
 export function SellTokenButton(props: SellTokenButtonProps) {
   const disclosure = useDisclosure();
+  const { status } = useSelector(s => s.status.listToken)
+  
   return (
     <>
-      <MinterButton variant="primaryAction" onClick={disclosure.onOpen}>
+      <MinterButton variant="primaryAction" onClick={disclosure.onOpen} disabled={status === 'in_transit'}>
         Sell
       </MinterButton>
       <SellTokenModal {...props} disclosure={disclosure} sync={props.sync} />

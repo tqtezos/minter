@@ -153,7 +153,6 @@ export default function FormModal(props: FormModalProps) {
     onClose();
     setRequestId(null);
     dispatch(clearError({ method: props.method }));
-    dispatch(setStatus({ method: props.method, status: 'ready' }));
     withCallback && props.afterClose && props.afterClose();
   };
 

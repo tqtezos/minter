@@ -60,7 +60,7 @@ const askConfigQuestions = (): Promise<ConfigInput> => {
     {
       name: 'network',
       type: 'list',
-      choices: ['Mainnet', 'Edonet'],
+      choices: ['Mainnet', 'Florencenet'],
       message: 'Select the network to deploy OpenMinter contracts to:',
       filter: function (val: string) {
         return val.toLowerCase();
@@ -79,12 +79,12 @@ const askConfigQuestions = (): Promise<ConfigInput> => {
             "https://mainnet-tezos.giganode.io",
             "Other"
           ]
-        } else if (input.network === "edonet") {
+        } else if (input.network === "florencenet") {
           rpcOpts = [
             "https://rpctest.tzbeta.net",
-            "https://edonet.smartpy.io",
-            "https://api.tez.ie/rpc/edonet",
-            "https://edonet-tezos.giganode.io",
+            "https://florencenet.smartpy.io",
+            "https://api.tez.ie/rpc/florencenet",
+            "https://testnet-tezos.giganode.io",
             "Other"
           ]
         }
@@ -186,7 +186,7 @@ const saveConfig = (input: ConfigInput) => {
   config.set('rpc', input.rpc === "Other" ? input.rpcCustom : input.rpc);
   config.set('bcd.api', "https://api.better-call.dev");
   config.set('bcd.gui', "https://better-call.dev");
-  config.set('tzkt.api', input.network === "mainnet" ? "https://staging.api.mainnet.tzkt.io" : "https://staging.api.edo2net.tzkt.io");
+  config.set('tzkt.api', input.network === "mainnet" ? "https://api.mainnet.tzkt.io" : "https://api.florencenet.tzkt.io");
   config.set('admin.address', input.adminPkh);
   config.set('admin.secret', input.adminSk);
   config.set('ipfsApi', "https://minter-api.tqhosted.com");

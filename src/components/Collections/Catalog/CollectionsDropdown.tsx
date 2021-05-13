@@ -59,9 +59,9 @@ export default function CollectionsDropdown() {
             </Text>
             {Object.keys(state.collections)
               .filter(address => address !== state.globalCollection)
-              .map(address => (
+              .map((address, idx) => (
                 <MenuItemOption
-                  key={address}
+                  key={address + idx}
                   value={address}
                   selected={address === state.selectedCollection}
                   onClick={() => dispatch(selectCollection(address))}

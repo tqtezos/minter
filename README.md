@@ -26,13 +26,6 @@ yarn install
 yarn start
 ```
 
-Or with NPM:
-
-```
-npm install
-npm start
-```
-
 ## Support
 
 OpenMinter supports the following networks and software components:

@@ -12,7 +12,7 @@ const Button = {
     primaryAction: {
       bg: 'brand.blue',
       borderColor: 'brand.blue',
-      borderRadius: '2px',
+      borderRadius: '8rem',
       color: 'white',
       transition: 'none',
       _active: {
@@ -26,7 +26,7 @@ const Button = {
     primaryActionInactive: {
       bg: 'brand.blue',
       borderColor: 'brand.blue',
-      borderRadius: '2px',
+      borderRadius: '8rem',
       color: 'white',
       opacity: '0.3',
       transition: 'none',
@@ -37,7 +37,7 @@ const Button = {
     primaryActionLined: {
       bg: 'transparent',
       borderColor: 'brand.blue',
-      borderRadius: '2px',
+      borderRadius: '8rem',
       borderWidth: '1px',
       color: 'brand.blue',
       transition: 'none',
@@ -53,7 +53,7 @@ const Button = {
     primaryActionInverted: {
       bg: 'transparent',
       borderColor: 'brand.blue',
-      borderRadius: '2px',
+      borderRadius: '8rem',
       color: 'brand.blue',
       transition: 'none',
       _active: {
@@ -68,7 +68,7 @@ const Button = {
       bg: 'brand.turquoise',
       color: 'brand.background',
       borderColor: 'brand.turquoise',
-      borderRadius: '2px',
+      borderRadius: '8rem',
       borderWidth: '1px',
       transition: 'none',
       _active: {
@@ -84,7 +84,7 @@ const Button = {
     secondaryActionLined: {
       bg: 'none',
       borderColor: 'brand.turquoise',
-      borderRadius: '2px',
+      borderRadius: '8rem',
       borderWidth: '1px',
       color: 'brand.turquoise',
       transition: 'none',
@@ -100,7 +100,7 @@ const Button = {
     cancelAction: {
       bg: 'none',
       borderColor: 'brand.red',
-      borderRadius: '2px',
+      borderRadius: '8rem',
       borderWidth: '1px',
       color: 'brand.red',
       transition: 'none',
@@ -116,7 +116,7 @@ const Button = {
     tertiaryAction: {
       bg: 'gray.200',
       color: 'gray.500',
-      borderRadius: '2px',
+      borderRadius: '8rem',
       _hover: {
         bg: 'gray.100',
         color: 'gray.400'

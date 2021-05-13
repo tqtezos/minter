@@ -1,160 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation } from 'wouter';
+import React, { useEffect } from 'react';
 import {
-  AspectRatio,
-  Box,
   Flex,
   Heading,
-  Image,
   Link,
   SimpleGrid,
   Spinner,
   Text
 } from '@chakra-ui/react';
 import { MinterButton } from '../../common';
-import { ExternalLink, Wind, HelpCircle } from 'react-feather';
-import { Token } from '../../../reducer/slices/collections';
-import { IpfsGatewayConfig, ipfsUriToGatewayUrl } from '../../../lib/util/ipfs';
+import { ExternalLink, Wind } from 'react-feather';
 import { useDispatch, useSelector } from '../../../reducer';
 import {
   getContractNftsQuery,
   getNftAssetContractQuery
 } from '../../../reducer/async/queries';
 import CollectionsDropdown from './CollectionsDropdown';
-
-function MediaNotFound() {
-  return (
-    <Flex
-      flexDir="column"
-      align="center"
-      justify="center"
-      flex="1"
-      bg="gray.100"
-      color="gray.300"
-      height="100%"
-    >
-      <HelpCircle size="70px" />
-    </Flex>
-  );
-}
-
-function TokenImage(props: TokenTileProps) {
-  const src = ipfsUriToGatewayUrl(props.config, props.artifactUri);
-  const [errored, setErrored] = useState(false);
-  const [obj, setObj] = useState<{ url: string; type: string } | null>(null);
-  useEffect(() => {
-    (async () => {
-      let blob;
-      try {
-        blob = await fetch(src).then(r => r.blob());
-      } catch (e) {
-        return setErrored(true);
-      }
-      setObj({
-        url: URL.createObjectURL(blob),
-        type: blob.type
-      });
-    })();
-  }, [src]);
-
-  if (errored) {
-    return <MediaNotFound />;
-  }
-
-  if (!obj) return null;
-
-  if (/^image\/.*/.test(obj.type)) {
-    return (
-      <Image
-        src={src}
-        objectFit="scale-down"
-        flex="1"
-        height="100%"
-        onError={() => setErrored(true)}
-      />
-    );
-  }
-
-  if (/^video\/.*/.test(obj.type)) {
-    return (
-      <video
-        loop
-        onClick={e => e.preventDefault()}
-        onMouseEnter={e => e.currentTarget.play()}
-        onMouseLeave={e => e.currentTarget.pause()}
-        muted
-      >
-        <source src={obj.url} type={obj.type} />
-      </video>
-    );
-  }
-
-  if (props.metadata.formats?.length) {
-    if (
-      props.metadata.formats[0].mimeType === 'model/gltf-binary' ||
-      props.metadata.formats[0].mimeType === 'model/gltf+json'
-    ) {
-      return (
-        <>
-          <model-viewer
-            auto-rotate
-            rotation-per-second="30deg"
-            src={obj.url}
-            class="grid"
-          ></model-viewer>
-        </>
-      );
-    }
-  }
-
-  return <MediaNotFound />;
-}
-
-interface TokenTileProps extends Token {
-  config: IpfsGatewayConfig;
-  address: string;
-}
-
-function TokenTile(props: TokenTileProps) {
-  const [, setLocation] = useLocation();
-  return (
-    <Flex
-      flexDir="column"
-      ratio={1}
-      w="100%"
-      bg="white"
-      border="1px solid"
-      borderColor="brand.lightBlue"
-      borderRadius="3px"
-      overflow="hidden"
-      boxShadow="0px 0px 0px 4px rgba(15, 97, 255, 0)"
-      transition="all linear 50ms"
-      _hover={{
-        cursor: 'pointer',
-        boxShadow: '0px 0px 0px 4px rgba(15, 97, 255, 0.1)'
-      }}
-      onClick={() =>
-        setLocation(`/collection/${props.address}/token/${props.id}`)
-      }
-    >
-      <AspectRatio ratio={3 / 2}>
-        <Box p={4}>
-          <TokenImage {...props} />
-        </Box>
-      </AspectRatio>
-      <Flex
-        width="100%"
-        px={4}
-        py={4}
-        bg="white"
-        borderTop="1px solid"
-        borderColor="brand.lightBlue"
-      >
-        <Text>{props.title}</Text>
-      </Flex>
-    </Flex>
-  );
-}
+import TokenCard from '../../common/TokenCard';
 
 interface CollectionDisplayProps {
   address: string | null;
@@ -276,7 +137,7 @@ export default function CollectionDisplay({
               {collection.address}
             </Text>
             <Link
-              href={config.bcd.gui + '/' + collection.address}
+              href={`${config.bcd.gui}/${config.network}/${collection.address}`}
               color="brand.darkGray"
               isExternal
               ml={2}
@@ -303,8 +164,8 @@ export default function CollectionDisplay({
       <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
         {tokens.map(token => {
           return (
-            <TokenTile
-              key={token.id}
+            <TokenCard
+              key={address + token.id}
               address={address}
               config={config}
               {...token}
