@@ -8,7 +8,8 @@ import { Flex } from '@chakra-ui/react';
 import Notifications from '../common/Notifications';
 import { useSelector, useDispatch } from '../../reducer';
 import { reconnectWallet } from '../../reducer/async/wallet';
-import Creator from '../Creators';
+import Creator from '../Creator';
+import Catalog from '../Collections/Catalog';
 // import { getMarketplaceNftsQuery } from '../../reducer/async/queries';
 
 export default function App() {
@@ -45,8 +46,11 @@ export default function App() {
           <Route path="/marketplace">
             <MarketplaceCatalog />
           </Route>
-          <Route path="/creator">
-              <Creator />
+          <Route path="/collections">
+            <Catalog />
+          </Route>
+          <Route path="/creator/:minter">
+            {({ minter }) => <Creator minter={minter} />}
           </Route>
           <Route path="/collection/:contractAddress/token/:tokenId">
             {({ contractAddress, tokenId }) => (

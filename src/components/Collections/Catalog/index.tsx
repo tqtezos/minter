@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { Flex } from '@chakra-ui/react';
-import CreatorDisplay from './CreatorDisplay';
-import { useSelector, useDispatch } from '../../reducer';
+import CollectionsDisplay from './CollectionsDisplay';
+import { useSelector, useDispatch } from '../../../reducer';
 import {
   getWalletAssetContractsQuery,
   getNftAssetContractQuery
-} from '../../reducer/async/queries';
-import { selectCollection } from '../../reducer/slices/collections';
-import Sidebar from '../Collections/Catalog/Sidebar';
+} from '../../../reducer/async/queries';
+import { selectCollection } from '../../../reducer/slices/collections';
+import Sidebar from './Sidebar';
 
 export default function Catalog() {
   const system = useSelector(s => s.system);
@@ -63,7 +63,7 @@ export default function Catalog() {
       >
         <Sidebar />
       </Flex>
-      <CreatorDisplay address={selectedCollection} />
+      <CollectionsDisplay address={selectedCollection} />
     </Flex>
   );
 }

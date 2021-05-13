@@ -210,10 +210,17 @@ export async function getNftAssetContract(
 export async function getWalletNftAssetContracts(
   system: SystemWithWallet
 ): Promise<D.AssetContract[]> {
+  return await getNftAssetContracts(system, system.tzPublicKey);
+};
+
+export async function getNftAssetContracts(
+  system: SystemWithWallet,
+  tzPublicKey: string
+): Promise<D.AssetContract[]> {
   const contracts = await getContracts(
     system.tzkt,
     {
-      creator: system.tzPublicKey,
+      creator: tzPublicKey,
       includeStorage: 'true'
     },
     t.unknown
