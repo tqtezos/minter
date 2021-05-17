@@ -1,3 +1,4 @@
+/* eslint-disable no-redeclare */
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { State } from '..';
 import {
@@ -9,7 +10,6 @@ import {
   cancelTokenSale,
   buyToken
 } from '../../lib/nfts/actions';
-// import {getNftAssetContract} from '../../lib/nfts/queries'
 import { ErrorKind, RejectValue } from './errors';
 import { getContractNftsQuery, getWalletAssetContractsQuery } from './queries';
 import { validateCreateNftForm } from '../validators/createNft';

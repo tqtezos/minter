@@ -17,10 +17,7 @@ import {
   incrementStep,
   steps
 } from '../../reducer/slices/createNft';
-import {
-  mintTokenAction,
-  mintCsvTokensAction
-} from '../../reducer/async/actions';
+import { mintTokenAction } from '../../reducer/async/actions';
 import { validateCreateNftStep } from '../../reducer/validators/createNft';
 import FormModal from '../common/modals/FormModal';
 
@@ -60,7 +57,6 @@ function ProgressIndicator({ state }: { state: CreateNftState }) {
 
 function LeftContent() {
   const step = useSelector(s => s.createNft.step);
-  const dispatch = useDispatch();
   switch (step) {
     case 'file_upload':
       return (
