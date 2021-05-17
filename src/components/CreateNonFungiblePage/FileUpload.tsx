@@ -209,18 +209,37 @@ export function CsvFileUpload() {
   });
 
   return (
-    <div>
-      <div {...getRootProps()}>
+    <Flex flexDir="column" align="center">
+      <Flex
+        bg="brand.brightGray"
+        border="1px solid"
+        borderColor="brand.lightBlue"
+        borderRadius="5px"
+        display="inline-flex"
+        marginBottom="4"
+        paddingX={16}
+        paddingY={12}
+        {...getRootProps()}
+      >
         <input {...getInputProps()} />
-        <p>
+        <Text fontWeight="500" fontSize={18}>
           {state.selectedCsvFile
-            ? state.selectedCsvFile.name
-            : 'Drop CSV file Here'}
-        </p>
-      </div>
-      <MinterButton variant="primaryAction" onClick={() => disclosure.onOpen()}>
-        Mint from CSV
-      </MinterButton>
+            ? `Selected file: ${state.selectedCsvFile.name}`
+            : 'Click or drag CSV file to this area to upload'}
+        </Text>
+      </Flex>
+      <Flex justify="center">
+        <MinterButton
+          variant={
+            state.selectedCsvFile === null
+              ? 'primaryActionInactive'
+              : 'primaryAction'
+          }
+          onClick={() => state.selectedCsvFile && disclosure.onOpen()}
+        >
+          Mint from CSV
+        </MinterButton>
+      </Flex>
       <FormModal
         disclosure={disclosure}
         method="mintCsvTokens"
@@ -248,6 +267,6 @@ export function CsvFileUpload() {
           </>
         }
       />
-    </div>
+    </Flex>
   );
 }

@@ -62,6 +62,21 @@ function LeftContent() {
       return (
         <Box w="100%" maxWidth="1200px">
           <FileUpload />
+          <Flex align="center" marginY={12}>
+            <Box
+              flex="1"
+              borderBottom="1px solid"
+              borderColor="brand.lightGray"
+            />
+            <Text color="brand.blue" fontWeight="700" paddingX={5}>
+              OR
+            </Text>
+            <Box
+              flex="1"
+              borderBottom="1px solid"
+              borderColor="brand.lightGray"
+            />
+          </Flex>
           <CsvFileUpload />
         </Box>
       );
