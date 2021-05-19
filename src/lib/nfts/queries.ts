@@ -24,7 +24,7 @@ async function getAssetMetadataBigMap(
 ): Promise<D.AssetMetadataBigMap> {
   const path = 'metadata';
   const data = await tzkt.getContractBigMapKeys(address, path);
-  const decoded = D.LedgerBigMap.decode(data);
+  const decoded = D.AssetMetadataBigMap.decode(data);
   if (isLeft(decoded)) {
     throw Error('Failed to decode `getAssetMetadata` response');
   }
@@ -37,14 +37,29 @@ async function getLedgerBigMap(
 ): Promise<D.LedgerBigMap> {
   const path = 'assets.ledger';
   const data = await tzkt.getContractBigMapKeys(address, path);
-  const decoded = D.LedgerBigMap.decode(data);
-  if (isLeft(decoded)) {
-    throw Error('Failed to decode `getLedger` response');
+  if (D.NftLedgerBigMap.is(data)) {
+    return data.map(row => ({
+      ...row,
+      value: {
+        owner: row.value,
+        amount: '1'
+      }
+    }));
   }
-  return decoded.right;
+  if (D.FtLedgerBigMap.is(data)) {
+    return data.map(row => ({
+      ...row,
+      key: row.key.nat,
+      value: {
+        owner: row.key.address,
+        amount: row.value
+      }
+    }));
+  }
+  throw Error('Failed to decode `getLedger` response');
 }
 
-async function getTokenMetadataBigMap(
+export async function getTokenMetadataBigMap(
   tzkt: TzKt,
   address: string
 ): Promise<D.TokenMetadataBigMap> {
@@ -159,7 +174,8 @@ export async function getContractNfts(
 
         return {
           id: parseInt(tokenId, 10),
-          owner: ledger.find(e => e.key === tokenId)?.value!,
+          owner: ledger.find(e => e.key === tokenId)?.value.owner!,
+          amount: ledger.find(e => e.key === tokenId)?.value.amount!,
           title: metadata.name,
           description: metadata.description,
           artifactUri: metadata.artifactUri,

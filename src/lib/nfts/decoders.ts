@@ -69,9 +69,25 @@ export const AssetMetadataBigMap = t.array(
   BigMapRow({ key: t.string, value: t.string })
 );
 
+export type NftLedgerBigMap = t.TypeOf<typeof NftLedgerBigMap>;
+export const NftLedgerBigMap = t.array(
+  BigMapRow({ key: t.string, value: t.string })
+);
+
+export type FtLedgerBigMap = t.TypeOf<typeof FtLedgerBigMap>;
+export const FtLedgerBigMap = t.array(
+  BigMapRow({
+    key: t.type({ nat: t.string, address: t.string }),
+    value: t.string
+  })
+);
+
 export type LedgerBigMap = t.TypeOf<typeof LedgerBigMap>;
 export const LedgerBigMap = t.array(
-  BigMapRow({ key: t.string, value: t.string })
+  BigMapRow({
+    key: t.string,
+    value: t.type({ owner: t.string, amount: t.string })
+  })
 );
 
 export type TokenMetadataBigMap = t.TypeOf<typeof TokenMetadataBigMap>;
@@ -238,7 +254,8 @@ export const Nft = t.intersection([
   }),
   t.partial({
     sale: NftSale,
-    address: t.string
+    address: t.string,
+    amount: t.string
   })
 ]);
 
