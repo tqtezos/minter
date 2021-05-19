@@ -11,6 +11,7 @@ export const steps: Step[] = ['file_upload', 'asset_details', 'confirm'];
 interface Fields {
   name: string | null;
   description: string | null;
+  amount: number;
 }
 
 export enum CreateStatus {
@@ -49,7 +50,8 @@ export const initialState: CreateNftState = {
   uploadedArtifact: null,
   fields: {
     name: null,
-    description: null
+    description: null,
+    amount: 1
   },
   attributes: [],
   collectionAddress: null,
@@ -80,8 +82,14 @@ const slice = createSlice({
         state.step = steps[stepIdx - 1];
       }
     },
-    updateField(state, action: UpdateFieldAction) {
-      state.fields[action.payload.name] = action.payload.value;
+    updateName(state, action: PayloadAction<string>) {
+      state.fields.name = action.payload;
+    },
+    updateDescription(state, action: PayloadAction<string>) {
+      state.fields.description = action.payload;
+    },
+    updateAmount(state, action: PayloadAction<number>) {
+      state.fields.amount = action.payload;
     },
     updateSelectedFile(state, action: PayloadAction<SelectedFile>) {
       state.selectedFile = action.payload;
@@ -133,7 +141,9 @@ const slice = createSlice({
 export const {
   incrementStep,
   decrementStep,
-  updateField,
+  updateName,
+  updateDescription,
+  updateAmount,
   updateSelectedFile,
   clearSelectedfile,
   updateDisplayImageFile,

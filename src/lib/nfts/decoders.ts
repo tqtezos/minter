@@ -269,6 +269,13 @@ export type AssetContract = t.TypeOf<typeof AssetContract>;
 export const AssetContract = t.intersection([
   ContractRow(t.unknown),
   t.type({
-    metadata: AssetContractMetadata
+    metadata: AssetContractMetadata,
+    fungible: t.boolean
   })
 ]);
+
+//// Contract Entrypoints
+
+export const ContractEntrypoints = t.array(
+  t.type({ name: t.string, jsonParameters: t.unknown, unused: t.boolean })
+);

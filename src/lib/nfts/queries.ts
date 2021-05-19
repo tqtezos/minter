@@ -133,6 +133,19 @@ async function getContract<S extends t.Mixed>(
   return decoded.right;
 }
 
+async function getCreateEntrypoint(
+  tzkt: TzKt,
+  address: string,
+  params: Params,
+  entries: string[]
+) {
+  const entrypoints = await tzkt.getContractEntrypoints(address, params);
+  if (D.ContractEntrypoints.is(entrypoints)) {
+    return entrypoints.find(row => entries.includes(row.name))?.name;
+  }
+  throw Error('Failed to decode `getCreateEntrypoint` response');
+}
+
 //// Main query functions
 
 export async function getContractNfts(
@@ -207,7 +220,19 @@ export async function getNftAssetContract(
   if (isLeft(decoded)) {
     throw Error('Metadata validation failed');
   }
-  return { ...contract, metadata: decoded.right };
+  const createEntry = await getCreateEntrypoint(system.tzkt, address, {}, [
+    'mint',
+    'create_token'
+  ]);
+
+  if (!createEntry) {
+    throw Error('Could not find `mint` or `create_token` entrypoints');
+  }
+  return {
+    ...contract,
+    metadata: decoded.right,
+    fungible: createEntry === 'create_token'
+  };
 }
 
 export async function getWalletNftAssetContracts(
@@ -256,6 +281,21 @@ export async function getWalletNftAssetContracts(
       continue;
     }
     try {
+      const entrypoints = await system.tzkt.getContractEntrypoints(
+        row.contract.address
+      );
+      if (!D.ContractEntrypoints.is(entrypoints)) {
+        continue;
+      }
+      const createEntry = await getCreateEntrypoint(
+        system.tzkt,
+        row.contract.address,
+        {},
+        ['mint', 'create_token']
+      );
+      if (!createEntry) {
+        continue;
+      }
       const metaUri = row.content.value;
       const { metadata } = await system.resolveMetadata(
         fromHexString(metaUri),
@@ -263,7 +303,11 @@ export async function getWalletNftAssetContracts(
       );
       const decoded = D.AssetContractMetadata.decode(metadata);
       if (!isLeft(decoded)) {
-        results.push({ ...contract, metadata: decoded.right });
+        results.push({
+          ...contract,
+          metadata: decoded.right,
+          fungible: createEntry === 'create_token'
+        });
       }
     } catch (e) {
       console.log(e);

@@ -17,7 +17,9 @@ import { useSelector, useDispatch } from '../../reducer';
 import {
   addMetadataRow,
   deleteMetadataRow,
-  updateField,
+  updateName,
+  updateDescription,
+  updateAmount,
   updateMetadataRowName,
   updateMetadataRowValue
 } from '../../reducer/slices/createNft';
@@ -28,8 +30,12 @@ const DESCRIPTION_PLACEHOLDER =
 
 export default function Form() {
   const state = useSelector(s => s.createNft);
+  const collections = useSelector(s => s.collections.collections);
+  const collection = state.collectionAddress
+    ? collections[state.collectionAddress] || null
+    : null;
   const dispatch = useDispatch();
-  const { name, description } = state.fields;
+  const { name, description, amount } = state.fields;
   return (
     <>
       <CollectionSelect />
@@ -42,11 +48,25 @@ export default function Form() {
           autoFocus={true}
           placeholder="Input your asset name"
           value={name || ''}
-          onChange={e =>
-            dispatch(updateField({ name: 'name', value: e.target.value }))
-          }
+          onChange={e => dispatch(updateName(e.target.value))}
         />
       </FormControl>
+      {collection?.fungible ? (
+        <FormControl paddingBottom={6}>
+          <FormLabel fontFamily="mono">Number of editions</FormLabel>
+          <Input
+            type="number"
+            placeholder="Input the amount of editions"
+            value={amount || ''}
+            onChange={e => {
+              const amount = parseInt(e.target.value, 10);
+              if (!isNaN(amount) && amount > 0 && Number.isInteger(amount)) {
+                dispatch(updateAmount(amount));
+              }
+            }}
+          />
+        </FormControl>
+      ) : null}
       <FormControl paddingBottom={6}>
         <FormLabel fontFamily="mono" display="flex">
           Description
@@ -59,11 +79,7 @@ export default function Form() {
           fontFamily="mono"
           placeholder={DESCRIPTION_PLACEHOLDER}
           value={description || ''}
-          onChange={e =>
-            dispatch(
-              updateField({ name: 'description', value: e.target.value })
-            )
-          }
+          onChange={e => dispatch(updateDescription(e.target.value))}
         />
       </FormControl>
       <Divider borderColor="brand.lightBlue" opacity="1" marginY={10} />
