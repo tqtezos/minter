@@ -62,7 +62,6 @@ export const initialState: CreateNftState = {
 
 // Reducers & Slice
 
-type UpdateFieldAction = PayloadAction<{ name: keyof Fields; value: string }>;
 type UpdateRowNameAction = PayloadAction<{ key: number; name: string }>;
 type UpdateRowValueAction = PayloadAction<{ key: number; value: string }>;
 
