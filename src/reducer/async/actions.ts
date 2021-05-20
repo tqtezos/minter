@@ -61,6 +61,7 @@ export const readFileAsDataUrlAction = createAsyncThunk<
   try {
     return await readFile;
   } catch (e) {
+    console.error(e);
     return rejectWithValue({
       kind: ErrorKind.UknownError,
       message: 'Could not read file'
@@ -95,6 +96,7 @@ export const createAssetContractAction = createAsyncThunk<
       dispatch(getWalletAssetContractsQuery());
       return { name, address };
     } catch (e) {
+      console.error(e);
       return rejectWithValue({
         kind: ErrorKind.CreateAssetContractFailed,
         message: 'Collection creation failed'
@@ -159,6 +161,7 @@ export const mintTokenAction = createAsyncThunk<
       const blob = await fetched.blob();
       file = new File([blob], name, { type });
     } catch (e) {
+      console.log(e);
       return rejectWithValue({
         kind: ErrorKind.UknownError,
         message: 'Could not mint token: selected file not found'
@@ -195,6 +198,7 @@ export const mintTokenAction = createAsyncThunk<
           const blob = await fetched.blob();
           displayFile = new File([blob], name, { type });
         } catch (e) {
+          console.log(e);
           return rejectWithValue({
             kind: ErrorKind.UknownError,
             message: 'Could not mint token: video display file not found'
@@ -225,6 +229,7 @@ export const mintTokenAction = createAsyncThunk<
         ];
       }
     } catch (e) {
+      console.log(e);
       return rejectWithValue({
         kind: ErrorKind.IPFSUploadFailed,
         message: 'IPFS upload failed'
@@ -245,6 +250,7 @@ export const mintTokenAction = createAsyncThunk<
       dispatch(getContractNftsQuery(address));
       return { contract: address, metadata };
     } catch (e) {
+      console.error(e);
       return rejectWithValue({
         kind: ErrorKind.MintTokenFailed,
         message: 'Mint token failed'
@@ -276,6 +282,7 @@ export const transferTokenAction = createAsyncThunk<
     dispatch(getContractNftsQuery(contract));
     return args;
   } catch (e) {
+    console.error(e);
     return rejectWithValue({
       kind: ErrorKind.TransferTokenFailed,
       message: 'Transfer token failed'
@@ -318,6 +325,7 @@ export const listTokenAction = createAsyncThunk<
     dispatch(getContractNftsQuery(contract));
     return args;
   } catch (e) {
+    console.error(e);
     return rejectWithValue({
       kind: ErrorKind.ListTokenFailed,
       message: 'List token failed'
@@ -355,6 +363,7 @@ export const cancelTokenSaleAction = createAsyncThunk<
     dispatch(getContractNftsQuery(contract));
     return { contract: contract, tokenId: tokenId };
   } catch (e) {
+    console.error(e);
     return rejectWithValue({
       kind: ErrorKind.CancelTokenSaleFailed,
       message: 'Cancel token sale failed'
@@ -400,6 +409,7 @@ export const buyTokenAction = createAsyncThunk<
     dispatch(getContractNftsQuery(contract));
     return { contract: contract, tokenId: tokenId };
   } catch (e) {
+    console.error(e);
     return rejectWithValue({
       kind: ErrorKind.BuyTokenFailed,
       message: 'Purchase token failed'

@@ -69,6 +69,18 @@ export async function getContractStorage(
   return response.data;
 }
 
+export async function getContractEntrypoints(
+  config: Config,
+  address: string,
+  params?: Params
+) {
+  const uri = `${
+    config.tzkt.api
+  }/v1/contracts/${address}/entrypoints?${mkQueryParams(params)}`;
+  const response = await axios.get(uri);
+  return response.data;
+}
+
 export class TzKt {
   config: Config;
 
@@ -98,5 +110,9 @@ export class TzKt {
 
   getContractStorage(address: string, params?: Params) {
     return getContractStorage(this.config, address, params);
+  }
+
+  getContractEntrypoints(address: string, params?: Params) {
+    return getContractEntrypoints(this.config, address, params);
   }
 }

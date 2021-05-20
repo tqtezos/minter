@@ -1,12 +1,13 @@
-import { MichelsonMap } from '@taquito/taquito';
+import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 import {
-  Fa2MultiNftAssetCode,
+  Fa2MultiFtAssetCode,
   Fa2MultiNftFaucetCode
 } from '@tqtezos/minter-contracts';
 import { Buffer } from 'buffer';
 import { SystemWithWallet } from '../system';
 import { uploadIPFSJSON } from '../util/ipfs';
 import { NftMetadata } from './decoders';
+import { getTokenMetadataBigMap } from './queries';
 
 function toHexString(input: string) {
   return Buffer.from(input).toString('hex');
@@ -26,7 +27,7 @@ export async function createFaucetContract(
   metadataMap.set('', toHexString(resp.data.ipfsUri));
   return await system.toolkit.wallet
     .originate({
-      code: Fa2MultiNftFaucetCode.code,
+      code: [Fa2MultiNftFaucetCode.code],
       storage: {
         assets: {
           ledger: new MichelsonMap(),
@@ -54,13 +55,14 @@ export async function createAssetContract(
   metadataMap.set('', toHexString(resp.data.ipfsUri));
   return await system.toolkit.wallet
     .originate({
-      code: Fa2MultiNftAssetCode.code,
+      code: Fa2MultiFtAssetCode.code as any,
       storage: {
         assets: {
           ledger: new MichelsonMap(),
           next_token_id: 0,
           operators: new MichelsonMap(),
-          token_metadata: new MichelsonMap()
+          token_metadata: new MichelsonMap(),
+          token_total_supply: new MichelsonMap()
         },
         admin: {
           admin: system.tzPublicKey,
@@ -76,12 +78,12 @@ export async function createAssetContract(
 export async function mintToken(
   system: SystemWithWallet,
   address: string,
-  metadata: NftMetadata
+  metadata: NftMetadata,
+  amount = 1
 ) {
   const contract = await system.toolkit.wallet.at(address);
   const storage = await contract.storage<any>();
 
-  const token_id = storage.assets.next_token_id;
   const token_info = new MichelsonMap<string, string>();
   const resp = await uploadIPFSJSON(system.config.ipfsApi, {
     ...metadata,
@@ -90,17 +92,48 @@ export async function mintToken(
   });
   token_info.set('', toHexString(resp.data.ipfsUri));
 
-  return contract.methods
-    .mint([
-      {
-        owner: system.tzPublicKey,
-        token_metadata: {
-          token_id,
-          token_info
+  if (contract.methods.mint) {
+    const token_id = storage.assets.next_token_id;
+    return contract.methods
+      .mint([
+        {
+          owner: system.tzPublicKey,
+          token_metadata: {
+            token_id,
+            token_info
+          }
         }
-      }
-    ])
-    .send();
+      ])
+      .send();
+  }
+
+  if (contract.methods.create_token) {
+    const metadata = await getTokenMetadataBigMap(system.tzkt, address);
+    const last_id = metadata
+      .map(row => parseInt(row.key, 10))
+      .sort()
+      .slice(-1)[0];
+    const token_id = last_id ? last_id + 1 : 0;
+    const tz = new TezosToolkit(system.config.rpc);
+    tz.setWalletProvider(system.wallet);
+    return tz.wallet
+      .batch()
+      .withContractCall(contract.methods.create_token(token_id, token_info))
+      .withContractCall(
+        contract.methods.mint_tokens([
+          {
+            token_id: token_id,
+            owner: system.tzPublicKey,
+            amount
+          }
+        ])
+      )
+      .send();
+  }
+
+  throw Error(
+    `Cannot mint: no "mint" or "create_token" method found in ${address}`
+  );
 }
 
 export async function transferToken(

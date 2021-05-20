@@ -24,7 +24,7 @@ async function getAssetMetadataBigMap(
 ): Promise<D.AssetMetadataBigMap> {
   const path = 'metadata';
   const data = await tzkt.getContractBigMapKeys(address, path);
-  const decoded = D.LedgerBigMap.decode(data);
+  const decoded = D.AssetMetadataBigMap.decode(data);
   if (isLeft(decoded)) {
     throw Error('Failed to decode `getAssetMetadata` response');
   }
@@ -37,14 +37,29 @@ async function getLedgerBigMap(
 ): Promise<D.LedgerBigMap> {
   const path = 'assets.ledger';
   const data = await tzkt.getContractBigMapKeys(address, path);
-  const decoded = D.LedgerBigMap.decode(data);
-  if (isLeft(decoded)) {
-    throw Error('Failed to decode `getLedger` response');
+  if (D.NftLedgerBigMap.is(data)) {
+    return data.map(row => ({
+      ...row,
+      value: {
+        owner: row.value,
+        amount: '1'
+      }
+    }));
   }
-  return decoded.right;
+  if (D.FtLedgerBigMap.is(data)) {
+    return data.map(row => ({
+      ...row,
+      key: row.key.nat,
+      value: {
+        owner: row.key.address,
+        amount: row.value
+      }
+    }));
+  }
+  throw Error('Failed to decode `getLedger` response');
 }
 
-async function getTokenMetadataBigMap(
+export async function getTokenMetadataBigMap(
   tzkt: TzKt,
   address: string
 ): Promise<D.TokenMetadataBigMap> {
@@ -118,6 +133,19 @@ async function getContract<S extends t.Mixed>(
   return decoded.right;
 }
 
+async function getCreateEntrypoint(
+  tzkt: TzKt,
+  address: string,
+  params: Params,
+  entries: string[]
+) {
+  const entrypoints = await tzkt.getContractEntrypoints(address, params);
+  if (D.ContractEntrypoints.is(entrypoints)) {
+    return entrypoints.find(row => entries.includes(row.name))?.name;
+  }
+  throw Error('Failed to decode `getCreateEntrypoint` response');
+}
+
 //// Main query functions
 
 export async function getContractNfts(
@@ -159,7 +187,8 @@ export async function getContractNfts(
 
         return {
           id: parseInt(tokenId, 10),
-          owner: ledger.find(e => e.key === tokenId)?.value!,
+          owner: ledger.find(e => e.key === tokenId)?.value.owner!,
+          amount: ledger.find(e => e.key === tokenId)?.value.amount!,
           title: metadata.name,
           description: metadata.description,
           artifactUri: metadata.artifactUri,
@@ -191,7 +220,19 @@ export async function getNftAssetContract(
   if (isLeft(decoded)) {
     throw Error('Metadata validation failed');
   }
-  return { ...contract, metadata: decoded.right };
+  const createEntry = await getCreateEntrypoint(system.tzkt, address, {}, [
+    'mint',
+    'create_token'
+  ]);
+
+  if (!createEntry) {
+    throw Error('Could not find `mint` or `create_token` entrypoints');
+  }
+  return {
+    ...contract,
+    metadata: decoded.right,
+    fungible: createEntry === 'create_token'
+  };
 }
 
 export async function getWalletNftAssetContracts(
@@ -240,6 +281,21 @@ export async function getWalletNftAssetContracts(
       continue;
     }
     try {
+      const entrypoints = await system.tzkt.getContractEntrypoints(
+        row.contract.address
+      );
+      if (!D.ContractEntrypoints.is(entrypoints)) {
+        continue;
+      }
+      const createEntry = await getCreateEntrypoint(
+        system.tzkt,
+        row.contract.address,
+        {},
+        ['mint', 'create_token']
+      );
+      if (!createEntry) {
+        continue;
+      }
       const metaUri = row.content.value;
       const { metadata } = await system.resolveMetadata(
         fromHexString(metaUri),
@@ -247,7 +303,11 @@ export async function getWalletNftAssetContracts(
       );
       const decoded = D.AssetContractMetadata.decode(metadata);
       if (!isLeft(decoded)) {
-        results.push({ ...contract, metadata: decoded.right });
+        results.push({
+          ...contract,
+          metadata: decoded.right,
+          fungible: createEntry === 'create_token'
+        });
       }
     } catch (e) {
       console.log(e);
