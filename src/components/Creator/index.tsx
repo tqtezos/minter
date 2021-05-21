@@ -3,7 +3,6 @@ import { Flex } from '@chakra-ui/react';
 import CreatorDisplay from './CreatorDisplay';
 import { useSelector, useDispatch } from '../../reducer';
 import {
-  getWalletAssetContractsQuery,
   getAssetContractsQuery,
   getMarketplaceNftsQuery
 } from '../../reducer/async/queries';
@@ -16,12 +15,8 @@ export default function Creator({ minter }: { minter: string }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (system.status === 'WalletConnected' && !minter) {
-      dispatch(getWalletAssetContractsQuery());
-    } else if (!!minter) {
       dispatch(getAssetContractsQuery(minter));
-    }
-  }, [system.status, dispatch, minter]);
+  }, [system.status, dispatch, minter, collections.globalCollection]);
 
   useEffect(() => {
     dispatch(getMarketplaceNftsQuery(marketplace.address));
@@ -50,6 +45,7 @@ export default function Creator({ minter }: { minter: string }) {
       creatorsCollections[addr] = collections.collections[addr];
       return null;
     });
+    console.log(collections.collections)
   return (
     <Flex
       flex="1"

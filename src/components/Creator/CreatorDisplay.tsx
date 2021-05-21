@@ -1,19 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   Flex,
   Heading,
-  Link,
   SimpleGrid,
   Spinner,
   Text,
-  Image,
-  Menu,
-  MenuList,
-  MenuOptionGroup,
-  MenuItemOption
+  Image
 } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
-import { ExternalLink, Wind } from 'react-feather';
+import { Wind } from 'react-feather';
 import { useDispatch, useSelector } from '../../reducer';
 import {
   getContractNftsQuery,
@@ -33,9 +28,7 @@ export default function CreatorDisplay({
   collections,
   ownedOnly = true
 }: CreatorDisplayProps) {
-  const system = useSelector(s => s.system);
   const { config } = useSelector(s => s.system);
-  const [obj, setObj] = useState('');
   const dispatch = useDispatch();
   let selectedCollection = Object.keys(collections)[0];
 
@@ -90,9 +83,7 @@ export default function CreatorDisplay({
         >
           <Wind />
           <Text fontWeight="600" pt={5}>
-            {ownedOnly
-              ? 'No owned tokens to display in this collection'
-              : 'No tokens to display in this collection'}
+            {ownedOnly ? 'No owned tokens to display' : 'No tokens to display'}
           </Text>
         </Flex>
       </Flex>
@@ -113,25 +104,6 @@ export default function CreatorDisplay({
       overflowY="scroll"
       justify="start"
     >
-      <Menu>
-        <MenuList>
-          <MenuOptionGroup type="radio" defaultValue={obj || ''}>
-            <Text ml={4} my={2} fontWeight="600">
-              Collections
-            </Text>
-            {Object.keys(collections).map((address, idx) => (
-              <MenuItemOption
-                key={address + idx}
-                value={address}
-                selected={address === obj}
-                onClick={() => setObj(address)}
-              >
-                {collections[address].metadata.name}
-              </MenuItemOption>
-            ))}
-          </MenuOptionGroup>
-        </MenuList>
-      </Menu>
       <Flex
         w="100%"
         pb={6}
@@ -151,27 +123,7 @@ export default function CreatorDisplay({
             <Image
               src={`https://services.tzkt.io/v1/avatars2/${collection.address}`}
             />
-            <Link
-              color="brand.darkGray"
-              display="block"
-              whiteSpace="nowrap"
-              overflow="hidden"
-              textOverflow="ellipsis"
-              href={`https://${(system.config.network + '.').replace(
-                'mainnet.',
-                ''
-              )}tzkt.io/${collection.address}`}
-            >
-              <Heading>{collection.address}</Heading>
-            </Link>
-            <Link
-              href={`${config.bcd.gui}/${config.network}/${collection.address}`}
-              color="brand.darkGray"
-              isExternal
-              ml={2}
-            >
-              <ExternalLink size={16} />
-            </Link>
+            <Heading fontSize={1.5}>{minter}</Heading>
           </Flex>
         </Flex>
       </Flex>
