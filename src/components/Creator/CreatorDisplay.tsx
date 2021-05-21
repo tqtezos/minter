@@ -120,10 +120,10 @@ export default function CreatorDisplay({
       >
         <Flex flexDir="column" width="100%">
           <Flex align="center" display={{ base: 'none', md: 'flex' }}>
-            <Image
+            <Image width="5rem"
               src={`https://services.tzkt.io/v1/avatars2/${collection.address}`}
             />
-            <Heading fontSize={1.5}>{minter}</Heading>
+            <Heading fontSize="1.5rem">{minter}</Heading>
           </Flex>
         </Flex>
       </Flex>
