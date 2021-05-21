@@ -106,6 +106,23 @@ export const createAssetContractAction = createAsyncThunk<
   }
 );
 
+type Attributes = { name: string; value: string }[];
+
+function appendAttributes(metadata: NftMetadata, attributes: Attributes) {
+  return attributes.reduce(
+    (acc, row) => {
+      const keys = Object.keys(NftMetadata.props);
+      const key = keys.find(k => k === row.name) as keyof NftMetadata;
+      if (key && NftMetadata.props[key].decode(row.value)._tag === 'Right') {
+        return { ...acc, [key]: row.value };
+      }
+      const attribute = { name: row.name, value: row.value };
+      return { ...acc, attributes: [...acc.attributes, attribute] };
+    },
+    { attributes: [], ...metadata }
+  );
+}
+
 function appendStateMetadata(
   state: State['createNft'],
   metadata: NftMetadata,
@@ -118,16 +135,7 @@ function appendStateMetadata(
     description: state.fields.description || undefined,
     attributes: []
   };
-
-  return state.attributes.reduce((acc, row) => {
-    const keys = Object.keys(NftMetadata.props);
-    const key = keys.find(k => k === row.name) as keyof NftMetadata;
-    if (key && NftMetadata.props[key].decode(row.value)._tag === 'Right') {
-      return { ...acc, [key]: row.value };
-    }
-    const attribute = { name: row.name, value: row.value };
-    return { ...acc, attributes: [...acc.attributes!, attribute] };
-  }, appendedMetadata);
+  return appendAttributes(appendedMetadata, state.attributes);
 }
 
 export const mintTokenAction = createAsyncThunk<
@@ -325,12 +333,13 @@ export const mintCsvTokensAction = createAsyncThunk<null, undefined, Options>(
         }));
       const metadata: NftMetadata = {
         name: p.name,
+        minter: system.tzPublicKey,
         description: p.description,
         artifactUri: p.artifactUri,
         displayUri: p.displayUri,
         attributes
       };
-      return metadata;
+      return appendAttributes(metadata, attributes);
     });
 
     try {
