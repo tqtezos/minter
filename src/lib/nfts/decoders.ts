@@ -119,28 +119,66 @@ function sequenceCodecs<A, B, O, P, H, I>(
 // "output" codec will fail if this is the case.
 
 export type FixedPriceSaleBigMapKey = t.TypeOf<typeof FixedPriceSaleBigMapKey>;
+const legacySaleV1 = t.type({
+  price: t.string,
+  sale_seller: t.string,
+  sale_token: t.type({
+    token_for_sale_address: t.string,
+    token_for_sale_token_id: t.string
+  })
+});
+const legacySaleV2 = t.type({
+  price: t.string,
+  seller: t.string,
+  sale_token: t.type({
+    token_for_sale_address: t.string,
+    token_for_sale_token_id: t.string
+  })
+});
+const saleV3 = t.type({
+  sale_data: t.type({
+    amount: t.string,
+    price: t.string,
+    sale_token: t.type({
+      fa2_address: t.string,
+      token_id: t.string
+    }),
+  }),
+  seller: t.string
+});
 export const FixedPriceSaleBigMapKey = sequenceCodecs(
-  t.partial({ sale_seller: t.string, seller: t.string }),
+  t.union([ legacySaleV1, legacySaleV2, saleV3 ]),
   decoded => ({
     ...decoded,
-    sale_seller: decoded.sale_seller || decoded.seller
+    sale_data: saleV3.is(decoded) ? decoded.sale_data : {
+      amount: "1",
+      price: decoded.price,
+      sale_token: {
+        fa2_address: decoded.sale_token.token_for_sale_address,
+        token_id: decoded.sale_token.token_for_sale_token_id
+      }
+    },
+    seller: (saleV3.is(decoded) || legacySaleV2.is(decoded)) ? decoded.seller : decoded.sale_seller
   }),
-  t.type({
-    sale_token: t.type({
-      token_for_sale_address: t.string,
-      token_for_sale_token_id: t.string
-    }),
-    sale_seller: t.string
-  })
+  saleV3
 );
 
+const FixedPriceSaleBigMapRowV1 = BigMapRow({
+  key: FixedPriceSaleBigMapKey,
+  value: t.string
+});
+
+const FixedPriceSaleBigMapRowV2 = BigMapRow({
+  key: t.string,
+  value: FixedPriceSaleBigMapKey
+});
+
 export type FixedPriceSaleBigMap = t.TypeOf<typeof FixedPriceSaleBigMap>;
-export const FixedPriceSaleBigMap = t.array(
-  BigMapRow({
-    key: FixedPriceSaleBigMapKey,
-    value: t.string
-  })
-);
+export const FixedPriceSaleBigMap = t.array(sequenceCodecs(
+  t.union([ FixedPriceSaleBigMapRowV1, FixedPriceSaleBigMapRowV2 ]),
+  row => FixedPriceSaleBigMapRowV1.is(row) ? { key: "legacy", value: { ...row.key, price: row.value } } : row,
+  FixedPriceSaleBigMapRowV2
+));
 
 // Compatibility: fixed_price_sale contracts may have different storage
 // depending on which version was originated. Older versions only contain a
@@ -223,7 +261,12 @@ export const NftSale = t.type({
   seller: t.string,
   price: t.number,
   mutez: t.number,
-  type: t.string
+  type: t.string,
+  saleToken: t.type({
+    address: t.string,
+    tokenId: t.number
+  }),
+  saleId: t.number
 });
 
 export type Nft = t.TypeOf<typeof Nft>;

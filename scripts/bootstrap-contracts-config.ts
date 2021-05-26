@@ -8,6 +8,8 @@ import { InMemorySigner } from '@taquito/signer';
 import {
   Fa2MultiNftFaucetCode,
   FixedPriceSaleMarketTezCode,
+  FixedPriceSaleMarketTezCancelOnlyAdminCode,
+  FixedPriceSaleMarketTezFixedFeeCancelOnlyAdminCode,
   FixedPriceSaleTezFixedFeeCode
 } from '@tqtezos/minter-contracts';
 
@@ -162,13 +164,14 @@ async function bootstrap(env: string) {
   });
 
   // bootstrap marketplace fixed price (tez)
+  const adminOnly = config.get("contractOpts.marketplace.adminOnly");
   const marketplaceFeePercent = config.get("contractOpts.marketplace.fee.percent");
   const marketplaceFeeAddress = config.get("contractOpts.marketplace.fee.address");
   if (marketplaceFeePercent && marketplaceFeeAddress) {
     await bootstrapContract(bootstrappedConfig, toolkit, {
       configKey: 'contracts.marketplace.fixedPrice.tez',
       contractAlias: 'fixedPriceMarketTez',
-      contractCode: FixedPriceSaleTezFixedFeeCode.code,
+      contractCode: adminOnly ? FixedPriceSaleTezFixedFeeCode.code : FixedPriceSaleMarketTezFixedFeeCancelOnlyAdminCode.code,
       initStorage: () => ({
         admin: {
           admin: config.get("admin.address"),
@@ -178,6 +181,7 @@ async function bootstrap(env: string) {
           fee_address: marketplaceFeeAddress,
           fee_percent: marketplaceFeePercent
         },
+        next_sale_id: 0,
         sales: new MichelsonMap()
       })
     });
@@ -185,12 +189,13 @@ async function bootstrap(env: string) {
     await bootstrapContract(bootstrappedConfig, toolkit, {
       configKey: 'contracts.marketplace.fixedPrice.tez',
       contractAlias: 'fixedPriceMarketTez',
-      contractCode: FixedPriceSaleMarketTezCode.code,
+      contractCode: adminOnly ? FixedPriceSaleMarketTezCode.code : FixedPriceSaleMarketTezCancelOnlyAdminCode.code,
       initStorage: () => ({
         admin: {
           admin: config.get("admin.address"),
           paused: false
         },
+        next_sale_id: 0,
         sales: new MichelsonMap()
       })
     });

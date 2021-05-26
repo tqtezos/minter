@@ -17,6 +17,7 @@ interface ConfigInput {
   marketplaceHasFee: boolean;
   marketplaceFeePercent?: number;
   marketplaceFeeAddress?: string;
+  marketplaceAdminOnly: boolean;
 }
 
 const stripAnsi = (input: string): string => {
@@ -126,6 +127,11 @@ const askConfigQuestions = (): Promise<ConfigInput> => {
       }
     },
     {
+      name: 'marketplaceAdminOnly',
+      type: 'confirm',
+      message: 'Do you want to only allow the admin address to list items for sale?'
+    },
+    {
       name: 'marketplaceHasFee',
       type: 'confirm',
       message: 'Do you want to collect a fee on sales in the marketplace?'
@@ -191,6 +197,8 @@ const saveConfig = (input: ConfigInput) => {
   config.set('admin.secret', input.adminSk);
   config.set('ipfsApi', "https://minter-api.tqhosted.com");
   config.set('ipfsGateway', "https://tqtezos.mypinata.cloud");
+
+  config.set("contractOpts.marketplace.adminOnly", input.marketplaceAdminOnly);
 
   if (input.marketplaceHasFee) {
     config.set("contractOpts.marketplace.fee.percent", input.marketplaceFeePercent);
