@@ -205,7 +205,8 @@ export function CsvFileUpload() {
     onDrop,
     maxFiles: 1,
     maxSize: 30 * 1024 * 1024,
-    accept: ['text/csv']
+    // The type for a csv file is blank in some cases (like in windows chrome)
+    // accept: ['text/csv']
   });
 
   return (

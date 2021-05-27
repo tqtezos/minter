@@ -117,9 +117,9 @@ function appendAttributes(metadata: NftMetadata, attributes: Attributes) {
         return { ...acc, [key]: row.value };
       }
       const attribute = { name: row.name, value: row.value };
-      return { ...acc, attributes: [...acc.attributes, attribute] };
-    },
-    { attributes: [], ...metadata }
+      return { ...acc, attributes: [...acc.attributes ?? [], attribute] };
+    }, 
+    metadata
   );
 }
 
@@ -337,7 +337,7 @@ export const mintCsvTokensAction = createAsyncThunk<null, undefined, Options>(
         description: p.description,
         artifactUri: p.artifactUri,
         displayUri: p.displayUri,
-        attributes
+        attributes: [],
       };
       return appendAttributes(metadata, attributes);
     });
