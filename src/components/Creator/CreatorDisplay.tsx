@@ -106,7 +106,6 @@ export default function CreatorDisplay({
     >
       <Flex
         w="100%"
-        pb={6}
         justify="space-between"
         align={{
           base: 'flex-start',
@@ -119,11 +118,11 @@ export default function CreatorDisplay({
         marginBottom={2}
       >
         <Flex flexDir="column" width="100%">
-          <Flex align="center" display={{ base: 'none', md: 'flex' }}>
+          <Flex align="center">
             <Image width="5rem"
               src={`https://services.tzkt.io/v1/avatars2/${collection.address}`}
             />
-            <Heading fontSize="1.5rem">{minter}</Heading>
+            <Heading fontSize="1.5rem" overflow='hidden' textOverflow='ellipsis' overflowWrap='normal'>{minter}</Heading>
           </Flex>
         </Flex>
       </Flex>
@@ -173,7 +172,7 @@ export default function CreatorDisplay({
                 })}
             </SimpleGrid>
           </TabPanel>
-          
+
         </TabPanels>
       </Tabs>
     </Flex>
