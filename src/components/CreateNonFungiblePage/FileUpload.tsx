@@ -194,6 +194,7 @@ export function CsvFileUpload() {
 
   const onDrop = useCallback(
     (files: File[]) => {
+      console.log(`onDrop`, {files});
       dispatch(
         readFileAsDataUrlAction({ ns: 'createNftCsvImport', file: files[0] })
       );
@@ -205,9 +206,11 @@ export function CsvFileUpload() {
     onDrop,
     maxFiles: 1,
     maxSize: 30 * 1024 * 1024,
-    accept: ['text/csv']
+    // The type for a csv file is blank in some cases (like in windows chrome)
+    // accept: ['text/csv']
   });
 
+  // console.log(`CsvFileUpload RENDER`, {state});
   return (
     <Flex flexDir="column" align="center">
       <Flex
