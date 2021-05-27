@@ -97,8 +97,8 @@ export const getAssetContractsQuery = createAsyncThunk<
     } catch (e) {
       console.log(e);
       return rejectWithValue({
-        kind: ErrorKind.GetWalletNftAssetContractsFailed,
-        message: "Failed to retrieve wallet's asset contracts"
+        kind: ErrorKind.GetNftAssetContractsFailed,
+        message: "Failed to retrieve asset contracts"
       });
     }
   }
