@@ -8,7 +8,7 @@ template and filling it in with their own information.
 
 ## The Template 
 
-Note - the template can be found [here](docs/batch_template.csv) and for testnet [here](docs/batch_template_testnet.csv)
+Note - the template can be found [here](batch_template.csv) and for testnet [here](batch_template_testnet.csv)
 
 The template requires the following fields to be filled in:
 - **name**: The name of the token you wish to mint.
