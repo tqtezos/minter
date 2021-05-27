@@ -14,9 +14,10 @@ export default function Creator({ minter }: { minter: string }) {
   const { marketplace } = useSelector(s => s.marketplace);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-      dispatch(getAssetContractsQuery(minter));
-  }, [system.status, dispatch, minter, collections.globalCollection]);
+  // Don't get assets from other contracts for now
+  // useEffect(() => {
+  //     dispatch(getAssetContractsQuery(minter));
+  // }, [system.status, dispatch, minter, collections.globalCollection]);
 
   useEffect(() => {
     dispatch(getMarketplaceNftsQuery(marketplace.address));
