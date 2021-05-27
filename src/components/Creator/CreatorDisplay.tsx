@@ -6,7 +6,8 @@ import {
   Spinner,
   Text,
   Image,
-  Box
+  Box,
+  Link
 } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import { ChevronLeft, Wind } from 'react-feather';
@@ -18,6 +19,7 @@ import {
 import TokenCard from '../common/TokenCard';
 import { Collection } from '../../reducer/slices/collections';
 import { MinterButton } from '../common';
+import lk from '../common/assets/link-icon.svg'
 
 interface CreatorDisplayProps {
   minter: string;
@@ -122,7 +124,9 @@ export default function CreatorDisplay({
           <Image width="5rem"
             src={`https://services.tzkt.io/v1/avatars2/${collection.address}`}
           />
-          <Heading fontSize="1.5rem" overflow="hidden" textOverflow="ellipsis" overflowWrap="normal">{minter}</Heading>
+          <Link display="block" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" href={`https://${(config.network + '.').replace('mainnet.', '')}tzkt.io/${minter}`}>
+            <Heading fontSize="1.5rem" overflow="hidden" textOverflow="ellipsis" overflowWrap="normal">{minter}&nbsp;<sup><img src={lk} alt="" width="auto" height="auto" style={{ display: 'inline-block' }} /></sup></Heading>
+          </Link>
         </Flex>
       </Flex>
 
