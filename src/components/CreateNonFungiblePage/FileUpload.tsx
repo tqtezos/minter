@@ -194,7 +194,6 @@ export function CsvFileUpload() {
 
   const onDrop = useCallback(
     (files: File[]) => {
-      console.log(`onDrop`, {files});
       dispatch(
         readFileAsDataUrlAction({ ns: 'createNftCsvImport', file: files[0] })
       );
@@ -210,7 +209,6 @@ export function CsvFileUpload() {
     // accept: ['text/csv']
   });
 
-  // console.log(`CsvFileUpload RENDER`, {state});
   return (
     <Flex flexDir="column" align="center">
       <Flex
