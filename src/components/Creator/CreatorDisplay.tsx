@@ -5,10 +5,11 @@ import {
   SimpleGrid,
   Spinner,
   Text,
-  Image
+  Image,
+  Box
 } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
-import { Wind } from 'react-feather';
+import { ChevronLeft, Wind } from 'react-feather';
 import { useDispatch, useSelector } from '../../reducer';
 import {
   getContractNftsQuery,
@@ -16,6 +17,7 @@ import {
 } from '../../reducer/async/queries';
 import TokenCard from '../common/TokenCard';
 import { Collection } from '../../reducer/slices/collections';
+import { MinterButton } from '../common';
 
 interface CreatorDisplayProps {
   minter: string;
@@ -91,90 +93,96 @@ export default function CreatorDisplay({
   }
 
   return (
-    <Flex
-      flexDir="column"
+    <Flex 
+      flexDir="column" 
       h="100%"
       w="100%"
-      px={{ base: 6, md: 10 }}
-      pt={6}
-      flex="1"
       bg="brand.brightGray"
+      flex="1"
       borderLeftWidth="1px"
       borderLeftColor="brand.lightBlue"
       overflowY="scroll"
       justify="start"
     >
-      <Flex
-        w="100%"
-        justify="space-between"
-        align={{
-          base: 'flex-start',
-          md: 'center'
-        }}
-        flexDir={{
-          base: 'column',
-          md: 'row'
-        }}
-        marginBottom={2}
-      >
-        <Flex flexDir="column" width="100%">
-          <Flex align="center">
-            <Image width="5rem"
-              src={`https://services.tzkt.io/v1/avatars2/${collection.address}`}
-            />
-            <Heading fontSize="1.5rem" overflow='hidden' textOverflow='ellipsis' overflowWrap='normal'>{minter}</Heading>
-          </Flex>
+      <Flex flexDir="row">
+        <Flex justifyContent="flex-start" width="4rem">
+          <MinterButton
+            variant="primaryActionInverted"
+            onClick={e => {
+              e.preventDefault();
+              window.history.back();
+            }}
+          >
+            <Box color="currentcolor">
+              <ChevronLeft size={24} strokeWidth="3" />
+            </Box>
+          </MinterButton>
+        </Flex>
+        <Flex align="center" overflow="hidden">
+          <Image width="5rem"
+            src={`https://services.tzkt.io/v1/avatars2/${collection.address}`}
+          />
+          <Heading fontSize="1.5rem" overflow="hidden" textOverflow="ellipsis" overflowWrap="normal">{minter}</Heading>
         </Flex>
       </Flex>
-      <Tabs>
-        <TabList>
-          <Tab>Minted</Tab>
-          <Tab>For Sale</Tab>
-        </TabList>
 
-        <TabPanels>
+      <Flex
+        flexDir="column"
+        h="100%"
+        w="100%"
+        px={{ base: 6, md: 10 }}
+        flex="1"
+      >
+        <Tabs>
+          <TabList>
+            <Tab>Minted</Tab>
+            <Tab>For Sale</Tab>
+          </TabList>
 
-          <TabPanel>
-            <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
-              {tokens
-                .filter(
-                  ({ owner, metadata }) =>
-                    owner === minter &&
-                    (metadata?.creators?.find(creator => creator === owner) ||
-                      metadata?.minter === owner)
-                )
-                .map(token => {
-                  return (
-                    <TokenCard
-                      key={collection.address + token.id}
-                      address={collection.address}
-                      config={config}
-                      {...token}
-                    />
-                  );
-                })}
-            </SimpleGrid>
-          </TabPanel>
+          <TabPanels>
 
-          <TabPanel>
-            <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
-              {tokens
-                .filter(({ sale }) => sale?.seller === minter)
-                .map(token => {
-                  return (
-                    <TokenCard
-                      key={collection.address + token.id}
-                      address={collection.address}
-                      config={config}
-                      {...token}
-                    />
-                  );
-                })}
-            </SimpleGrid>
-          </TabPanel>
+            <TabPanel>
+              <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
+                {tokens
+                  .filter(
+                    ({ owner, metadata }) =>
+                      owner === minter &&
+                      (metadata?.creators?.find(creator => creator === owner) ||
+                        metadata?.minter === owner)
+                  )
+                  .map(token => {
+                    return (
+                      <TokenCard
+                        key={collection.address + token.id}
+                        address={collection.address}
+                        config={config}
+                        {...token}
+                      />
+                    );
+                  })}
+              </SimpleGrid>
+            </TabPanel>
 
-        </TabPanels>
-      </Tabs>
+            <TabPanel>
+              <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
+                {tokens
+                  .filter(({ sale }) => sale?.seller === minter)
+                  .map(token => {
+                    return (
+                      <TokenCard
+                        key={collection.address + token.id}
+                        address={collection.address}
+                        config={config}
+                        {...token}
+                      />
+                    );
+                  })}
+              </SimpleGrid>
+            </TabPanel>
+
+          </TabPanels>
+        </Tabs>
+      </Flex>
     </Flex>
   );
 }
