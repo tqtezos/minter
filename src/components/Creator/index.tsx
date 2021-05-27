@@ -3,7 +3,6 @@ import { Flex } from '@chakra-ui/react';
 import CreatorDisplay from './CreatorDisplay';
 import { useSelector, useDispatch } from '../../reducer';
 import {
-  getAssetContractsQuery,
   getMarketplaceNftsQuery
 } from '../../reducer/async/queries';
 import { Collection } from '../../reducer/slices/collections';
