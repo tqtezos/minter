@@ -130,11 +130,11 @@ export default function CreatorDisplay({
       <Tabs>
         <TabList>
           <Tab>Minted</Tab>
-          <Tab>Collected</Tab>
           <Tab>For Sale</Tab>
         </TabList>
 
         <TabPanels>
+
           <TabPanel>
             <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
               {tokens
@@ -156,27 +156,7 @@ export default function CreatorDisplay({
                 })}
             </SimpleGrid>
           </TabPanel>
-          <TabPanel>
-            <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
-              {tokens
-                .filter(
-                  ({ owner, metadata }) =>
-                    owner === minter &&
-                    !metadata?.creators?.find(creator => creator === owner) &&
-                    metadata?.minter !== owner
-                )
-                .map(token => {
-                  return (
-                    <TokenCard
-                      key={collection.address + token.id}
-                      address={collection.address}
-                      config={config}
-                      {...token}
-                    />
-                  );
-                })}
-            </SimpleGrid>
-          </TabPanel>
+
           <TabPanel>
             <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
               {tokens
@@ -193,6 +173,7 @@ export default function CreatorDisplay({
                 })}
             </SimpleGrid>
           </TabPanel>
+          
         </TabPanels>
       </Tabs>
     </Flex>
