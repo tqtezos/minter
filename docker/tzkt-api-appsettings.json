@@ -1,0 +1,28 @@
+{
+  "Metadata": {
+    "AccountsPath": "*",
+    "ProposalsPath": "*",
+    "ProtocolsPath": "*"
+  },
+  "Cache": {
+    "LoadRate": 0.75,
+    "MaxAccounts": 32000
+  },
+  "Websocket": {
+    "Enabled": true,
+    "MaxConnections": 1000,
+    "MaxAccountSubscriptions": 50,
+    "MaxBigMapSubscriptions": 50
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "server=db;port=5432;database=tzkt;username=root;password=root;"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "AllowedHosts": "*"
+}

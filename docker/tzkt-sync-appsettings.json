@@ -1,0 +1,27 @@
+{
+  "Protocols": {
+    "Diagnostics": false,
+    "Validation": true
+  },
+  "TezosNode": {
+    "ChainId": "NetXfpUfwJdBox9",
+    "Endpoint": "http://sandbox:20000/",
+    "Timeout": 60
+  },
+  "Quotes": {
+    "Async": true,
+    "Provider": {
+      "Name": "TzktQuotes"
+    }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "server=db;port=5432;database=tzkt;username=root;password=root;"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  }
+}

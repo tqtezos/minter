@@ -1,22 +1,25 @@
 {
-  "rpc": "http://localhost:8732",
-  "network": "sandboxnet",
-  "bcd": {
-    "api": "http://localhost:42000",
-    "gui": "http://localhost:8009"
-  },
-  "admin": {
-    "address": "tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU",
-    "secret": "edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx"
-  },
-  "contracts": {
-    "nftFaucet": null,
-    "marketplace": {
-      "fixedPrice": {
-        "tez": null
-      }
-    }
-  },
-  "ipfsApi": "http://localhost:3300",
-  "ipfsGateway": "http://localhost:8080"
+	"rpc": "http://localhost:8732",
+	"network": "sandboxnet",
+	"bcd": {
+		"api": "http://localhost:42000",
+		"gui": "http://localhost:8009"
+	},
+	"tzkt": {
+		"api": "http://localhost:5000"
+	},
+	"admin": {
+		"address": "tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU",
+		"secret": "edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx"
+	},
+	"contracts": {
+		"nftFaucet": null,
+		"marketplace": {
+			"fixedPrice": {
+				"tez": null
+			}
+		}
+	},
+	"ipfsApi": "http://localhost:3300",
+	"ipfsGateway": "http://localhost:8080"
 }
