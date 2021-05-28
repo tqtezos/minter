@@ -1,6 +1,7 @@
 /* eslint-disable no-redeclare */
 import * as t from 'io-ts';
 import * as e from 'fp-ts/Either';
+import merge from "ts-deepmerge";
 
 //// Contracts
 
@@ -120,21 +121,19 @@ function sequenceCodecs<A, B, O, P, H, I>(
 
 export type FixedPriceSaleBigMapKey = t.TypeOf<typeof FixedPriceSaleBigMapKey>;
 const legacySaleV1 = t.type({
-  price: t.string,
-  sale_seller: t.string,
-  sale_token: t.type({
-    token_for_sale_address: t.string,
-    token_for_sale_token_id: t.string
-  })
-});
+    sale_seller: t.string,
+    sale_token: t.type({
+      token_for_sale_address: t.string,
+      token_for_sale_token_id: t.string
+    })
+  });
 const legacySaleV2 = t.type({
-  price: t.string,
-  seller: t.string,
-  sale_token: t.type({
-    token_for_sale_address: t.string,
-    token_for_sale_token_id: t.string
-  })
-});
+    seller: t.string,
+    sale_token: t.type({
+      token_for_sale_address: t.string,
+      token_for_sale_token_id: t.string
+    })
+  });
 const saleV3 = t.type({
   sale_data: t.type({
     amount: t.string,
@@ -146,13 +145,18 @@ const saleV3 = t.type({
   }),
   seller: t.string
 });
+const sale = t.intersection([
+  saleV3,
+  t.partial({ isLegacy: t.boolean })
+]);
+
 export const FixedPriceSaleBigMapKey = sequenceCodecs(
   t.union([ legacySaleV1, legacySaleV2, saleV3 ]),
   decoded => ({
     ...decoded,
     sale_data: saleV3.is(decoded) ? decoded.sale_data : {
       amount: "1",
-      price: decoded.price,
+      price: "0",
       sale_token: {
         fa2_address: decoded.sale_token.token_for_sale_address,
         token_id: decoded.sale_token.token_for_sale_token_id
@@ -160,7 +164,7 @@ export const FixedPriceSaleBigMapKey = sequenceCodecs(
     },
     seller: (saleV3.is(decoded) || legacySaleV2.is(decoded)) ? decoded.seller : decoded.sale_seller
   }),
-  saleV3
+  sale
 );
 
 const FixedPriceSaleBigMapRowV1 = BigMapRow({
@@ -176,7 +180,12 @@ const FixedPriceSaleBigMapRowV2 = BigMapRow({
 export type FixedPriceSaleBigMap = t.TypeOf<typeof FixedPriceSaleBigMap>;
 export const FixedPriceSaleBigMap = t.array(sequenceCodecs(
   t.union([ FixedPriceSaleBigMapRowV1, FixedPriceSaleBigMapRowV2 ]),
-  row => FixedPriceSaleBigMapRowV1.is(row) ? { key: "legacy", value: { ...row.key, price: row.value } } : row,
+  row => (FixedPriceSaleBigMapRowV1.is(row) ? merge(
+      row,
+      { key: row.id.toString(), value: row.key },
+      { value: { isLegacy: true, sale_data: { price: row.value }}}
+    ) : merge(row, { value: { isLegacy: false }})
+  ),
   FixedPriceSaleBigMapRowV2
 ));
 

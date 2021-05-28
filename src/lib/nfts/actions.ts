@@ -142,10 +142,19 @@ export async function listTokenForSale(
           }
         }
       ])
-    )
-    .withContractCall(
+    );
+
+  const sellSchema = contractM.parameterSchema.ExtractSchema()['sell'];
+  if (sellSchema.hasOwnProperty('sale_token_param_tez')) {
+    batch.withContractCall(
+      contractM.methods.sell(salePrice, tokenContract, tokenId)
+    );
+  } else {
+    batch.withContractCall(
       contractM.methods.sell(tokenContract, tokenId, salePrice, saleQty)
     );
+  }
+
   return batch.send();
 }
 

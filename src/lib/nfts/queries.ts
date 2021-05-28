@@ -158,8 +158,8 @@ export async function getContractNfts(
             address: saleData.value.sale_data.sale_token.fa2_address,
             tokenId: Number.parseInt(saleData.value.sale_data.sale_token.token_id)
           },
-          saleId: saleData.key === "legacy" ? 0 : Number.parseInt(saleData.key),
-          type: saleData.key === "legacy" ? 'fixedPriceLegacy' : 'fixedPrice'
+          saleId: saleData.value.isLegacy ? 0 : Number.parseInt(saleData.key),
+          type: saleData.value.isLegacy ? 'fixedPriceLegacy' : 'fixedPrice'
         };
 
         return {
@@ -354,8 +354,8 @@ export const loadMarketplaceNft = async (
         address: tokenSale.value.sale_data.sale_token.fa2_address,
         tokenId: Number.parseInt(tokenSale.value.sale_data.sale_token.token_id)
       },
-      saleId: tokenSale.key === "legacy" ? 0 : Number.parseInt(tokenSale.key),
-      type: tokenSale.key === "legacy" ? 'fixedPriceLegacy' : 'fixedPrice'
+      saleId: tokenSale.value.isLegacy ? 0 : Number.parseInt(tokenSale.key),
+      type: tokenSale.value.isLegacy ? 'fixedPriceLegacy' : 'fixedPrice'
     };
 
     if (!tokenMetadata) {
