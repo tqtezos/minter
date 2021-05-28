@@ -1,14 +1,15 @@
+/* eslint-disable no-redeclare */
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { State } from '..';
 import {
   createAssetContract,
   mintToken,
+  mintTokens,
   transferToken,
   listTokenForSale,
   cancelTokenSale,
   buyToken
 } from '../../lib/nfts/actions';
-// import {getNftAssetContract} from '../../lib/nfts/queries'
 import { ErrorKind, RejectValue } from './errors';
 import { getContractNftsQuery, getWalletAssetContractsQuery } from './queries';
 import { validateCreateNftForm } from '../validators/createNft';
@@ -21,6 +22,8 @@ import { connectWallet } from './wallet';
 import { NftMetadata } from '../../lib/nfts/decoders';
 import { SystemWithToolkit, SystemWithWallet } from '../../lib/system';
 import { notifyPending, notifyFulfilled } from '../slices/notificationsActions';
+import parse from 'csv-parse/lib/sync';
+import * as t from 'io-ts';
 
 type Options = {
   state: State;
@@ -62,7 +65,7 @@ export const readFileAsDataUrlAction = createAsyncThunk<
     return await readFile;
   } catch (e) {
     return rejectWithValue({
-      kind: ErrorKind.UknownError,
+      kind: ErrorKind.UnknownError,
       message: 'Could not read file'
     });
   }
@@ -103,6 +106,23 @@ export const createAssetContractAction = createAsyncThunk<
   }
 );
 
+type Attributes = { name: string; value: string }[];
+
+function appendAttributes(metadata: NftMetadata, attributes: Attributes) {
+  return attributes.reduce(
+    (acc, row) => {
+      const keys = Object.keys(NftMetadata.props);
+      const key = keys.find(k => k === row.name) as keyof NftMetadata;
+      if (key && NftMetadata.props[key].decode(row.value)._tag === 'Right') {
+        return { ...acc, [key]: row.value };
+      }
+      const attribute = { name: row.name, value: row.value };
+      return { ...acc, attributes: [...acc.attributes ?? [], attribute] };
+    }, 
+    metadata
+  );
+}
+
 function appendStateMetadata(
   state: State['createNft'],
   metadata: NftMetadata,
@@ -115,16 +135,7 @@ function appendStateMetadata(
     description: state.fields.description || undefined,
     attributes: []
   };
-
-  return state.attributes.reduce((acc, row) => {
-    const keys = Object.keys(NftMetadata.props);
-    const key = keys.find(k => k === row.name) as keyof NftMetadata;
-    if (key && NftMetadata.props[key].decode(row.value)._tag === 'Right') {
-      return { ...acc, [key]: row.value };
-    }
-    const attribute = { name: row.name, value: row.value };
-    return { ...acc, attributes: [...acc.attributes!, attribute] };
-  }, appendedMetadata);
+  return appendAttributes(appendedMetadata, state.attributes);
 }
 
 export const mintTokenAction = createAsyncThunk<
@@ -137,7 +148,7 @@ export const mintTokenAction = createAsyncThunk<
     const { system, createNft: state } = getState();
     if (state.selectedFile === null) {
       return rejectWithValue({
-        kind: ErrorKind.UknownError,
+        kind: ErrorKind.UnknownError,
         message: 'Could not mint token: no file selected'
       });
     } else if (system.status !== 'WalletConnected') {
@@ -160,7 +171,7 @@ export const mintTokenAction = createAsyncThunk<
       file = new File([blob], name, { type });
     } catch (e) {
       return rejectWithValue({
-        kind: ErrorKind.UknownError,
+        kind: ErrorKind.UnknownError,
         message: 'Could not mint token: selected file not found'
       });
     }
@@ -196,7 +207,7 @@ export const mintTokenAction = createAsyncThunk<
           displayFile = new File([blob], name, { type });
         } catch (e) {
           return rejectWithValue({
-            kind: ErrorKind.UknownError,
+            kind: ErrorKind.UnknownError,
             message: 'Could not mint token: video display file not found'
           });
         }
@@ -250,6 +261,105 @@ export const mintTokenAction = createAsyncThunk<
         message: 'Mint token failed'
       });
     }
+  }
+);
+
+interface NonEmptyArrayBrand {
+  readonly NonEmptyArray: unique symbol;
+}
+
+type ParsedCsvRow = t.TypeOf<typeof ParsedCsvRow>;
+const ParsedCsvRow = t.intersection([
+  t.type({
+    name: t.string,
+    description: t.string,
+    artifactUri: t.string,
+    collection: t.string
+  }),
+  t.partial({
+    displayUri: t.string
+  }),
+  t.record(t.string, t.string)
+]);
+
+const ParsedCsv = t.brand(
+  t.array(ParsedCsvRow),
+  (n): n is t.Branded<Array<ParsedCsvRow>, NonEmptyArrayBrand> => n.length > 0,
+  'NonEmptyArray'
+);
+
+export const mintCsvTokensAction = createAsyncThunk<null, undefined, Options>(
+  'action/mintCsvTokens',
+  async (_, { getState, rejectWithValue, dispatch, requestId }) => {
+    const { system, createNftCsvImport: state } = getState();
+    if (system.status !== 'WalletConnected') {
+      return rejectWithValue({
+        kind: ErrorKind.WalletNotConnected,
+        message: 'Wallet not connected'
+      });
+    }
+    if (state.selectedCsvFile === null) {
+      return rejectWithValue({
+        kind: ErrorKind.UnknownError,
+        message: 'No CSV file selected'
+      });
+    }
+
+    let text: string;
+    try {
+      text = await fetch(state.selectedCsvFile.objectUrl).then(r => r.text());
+    } catch (e) {
+      return rejectWithValue({
+        kind: ErrorKind.UnknownError,
+        message: 'Could not mint tokens: selected CSV file not found'
+      });
+    }
+    const parsed = parse(text, { columns: true, skipEmptyLines: true });
+    if (!ParsedCsv.is(parsed)) {
+      console.log('ERROR:', parsed);
+      return rejectWithValue({
+        kind: ErrorKind.UnknownError,
+        message: ''
+      });
+    }
+    const attrRegex = /^attribute\./;
+    const attrRegexTest = new RegExp(attrRegex.source + '.+');
+    const metadataArray = parsed.map(p => {
+      const attributes = Object.keys(p)
+        .filter(k => attrRegexTest.test(k))
+        .map(k => ({
+          name: k.split(attrRegex)[1],
+          value: p[k]
+        }));
+      const metadata: NftMetadata = {
+        name: p.name,
+        minter: system.tzPublicKey,
+        description: p.description,
+        artifactUri: p.artifactUri,
+        displayUri: p.displayUri,
+        attributes: [],
+      };
+      return appendAttributes(metadata, attributes);
+    });
+
+    try {
+      const address = parsed[0].collection;
+      const op = await mintTokens(system, address, metadataArray);
+      const pendingMessage = `Minting new tokens from CSV`;
+      dispatch(notifyPending(requestId, pendingMessage));
+      await op.confirmation(2);
+
+      const fulfilledMessage = `Created new tokens from CSV in ${address}`;
+      dispatch(notifyFulfilled(requestId, fulfilledMessage));
+      dispatch(getContractNftsQuery(address));
+    } catch (e) {
+      return rejectWithValue({
+        kind: ErrorKind.MintTokenFailed,
+        message: 'Mint tokens from CSV failed'
+      });
+    }
+
+    return null;
   }
 );
 

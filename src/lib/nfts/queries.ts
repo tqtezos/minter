@@ -130,8 +130,11 @@ export async function getContractNfts(
   const tokenSales = await getFixedPriceSalesBigMap(system.tzkt, mktAddress);
   const activeSales = tokenSales.filter(sale => sale.active);
 
+  // Sort by token id - descending
+  const tokensSorted = [...tokens].sort((a,b)=>- (Number.parseInt(a.value.token_id, 10) - Number.parseInt(b.value.token_id, 10)));
+
   return Promise.all(
-    tokens.map(
+    tokensSorted.map(
       async (token): Promise<D.Nft> => {
         const { token_id: tokenId, token_info: tokenInfo } = token.value;
 

@@ -103,6 +103,44 @@ export async function mintToken(
     .send();
 }
 
+interface MintData {
+  owner: string;
+  token_metadata: {
+    token_id: number;
+    token_info: MichelsonMap<string, string>;
+  };
+}
+
+export async function mintTokens(
+  system: SystemWithWallet,
+  address: string,
+  metadata: NftMetadata[]
+) {
+  const contract = await system.toolkit.wallet.at(address);
+  const storage = await contract.storage<any>();
+
+  const token_id = storage.assets.next_token_id;
+  const mints: MintData[] = [];
+  for (const [index, meta] of metadata.entries()) {
+    const token_info = new MichelsonMap<string, string>();
+    const resp = await uploadIPFSJSON(system.config.ipfsApi, {
+      ...meta,
+      decimals: 0,
+      booleanAmount: true
+    });
+    token_info.set('', toHexString(resp.data.ipfsUri));
+    mints.push({
+      owner: system.tzPublicKey,
+      token_metadata: {
+        token_id: token_id + index,
+        token_info
+      }
+    });
+  }
+
+  return contract.methods.mint(mints).send();
+}
+
 export async function transferToken(
   system: SystemWithWallet,
   contractAddress: string,

@@ -1,0 +1,3 @@
+name,description,collection,artifactUri,displayUri,attribute.test
+Test Token 1,The first,KT1QcxwB4QyPKfmSwjH1VRxa6kquUjeDWeEy,ipfs://QmbZGq67PaU6GidU77dxAyvf2VZr3R3vNgr9y5SytaeYPW,ipfs://QmbZGq67PaU6GidU77dxAyvf2VZr3R3vNgr9y5SytaeYPW,test
+Test Token 2,The second,KT1QcxwB4QyPKfmSwjH1VRxa6kquUjeDWeEy,ipfs://QmbZGq67PaU6GidU77dxAyvf2VZr3R3vNgr9y5SytaeYPW,ipfs://QmbZGq67PaU6GidU77dxAyvf2VZr3R3vNgr9y5SytaeYPW,test
