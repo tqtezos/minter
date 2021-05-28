@@ -30,13 +30,14 @@ yarn start
 
 OpenMinter supports the following networks and software components:
 
-#### 🌐 Mainnet and Edonet
+#### 🌐 Mainnet and Florencenet
 #### 📦 Sandboxed development via [Flextesa][flextesa]
 #### 🎨 Multimedia NFTs powered by [TZIP-21](https://tzip.tezosagora.org/proposal/tzip-21/)
 #### ⚙️ Smart contracts based on [minter-sdk](https://github.com/tqtezos/minter-sdk)
 #### 👛 Wallets compatible with [Beacon](https://www.walletbeacon.io/)
 #### 📖 Indexing via [tzkt](https://api.tzkt.io/)
 #### 🚀 [IPFS](https://ipfs.io/) via a local node or [Pinata](https://pinata.cloud/)
+#### 🏭 Batch minting support
 
 The following dependencies are required to run OpenMinter.
 
