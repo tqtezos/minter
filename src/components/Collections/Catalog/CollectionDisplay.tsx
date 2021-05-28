@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import {
+  Box,
   Flex,
   Heading,
   Link,
@@ -8,7 +9,7 @@ import {
   Text
 } from '@chakra-ui/react';
 import { MinterButton } from '../../common';
-import { ExternalLink, Wind } from 'react-feather';
+import { ChevronLeft, ExternalLink, Wind } from 'react-feather';
 import { useDispatch, useSelector } from '../../../reducer';
 import {
   getContractNftsQuery,
@@ -101,8 +102,6 @@ export default function CollectionDisplay({
       flexDir="column"
       h="100%"
       w="100%"
-      px={{ base: 6, md: 10 }}
-      pt={6}
       flex="1"
       bg="brand.brightGray"
       borderLeftWidth="1px"
@@ -110,58 +109,87 @@ export default function CollectionDisplay({
       overflowY="scroll"
       justify="start"
     >
-      {ownedOnly && wallet !== null ? (
-        <Flex display={{ base: 'flex', md: 'none' }} mb={4}>
-          <CollectionsDropdown />
+      <Flex flexDir="row">
+        <Flex justifyContent="flex-start" width="4rem">
+          <MinterButton
+            variant="primaryActionInverted"
+            onClick={e => {
+              e.preventDefault();
+              window.history.back();
+            }}
+          >
+            <Box color="currentcolor">
+              <ChevronLeft size={24} strokeWidth="3" />
+            </Box>
+          </MinterButton>
         </Flex>
-      ) : null}
-      <Flex
-        w="100%"
-        pb={6}
-        justify="space-between"
-        align={{
-          base: 'flex-start',
-          md: 'center'
-        }}
-        flexDir={{
-          base: 'column',
-          md: 'row'
-        }}
-      >
-        <Flex flexDir="column" width="100%">
-          <Flex justify="space-between" width="100%">
-            <Heading size="lg">{collection.metadata.name || ''}</Heading>
-          </Flex>
-          <Flex align="center" display={{ base: 'none', md: 'flex' }}>
-            <Text fontFamily="mono" color="brand.lightGray">
-              {collection.address}
-            </Text>
-            <Link
-              href={`${config.bcd.gui}/${config.network}/${collection.address}`}
-              color="brand.darkGray"
-              isExternal
-              ml={2}
-            >
-              <ExternalLink size={16} />
-            </Link>
+
+        <Flex
+            flexDir="column"
+            px={{ base: 6, md: 10 }}
+            pt={6}
+            overflow="hidden"
+        >
+          {ownedOnly && wallet !== null ? (
+            <Flex display={{ base: 'flex', md: 'none' }} mb={4}>
+              <CollectionsDropdown />
+            </Flex>
+          ) : null}
+          <Flex
+            w="100%"
+            pb={6}
+            justify="space-between"
+            align={{
+              base: 'flex-start',
+              md: 'center'
+            }}
+            flexDir={{
+              base: 'column',
+              md: 'row'
+            }}
+          >
+            <Flex flexDir="column" width="100%">
+              <Flex justify="space-between" width="100%">
+                <Heading size="lg">{collection.metadata.name || ''}</Heading>
+              </Flex>
+              <Flex align="center">
+                <Text 
+                  fontFamily="mono" 
+                  color="brand.lightGray"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                  overflowWrap="normal"
+                >
+                  {collection.address}
+                </Text>
+                <Link
+                  href={`${config.bcd.gui}/${config.network}/${collection.address}`}
+                  color="brand.darkGray"
+                  isExternal
+                  ml={2}
+                >
+                  <ExternalLink size={16} />
+                </Link>
+              </Flex>
+            </Flex>
+            <MinterButton
+              display={{ base: 'none', md: 'flex' }}
+              variant="primaryActionInverted"
+              onClick={() => {
+                const selectedCollection = collections.selectedCollection;
+                if (selectedCollection !== null) {
+                  dispatch(getContractNftsQuery(selectedCollection));
+                }
+              }}
+              mt={{
+                base: 4,
+                md: 0
+              }}
+            ></MinterButton>
           </Flex>
         </Flex>
-        <MinterButton
-          display={{ base: 'none', md: 'flex' }}
-          variant="primaryActionInverted"
-          onClick={() => {
-            const selectedCollection = collections.selectedCollection;
-            if (selectedCollection !== null) {
-              dispatch(getContractNftsQuery(selectedCollection));
-            }
-          }}
-          mt={{
-            base: 4,
-            md: 0
-          }}
-        ></MinterButton>
       </Flex>
-      <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} pb={8}>
+      <SimpleGrid columns={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8} px={{ base: 6, md: 10 }} pb={8}>
         {tokens.map(token => {
           return (
             <TokenCard

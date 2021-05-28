@@ -6,7 +6,8 @@ import {
   getMarketplaceNfts,
   getWalletNftAssetContracts,
   MarketplaceNftLoadingData,
-  loadMarketplaceNft
+  loadMarketplaceNft,
+  getNftAssetContracts
 } from '../../lib/nfts/queries';
 import { Nft, AssetContract } from '../../lib/nfts/decoders';
 import { ErrorKind, RejectValue } from './errors';
@@ -71,6 +72,33 @@ export const getWalletAssetContractsQuery = createAsyncThunk<
       return rejectWithValue({
         kind: ErrorKind.GetWalletNftAssetContractsFailed,
         message: "Failed to retrieve wallet's asset contracts"
+      });
+    }
+  }
+);
+
+export const getAssetContractsQuery = createAsyncThunk<
+  AssetContract[],
+  string,
+  Opts
+>(
+  'query/getNftAssetContracts',
+  async (address, { getState, rejectWithValue }) => {
+    const { system } = getState();
+    if (system.status !== 'WalletConnected') {
+      return rejectWithValue({
+        kind: ErrorKind.WalletNotConnected,
+        message:
+          "Could not retrieve wallet's asset contracts: no wallet connected"
+      });
+    }
+    try {
+      return await getNftAssetContracts(system, address);
+    } catch (e) {
+      console.log(e);
+      return rejectWithValue({
+        kind: ErrorKind.GetNftAssetContractsFailed,
+        message: "Failed to retrieve asset contracts"
       });
     }
   }
