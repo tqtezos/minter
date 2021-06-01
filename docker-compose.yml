@@ -1,8 +1,8 @@
 version: '3.7'
 
 services:
-  api:
-    image: bakingbad/bcdhub-api:3.4
+  bcd-api:
+    image: bakingbad/bcdhub-api:3.5
     environment:
       - BCD_ENV=sandbox
       - GIN_MODE=debug
@@ -13,9 +13,8 @@ services:
       - RABBITMQ_DEFAULT_PASS=guest
       - SANDBOX_NODE_URI=http://sandbox:20000 # Optional key to point to sandbox
     depends_on:
-      - elastic
       - db
-      - mq
+      - bcd-indexer
     ports:
       - 42000:14000
     restart: on-failure
@@ -24,8 +23,8 @@ services:
         max-size: 10m
         max-file: '5'
 
-  indexer:
-    image: bakingbad/bcdhub-indexer:3.4
+  bcd-indexer:
+    image: bakingbad/bcdhub-indexer:3.5
     environment:
       - BCD_ENV=sandbox
       - GIN_MODE=debug
@@ -38,17 +37,44 @@ services:
     depends_on:
       - elastic
       - mq
+      - sandbox
     logging:
       options:
         max-size: 10m
         max-file: '5'
 
+  tzkt-api:
+    container_name: tzkt-api
+    restart: always
+    image: bakingbad/tzkt-api:latest
+    volumes:
+      - ./docker/tzkt-api-appsettings.json:/app/appsettings.json
+    depends_on:
+      - db
+      - tzkt-sync
+    expose:
+      - 5000
+    ports:
+      - 0.0.0.0:5000:5000
+
+  tzkt-sync:
+    container_name: tzkt-sync
+    restart: always
+    image: bakingbad/tzkt-sync:latest
+    volumes:
+      - ./docker/tzkt-sync-appsettings.json:/app/appsettings.json
+    depends_on:
+      - db
+      - sandbox
+
   db:
     image: postgres
+    volumes:
+      - ./docker/multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/multiple-postgresql-databases.sh
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: bcd
+      POSTGRES_MULTIPLE_DATABASES: bcd,tzkt
     ports:
       - 5432:5432
 
@@ -63,7 +89,7 @@ services:
         max-file: '5'
 
   elastic:
-    image: bakingbad/bcdhub-elastic:3.4
+    image: bakingbad/bcdhub-elastic:3.5
     environment:
       - bootstrap.memory_lock=true
       - discovery.type=single-node
@@ -76,11 +102,11 @@ services:
   # Flextesa is included only to support running this docker-compose file with
   # a sandbox node
   sandbox:
-    image: registry.gitlab.com/tezos/flextesa:56f651af-run
+    image: tqtezos/flextesa:20210514
     environment:
       block_time: 5
       flextesa_node_cors_origin: "*"
-    command: "edobox start --keep-root --genesis-block-hash random"
+    command: "flobox start --keep-root"
     ports:
       - 8732:20000
 
@@ -97,7 +123,3 @@ services:
       - 3300:3300
     volumes:
       - ./config/minter-api.sandbox.json:/usr/src/app/server/config.json
-
-volumes:
-  esdata:
-  mqdata:
