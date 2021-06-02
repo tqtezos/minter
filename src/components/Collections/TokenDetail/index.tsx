@@ -265,8 +265,10 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                       </Text>
                       <Box marginRight={8}>
                         <CancelTokenSaleButton
-                          contract={contractAddress}
-                          tokenId={tokenId}
+                          contract={token.sale.saleToken.address}
+                          tokenId={token.sale.saleToken.tokenId}
+                          saleId={token.sale.saleId}
+                          saleType={token.sale.type}
                         />
                       </Box>
                     </>
@@ -276,7 +278,7 @@ function TokenDetail({ contractAddress, tokenId }: TokenDetailProps) {
                         {token.sale.price.toFixed(2)} <img src={tz} alt="" width={10} height="auto" style={{ display: 'inline-block' }} />
                       </Text>
                       <Box>
-                        <BuyTokenButton contract={contractAddress} token={token} />
+                        <BuyTokenButton token={token} />
                       </Box>
                     </>
                   )

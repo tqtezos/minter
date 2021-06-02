@@ -148,16 +148,21 @@ export async function getContractNfts(
 
         const saleData = activeSales.find(
           v =>
-            v.key.sale_token.token_for_sale_address === address &&
-            v.key.sale_token.token_for_sale_token_id === tokenId
+            v.value.sale_data.sale_token.fa2_address === address &&
+            v.value.sale_data.sale_token.token_id === tokenId
         );
 
         const sale = saleData && {
           id: saleData.id,
-          seller: saleData.key.sale_seller,
-          price: Number.parseInt(saleData.value, 10) / 1000000,
-          mutez: Number.parseInt(saleData.value, 10),
-          type: 'fixedPrice'
+          seller: saleData.value.seller,
+          price: Number.parseInt(saleData.value.sale_data.price, 10) / 1000000,
+          mutez: Number.parseInt(saleData.value.sale_data.price, 10),
+          saleToken: {
+            address: saleData.value.sale_data.sale_token.fa2_address,
+            tokenId: Number.parseInt(saleData.value.sale_data.sale_token.token_id)
+          },
+          saleId: saleData.value.isLegacy ? 0 : Number.parseInt(saleData.key),
+          type: saleData.value.isLegacy ? 'fixedPriceLegacy' : 'fixedPrice'
         };
 
         return {
@@ -282,7 +287,7 @@ export async function getMarketplaceNfts(
   const tokenSales = await getFixedPriceSalesBigMap(system.tzkt, address);
   const activeSales = tokenSales.filter(v => v.active);
   const addresses = _.uniq(
-    activeSales.map(s => s.key.sale_token.token_for_sale_address)
+    activeSales.map(s => s.value.sale_data.sale_token.fa2_address)
   );
 
   const uniqueAddresses = Array.from(new Set(addresses));
@@ -315,8 +320,8 @@ export async function getMarketplaceNfts(
       tokenSale: x,
       tokenItem: tokenBigMapRows.find(
         item =>
-          x.key.sale_token.token_for_sale_address === item.contract.address &&
-          x.key.sale_token.token_for_sale_token_id ===
+          x.value.sale_data.sale_token.fa2_address === item.contract.address &&
+          x.value.sale_data.sale_token.token_id ===
             item.content.value.token_id + ''
       )
     }))
@@ -344,18 +349,23 @@ export const loadMarketplaceNft = async (
 
   try {
     const {
-      token_for_sale_address: saleAddress,
-      token_for_sale_token_id: tokenIdStr
-    } = tokenSale.key.sale_token;
+      fa2_address: saleAddress,
+      token_id: tokenIdStr
+    } = tokenSale.value.sale_data.sale_token;
 
     const tokenId = parseInt(tokenIdStr, 10);
-    const mutez = Number.parseInt(tokenSale.value, 10);
+    const mutez = Number.parseInt(tokenSale.value.sale_data.price, 10);
     const sale = {
       id: tokenSale.id,
-      seller: tokenSale.key.sale_seller,
+      seller: tokenSale.value.seller,
       price: mutez / 1000000,
       mutez: mutez,
-      type: 'fixedPrice'
+      saleToken: {
+        address: tokenSale.value.sale_data.sale_token.fa2_address,
+        tokenId: Number.parseInt(tokenSale.value.sale_data.sale_token.token_id)
+      },
+      saleId: tokenSale.value.isLegacy ? 0 : Number.parseInt(tokenSale.key),
+      type: tokenSale.value.isLegacy ? 'fixedPriceLegacy' : 'fixedPrice'
     };
 
     if (!tokenMetadata) {

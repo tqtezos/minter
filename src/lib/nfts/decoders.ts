@@ -1,6 +1,7 @@
 /* eslint-disable no-redeclare */
 import * as t from 'io-ts';
 import * as e from 'fp-ts/Either';
+import merge from "ts-deepmerge";
 
 //// Contracts
 
@@ -119,28 +120,74 @@ function sequenceCodecs<A, B, O, P, H, I>(
 // "output" codec will fail if this is the case.
 
 export type FixedPriceSaleBigMapKey = t.TypeOf<typeof FixedPriceSaleBigMapKey>;
-export const FixedPriceSaleBigMapKey = sequenceCodecs(
-  t.partial({ sale_seller: t.string, seller: t.string }),
-  decoded => ({
-    ...decoded,
-    sale_seller: decoded.sale_seller || decoded.seller
-  }),
-  t.type({
+const legacySaleV1 = t.type({
+    sale_seller: t.string,
     sale_token: t.type({
       token_for_sale_address: t.string,
       token_for_sale_token_id: t.string
+    })
+  });
+const legacySaleV2 = t.type({
+    seller: t.string,
+    sale_token: t.type({
+      token_for_sale_address: t.string,
+      token_for_sale_token_id: t.string
+    })
+  });
+const saleV3 = t.type({
+  sale_data: t.type({
+    amount: t.string,
+    price: t.string,
+    sale_token: t.type({
+      fa2_address: t.string,
+      token_id: t.string
     }),
-    sale_seller: t.string
-  })
+  }),
+  seller: t.string
+});
+const sale = t.intersection([
+  saleV3,
+  t.partial({ isLegacy: t.boolean })
+]);
+
+export const FixedPriceSaleBigMapKey = sequenceCodecs(
+  t.union([ legacySaleV1, legacySaleV2, saleV3 ]),
+  decoded => ({
+    ...decoded,
+    sale_data: saleV3.is(decoded) ? decoded.sale_data : {
+      amount: "1",
+      price: "0",
+      sale_token: {
+        fa2_address: decoded.sale_token.token_for_sale_address,
+        token_id: decoded.sale_token.token_for_sale_token_id
+      }
+    },
+    seller: (saleV3.is(decoded) || legacySaleV2.is(decoded)) ? decoded.seller : decoded.sale_seller
+  }),
+  sale
 );
 
+const FixedPriceSaleBigMapRowV1 = BigMapRow({
+  key: FixedPriceSaleBigMapKey,
+  value: t.string
+});
+
+const FixedPriceSaleBigMapRowV2 = BigMapRow({
+  key: t.string,
+  value: FixedPriceSaleBigMapKey
+});
+
 export type FixedPriceSaleBigMap = t.TypeOf<typeof FixedPriceSaleBigMap>;
-export const FixedPriceSaleBigMap = t.array(
-  BigMapRow({
-    key: FixedPriceSaleBigMapKey,
-    value: t.string
-  })
-);
+export const FixedPriceSaleBigMap = t.array(sequenceCodecs(
+  t.union([ FixedPriceSaleBigMapRowV1, FixedPriceSaleBigMapRowV2 ]),
+  row => (FixedPriceSaleBigMapRowV1.is(row) ? merge(
+      row,
+      { key: row.id.toString(), value: row.key },
+      { value: { isLegacy: true, sale_data: { price: row.value }}}
+    ) : merge(row, { value: { isLegacy: false }})
+  ),
+  FixedPriceSaleBigMapRowV2
+));
 
 // Compatibility: fixed_price_sale contracts may have different storage
 // depending on which version was originated. Older versions only contain a
@@ -223,7 +270,12 @@ export const NftSale = t.type({
   seller: t.string,
   price: t.number,
   mutez: t.number,
-  type: t.string
+  type: t.string,
+  saleToken: t.type({
+    address: t.string,
+    tokenId: t.number
+  }),
+  saleId: t.number
 });
 
 export type Nft = t.TypeOf<typeof Nft>;

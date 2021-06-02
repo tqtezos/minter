@@ -163,7 +163,8 @@ export async function listTokenForSale(
   marketplaceContract: string,
   tokenContract: string,
   tokenId: number,
-  salePrice: number
+  salePrice: number,
+  saleQty: number
 ) {
   const contractM = await system.toolkit.wallet.at(marketplaceContract);
   const contractT = await system.toolkit.wallet.at(tokenContract);
@@ -179,14 +180,23 @@ export async function listTokenForSale(
           }
         }
       ])
-    )
-    .withContractCall(
+    );
+
+  const sellSchema = contractM.parameterSchema.ExtractSchema()['sell'];
+  if (sellSchema.hasOwnProperty('sale_token_param_tez')) {
+    batch.withContractCall(
       contractM.methods.sell(salePrice, tokenContract, tokenId)
     );
+  } else {
+    batch.withContractCall(
+      contractM.methods.sell(tokenContract, tokenId, salePrice, saleQty)
+    );
+  }
+
   return batch.send();
 }
 
-export async function cancelTokenSale(
+export async function cancelTokenSaleLegacy(
   system: SystemWithWallet,
   marketplaceContract: string,
   tokenContract: string,
@@ -198,6 +208,34 @@ export async function cancelTokenSale(
     .batch([])
     .withContractCall(
       contractM.methods.cancel(system.tzPublicKey, tokenContract, tokenId)
+    )
+    .withContractCall(
+      contractT.methods.update_operators([
+        {
+          remove_operator: {
+            owner: system.tzPublicKey,
+            operator: marketplaceContract,
+            token_id: tokenId
+          }
+        }
+      ])
+    );
+  return batch.send();
+}
+
+export async function cancelTokenSale(
+  system: SystemWithWallet,
+  marketplaceContract: string,
+  tokenContract: string,
+  tokenId: number,
+  saleId: number
+) {
+  const contractM = await system.toolkit.wallet.at(marketplaceContract);
+  const contractT = await system.toolkit.wallet.at(tokenContract);
+  const batch = system.toolkit.wallet
+    .batch([])
+    .withContractCall(
+      contractM.methods.cancel(saleId)
     )
     .withContractCall(
       contractT.methods.update_operators([
@@ -253,7 +291,7 @@ export async function removeTokenOperator(
     .send();
 }
 
-export async function buyToken(
+export async function buyTokenLegacy(
   system: SystemWithWallet,
   marketplaceContract: string,
   tokenContract: string,
@@ -264,5 +302,17 @@ export async function buyToken(
   const contract = await system.toolkit.wallet.at(marketplaceContract);
   return contract.methods
     .buy(tokenSeller, tokenContract, tokenId)
+    .send({ amount: salePrice });
+}
+
+export async function buyToken(
+  system: SystemWithWallet,
+  marketplaceContract: string,
+  saleId: number,
+  salePrice: number
+) {
+  const contract = await system.toolkit.wallet.at(marketplaceContract);
+  return contract.methods
+    .buy(saleId)
     .send({ amount: salePrice });
 }

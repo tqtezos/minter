@@ -8,7 +8,9 @@ import {
   transferToken,
   listTokenForSale,
   cancelTokenSale,
-  buyToken
+  cancelTokenSaleLegacy,
+  buyToken,
+  buyTokenLegacy
 } from '../../lib/nfts/actions';
 import { ErrorKind, RejectValue } from './errors';
 import { getContractNftsQuery, getWalletAssetContractsQuery } from './queries';
@@ -415,7 +417,8 @@ export const listTokenAction = createAsyncThunk<
       marketplaceContract,
       contract,
       tokenId,
-      salePrice
+      salePrice,
+      1
     );
     const pendingMessage = `Listing token for sale for ${salePrice / 1000000}ꜩ`;
     dispatch(notifyPending(requestId, pendingMessage));
@@ -428,6 +431,7 @@ export const listTokenAction = createAsyncThunk<
     dispatch(getContractNftsQuery(contract));
     return args;
   } catch (e) {
+      console.log(e);
     return rejectWithValue({
       kind: ErrorKind.ListTokenFailed,
       message: 'List token failed'
@@ -436,12 +440,12 @@ export const listTokenAction = createAsyncThunk<
 });
 
 export const cancelTokenSaleAction = createAsyncThunk<
-  { contract: string; tokenId: number },
-  { contract: string; tokenId: number },
+  { contract: string; tokenId: number; saleId: number; saleType: string },
+  { contract: string; tokenId: number; saleId: number; saleType: string },
   Options
 >('action/cancelTokenSale', async (args, api) => {
   const { getState, rejectWithValue, dispatch, requestId } = api;
-  const { contract, tokenId } = args;
+  const { contract, tokenId, saleId, saleType } = args;
   const { system } = getState();
   const marketplaceContract =
     system.config.contracts.marketplace.fixedPrice.tez;
@@ -452,18 +456,30 @@ export const cancelTokenSaleAction = createAsyncThunk<
     });
   }
   try {
-    const op = await cancelTokenSale(
-      system,
-      marketplaceContract,
-      contract,
-      tokenId
-    );
+    let op;
+    if (saleType === "fixedPriceLegacy") {
+      op = await cancelTokenSaleLegacy(
+        system,
+        marketplaceContract,
+        contract,
+        tokenId
+      );
+    } else {
+      op = await cancelTokenSale(
+        system,
+        marketplaceContract,
+        contract,
+        tokenId,
+        saleId
+      );
+    }
+
     dispatch(notifyPending(requestId, `Canceling token sale`));
     await op.confirmation(2);
 
     dispatch(notifyFulfilled(requestId, `Token sale canceled`));
     dispatch(getContractNftsQuery(contract));
-    return { contract: contract, tokenId: tokenId };
+    return { contract: contract, tokenId: tokenId, saleId: saleId, saleType: saleType };
   } catch (e) {
     return rejectWithValue({
       kind: ErrorKind.CancelTokenSaleFailed,
@@ -473,12 +489,12 @@ export const cancelTokenSaleAction = createAsyncThunk<
 });
 
 export const buyTokenAction = createAsyncThunk<
-  { contract: string; tokenId: number },
-  { contract: string; tokenId: number; tokenSeller: string; salePrice: number },
+  { contract: string; tokenId: number; saleId: number; saleType: string },
+  { contract: string; tokenId: number; tokenSeller: string; salePrice: number; saleId: number; saleType: string },
   Options
 >('action/buyToken', async (args, api) => {
   const { getState, rejectWithValue, dispatch, requestId } = api;
-  const { contract, tokenId, tokenSeller, salePrice } = args;
+  const { contract, tokenId, tokenSeller, salePrice, saleId, saleType } = args;
   let { system } = getState();
   const marketplaceContract =
     system.config.contracts.marketplace.fixedPrice.tez;
@@ -493,14 +509,24 @@ export const buyTokenAction = createAsyncThunk<
     system = res.payload;
   }
   try {
-    const op = await buyToken(
-      system,
-      marketplaceContract,
-      contract,
-      tokenId,
-      tokenSeller,
-      salePrice
-    );
+    let op;
+    if (saleType === "fixedPriceLegacy") {
+      op = await buyTokenLegacy(
+        system,
+        marketplaceContract,
+        contract,
+        tokenId,
+        tokenSeller,
+        salePrice
+      );
+    } else {
+      op = await buyToken(
+        system,
+        marketplaceContract,
+        saleId,
+        salePrice
+      );
+    }
     const pendingMessage = `Buying token from ${tokenSeller} for ${salePrice}`;
     dispatch(notifyPending(requestId, pendingMessage));
     await op.confirmation(2);
@@ -508,7 +534,7 @@ export const buyTokenAction = createAsyncThunk<
     const fulfilledMessage = `Bought token from ${tokenSeller} for ${salePrice}`;
     dispatch(notifyFulfilled(requestId, fulfilledMessage));
     dispatch(getContractNftsQuery(contract));
-    return { contract: contract, tokenId: tokenId };
+    return { contract: contract, tokenId: tokenId, saleId: saleId, saleType: saleType };
   } catch (e) {
     return rejectWithValue({
       kind: ErrorKind.BuyTokenFailed,
