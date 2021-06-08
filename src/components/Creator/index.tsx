@@ -31,7 +31,7 @@ export default function Creator({ minter }: { minter: string }) {
         token?.token?.owner === (minter ?? system.tzPublicKey)
     )
     .map(token => {
-      creatorsCollections[token?.tokenSale?.key?.sale_token?.token_for_sale_address] = collections.collections[token?.tokenSale?.key?.sale_token?.token_for_sale_address];
+      creatorsCollections[token?.tokenSale?.value?.sale_data?.sale_token?.fa2_address] = collections.collections[token?.tokenSale?.value?.sale_data?.sale_token?.fa2_address];
       return null;
     });
   }
