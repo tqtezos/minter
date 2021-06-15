@@ -86,7 +86,7 @@ export async function mintToken(
   const resp = await uploadIPFSJSON(system.config.ipfsApi, {
     ...metadata,
     decimals: 0,
-    booleanAmount: true
+    isBooleanAmount: true
   });
   token_info.set('', toHexString(resp.data.ipfsUri));
 
@@ -126,7 +126,7 @@ export async function mintTokens(
     const resp = await uploadIPFSJSON(system.config.ipfsApi, {
       ...meta,
       decimals: 0,
-      booleanAmount: true
+      isBooleanAmount: true
     });
     token_info.set('', toHexString(resp.data.ipfsUri));
     mints.push({
