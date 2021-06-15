@@ -21,6 +21,34 @@ import { Collection } from '../../reducer/slices/collections';
 import { MinterButton } from '../common';
 import lk from '../common/assets/link-icon.svg'
 
+interface CreatorDisplay404Props {
+  ownedOnly: boolean;
+}
+
+function CreatorDisplay404(props: CreatorDisplay404Props) {
+  return (
+    <Flex w="100%" flex="1" flexDir="column" align="center">
+      <Flex
+        px={20}
+        py={10}
+        bg="gray.200"
+        textAlign="center"
+        align="center"
+        borderRadius="5px"
+        flexDir="column"
+        fontSize="xl"
+        color="gray.400"
+        mt={28}
+      >
+        <Wind />
+        <Text fontWeight="600" pt={5}>
+          {props.ownedOnly ? 'No owned tokens to display' : 'No tokens to display'}
+        </Text>
+      </Flex>
+    </Flex>
+  );
+}
+
 interface CreatorDisplayProps {
   minter: string;
   collections: { [key: string]: Collection };
@@ -45,12 +73,16 @@ export default function CreatorDisplay({
   }, [dispatch, selectedCollection]);
 
   if (!selectedCollection) {
-    return <></>;
+    return (
+      <CreatorDisplay404 ownedOnly={ownedOnly} />
+    );
   }
 
   const collection = collections[selectedCollection];
   if (!collection) {
-    return <></>;
+    return (
+      <CreatorDisplay404 ownedOnly={ownedOnly} />
+    );
   }
 
   if (!collection.loaded) {
@@ -65,32 +97,16 @@ export default function CreatorDisplay({
   }
 
   if (collection.tokens === null) {
-    return <></>;
+    return (
+      <CreatorDisplay404 ownedOnly={ownedOnly} />
+    );
   }
 
   const tokens = collection.tokens;
 
   if (tokens.length === 0) {
     return (
-      <Flex w="100%" flex="1" flexDir="column" align="center">
-        <Flex
-          px={20}
-          py={10}
-          bg="gray.200"
-          textAlign="center"
-          align="center"
-          borderRadius="5px"
-          flexDir="column"
-          fontSize="xl"
-          color="gray.400"
-          mt={28}
-        >
-          <Wind />
-          <Text fontWeight="600" pt={5}>
-            {ownedOnly ? 'No owned tokens to display' : 'No tokens to display'}
-          </Text>
-        </Flex>
-      </Flex>
+      <CreatorDisplay404 ownedOnly={ownedOnly} />
     );
   }
 
