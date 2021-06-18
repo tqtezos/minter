@@ -45,6 +45,7 @@ export default function Creator({ minter }: { minter: string }) {
       creatorsCollections[addr] = collections.collections[addr];
       return null;
     });
+
   return (
     <Flex
       flex="1"
